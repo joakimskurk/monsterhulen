@@ -1,44 +1,39 @@
 # MONSTERHULEN - CURRENT STATUS
 
 DATO: 2026-10-22
-STATUS: V0.12.2 GITHUB BASELINE / PRODUCT RENAME PASS
+STATUS: V0.12.3 LASTING THING IDENTITY PASS
 
-## KANONISK PROSJEKT
-
-GitHub-repo: `joakimskurk/monsterhulen`, branch `main`.
-
-V0.12.2 bygger direkte på V0.12.1 Treasure + Secret Affordance Pass. Runtime-innhold, entity-ID-er, encounter-banker, puzzlebank, D6-regler og Asset Contract er uendret.
-
-## PRODUKTNAVN
-
-Synlig navn er nå **MONSTERHULEN**.
-
-Tagline: **Hver gang du går inn i hulen, er den litt annerledes. Hvert eventyr blir helt sitt eget.**
-
-## SAVE / KOMPATIBILITET
-
+## BASELINE
+- Produkt: Monsterhulen
 - State schema: 12
-- Ny storage key: `monsterhulen_v120`
+- Storage: `monsterhulen_v120`
 - Første legacy key: `eventyrkryper_v100`
-- Eksisterende saves migreres ved load og skrives til ny key.
-- Legacy key slettes ikke automatisk ved migrering.
-- Full reset rydder både ny og gamle keys.
+- Asset Contract: 2.4.0
+- Runtime-assets: 116
 
-## QA V0.12.2
+## V0.12.3
+De 12 varige TING-belønningene i Helteboka er nå funksjonelt differensiert. Alle har unik rolle, eksplisitt begrensning og minst to konkrete encounter-hooks. Gamle lagrede TING-belønninger med kjent stabil ID får dagens kanoniske navn/beskrivelse ved normalisering.
 
-- Treasure runtime: PASS
-- Puzzle runtime: PASS
-- NPC runtime: PASS
-- Friend runtime: PASS
-- Pet runtime: PASS
-- Rescue runtime: PASS
-- 11 JavaScript-blokker: 0 syntaksfeil
-- Runtime-assets i lokal releasebaseline: 116
+De viktigste tidligere overlappparene er nå eksplisitt skilt:
+- Tau → Tauet som aldri floker seg: ledelinje gjennom trange/kronglete steder.
+- Speil → Lommespeilet: plasserbar refleks og underside.
+- Kikkert → Stjernekikkerten: lyspunkter, retning og mønster.
+- Kritt → Krittetuiet: fargekode, grupper og rekkefølge.
+- Verktøysett → Lappesettet: stoff, remmer, tråd og andre myke materialer.
 
-## GITHUB-IMPORTSTATUS
+## QA
+- Lasting thing: 67 / 0
+- Treasure: 121 / 0
+- Puzzle: 4665 / 0
+- NPC: 4935 / 0
+- Friend: 4104 / 0
+- Pet: 6069 / 0
+- Rescue: 5070 / 0
+- 11 scriptblokker, 0 syntaksfeil
+- 116 assets uendret fra V0.12.2
 
-Roadmap/status/migreringsdokumentasjon ligger på `main`. Den komplette runtimepakken er verifisert lokalt, men `index.html` og de 116 binære runtime-assets er ennå ikke bulk-importert til repoet. Repoet skal derfor ikke omtales som deploybart før denne importen faktisk er fullført.
+## GITHUB
+`joakimskurk/monsterhulen` er prosjektets GitHub-hjem. Dokumentasjon og baseline-hashes ligger på `main`; komplett runtime bulk-import er fortsatt en egen repo-gate.
 
-## NESTE INNHOLDSSTEG
-
-Audit og differensiering av de **12 varige TING-belønningene i Helteboka** mot startutstyr og de 14 midlertidige funnene.
+## NESTE
+Resterende start-/fortellerutstyr + scenario-nøkler, 7 gjenstående.
