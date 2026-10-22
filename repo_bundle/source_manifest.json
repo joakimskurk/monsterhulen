@@ -1,0 +1,26 @@
+{
+  "archive": "source_bundle_v0.12.3.tar.gz",
+  "encoding": "base85",
+  "sha256": "355ea7f986a1d14b2bd33f247b44a2b01d72e7740010e7946dadd1a54d902523",
+  "bytes": 192581,
+  "parts": [
+    "source_bundle_v0.12.3.tar.gz.b85.part000",
+    "source_bundle_v0.12.3.tar.gz.b85.part001",
+    "source_bundle_v0.12.3.tar.gz.b85.part002",
+    "source_bundle_v0.12.3.tar.gz.b85.part003",
+    "source_bundle_v0.12.3.tar.gz.b85.part004",
+    "source_bundle_v0.12.3.tar.gz.b85.part005",
+    "source_bundle_v0.12.3.tar.gz.b85.part006",
+    "source_bundle_v0.12.3.tar.gz.b85.part007",
+    "source_bundle_v0.12.3.tar.gz.b85.part008",
+    "source_bundle_v0.12.3.tar.gz.b85.part009",
+    "source_bundle_v0.12.3.tar.gz.b85.part010",
+    "source_bundle_v0.12.3.tar.gz.b85.part011",
+    "source_bundle_v0.12.3.tar.gz.b85.part012",
+    "source_bundle_v0.12.3.tar.gz.b85.part013",
+    "source_bundle_v0.12.3.tar.gz.b85.part014",
+    "source_bundle_v0.12.3.tar.gz.b85.part015",
+    "source_bundle_v0.12.3.tar.gz.b85.part016",
+    "source_bundle_v0.12.3.tar.gz.b85.part017"
+  ]
+}
