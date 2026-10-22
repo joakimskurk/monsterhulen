@@ -1,0 +1,12 @@
+{
+  "release": "v0.12.3",
+  "product": "Monsterhulen",
+  "index_sha256": "7e4ff0984a630fd9f79d8e9d838806a6bdde25a4f443a37d541181341de8e04d",
+  "runtime_asset_count": 116,
+  "runtime_assets_tree_sha256": "5deb63780cd59def25452c73aab5a522f5d47b93715e61a275a361ef4f7a25b4",
+  "storage_key": "monsterhulen_v120",
+  "legacy_first": "eventyrkryper_v100",
+  "state_version": 12,
+  "asset_contract": "2.4.0",
+  "thing_count": 12
+}
