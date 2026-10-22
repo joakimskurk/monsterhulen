@@ -1,0 +1,31 @@
+{
+  "archive": "runtime_thumbs_v0.12.3.tar.gz",
+  "encoding": "base85",
+  "sha256": "114c8f1bd3c5ea0a2613f4956030fb9bd3b0f2a2c7d3968b04dedef86b7a3dcf",
+  "bytes": 239399,
+  "thumbnail_files": 43,
+  "parts": [
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part000",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part001",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part002",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part003",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part004",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part005",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part006",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part007",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part008",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part009",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part010",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part011",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part012",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part013",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part014",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part015",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part016",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part017",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part018",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part019",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part020",
+    "runtime_thumbs_v0.12.3.tar.gz.b85.part021"
+  ]
+}
