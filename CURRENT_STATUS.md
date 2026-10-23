@@ -1,27 +1,38 @@
 # MONSTERHULEN - CURRENT STATUS
 
-DATO: 2026-10-22
-STATUS: V0.12.3 LASTING THING IDENTITY PASS
+DATO: 2026-10-23
+STATUS: V0.12.3 + REPOSITORY HEALTH BASELINE PÅGÅR
+
+> `PROJECT_STATE.md` er nå den kanoniske korte handoff-filen. Denne filen beholdes som kompatibilitets-/oversiktsfil.
 
 ## BASELINE
 - Produkt: Monsterhulen
+- Release-baseline: V0.12.3 Lasting Thing Identity Pass
 - State schema: 12
 - Storage: `monsterhulen_v120`
 - Første legacy key: `eventyrkryper_v100`
 - Asset Contract: 2.4.0
-- Runtime-assets: 116
 
-## V0.12.3
-De 12 varige TING-belønningene i Helteboka er nå funksjonelt differensiert. Alle har unik rolle, eksplisitt begrensning og minst to konkrete encounter-hooks. Gamle lagrede TING-belønninger med kjent stabil ID får dagens kanoniske navn/beskrivelse ved normalisering.
+## IMPLEMENTERT I V0.12.3-BASELINEN
+- fysisk dice result UX
+- 36 puzzles
+- NPC/friend/pet/rescue-lag
+- 14 treasure/secret finds
+- 12 varige TING med unike affordances
+- 13 start items, 8 narrator items og 5 scenario keys i innholdsbankene
 
-De viktigste tidligere overlappparene er nå eksplisitt skilt:
-- Tau → Tauet som aldri floker seg: ledelinje gjennom trange/kronglete steder.
-- Speil → Lommespeilet: plasserbar refleks og underside.
-- Kikkert → Stjernekikkerten: lyspunkter, retning og mønster.
-- Kritt → Krittetuiet: fargekode, grupper og rekkefølge.
-- Verktøysett → Lappesettet: stoff, remmer, tråd og andre myke materialer.
+## GITHUB REALITY
+`joakimskurk/monsterhulen` er permanent source of truth, men repository-health-gaten er ikke lukket før den komplette V0.12.3 runtime/source-snapshoten er importert eller rekonstruerbar direkte fra repoet og `scripts/verify_repo.py` er verifisert mot repo-innholdet.
 
-## QA
+Repo-memory er etablert:
+- `PROJECT_STATE.md`
+- `ROADMAP.md`
+- `DECISIONS.md`
+- `TESTING.md`
+- `ChatGPT_GitHub_Project_Workflow.md`
+
+## VERIFISERING
+Historisk V0.12.3 release evidence:
 - Lasting thing: 67 / 0
 - Treasure: 121 / 0
 - Puzzle: 4665 / 0
@@ -30,10 +41,9 @@ De viktigste tidligere overlappparene er nå eksplisitt skilt:
 - Pet: 6069 / 0
 - Rescue: 5070 / 0
 - 11 scriptblokker, 0 syntaksfeil
-- 116 assets uendret fra V0.12.2
 
-## GITHUB
-`joakimskurk/monsterhulen` er prosjektets GitHub-hjem. Dokumentasjon og baseline-hashes ligger på `main`; komplett runtime bulk-import er fortsatt en egen repo-gate.
+Full browser/mobile interaction QA ble ikke rerunnet for V0.12.3. Ingen fysisk-device-sertifisering er gjort.
 
 ## NESTE
-Resterende start-/fortellerutstyr + scenario-nøkler, 7 gjenstående.
+1. lukk Repository Health Baseline,
+2. deretter V0.12.4 med de 7 gjenstående start-/fortellerutstyr/scenario-key entityene.
