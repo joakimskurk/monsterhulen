@@ -1,0 +1,12 @@
+{
+  "archive": "source_docs_v0.12.3.tar.gz",
+  "encoding": "base85",
+  "bytes": 161618,
+  "sha256": "d1a62b64154e8cb687ac3bf6b5b6e159bbf3a486c1a102e33955d60eb7392b66",
+  "parts": [
+    "source_docs_v0.12.3.tar.gz.b85.part000",
+    "source_docs_v0.12.3.tar.gz.b85.part001",
+    "source_docs_v0.12.3.tar.gz.b85.part002",
+    "source_docs_v0.12.3.tar.gz.b85.part003"
+  ]
+}
