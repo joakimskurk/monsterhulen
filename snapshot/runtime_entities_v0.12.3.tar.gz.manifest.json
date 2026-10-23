@@ -1,0 +1,29 @@
+{
+  "archive": "runtime_entities_v0.12.3.tar.gz",
+  "encoding": "base85",
+  "bytes": 989673,
+  "sha256": "894d743735f4e96d3d907a4407cc4e78605b5cfa76fb1a28bb017bd8ca11825c",
+  "parts": [
+    "runtime_entities_v0.12.3.tar.gz.b85.part000",
+    "runtime_entities_v0.12.3.tar.gz.b85.part001",
+    "runtime_entities_v0.12.3.tar.gz.b85.part002",
+    "runtime_entities_v0.12.3.tar.gz.b85.part003",
+    "runtime_entities_v0.12.3.tar.gz.b85.part004",
+    "runtime_entities_v0.12.3.tar.gz.b85.part005",
+    "runtime_entities_v0.12.3.tar.gz.b85.part006",
+    "runtime_entities_v0.12.3.tar.gz.b85.part007",
+    "runtime_entities_v0.12.3.tar.gz.b85.part008",
+    "runtime_entities_v0.12.3.tar.gz.b85.part009",
+    "runtime_entities_v0.12.3.tar.gz.b85.part010",
+    "runtime_entities_v0.12.3.tar.gz.b85.part011",
+    "runtime_entities_v0.12.3.tar.gz.b85.part012",
+    "runtime_entities_v0.12.3.tar.gz.b85.part013",
+    "runtime_entities_v0.12.3.tar.gz.b85.part014",
+    "runtime_entities_v0.12.3.tar.gz.b85.part015",
+    "runtime_entities_v0.12.3.tar.gz.b85.part016",
+    "runtime_entities_v0.12.3.tar.gz.b85.part017",
+    "runtime_entities_v0.12.3.tar.gz.b85.part018",
+    "runtime_entities_v0.12.3.tar.gz.b85.part019",
+    "runtime_entities_v0.12.3.tar.gz.b85.part020"
+  ]
+}
