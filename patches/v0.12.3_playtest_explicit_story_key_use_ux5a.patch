@@ -1,0 +1,67 @@
+--- a/index.html
++++ b/index.html
+@@ -3317,15 +3317,28 @@
+   }
+   updateGoal();save();render();toast('FUNNET!');
+ }
++function tryUseStoryKey(item,index){
++  const c=connectionsFor(state.currentRoomId).find(x=>x.locked&&!x.unlocked&&x.keyItem===item);
++  if(!c)return false;
++  c.unlocked=true;state.scenario.gateOpened=true;state.scenario.seenGate=true;
++  state.inventory.splice(index,1);
++  addLog(`${item} PASSER I LÅSEN. NØKKELEN BLIR SITTENDE, OG DØREN ÅPNER SEG.`);
++  save();render();toast('NØKKELEN PASSER - DØREN ER ÅPEN!');return true;
++}
+ function renderInv(){
+   const root=$('#inventory');root.innerHTML='';
++  const storyKey=spec()?.type==='LOCK'?spec().keyName:null;
+   for(let i=0;i<6;i++){
+     const item=state.inventory[i],el=document.createElement('div');el.className='slot'+(item?' filled':'');
+-    if(item){const quest=state.scenario.found.includes(item),ref=A.entityForItemName(item),visual=ref?A.entityHtml(ref,{interactive:true,label:item,caption:findGuide(item)}):A.slotHtml(A.item(item),{alt:item});el.innerHTML=`<div class="ico">${visual}</div><div>${item}</div>${quest?'<div class="sub">VIKTIG · KAN IKKE FJERNES</div>':`<div class="invActions"><button class="small" data-use="${i}">BRUK</button><button class="small ghost consume" data-drop="${i}">BRUK OPP / LEGG FRA</button></div>`}`;}
++    if(item){
++      const quest=state.scenario.found.includes(item),isStoryKey=item===storyKey,ref=A.entityForItemName(item),visual=ref?A.entityHtml(ref,{interactive:true,label:item,caption:findGuide(item)}):A.slotHtml(A.item(item),{alt:item});
++      const actions=isStoryKey?`<div class="sub">VIKTIG · KAN IKKE FJERNES</div><div class="invActions"><button class="small" data-use="${i}">BRUK</button></div>`:quest?'<div class="sub">VIKTIG · KAN IKKE FJERNES</div>':`<div class="invActions"><button class="small" data-use="${i}">BRUK</button><button class="small ghost consume" data-drop="${i}">BRUK OPP / LEGG FRA</button></div>`;
++      el.innerHTML=`<div class="ico">${visual}</div><div>${item}</div>${actions}`;
++    }
+     else el.innerHTML='<div class="ico">--</div><div>TOM</div>';
+     root.appendChild(el);
+   }
+-  $$('[data-use]').forEach(b=>b.onclick=()=>{const i=+b.dataset.use,item=state.inventory[i];if(!item)return;addLog(`${item} BLE BRUKT I HISTORIEN.`);save();toast('TINGEN ER FORTSATT MED')});
++  $$('[data-use]').forEach(b=>b.onclick=()=>{const i=+b.dataset.use,item=state.inventory[i];if(!item)return;if(tryUseStoryKey(item,i))return;addLog(`${item} BLE BRUKT I HISTORIEN.`);save();toast('TINGEN ER FORTSATT MED')});
+   $$('[data-drop]').forEach(b=>b.onclick=()=>{const i=+b.dataset.drop,item=state.inventory[i];if(!item)return;if(confirm(`BRUKE OPP ELLER LEGGE FRA DEG ${item}? DEN FJERNES FRA SEKKEN.`)){state.inventory.splice(i,1);addLog(`${item} BLE BRUKT OPP ELLER LAGT FRA SEG.`);save();renderInv();toast('TINGEN ER FJERNET')}});
+ }
+ function renderLog(){const log=$('#log');log.innerHTML=state.log.length?state.log.map(l=>`<p><time>${l.at}</time>${l.t}</p>`).join(''):'<p>EVENTYRET HAR IKKE STARTET ENNÅ.</p>'}
+@@ -3361,7 +3374,11 @@
+ function situationAdvice(){
+   const r=currentRoom(),events=(r.events||[]).map(normalizeEvent);
+   const locked=connectionsFor(r.id).find(c=>c.locked&&!c.unlocked);
+-  if(locked){const g=progressionGateStatus(locked);return g.ready?'KRAVET ER OPPFYLT. LA BARNET FÅ ÅPNE VEIEN SELV.':`VIS AT VEIEN ER LÅST. FORTELLEREN VET AT DEN ÅPNES NÅR: ${g.label}.${g.missing.length?` MANGLER: ${g.missing.join(' / ')}.`:''}`;}
++  if(locked){
++    const g=progressionGateStatus(locked);
++    if(locked.keyItem&&g.ready)return 'DØREN ER LÅST. IKKE FORTELL AT NØKKELEN ER LØSNINGEN. LA BARNET FORESLÅ HVA DET VIL GJØRE. HVIS BARNET STÅR FAST KAN DU SI: «KANSKJE DU HAR NOE I SEKKEN?»';
++    return g.ready?'KRAVET ER OPPFYLT. LA BARNET FÅ ÅPNE VEIEN SELV.':`VIS AT VEIEN ER LÅST. FORTELLEREN VET AT DEN ÅPNES NÅR: ${g.label}.${g.missing.length?` MANGLER: ${g.missing.join(' / ')}.`:''}`;
++  }
+   const e=events.find(x=>x.type==='HEMMELIG_VEGG');if(e)return 'GI ET LITE HINT: DET TREKKER FRA VEGGEN. IKKE SI AT DET ER EN DØR. SPØR HVORDAN BARNET UNDERSØKER. HVIS SØKET ER USIKKERT, BRUK FYSISK D6. 1–2 GIR ET STERKERE HINT, 3–6 OPPDAGER DØREN.';
+   if(events.some(x=>x.type==='SNARVEI'))return 'DETTE ER EN BELØNNING FOR UTFORSKING. LA SIDEPORTEN KOBLE VERDEN SAMMEN.';
+   const hiddenFind=events.find(x=>x.type==='HEMMELIG_SKATT');if(hiddenFind)return `HEMMELIG FUNN: ${hiddenFind.findGuide||findGuide(hiddenFind.item)||'LA BARNET FORESLÅ HVA DET KAN BRUKES TIL.'} DETTE ER EN MULIGHET, IKKE EN NØKKEL.`;
+@@ -3403,13 +3420,15 @@
+   const c=connectionForDir(state.currentRoomId,dir);if(!c){toast('INGEN DØR DEN VEIEN');return;}
+   if(c.locked&&!c.unlocked){
+     const gate=progressionGateStatus(c);
++    if(c.keyItem){
++      toast('DØREN ER LÅST');
++      if(!state.scenario.seenGate){state.scenario.seenGate=true;addLog('FANT EN LÅST DØR.');save();}
++      render();return;
++    }
+     if(gate.ready){
+       c.unlocked=true;state.scenario.gateOpened=true;state.scenario.seenGate=true;
+-      if(c.keyItem){
+-        const keyIndex=state.inventory.indexOf(c.keyItem);if(keyIndex>=0)state.inventory.splice(keyIndex,1);
+-        addLog(`${c.keyItem} PASSER. NØKKELEN BLIR SITTENDE I LÅSEN, OG DØREN ÅPNER SEG.`);
+-      }else addLog(`FORUTSETNINGEN ER OPPFYLT. VEIEN TIL FINALEN ÅPNER SEG.`);
+-      save();render();toast(c.keyItem?'NØKKELEN PASSER - DØREN ER ÅPEN!':'VEIEN ÅPNER SEG!');return;
++      addLog(`FORUTSETNINGEN ER OPPFYLT. VEIEN TIL FINALEN ÅPNER SEG.`);
++      save();render();toast('VEIEN ÅPNER SEG!');return;
+     }else{
+       toast('VEIEN ER LÅST');
+       if(!state.scenario.seenGate){state.scenario.seenGate=true;addLog(`FANT EN LÅST VEI. ${gate.label}.`);save();}
