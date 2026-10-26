@@ -1,55 +1,64 @@
 # Narrative Graph V1 Work Package
 
-Status: **WP-NG0 COMPLETE; WP-NG1 BLOCKED ON UX5A PHYSICAL GREEN**
+Status: **WP-NG0 SPEC UPDATED; WP-NG1 BLOCKED ON UX5A PHYSICAL GREEN**
 
 ## Purpose
-Replace bare critical-object placement with a validated narrative graph and curated storylet system, beginning only with `CRYSTAL_MACHINE`.
+Replace bare critical placement with validated Narrative Graph + curated Storylets, beginning only with `CRYSTAL_MACHINE`.
 
-A new locked principle from UX5A applies to all work packages: **resource availability enables an action; it does not silently perform the action.** The child proposes/chooses what to do. UI and narrator expose affordances without automatically applying the obvious solution.
+Locked principles inherited from UX5A:
+- resource availability enables an action; it does not perform the action,
+- child proposes/chooses what to do,
+- interactive content requires `purpose`, `stakes`, `resolvedWhen`, `payoff` and coherent world effects,
+- progress exists only as authored meaningful stages, never generic duration boxes,
+- a promised obstacle/payoff must be reflected in actual world state,
+- puzzles/mechanics require authored contextual purpose.
 
 ## Branch policy
-- Current UX5A runtime branch remains `ux5/searchable-rooms-encounter-tracks`.
-- This document/spec work lives on `narrative/story-graph-v1-prep` only.
-- Do not implement runtime code on prep branch.
-- After UX5A physical green: merge UX5A to `main`, verify `main`, then create real implementation branch `narrative/story-graph-v1` from merged head.
-- Do not blindly merge prep branch after later UX5A runtime commits. Carry approved documentation onto implementation branch from new merged `main` head.
+- active UX5A runtime: `ux5/searchable-rooms-encounter-tracks`,
+- prep/docs only: `narrative/story-graph-v1-prep`,
+- do not implement runtime on prep branch,
+- after physical UX5A green: merge UX5A to `main`, verify, then create `narrative/story-graph-v1` from merged main and carry approved docs,
+- do not blindly merge prep branch over newer runtime.
 
-## WP-NG0 - freeze architecture and baseline - COMPLETE
-Deliverables completed:
-- `START_HERE.md`
-- `docs/NARRATIVE_GRAPH_V1.md`
-- `docs/STORYLET_MATRIX_V1.md`
-- `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
-- `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
-- synchronized handoff/status/test/playtest docs.
+## WP-NG0 - architecture/spec freeze - COMPLETE / UPDATED BY UX5A FINDINGS
+Documentation exists and now incorporates:
+- causal structure,
+- temporal phases/expiry,
+- resource-vs-action separation,
+- child agency,
+- single clear location identity,
+- encounter/storylet purpose contract from `REGNBUENETTET` physical finding,
+- authored-progress-only rule,
+- world-effect/payoff consistency.
 
-Exit criteria met:
-- human-curated vs procedural responsibility explicit,
-- UX5B deferred until Narrative Graph V1 proves coherent critical stories,
-- Crystal Machine acceptance explicit,
-- automated and manual/editorial evidence separated,
-- temporal causality explicit,
-- resource/prerequisite state separated from explicit child action completion,
-- no Narrative Graph runtime code on prep branch.
+No Narrative Graph runtime code exists on prep branch.
 
 ## WP-NG1 - graph data model + validator - NEXT AFTER DEVICE GATE
 Implement data structures and validation only.
 
-Required:
+Required model:
 - `StoryGraph`,
 - `StoryNode`,
 - resource dependency edges,
 - knowledge reveal state,
-- dramatic phase state (`INTRO`, `QUEST_ACTIVE`, `RETURN`, `CLIMAX`, `AFTERMATH`),
-- per-node/storylet phase windows and expiry rules,
-- storylet IDs/roles,
-- explicit per-node `completion` semantics,
+- dramatic phases (`INTRO`, `QUEST_ACTIVE`, `RETURN`, `CLIMAX`, `AFTERMATH`),
+- per-node phase windows/expiry,
+- stable storylet IDs/roles,
+- explicit `completion`,
+- `purpose`,
+- `stakes`,
+- `resolvedWhen`,
+- `payoff`,
+- `worldEffects[]`,
+- optional semantic `progressStages[]`,
 - graph validator.
 
-Model rule:
-- `requires[]` says when a node is actionable,
-- `completion` says what transition makes it complete,
-- action-bearing nodes may not auto-complete solely because `requires[]` are true.
+Model rules:
+- `requires[]` says when node is actionable,
+- `completion`/`resolvedWhen` says what transition makes it complete,
+- action-bearing nodes do not auto-complete from requirements,
+- `progressStages[]` exists only if each stage is an authored changed fictional state,
+- `worldEffects[]` must make the promised payoff true.
 
 Validator must reject:
 - missing setup/signal for critical node,
@@ -57,44 +66,46 @@ Validator must reject:
 - unavailable pre-gate requirement,
 - critical dependency on optional UX5A find,
 - required hidden item without fail-forward clue path,
-- guardian with no authored non-combat route,
-- quest knowledge exposed before reveal,
-- complication/antagonist whose first valid activation is after objective it obstructs has resolved,
-- unresolved pre-resolution beat active after expiry,
-- ambient story text referring to unfinished objective after completion,
-- action-bearing critical node with no explicit completion transition,
-- action node whose completion is implicitly equivalent to `all required resources are owned/known` when fiction requires a child choice,
-- UI/materialization contract that would auto-apply an obvious possessed resource rather than expose it as an affordance.
+- guardian with no non-combat route,
+- knowledge exposed before reveal,
+- stale complication after its objective/phase,
+- obsolete ambient objective text,
+- action-bearing node without explicit completion transition,
+- action completion equivalent to “requirements now owned/known” when fiction requires child choice,
+- auto-application of an obvious possessed resource,
+- interactive node missing purpose/stakes/resolvedWhen/payoff,
+- promised payoff with no matching world effect,
+- blocking obstacle with no safe retreat/fail-forward topology policy,
+- generic progress count without authored named stages,
+- filler progress stage that does not change fictional state,
+- puzzle/mechanic with no authored contextual relationship to Storylet.
 
-No UI change required for NG1 itself.
+No UI change required for NG1.
 
 ## WP-NG2 - Storylet Matrix engine
-Implement hard compatibility filtering and deterministic seeded selection.
+Implement hard compatibility filtering and deterministic selection.
 
 Start only with:
 - `SEARCH_SECRET`,
 - `NPC_FAVOR`,
 - `GUARDIAN`.
 
-Initial editorial target:
-- 3 approved `SEARCH_SECRET`,
-- 3 approved `NPC_FAVOR`,
-- 3 approved `GUARDIAN`.
+Initial target: 3 approved of each. Nine strong Storylets beat fifty weak templates.
 
-Nine strong storylets are better than fifty weak templates.
-
-Every storylet declares:
+Every Storylet declares:
 - what enables it,
-- how it is signalled,
-- authored approach families,
-- explicit completion rule,
+- setup/signal,
+- purpose/stakes,
+- authored approaches,
+- explicit completion/resolvedWhen,
 - valid phases/expiry,
-- payoff.
+- payoff + world effects,
+- optional meaningful progress stages.
 
-Authored approaches are affordances, not a closed answer list.
+Approaches are affordances, not closed answers.
 
 ## WP-NG3 - Crystal Machine graph planner
-Replace legacy three-room bare `DEL` plan for `CRYSTAL_MACHINE` only.
+Replace legacy bare three-room `DEL` plan for `CRYSTAL_MACHINE` only.
 
 Required graph:
 - setup/reveal,
@@ -104,107 +115,97 @@ Required graph:
 - gate,
 - climax.
 
-Default seeded family mix:
-- one search,
-- one NPC favor,
-- one guardian.
+Default seeded family mix: one search, one NPC favor, one guardian. Colors may rotate if copy remains coherent. Other blueprints remain legacy during experiment.
 
-Colors may rotate if copy remains coherent. Other blueprints remain on legacy planner during experiment.
+Agency rule: all crystals acquired makes `ASSEMBLE` actionable; it must not set `MACHINE_ASSEMBLED` or open gate automatically.
 
-Critical agency rule:
-- acquiring all three crystals makes `ASSEMBLE` actionable,
-- it must **not** set `MACHINE_ASSEMBLED`, open gate or skip return/assembly automatically.
+Purpose rule: each acquisition branch must answer why the scene exists, what is at stake, how it resolves, and what observable state changes after the crystal is gained.
 
 ## WP-NG4 - room materialization + narrator knowledge
-Materialize selected storylets into real rooms/events.
-
 Required:
 - quest reveal occurs in fiction,
-- Forteller view distinguishes truth vs player knowledge,
-- NPC dependency points to actual generated resource/room,
+- narrator distinguishes truth vs player knowledge,
+- NPC dependency points to real resource/room,
 - guardian resource visibly tied to guardian,
 - required search has clue + fail-forward,
-- action affordances become visible only when fiction/knowledge supports them,
-- possessing relevant item/resource never silently performs an action,
-- narrator may give graded/open hints without turning approaches into a closed answer list,
-- assembly requires deliberate child/narrator interaction rather than inventory auto-completion,
-- objective resolution expires obsolete quest complications immediately,
-- post-resolution encounters are neutral ambient or explicitly authored climax/aftermath beats.
+- action affordances appear only when supported,
+- relevant resources never auto-perform actions,
+- narrator exposes graded/open hints,
+- narrator can understand purpose/stakes/resolution/payoff without reverse-engineering mechanics,
+- world effects implement promised payoff,
+- deliberate assembly,
+- obsolete complications expire immediately,
+- post-resolution reuse requires new authored role.
 
 ## WP-NG5 - automated graph generation QA
-Generate at least 1000 `CRYSTAL_MACHINE` adventures across layout/adventure seeds and all supported lengths where valid.
+Generate >=1000 `CRYSTAL_MACHINE` adventures across seeds/lengths.
 
 Check at minimum:
 - valid acyclic graph,
 - critical nodes reachable in correct phase,
 - all dependencies generated,
-- three acquisition families by default,
-- no optional-find dependency,
-- no story gate bypass,
-- resource possession does not auto-complete separate action nodes,
-- all three crystals owned while `ASSEMBLE` remains pending until explicit completion event,
-- no stale complication can first appear after target objective resolved,
-- objective completion expires dependent pre-resolution complications,
-- separately authored climax/aftermath may reuse character only with new role/purpose,
-- same Adventure Code reconstructs same critical graph,
-- deterministic seeded storylet selection,
+- default three acquisition families,
+- no optional-find critical dependency,
+- no gate bypass,
+- resource possession does not auto-complete action nodes,
+- all crystals can be owned while assembly remains pending,
+- no stale complication after objective resolution,
+- same Adventure Code reconstructs same graph,
+- deterministic selection,
+- all interactive critical nodes have purpose/stakes/resolvedWhen/payoff,
+- all promised world effects are realizable and applied on completion,
+- no generic progress count without authored stages,
+- no unrelated puzzle/mechanic attachment,
 - save/re-enrichment idempotence where applicable,
-- existing UX4/UX5A regressions stay green.
+- existing UX regressions remain green.
 
-Passing 1000 structural cases does not prove narrative quality.
+1000/0 does not prove story quality.
 
 ## WP-NG6 - real browser interaction QA
-Use Chromium interaction smoke to test at least:
-- requirement reveal,
-- no premature UI knowledge,
+Test:
+- requirement reveal/no premature knowledge,
 - signalled search + fail-forward,
-- NPC favor dependency/completion,
-- guardian non-combat completion,
-- all crystals acquired,
-- all crystals owned but assembly still pending,
-- deliberate return/assembly through explicit action,
-- gate opens only after assembly,
-- relevant possessed resources appear as choices/affordances without auto-use,
-- quest complication available before resolution disappears/transforms immediately after resolution,
-- no obsolete antagonist appears by later navigation.
+- NPC favor dependency/completion/payoff,
+- guardian non-combat completion/payoff,
+- crystals acquired but assembly pending,
+- deliberate return/assembly,
+- gate only after assembly,
+- resources shown as affordances without auto-use,
+- complication expiry,
+- interactive obstacle world effect before and after resolution where used,
+- narrator purpose/solve/payoff guidance.
 
 ## WP-NG7 - manual editorial playtest
-Manually play 10-20 generated Crystal Machine adventures before converting another blueprint.
+Manually play 10-20 generated Crystal Machine adventures.
 
 Record:
 - goal clarity,
-- causal coherence,
-- temporal coherence,
-- whether UI/narrator preserves child choice instead of solving obvious actions automatically,
-- repeated patterns,
-- absurd combinations,
+- causal and temporal coherence,
+- whether each scene has an understandable purpose,
+- whether resolution causes a satisfying/visible change,
 - narrator burden,
-- child-led solution quality,
-- whether each crystal felt earned differently,
-- whether return/assembly paid off setup,
-- whether any encounter felt too early, too late or obsolete.
+- child choice/free solutions,
+- repeated patterns/absurd combinations,
+- whether each crystal feels earned differently,
+- whether return/assembly pays off setup,
+- any early/late/obsolete content,
+- any mechanics that ask narrator to invent filler.
 
-If repeated narrative problems remain, improve matrix/storylets first. Do not compensate by adding more random content.
+If problems persist, improve matrix/storylets before adding random content.
 
 ## WP-NG8 - decision gate
-Only after NG7:
-- accept architecture,
-- revise architecture,
-- or abandon it in favor of more hand-authored full scenarios.
-
-If accepted, port one blueprint at a time. Current candidate order remains `GLASS_HEART`, `WITCH_CAT`, `ZOMBIE_DELIVERY`, subject to evidence.
+After NG7: accept, revise or abandon architecture. If accepted, port one blueprint at a time. Do not port before this gate.
 
 ## UX5B relationship
-UX5B is deferred. It should later consume Narrative Graph rather than infer story logic from loosely placed rooms.
-
-That lets it show actual relevant resources, known vs unknown facts, real dependencies and map-supported non-combat options while still leaving the child to choose the action.
+UX5B is deferred and should later consume Narrative Graph so it can show actual resources, known/unknown facts, dependencies and map-supported non-combat options while leaving child choice open.
 
 ## Stop conditions
-Stop and reassess if:
-- storylet compatibility rules become more complex than authoring a small full scenario bank,
-- manual playtest still requires narrator to invent causal links frequently,
-- procedural variation repeatedly harms setup/payoff or dramatic ordering,
-- graph generation becomes valid only by reducing stories to generic interchangeable text,
-- UI increasingly auto-solves interactions because the graph knows the intended answer.
+Stop/reassess if:
+- compatibility rules become more complex than a small full scenario bank,
+- narrator must frequently invent causal links or filler steps,
+- variation repeatedly harms setup/payoff/timing,
+- validity requires generic interchangeable text,
+- UI increasingly auto-solves because graph knows answer,
+- mechanics promise stakes/payoff that world state cannot actually express.
 
-The system exists to improve story quality and child-led play, not to preserve procedural generation at all costs.
+The system exists to improve story quality and child-led play, not preserve procedural generation at all costs.
