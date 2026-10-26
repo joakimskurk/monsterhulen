@@ -2,6 +2,19 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Obstacles present problems before the app applies possessed solutions
+Possessing the authored solution to an obstacle does not mean the app should automatically use it when the obstacle is tapped.
+
+For a keyed story door:
+- tapping the locked door only establishes that it is locked,
+- the app does not announce that the matching key in the backpack is the answer,
+- the child gets to propose an action,
+- the scenario key is protected from accidental disposal but has an explicit `BRUK` action,
+- using the matching key beside the door opens it but does not traverse it,
+- the narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` if the child is stuck.
+
+This is a child-agency rule, not merely door polish. The app presents constraints, clues and affordances; the child chooses what to try. Authored solutions are not a closed answer list. A hard story gate still cannot be bypassed by a lucky die roll or accidental navigation, but a genuinely plausible free-form solution may be accepted explicitly by the narrator when the fiction supports it.
+
 ## 2026-10-26 - Critical stories use Narrative Graph + curated Storylets
 Live playtest of `CRYSTAL_MACHINE` showed that structurally valid placement is not enough. Three required parts placed safely in three rooms can still feel like unrelated pickups with no causal story.
 
@@ -20,7 +33,7 @@ Live playtest also showed the temporal version of the same problem: `SKYGGEHEKSA
 
 This is intentionally not pure procedural generation. If manual playtest still requires frequent narrator repair after the Storylet Matrix is implemented, prefer a more hand-authored scenario bank rather than preserving procedural variation at the cost of story quality.
 
-Implementation is blocked until UX5A physical device testing is green and UX5A has been merged to `main`. The previously planned UX5B map-aware solution graph is deferred until Narrative Graph V1 is proven, then should consume the explicit graph instead of inferring story logic after generation.
+Implementation is blocked until UX5A physical device testing is green and UX5A has been merged to `main`. UX5B is deferred until Narrative Graph V1 is proven, then should consume the explicit graph instead of inferring story logic after generation.
 
 ## 2026-10-26 - Dice report uncertainty; encounter state resolves encounters
 A physical die result may suggest a consequence, but may not automatically remove a normal encounter or fill its progress track. Normal generated encounters use explicit narrator-controlled progress, while monster combat uses explicit hearts only after the child chooses combat.
@@ -53,12 +66,8 @@ Adventure Code V1 uses protocol tag `MH1`. The child device can export a code an
 ## 2026-10-23 - GitHub is the permanent source of truth
 The connected `joakimskurk/monsterhulen` repository is the durable project workspace. Chat is temporary. No critical state, decision, test status or continuation point may exist only in chat.
 
-Rationale: long chats have previously lost continuity. A fresh chat must be able to resume from repository state alone.
-
 ## 2026-10-22 - Product name is Monsterhulen
-Visible product name is **Monsterhulen**. Core framing: the same cave is a little different every time, and each adventure becomes its own story.
-
-Internal Eventyr*/HulerCharacterSystem names are intentionally retained unless a future migration provides concrete value.
+Visible product name is **Monsterhulen**. Internal Eventyr*/HulerCharacterSystem names remain unless migration has concrete value.
 
 ## 2026-10-22 - Save migration remains backward compatible
 Canonical storage key is `monsterhulen_v120`; `eventyrkryper_v100` is the first legacy key. State schema remains 12. Legacy saves are normalized and copied forward; legacy storage is not silently destroyed.
@@ -66,16 +75,16 @@ Canonical storage key is `monsterhulen_v120`; `eventyrkryper_v100` is the first 
 UX5A does not bump the schema. Untouched legacy monster encounters may be normalized to the new 3/4-heart defaults, but an already-started legacy fight must not be healed during migration.
 
 ## 2026-10-21 - Physical dice are core interaction
-The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. The playtest UI records the exact physical die face; internal consequence compatibility remains low/mid/high.
+The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. Exact physical face is recorded; internal low/mid/high compatibility remains.
 
 ## 2026-10-21 - Identity and mechanics stay separate
-Hero type/species, selected trait and equipped start item are independent choices. Base hero art is state-neutral. Functional equipment is not baked into hero mechanics or inferred from species/archetype.
+Hero type/species, selected trait and equipped start item are independent choices. Base hero art is state-neutral.
 
 ## 2026-10-21 - Items and companions are affordances, not bonuses
-Start items, lasting TING, friends and pets can make a plan possible/easy and can inspire narrator cues. They do not grant generic +1/+2 or extra dice. Only the selected trait can trigger 2D6.
+Start items, lasting TING, friends and pets can make a plan possible/easy and inspire narrator cues. They do not grant generic numeric bonuses or extra dice.
 
 ## 2026-10-21 - Puzzle solving is not a die check
-Puzzle/logic content is part of the fictional world. Thinking/answering does not require D6. A later risky execution can use the normal physical dice rule.
+Puzzle/logic content is part of the fictional world. Thinking/answering does not require D6. A later risky execution can use normal physical dice rules.
 
 ## 2026-10-23 - Project-memory workflow is mandatory for now
-At the start of a chat, read `PROJECT_STATE.md`, `ROADMAP.md`, `DECISIONS.md`, `TESTING.md`, then relevant source and recent history. After meaningful milestones, keep these files synchronized with reality before moving on.
+At chat start, read the canonical handoff files in the order specified by `START_HERE.md`. After meaningful milestones, keep them synchronized with reality before moving on.
