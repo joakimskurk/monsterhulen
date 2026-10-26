@@ -1,15 +1,15 @@
-# UX5A — Room investigation + encounter tracks
+# UX5A - Room investigation + encounter tracks
 
-Status: ACTIVE CANDIDATE — IMPLEMENTED ON BRANCH, RUNTIME QA PENDING
+Status: **AUTOMATED RUNTIME + CHROMIUM VERIFIED; PHYSICAL DEVICE GATE PENDING**
 Branch: `ux5/searchable-rooms-encounter-tracks`
-Baseline: V0.12.3 + active UX1–UX4 playtest patch chain.
+Baseline: V0.12.3 + active UX1-UX4 playtest patch chain.
 
 ## Goal
 Make exploration and encounters stateful enough that play develops over several meaningful beats instead of one button or one lucky die result.
 
 ## Scope
 1. Every room can be deliberately investigated without revealing beforehand whether an optional find exists there.
-2. KORT/VANLIG/STORT target 2/3/4 deterministic curated optional finds in eligible rooms.
+2. KORT/VANLIG/STORT target 1/2/3 deterministic curated optional finds in eligible rooms.
 3. Empty-room investigation does not require a meaningless die roll.
 4. If investigation reveals signs of a hidden find and finding it remains uncertain, use the same physical D6 input model as the rest of Monsterhulen. The app never rolls.
 5. A low first hidden-find search gives a stronger in-fiction clue and keeps the find hidden; continued searching remains fail-forward and cannot softlock the optional find.
@@ -22,26 +22,34 @@ Make exploration and encounters stateful enough that play develops over several 
 12. Legacy migration is idempotent and may not heal an already-started fight.
 
 ## Out of scope for UX5A
-The map-aware solution graph is UX5B. It will derive actual cross-room resources, items/NPCs/rooms/companions and attempted approaches for the current encounter after UX5A is runtime-verified.
+The map-aware solution graph is UX5B. It will derive actual cross-room resources, items/NPCs/rooms/companions and attempted approaches for the current encounter after the physical UX5A device gate is green.
 
-## Acceptance
+## Acceptance status
+Automated/runtime/browser verified:
 - all rooms expose the same initial investigation affordance,
 - UI does not identify hidden-find rooms before investigation,
 - deterministic hidden-find placement for the same reconstructed adventure,
-- at least 2 optional finds in KORT, 3 in VANLIG and 4 in STORT when enough eligible rooms exist,
+- target 1/2/3 optional finds in KORT/VANLIG/STORT when enough eligible rooms exist,
 - no hidden find overlaps start/finale/story-critical/ambient-treasure placement,
 - physical D6 hidden-find UI only; no digital RNG,
 - low first hidden-find result does not reveal the item,
-- repeated low searching remains fail-forward rather than permanently hiding the find,
+- repeated low searching fail-forwards rather than permanently hiding the find,
 - full backpack preserves a revealed room find,
-- monster encounters have 3–4 hearts,
-- generated non-treasure encounters have a 3–4-step non-combat track,
+- monster encounters have 3-4 hearts,
+- generated non-treasure encounters have a 3-4-step non-combat track,
 - encounter dice input changes only die/consequence state and never automatically changes hearts/progress,
 - final explicit progress and final explicit combat heart each resolve through their own state path,
 - `LØST MED GOD IDÉ` remains available for genuinely decisive solutions,
 - active legacy combat does not regain hearts during migration,
-- existing UX4 progression gates and secret-door rules remain unchanged,
-- new QA plus full existing regression pass before merge.
+- existing UX4 progression gates and secret-door rules remain unchanged.
+
+Evidence:
+- UX5A QA: **2216 / 0**
+- Adventure Code: **405 / 0**
+- UX4 progression: **1797 / 0**
+- combined content regression: **5960 / 0**
+- 11 inline scripts: **0 syntax errors**
+- Chromium interaction smoke: **23 / 0**
 
 ## Implementation
 UX5A is split into four ordered patches after UX4:
@@ -50,10 +58,17 @@ UX5A is split into four ordered patches after UX4:
 3. investigation + encounter-card UI helpers,
 4. render/state handlers.
 
-`patches/README.md` is the canonical ordered list.
+`patches/README.md` is the canonical ordered list and verification note.
 
-## Current verification
-Structural patch-chain verification passes on a realistic source reconstruction with GNU `patch` and `git diff --check`. Full canonical-runtime QA and browser/iPad verification are still pending.
+## Remaining acceptance gate
+Physical iPad/mobile testing must confirm:
+- `SE DEG RUNDT` feels like exploration rather than compulsory bookkeeping,
+- 3-4 encounter steps feel satisfying for the target age,
+- touch targets and layout work on the real device,
+- hidden-find fail-forward and full-backpack behavior are understandable,
+- 3-heart normal / 4-heart `SPENNING` combat is easy to operate.
+
+Repository-health remains a parallel release blocker because the complete source/assets baseline is not yet directly reconstructable from ordinary repo files with byte-identical V0.12.3 provenance.
 
 ## Exact next action
-Reconstruct the canonical runtime as raw files, apply the full patch chain through UX5A, run `QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js` plus UX4/Adventure Code/full content regressions, then perform the manual iPad smoke test. Do not begin UX5B or merge to `main` until that gate is green.
+Run the physical UX5A smoke on iPad/mobile and record findings. If green, merge UX5A to `main` and begin UX5B. Do not expand the blueprint bank yet.
