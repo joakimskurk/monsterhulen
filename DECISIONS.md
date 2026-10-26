@@ -2,6 +2,13 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - One visible location identity per room
+Generated rooms may retain internal zone/biome metadata for deterministic generation, tone and authoring, but the player-facing app must not present both the room name and zone name as competing location names.
+
+The canonical visible place identity is the room name. Zone names remain internal metadata unless a future feature has a clearly labeled, non-competing use for them. Public continue/resume text, the room banner and current narrator location should therefore use the room name only.
+
+Rationale: live physical review found that labels such as `ROM: SOPPSTIEN` plus `OMRÅDE: SOPPSKOGEN` made every location appear to have two names, which was unnecessarily confusing.
+
 ## 2026-10-26 - Obstacles present problems before the app applies possessed solutions
 Possessing the authored solution to an obstacle does not mean the app should automatically use it when the obstacle is tapped.
 
@@ -66,8 +73,12 @@ Adventure Code V1 uses protocol tag `MH1`. The child device can export a code an
 ## 2026-10-23 - GitHub is the permanent source of truth
 The connected `joakimskurk/monsterhulen` repository is the durable project workspace. Chat is temporary. No critical state, decision, test status or continuation point may exist only in chat.
 
+Rationale: long chats have previously lost continuity. A fresh chat must be able to resume from repository state alone.
+
 ## 2026-10-22 - Product name is Monsterhulen
-Visible product name is **Monsterhulen**. Internal Eventyr*/HulerCharacterSystem names remain unless migration has concrete value.
+Visible product name is **Monsterhulen**. Core framing: the same cave is a little different every time, and each adventure becomes its own story.
+
+Internal Eventyr*/HulerCharacterSystem names are intentionally retained unless a future migration provides concrete value.
 
 ## 2026-10-22 - Save migration remains backward compatible
 Canonical storage key is `monsterhulen_v120`; `eventyrkryper_v100` is the first legacy key. State schema remains 12. Legacy saves are normalized and copied forward; legacy storage is not silently destroyed.
@@ -75,16 +86,16 @@ Canonical storage key is `monsterhulen_v120`; `eventyrkryper_v100` is the first 
 UX5A does not bump the schema. Untouched legacy monster encounters may be normalized to the new 3/4-heart defaults, but an already-started legacy fight must not be healed during migration.
 
 ## 2026-10-21 - Physical dice are core interaction
-The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. Exact physical face is recorded; internal low/mid/high compatibility remains.
+The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. The playtest UI records the exact physical die face; internal consequence compatibility remains low/mid/high.
 
 ## 2026-10-21 - Identity and mechanics stay separate
-Hero type/species, selected trait and equipped start item are independent choices. Base hero art is state-neutral.
+Hero type/species, selected trait and equipped start item are independent choices. Base hero art is state-neutral. Functional equipment is not baked into hero mechanics or inferred from species/archetype.
 
 ## 2026-10-21 - Items and companions are affordances, not bonuses
-Start items, lasting TING, friends and pets can make a plan possible/easy and inspire narrator cues. They do not grant generic numeric bonuses or extra dice.
+Start items, lasting TING, friends and pets can make a plan possible/easy and can inspire narrator cues. They do not grant generic +1/+2 or extra dice. Only the selected trait can trigger 2D6.
 
 ## 2026-10-21 - Puzzle solving is not a die check
-Puzzle/logic content is part of the fictional world. Thinking/answering does not require D6. A later risky execution can use normal physical dice rules.
+Puzzle/logic content is part of the fictional world. Thinking/answering does not require D6. A later risky execution can use the normal physical dice rule.
 
 ## 2026-10-23 - Project-memory workflow is mandatory for now
-At chat start, read the canonical handoff files in the order specified by `START_HERE.md`. After meaningful milestones, keep them synchronized with reality before moving on.
+At the start of a chat, read `PROJECT_STATE.md`, `ROADMAP.md`, `DECISIONS.md`, `TESTING.md`, then relevant source and recent history. After meaningful milestones, keep these files synchronized with reality before moving on.
