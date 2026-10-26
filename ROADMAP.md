@@ -1,19 +1,21 @@
 # MONSTERHULEN - ROADMAP
 
-DATO: 2026-10-23
-STATUS: KANONISK ETTER V0.12.3, REPO-HEALTH GATE AKTIV
+DATO: 2026-10-26
+STATUS: V0.12.3 BASELINE + ACTIVE UX / ADVENTURE CODE PLAYTEST
 
 ## LÅSTE PRINSIPPER
+- Fortellingskvalitet slår kombinasjonsmengde. Få gode eventyr er bedre enn tusen middelmådige.
+- Kritisk historie bygges fra kuraterte Adventure Blueprints. Seed varierer bare trygge detaljer.
 - Den samme Monsterhulen er litt annerledes hver gang man går inn.
 - Barnet foreslår handlinger; appen støtter, den bestemmer ikke fasiten.
 - Fysisk 1D6 ved usikker handling; relevant EKSTRA GOD PÅ gir fysisk 2D6, bruk høyeste.
-- Appen registrerer bare `1-2`, `3-4`, `5-6`.
+- Appen genererer aldri terningresultat.
 - Puzzle/gjetning trenger ikke terning i seg selv.
 - Ting, venner og kjæledyr åpner muligheter, men gir ikke bonusdie.
 - Ingen innholdsobjekter skal bli skjulte obligatoriske nøkler med mindre de eksplisitt er scenario-nøkler.
-- GitHub-repoet er permanent source of truth. Kritisk prosjektstatus skal ikke finnes bare i chat.
+- GitHub-repoet er permanent source of truth.
 
-## FERDIG
+## FERDIG BASELINE
 - V0.11.0-V0.11.4: helter, start-item art og 20 monsterfamilier / 40 varianter
 - V0.11.5: 12 standard-NPC-er
 - V0.11.6: 6 ambient venner + 10 varige venner
@@ -24,19 +26,30 @@ STATUS: KANONISK ETTER V0.12.3, REPO-HEALTH GATE AKTIV
 - V0.12.1: 14 skatter og hemmelige funn
 - V0.12.2: Monsterhulen rename + bakoverkompatibel storage migration
 - V0.12.3: 12 varige TING, identity/affordance pass
-- Repo-memory: `PROJECT_STATE.md`, `DECISIONS.md`, `TESTING.md` og arbeidsworkflow etablert.
 
-## NÅVÆRENDE ARBEIDSPAKKE: REPOSITORY HEALTH BASELINE
-Etter dette steget skal en ny ChatGPT-chat kunne fortsette fra repoet alene.
+## AKTIV PLAYTEST-REKKEFØLGE
+1. Kartnavigasjon via tappbare `?` / lås / kjente nabrom.
+2. FRITT KAST, tydelig narrator-frihet og ikke-forbrukende `BRUK`.
+3. Nybegynner-DM-guide + seks faktiske D6-flater som input.
+4. **Adventure Code V1 + kuraterte blueprint-eventyr + separat fortellervisning.**
 
-Acceptance gate:
-1. kanonisk V0.12.3 runtime/source finnes i repoet eller kan rekonstrueres derfra uten chat/ZIP,
-2. assetarkiv og hashes kan verifiseres,
-3. `scripts/verify_repo.py` passerer,
-4. prosjektminnefilene samsvarer med faktisk repo,
-5. browser/device-verifisering beskrives ærlig.
+### Adventure Code V1 - første bank
+Kun fire eventyr er aktive før videre utvidelse:
+- `GLASS_HEART`
+- `WITCH_CAT`
+- `CRYSTAL_MACHINE`
+- `ZOMBIE_DELIVERY`
 
-## DERETTER
+Gate før flere blueprints:
+- spill alle fire manuelt,
+- bekreft at hovedhistorie, spor og payoff føles sammenhengende,
+- bekreft samme kode på iPad/mobil gir samme kart og kritiske plan,
+- dokumenter konkrete svakheter før flere kombinasjoner legges til.
+
+## REPOSITORY HEALTH GATE
+Repo-health-reparasjonen er fortsatt åpen parallelt. Neste release checkpoint skal ikke låses før repoet kan rekonstruere hele aktive baseline uten chat/ekstern ZIP.
+
+## ETTER UX / ADVENTURE CODE-GATEN
 1. **V0.12.4: resterende start-/fortellerutstyr + scenario-nøkler - 7**
    - `ITEM_WITCH_BROOM`
    - `ITEM_SHOVEL`
@@ -45,9 +58,6 @@ Acceptance gate:
    - `SCENARIO_KEY_GLASS`
    - `SCENARIO_KEY_FEATHER`
    - `SCENARIO_KEY_ROOT`
-2. **Samledel-familier + EVNER - 15**
-3. **Feller + mysterier - 12**
-4. **Scenario-mål / samlingssteder / finale - 10**
-
-## V0.12.4 VERIFISERING
-De sju entity-ID-ene og resolver-pathene skal bevares. Kun art/content identity-pass, ingen gameplay- eller save-schemaendring. Asset Contract 2.4.0 gjelder. Full repo-verifikasjon kjøres før milepælen lukkes.
+2. Samledel-familier + EVNER - 15
+3. Feller + mysterier - 12
+4. Scenario-mål / samlingssteder / finale - 10
