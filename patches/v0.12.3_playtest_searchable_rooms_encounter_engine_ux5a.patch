@@ -1,17 +1,13 @@
 --- index.html
 +++ index.html
-@@ -214,4 +214,8 @@
- .puzzleBox .puzzleMeta{font-size:11px;opacity:.78;margin-bottom:5px}
- .puzzleBox.solved{border-style:dashed;opacity:.88}
+@@ -213,2 +213,6 @@
  .puzzleNarrator{border:1px dashed currentColor;padding:9px;margin:9px 0}
 +.searchBox{border:2px solid var(--cyan);padding:9px;margin:9px 0;background:rgba(99,242,255,.06)}
 +.searchBox.found{border-color:var(--yellow);background:rgba(255,217,92,.07)}
 +.encounterTrack{margin:7px 0;padding:7px;border:2px solid var(--cyan);background:rgba(13,23,48,.62);font-size:10px;line-height:1.35}
 +.encounterTrack b{color:var(--cyan)}.trackPips{font-size:18px;letter-spacing:3px;color:var(--cyan)}
  </style>
-@@ -1078,9 +1078,44 @@
-   function pick(arr,rng){return arr[Math.floor(rng()*arr.length)]}
-   function suitable(list,tone){const filtered=list.filter(x=>!x.tones||x.tones.includes(tone));return filtered.length?filtered:list}
+@@ -1080,5 +1084,39 @@
    function difficultyFor(room,type){
 -    if(type==='MONSTER') return room.beat==='SPENNING'?2:room.beat==='MØTE'?2:1;
 +    if(type==='MONSTER') return room.beat==='SPENNING'?4:3;
@@ -24,51 +20,42 @@
 +    return room.beat==='SPENNING'?4:3;
 +  }
 +  function eventType(ev){return typeof ev==='string'?ev:ev?.type}
++  function normalizeSearchState(room){
++    const s=room.search&&typeof room.search==='object'?room.search:{};
++    s.available=true;s.searched=!!s.searched;s.attempts=Math.max(0,Number.isInteger(s.attempts)?s.attempts:0);s.revealed=!!s.revealed;s.taken=!!s.taken;
++    s.lastDiceValue=Number.isFinite(s.lastDiceValue)?s.lastDiceValue:null;s.lastDiceBand=s.lastDiceBand||'';s.item=s.item||null;
++    room.search=s;return s;
++  }
 +  function planSearchables(dungeon,seed){
-+    const existing=dungeon.rooms.filter(room=>room.search?.available);
-+    if(existing.length){
-+      for(const room of existing){
-+        const s=room.search;
-+        s.searched=!!s.searched;s.attempts=Math.max(0,Number.isInteger(s.attempts)?s.attempts:0);s.revealed=!!s.revealed;s.taken=!!s.taken;
-+        s.lastDiceValue=Number.isFinite(s.lastDiceValue)?s.lastDiceValue:null;s.lastDiceBand=s.lastDiceBand||'';
-+      }
-+      return dungeon;
-+    }
-+    const wanted=dungeon.rooms.length<=9?2:dungeon.rooms.length>=17?4:3;
++    const rooms=dungeon.rooms||[],wanted=rooms.length<=9?2:rooms.length>=17?4:3;
++    for(const room of rooms)normalizeSearchState(room);
 +    const occupiedItems=new Set();
-+    for(const room of dungeon.rooms)for(const ev of room.events||[])if(eventType(ev)==='SKATT'&&ev?.item)occupiedItems.add(ev.item);
-+    const candidates=dungeon.rooms.filter(room=>
-+      room.id!==dungeon.startRoomId &&
++    for(const room of rooms)for(const ev of room.events||[])if(eventType(ev)==='SKATT'&&ev?.item)occupiedItems.add(ev.item);
++    const existingFinds=rooms.filter(room=>room.search?.item?.name),used=new Set([...occupiedItems,...existingFinds.map(room=>room.search.item.name)]);
++    const needed=Math.max(0,wanted-existingFinds.length);
++    if(!needed)return dungeon;
++    const candidates=rooms.filter(room=>
++      !room.search?.item && room.id!==dungeon.startRoomId && room.id!==dungeon.scenarioSpec?.goalRoomId &&
 +      !(room.events||[]).some(ev=>CRITICAL.has(eventType(ev))||eventType(ev)==='SKATT')
-+    ).map(room=>({room,score:hashString(`${seed}|SEARCH_ROOM|${room.id}`)})).sort((a,b)=>a.score-b.score);
-+    const chosen=candidates.slice(0,Math.min(wanted,candidates.length));
-+    const used=new Set(occupiedItems);
-+    for(const {room} of chosen){
++    ).map(room=>({room,score:hashString(`${seed}|SEARCH_ROOM|${room.id}`)})).sort((a,b)=>a.score-b.score).slice(0,needed);
++    for(const {room} of candidates){
 +      let pool=suitable(TREASURES,room.tone).filter(t=>!used.has(t.name));
 +      if(!pool.length)pool=TREASURES.filter(t=>!used.has(t.name));
 +      if(!pool.length)pool=TREASURES;
 +      const rng=mulberry32(hashString(`${seed}|SEARCH_FIND|${room.id}`));
 +      const t=pick(pool,rng);used.add(t.name);
-+      room.search={available:true,searched:false,attempts:0,revealed:false,taken:false,lastDiceValue:null,lastDiceBand:'',item:{entityId:t.entityId,name:t.name,role:t.role||'',intro:t.intro,findGuide:t.gm}};
++      room.search.item={entityId:t.entityId,name:t.name,role:t.role||'',intro:t.intro,findGuide:t.gm};
 +    }
 +    return dungeon;
    }
-   function sourceFor(type){return type==='MONSTER'?MONSTERS:type==='PERSON'?PEOPLE:type==='VENN'?FRIENDS:type==='FELLE'?TRAPS:type==='MYSTISK'?MYSTERIES:type==='SKATT'?TREASURES:null}
-   function makeEncounter(type,room,seedHint='',opts={}){
-@@ -1093,8 +1128,9 @@
-     const base={type,generated:true,name:t.name,intro:`${t.intro} ${detail}`,tone:room.tone,beat:room.beat,...(type==='MONSTER'?{family:familyOrEntry.family,entityId:familyOrEntry.entityId,variantId:t.id}:{entityId:familyOrEntry.entityId||null})};
-     if(type==='SKATT')return {...base,item:t.name,findRole:t.role||'',findGuide:t.gm,gm:{want:'ET VALGFRITT FUNN.',clue:t.gm,ways:'TA DEN, LA DEN LIGGE ELLER BRUK DEN KREATIVT. DEN ER ALDRI EN OBLIGATORISK NØKKEL.',low:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',mid:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',high:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.'}};
+@@ -1095,4 +1133,5 @@
      const difficulty=difficultyFor(room,type);
 +    const progressMax=progressFor(room,type);
      const puzzle=type==='MYSTISK'&&PZ?PZ.choose(String(seedHint)+'|'+(familyOrEntry.entityId||t.name),familyOrEntry.puzzleCats||[],opts.puzzleLevel||'YNGRE'):null;
 -    return {...base,...(puzzle?{puzzle,puzzleSolved:false}:{}),hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
 +    return {...base,...(puzzle?{puzzle,puzzleSolved:false}:{}),hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,progress:progressMax===null?null:0,maxProgress:progressMax,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
    }
-   function enrichDungeon(dungeon,opts={}){
-     const seed=dungeon.seed||Date.now(),usedNames=new Set(),usedMonsterFamilies=new Set();
-@@ -1102,7 +1138,17 @@
-       room.events=(room.events||[]).map((ev,idx)=>{
-         const type=typeof ev==='string'?ev:ev?.type;
+@@ -1104,3 +1143,13 @@
          if(!AMBIENT.has(type)||CRITICAL.has(type))return ev;
 -        if(typeof ev==='object'&&ev.generated&&ev.name&&ev.gm){usedNames.add(ev.name);if(ev.type==='MONSTER'&&ev.family)usedMonsterFamilies.add(ev.family);return ev;}
 +        if(typeof ev==='object'&&ev.generated&&ev.name&&ev.gm){
@@ -83,22 +70,12 @@
 +          usedNames.add(ev.name);if(ev.type==='MONSTER'&&ev.family)usedMonsterFamilies.add(ev.family);return ev;
 +        }
          let out=null;
-         for(let attempt=0;attempt<40;attempt++){
-           out=makeEncounter(type,room,seed+'|'+idx+'|'+attempt,opts);
-@@ -1115,6 +1161,7 @@
-         return out;
-       });
+@@ -1117,2 +1166,3 @@
      }
 +    planSearchables(dungeon,seed);
      return dungeon;
-   }
-   function validateEncounter(ev){
-@@ -1127,6 +1174,8 @@
-     if(!ev.gm)errors.push('MISSING GM');
-     else for(const k of ['want','clue','ways','low','mid','high'])if(!ev.gm[k])errors.push('MISSING GM '+k);
+@@ -1129,2 +1179,4 @@
      if(ev.type==='MONSTER'&&(!(ev.maxHp>=1)||!(ev.hp>=0)))errors.push('BAD HP');
 +    if(ev.type==='MONSTER'&&(ev.maxHp<3||ev.maxHp>4))errors.push('BAD MONSTER HEART SCALE');
 +    if(ev.type!=='SKATT'&&(!(ev.maxProgress>=3)||!(ev.progress>=0)))errors.push('BAD PROGRESS TRACK');
      if(ev.type==='MONSTER'&&!ev.family)errors.push('MISSING FAMILY');
-     if(ev.type==='MONSTER'&&!ev.variantId)errors.push('MISSING VARIANT ID');
-     if(ev.type==='SKATT'&&!ev.item)errors.push('MISSING ITEM');
