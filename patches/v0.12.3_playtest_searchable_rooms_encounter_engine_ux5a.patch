@@ -62,8 +62,8 @@
 +          if(ev.type==='MONSTER'){
 +            const target=difficultyFor(room,'MONSTER');
 +            if(!Number.isFinite(ev.maxHp)||ev.maxHp<3){
-+              const oldMax=Math.max(1,Number.isFinite(ev.maxHp)?ev.maxHp:target),oldHp=Math.max(0,Number.isFinite(ev.hp)?ev.hp:oldMax),damage=Math.max(0,oldMax-oldHp);
-+              ev.maxHp=target;ev.hp=Math.max(0,target-damage);
++              const oldMax=Math.max(1,Number.isFinite(ev.maxHp)?ev.maxHp:target),oldHp=Math.max(0,Number.isFinite(ev.hp)?ev.hp:oldMax),started=ev.combatStarted===true||oldHp<oldMax;
++              ev.maxHp=target;ev.hp=started?Math.min(oldHp,target):target;
 +            }
 +          }
 +          if(ev.type!=='SKATT'&&!Number.isFinite(ev.maxProgress)){ev.maxProgress=progressFor(room,ev.type);ev.progress=0;}
