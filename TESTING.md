@@ -9,67 +9,65 @@ Never conflate these states:
 - physical device tested
 
 ## Current V0.12.3 release evidence
-The completed V0.12.3 release reported:
-- Lasting thing: 67 PASS / 0 FAIL
-- Treasure: 121 / 0
-- Puzzle: 4665 / 0
-- NPC: 4935 / 0
-- Friend: 4104 / 0
-- Pet: 6069 / 0
-- Rescue: 5070 / 0
-- 11 JavaScript blocks, 0 syntax errors
+Historical release evidence remains:
+- Lasting thing 67 / 0
+- Treasure 121 / 0
+- Puzzle 4665 / 0
+- NPC 4935 / 0
+- Friend 4104 / 0
+- Pet 6069 / 0
+- Rescue 5070 / 0
+- 11 inline JavaScript blocks, 0 syntax errors
 
-This is historical release evidence. It is not a claim that the current GitHub `main` can rerun all those tests yet, because the full runtime/test snapshot is still being repaired into the repository.
-
-## Active playtest UX patch verification
-The current manual-test build is V0.12.3 plus these sequential patches:
+## Active playtest patch chain
+Against canonical V0.12.3:
 1. `patches/v0.12.3_playtest_map_navigation.patch`
 2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
 3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
+4. `patches/v0.12.3_playtest_adventure_code_v1.patch`
 
-Verified in the working build:
-- 11 inline JavaScript blocks, 0 syntax errors.
-- Existing Thing, Treasure, Puzzle, NPC, Friend, Pet and Rescue runtime QA still pass with no new failures.
-- Map navigation targeted logic: 3/3 PASS.
-  - open unexplored exit renders `?` and routes to the correct existing move direction,
-  - locked exit renders lock state and routes through the same existing move direction,
-  - revealed adjacent room is directly tappable and routes through the same existing move direction.
-- Existing `move()` function is unchanged from V0.12.3.
-- FRITT KAST contains no digital RNG.
-- Inventory `BRUK` does not remove the item.
-- Only the explicit `BRUK OPP / LEGG FRA` handler removes an ordinary bag item.
-- Encounter/climax consequences are labelled as suggestions, not narrator mandates.
-- Dice input presents six visual D6 faces with pips.
-- Exact `diceValue` is recorded; the existing compatibility mapping remains 1-2 -> low, 3-4 -> mid, 5-6 -> high.
-- The die animation is only visual feedback after the user selects the physical result; the app does not generate a result.
-- VENN/PERSON/MONSTER narrator guidance is present, including explicit beginner instructions for when a roll is unnecessary.
+## Adventure Code V1 automated evidence
+`QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**.
 
-Not verified yet:
-- automated real-browser interaction, because this execution environment blocks Chromium navigation to both localhost and `file://`,
-- manual mobile/tablet layout of the six die faces and new narrator guide,
-- live child/DM comprehension of `?`, lock state, FRITT KAST, revised inventory buttons, narrator guide and die-face input.
+Verified:
+- four blueprint IDs are stable,
+- each blueprint carries narrator premise/foreshadow/payoff metadata,
+- each blueprint uses its curated world route,
+- identical seed produces identical decorated dungeon JSON,
+- 128 repeated seed checks preserve blueprint/type/route determinism,
+- GLASS_HEART locks GLASSNØKKEL + KRYSTALLHJERTET,
+- WITCH_CAT locks HEKSEKATTEN rescue content,
+- CRYSTAL_MACHINE locks red/blue/yellow crystals + KRYSTALLMASKINEN,
+- ZOMBIE_DELIVERY locks its curated truth + three curated clues,
+- MH1 version tag, exact layout seed and blueprint ID are wired into the reproducibility contract,
+- copy/open code UI and full spoiler plan are wired.
+
+## Regression after Adventure Code patch
+All existing runtime QA passes after the patch:
+- Thing 67 / 0
+- Treasure 121 / 0
+- Puzzle 4665 / 0
+- NPC 4935 / 0
+- Friend 4104 / 0
+- Pet 6069 / 0
+- Rescue 5070 / 0
+- 11 inline JavaScript blocks, 0 syntax errors
+
+The Rescue QA wiring check was updated to recognize the new seeded `pickRng(rescue.clues||RESCUE_CLUES,rng)` implementation as equivalent target-specific clue selection.
+
+## Still manual / not certified
+- real iPad -> mobile Adventure Code copy/paste flow,
+- same-map visual comparison on two physical devices,
+- novice-DM usefulness of the full spoiler plan,
+- narrative quality of all four initial blueprints,
+- mobile layout of long code and spoiler plan,
+- browser/mobile interaction remains not automated in this execution environment.
+
+## Quality gate before adding blueprints
+Do not add more Adventure Blueprints until all four initial stories have been manually played and notes are recorded. A blueprint that is technically valid but narratively weak fails the gate.
 
 ## Repository verification
-For the repaired baseline, the repository must verify at minimum:
-- required project-memory files exist,
-- canonical runtime/source files are present or reconstructable from the repository alone,
-- `monsterhulen_v120` and `eventyrkryper_v100` migration markers are preserved,
-- inline JavaScript syntax passes when Node is available,
-- runtime asset archive/content hashes match the canonical manifest,
-- current bank counts remain 13 start items, 8 narrator items and 5 scenario keys.
-
-## Browser/mobile status
-V0.12.3 browser/mobile interaction QA was **not rerun**. Do not describe V0.12.3 or the active UX patches as browser-certified or physical-device-certified until that testing actually happens.
+Repository-health remains open. Before the next release checkpoint, the repository must reconstruct the full active source/assets/tests without chat or an external release ZIP.
 
 ## V0.12.4 acceptance gate
-For each of the seven pending item/key entities:
-- stable resolver ID/path unchanged,
-- large is exactly 64x64 RGBA,
-- thumbnail is exactly 32x32 RGBA,
-- transparent background,
-- alpha only 0/255,
-- no embedded text/UI frame,
-- recognizable silhouette at thumbnail size,
-- no gameplay/schema change,
-- repository verification passes,
-- Asset Manifest / Project State / Roadmap / Changelog are synchronized.
+For each of the seven pending item/key entities: stable resolver path, correct 64x64 / 32x32 RGBA item asset sizes, transparent 0/255 alpha, no embedded text/UI, recognizable thumbnail, no unintended schema/gameplay change, repo verification pass, and synchronized project memory.
