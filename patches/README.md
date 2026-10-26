@@ -45,7 +45,7 @@ The four UX5A patch files were applied sequentially in order to a realistic sour
 
 SHA-256 of the four plain UX5A patch files:
 
-- engine: `ecba8350c03ce74cf2f649826b243f10eb42bbfea7aa6a8435d2e19c85a180ee`
+- engine: `49d7fb0ab1558caea18a3a2b4cb720efde21a79ba269bec33d82f684c7e3a48f`
 - narrator: `bb86a8a1bd59fc3191058e38f022d2ecf1ba54cfac9a7b476c74964740c03ade`
 - UI helpers: `87bccb1376d57621168416669287489857baeabf178f803411b5c680c410ee02`
 - render/state: `fc28ab10cfae898c62e384fa4b32d1d6a19aece98b80bacf239607488674ecfa`
