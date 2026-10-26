@@ -1,5 +1,7 @@
 # MONSTERHULEN - TESTING
 
+Updated: 2026-10-27
+
 ## Verification levels
 Never conflate:
 - implemented,
@@ -29,14 +31,15 @@ Latest:
 - patch 11 explicit story-key use,
 - patch 12 one visible location identity,
 - patch 13 encounter purpose/world-effect contract,
-- patch 14 explicit narrator-improvisation guidance.
+- patch 14 explicit narrator-improvisation guidance,
+- patch 15 remaining room-description location-identity leak.
 
-## Automated evidence after patch 14 - GREEN
-Executed against reconstructed patch-14 runtime:
+## Automated evidence through patch 14 - GREEN AT THAT LAYER
+Executed against the previously reconstructed patch-14 runtime:
 - explicit-improvisation QA: **20 PASS / 0 FAIL**
 - encounter-purpose QA: **4337 PASS / 0 FAIL**
 - authored-mysteries-only QA: **3075 PASS / 0 FAIL**
-- single-location QA: **19 PASS / 0 FAIL**
+- single-location QA: **19 PASS / 0 FAIL** under the old coverage
 - targeted device QA: **27 PASS / 0 FAIL**
 - searchable-room/encounter QA: **2328 PASS / 0 FAIL**
 - Adventure Code: **405 PASS / 0 FAIL**
@@ -52,27 +55,113 @@ Patch-14 SHA-256:
 
 These are behavioral reconstruction artifacts, not byte-identical release-baseline claims.
 
+## Patch 15 - current verification status
+During the 2026-10-27 gate review, indexed current source showed:
+
+```text
+room.desc=`${zone.name}. ${room.name}. `+
+```
+
+while `renderMeta()` displayed both:
+- `ROM: ${r.name}`
+- `r.desc`
+
+This meant the internal zone name was still player-visible and the “one visible location identity” rule was not fully satisfied.
+
+Patch 15 changes the description prefix to:
+
+```text
+room.desc=`${room.name}. `+
+```
+
+while retaining `room.zoneName` internally.
+
+Test coverage was strengthened in `tests/QA_SINGLE_LOCATION_NAME_UX5A.js` to:
+- reject the old zone-prefixed `room.desc`,
+- require the room-name-only prefix.
+
+Verification level now:
+- patch written/committed: **PASS**,
+- source/static review of intended change: **PASS**,
+- updated QA JavaScript syntax: **PASS**,
+- full automated runtime regression after patch 15: **NOT RUN / PENDING**,
+- current browser interaction QA: **PENDING**,
+- physical device: **PENDING**.
+
+Do not carry the old 19/0 single-location result forward as patch-15 certification. The old test did not cover `room.desc`.
+
+### Current tooling/provenance limitation
+Project/Library search can inspect the indexed current patch-14 source. In this session the available materialization path returns an older backing representation, so it is not safe to certify patch 15 by running a browser or full regression against that stale export.
+
+Required next machine step is to reconstruct the exact current candidate from a trustworthy current source, apply patches through 15, and rerun tests there.
+
+## Current source-level checklist review
+The indexed current source supports the following before patch 15:
+
+### Boka som skriver tilbake
+Source contains:
+- `FORTELLER-IMPROVISASJON`,
+- `INGEN SKJULT FASIT`,
+- explicit statement that no larger predetermined hidden plan exists,
+- a concrete per-scene improvise prompt,
+- guardrails forbidding new mandatory story keys or contradiction of tracked state.
+
+This is source-verified. Real narrator comprehension remains physical/editorial.
+
+### Regnbuenettet / trap behavior
+Source contains:
+- `FELLE` contract with purpose/stakes/resolvedWhen/payoff,
+- `blocksForward=true`,
+- no generic progress UI without authored `progressStages`,
+- forward block while active,
+- retreat to previous room remains allowed,
+- resolving removes trap event and route becomes free.
+
+This is source-verified. Physical clarity remains open.
+
+### Ambient mystery puzzles
+Random puzzle attachment requires explicit `useRandomPuzzle===true`. No inspected ambient mystery entry opts in. Source-level behavior matches patch-13 intent.
+
+### Explicit key flow
+A keyed locked door tap only reports locked and returns. Key possession alone does not unlock or traverse. Explicit key use opens the door; movement is separate.
+
+### Search/full backpack
+- search UI does not reveal loot in advance,
+- first low result gives stronger clue,
+- repeated low fails forward,
+- full backpack leaves revealed find in room.
+
+### Combat
+- normal generated monster target = 3 hearts,
+- `SPENNING` = 4 hearts,
+- combat begins only after explicit child choice,
+- non-combat resolution remains visible,
+- legacy active fight normalization preserves already-lost hearts instead of healing to new max.
+
+### Adventure Code
+`MH1` encode/decode + copy/paste narrator flow exists in source. Prior automated regression: **405/0**. Browser/device copy/paste remains open.
+
 ## Current browser evidence
 Historical only:
 - broad Chromium UX5A smoke **23/0**,
 - patch-10 focused Chromium smoke **15/0**.
 
-These do not certify patches 11-14. Fresh local Chromium previously hit a browser/localStorage harness failure before interaction QA. No current browser-green claim.
+These do not certify patches 11-15. No current browser-green claim.
 
 ## Required physical-device gate before UX5A merge
-On actual iPad/mobile verify at minimum:
-1. `BOKA SOM SKRIVER TILBAKE` narrator panel makes intentional improv vs authored content obvious,
+On the exact patch-15 build, actual iPad/mobile must verify at minimum:
+1. `BOKA SOM SKRIVER TILBAKE` makes intentional improv vs authored content obvious,
 2. improv prompt is useful/bounded and does not create mandatory state,
 3. `REGNBUENETTET` has no generic progress boxes,
 4. narrator understands purpose/solve/payoff,
 5. active trap blocks onward and allows retreat; resolution frees route,
 6. ambient mysteries do not receive disconnected random puzzles,
-7. each room has one clear visible name,
+7. each room has one clear visible identity, including the description after patch 15,
 8. explicit story-key flow remains child-driven,
 9. `SE DEG RUNDT` feels exploratory rather than compulsory,
 10. hidden-find fail-forward/full-backpack flow works by touch,
-11. 3-heart normal / 4-heart SPENNING combat controls remain usable,
-12. final heart/non-combat resolution controls understandable,
+11. 3-heart normal / 4-heart `SPENNING` combat controls remain usable,
+12. final-heart/non-combat resolution controls are understandable,
 13. representative legacy active-combat save if possible,
 14. Adventure Code copy/paste still works.
 
@@ -88,8 +177,7 @@ Canonical prep docs:
 - `docs/INTERACTION_SHELLS_V1.md`
 - `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
 
-## NG1 validator tests
-Must reject:
+## NG1 validator must reject
 - missing setup/signal,
 - unavailable critical requirement,
 - provider behind consuming gate,
@@ -128,22 +216,10 @@ For critical resource plans verify:
 
 Reference cases:
 - `SUMPTROLLET requires FOOD`,
-- `BROTROLLET` chosen request variant binds provider plan before map materialization.
-
-## Subject/role/outcome tests
-Verify:
-- only approved subject/role combinations selected,
-- subject ID stable and separate from Storylet ID,
-- outcome is compatible with role,
-- critical outcome tracked and world effect applied,
-- subject repetition penalty does not affect hard validity,
-- ambient subject cannot silently become critical without authored Storylet.
+- `BROTROLLET` selected request binds provider plan before map materialization.
 
 ## Interaction-shell / popup tests
-Canonical spec: prep `docs/INTERACTION_SHELLS_V1.md`.
-
-### SLOT_GATE / ASSEMBLY reference
-Automated:
+### SLOT_GATE / ASSEMBLY automated
 - slots hidden until knowledge reveal,
 - owning resources does not auto-place,
 - explicit `PLACE_RESOURCE` required,
@@ -155,7 +231,7 @@ Automated:
 - repeated same action ID cannot duplicate resource/effect once idempotency layer is implemented,
 - undo restores both target and inventory atomically when undo layer exists.
 
-Browser/touch:
+### Browser/touch
 - popup readable on iPad/mobile,
 - open/close/reopen preserves state,
 - placement understandable,
@@ -164,7 +240,7 @@ Browser/touch:
 - child can still propose unlisted solution instead of being trapped in popup flow.
 
 ### Player-data isolation
-Test that player-visible shell/state payload never contains:
+Player-visible shell/state must not contain:
 - narrator-only answer,
 - hidden provider location,
 - future phase state,
@@ -173,7 +249,7 @@ Test that player-visible shell/state payload never contains:
 - secret map/story facts.
 
 ## DM semantic-control tests
-When NG4 begins, verify DM can understand/control scene without raw state edits:
+When NG4 begins verify DM can understand/control scene without raw state edits:
 - purpose,
 - requirement,
 - provider context,
@@ -190,103 +266,17 @@ Semantic actions:
 - `START KAMP` does not auto-appear as child-facing recommended answer,
 - authored outcome controls cannot create impossible/untracked state.
 
-## Optional combat tests
-- no combat auto-start based on subject category,
-- DM explicit start required,
-- physical dice only,
-- non-combat route remains valid for critical guardians where required,
-- combat can resolve through surrender/retreat/distraction/friendship/etc.,
-- no required kill semantics,
-- child-friendly presentation reviewed physically/editorially.
-
-## Typed transition / action tests
-Once transition boundary is implemented:
-- preconditions validated before effects,
-- failed action has no partial mutation,
-- composite effect atomic,
-- action ID stable,
-- duplicate action request idempotent where applicable,
-- save/reload does not replay committed effect,
-- deterministic Adventure Code rebuild reconstructs initial graph requirements/provider plan,
-- session progress remains save-state responsibility.
-
 ## NG5 structural volume
-Generate >=1000 `CRYSTAL_MACHINE` adventures across seeds/lengths.
-
-Check:
-- graph validity,
-- provider validity,
-- knowledge timing,
-- acquisition-family diversity,
-- crystals can all be owned while assembly remains pending,
-- slot state does not auto-fill,
-- gate remains closed until authored assembly/activation,
-- no stale complication,
-- deterministic reconstruction,
-- world effects/payoff consistency,
-- existing UX regressions remain green.
-
-1000/0 does **not** prove narrative quality.
+Generate >=1000 `CRYSTAL_MACHINE` adventures across seeds/lengths and verify graph/provider/knowledge/slot/world-effect/save/idempotence invariants. **1000/0 does not prove narrative quality.**
 
 ## NG6 browser/touch QA
-Test real interaction:
-- quest reveal before slot knowledge,
-- provider acquisition,
-- NPC favor,
-- guardian non-combat,
-- merchant/social bargain if selected,
-- deliberate slot placement,
-- partial assembly,
-- return/activation/gate,
-- DM accepts alternate solution,
-- optional combat if selected,
-- no narrator-data leak.
+Test real graph interactions and no narrator-data leakage.
 
 ## NG7 manual editorial/family playtest
-10-20 generated Crystal Machine adventures.
-
-Record:
-- goal clarity,
-- causal/temporal coherence,
-- provider naturalness,
-- DM cognitive load,
-- child agency/free solutions,
-- whether interaction shells feel tangible/supportive vs overly videogame-like,
-- repetition,
-- payoff quality,
-- whether narrator repairs missing logic.
+10-20 generated Crystal Machine adventures; judge goal clarity, causal/temporal coherence, provider naturalness, DM burden, child agency, popup feel, repetition and payoff quality.
 
 ## NG8 decision gate
-Accept / revise / abandon architecture.
-
-Do not convert another blueprint before this gate.
-
----
-
-# Future DM Control Surface verification
-If NG accepted, full DM Control Surface V1 should test:
-- scene summary understandable by novice DM,
-- player-view preview accurate,
-- action history complete enough for user-facing undo,
-- undo of movement, resolve, item placement/use, recorded die face and encounter transition,
-- undo cannot duplicate rewards/items/payoffs,
-- corrected state remains save-compatible.
-
-# Future Multiscreen / Shared Session verification
-Only after canonical action/state model is stable.
-
-Minimum later tests:
-- DM host authoritative,
-- touch player client on iPad,
-- display-only external screen,
-- same-Wi-Fi join via simple flow,
-- reconnect after refresh/network drop,
-- duplicate requests do not duplicate effects,
-- narrator-only data never transmitted/rendered to player surface,
-- DM player-view preview correct,
-- undo re-syncs all clients,
-- save/reload mid-session,
-- physical family playtest without network administration burden.
+Accept / revise / abandon architecture. Do not convert another blueprint before this gate.
 
 # Repository verification
-Repository-health remains open. Before release checkpoint is called locked, full active source/assets/tests must reconstruct without chat or external release ZIP.
+Repository-health remains open. Before a release checkpoint is called locked, full active source/assets/tests must reconstruct without chat or external release ZIP.
