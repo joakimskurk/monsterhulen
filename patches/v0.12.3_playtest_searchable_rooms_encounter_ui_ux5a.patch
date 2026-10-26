@@ -1,0 +1,81 @@
+--- index.html
++++ index.html
+@@ -2896,4 +2896,46 @@
+   $$('[data-free-die]').forEach(b=>b.onclick=()=>{const value=Number(b.dataset.dieValue);pulseDieButton(b,()=>{freeDiceValue=value;freeDiceBand=bandForDie(value);renderFreeRoll()})});
+ }
++function roomSearchHtml(r){
++  const s=r?.search;if(!s?.available)return'';
++  if(s.taken)return `<div class="searchBox found"><strong>ROMMET ER UNDERSØKT</strong><p>DET DERE FANT HER ER ALLEREDE TATT MED.</p></div>`;
++  if(s.revealed){
++    const item=s.item||{},ref=item.entityId?A.entity(item.entityId,{label:item.name,visualKind:'item'}):A.entityForItemName(item.name),visual=ref?A.entityHtml(ref,{interactive:true,label:item.name,caption:item.findGuide||findGuide(item.name)}):'';
++    return `<div class="searchBox found"><strong>DU FANT NOE!</strong><div class="entityTextRow">${visual}<div><b>${item.name}</b><p>${item.intro||''}</p><p class="sub">${item.findGuide||findGuide(item.name)||'LA BARNET FORESLÅ HVA DET KAN BRUKES TIL.'}</p></div></div><button class="small primary" data-search-take="1">TA FUNNET</button></div>`;
++  }
++  const selected=s.lastDiceValue||'';
++  const dice=[1,2,3,4,5,6].map(v=>dieFaceButton(v,selected,'data-room-search-die="1"')).join('');
++  const lowHint=s.attempts>0?'<p><b>STERKERE HINT:</b> NOE I ROMMET SER UT SOM DET HAR BLITT FLYTTET ELLER GJEMT. BESKRIV ET KONKRET STED BARNET KAN UNDERSØKE NÆRMERE.</p>':'';
++  return `<div class="searchBox"><strong>LET I ROMMET</strong><p>HVIS BARNET UNDERSØKER ET STED DER NOE KAN VÆRE GJEMT, KAST FYSISK D6 OG TRYKK SAMME SIDE HER. DETTE ER ALLTID ET VALGFRITT FUNN, ALDRI EN STORY-NØKKEL.</p>${lowHint}<div class="diceChoices">${dice}</div></div>`;
++}
++function registerRoomSearchDice(value){
++  const r=currentRoom(),s=r?.search;if(!s?.available||s.taken||s.revealed)return;
++  const band=bandForDie(value);if(!validDiceBand(band))return;
++  s.searched=true;s.attempts=Math.max(0,s.attempts||0)+1;s.lastDiceValue=Number(value);s.lastDiceBand=band;
++  if(band!=='low'||s.attempts>=2){
++    s.revealed=true;
++    addLog(`NOE BLE FUNNET VED Å LETE I ${r.name}: ${s.item?.name||'ET FUNN'}.`);
++    toast('DU FANT NOE!');
++  }else{
++    addLog(`DERE LETTE I ${r.name} OG FIKK ET STERKERE HINT.`);
++    toast('NOE ER GJEMT HER ...');
++  }
++  save();renderRoom();renderScenario();
++}
++function takeRoomSearchFind(){
++  const r=currentRoom(),s=r?.search;if(!s?.available||!s.revealed||s.taken)return;
++  const item=s.item?.name;if(!item)return;
++  if(state.inventory.length>=6){toast('RYGGSEKKEN ER FULL');return;}
++  state.inventory.push(item);s.taken=true;
++  addLog(`TOK MED ${item} FRA ${r.name}.`);save();render();toast('FUNNET ER I SEKKEN');
++}
++function bindRoomSearch(){
++  $$('[data-room-search-die]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerRoomSearchDice(v))});
++  $$('[data-search-take]').forEach(b=>b.onclick=()=>takeRoomSearchFind());
++}
++function encounterProgressHtml(o){
++  if(!Number.isFinite(o?.progress)||!Number.isFinite(o?.maxProgress))return'';
++  const max=Math.max(1,o.maxProgress),n=Math.max(0,Math.min(max,o.progress));
++  return `<div class="encounterTrack"><b>ANNEN LØSNING · ${n}/${max}</b><div class="trackPips">${'◆'.repeat(n)}${'◇'.repeat(max-n)}</div><span>${n>=max?'SITUASJONEN ER KLAR TIL Å AVSLUTTES. FORTELL HVA SOM SKJER.':'MARKER FREMGANG NÅR BARNETS PLAN FAKTISK ENDRER SITUASJONEN.'}</span></div>`;
++}
+ function registerEncounterDice(index,value){
+   const band=bandForDie(value);if(!validDiceBand(band))return;
+@@ -2953,10 +2953,11 @@
+   if(o.type==='SKATT')return `<div class="helpBox">${eventEntityHeader(o,o.name,o.intro,o.name)}<p><b>HVA VIL DU GJØRE?</b></p><div class="row"><button class="small primary" data-eaction="TA_SKATT" data-eindex="${i}">TA DEN</button></div></div>`;
+   const combat=o.type==='MONSTER'&&(o.combatStarted===true||(Number.isFinite(o.hp)&&Number.isFinite(o.maxHp)&&o.hp<o.maxHp));
+   const hp=combat?`<div style="margin:6px 0;color:var(--pink)">${hearts(o.hp||0,o.maxHp||1)} <span class="sub">KAMP</span></div>`:'';
++  const progress=encounterProgressHtml(o);
+   const returning=o.returning?'<div class="returningTag">KJENT VENN FRA HELTEBOKA</div>':'';
+   const combatButton=o.type==='MONSTER'?(combat?`<button class="small" data-ehit="${i}">− HJERTE</button>`:`<button class="small" data-ecombat="${i}">BARNET VELGER KAMP</button>`):'';
+   const puzzlePending=!!(o.puzzle&&!o.puzzleSolved);
+   const puzzle=o.puzzle?`<div class="puzzleBox${o.puzzleSolved?' solved':''}"><div class="puzzleMeta">${o.puzzle.categoryLabel} · ${o.puzzle.levelLabel} ÅR</div><strong>${o.puzzle.title}</strong>${puzzlePending?`<p>${o.puzzle.scene} ${o.puzzle.prompt}</p><p><b>HVA TROR DU?</b></p><button class="small" data-epuzzle="${i}">SVARET ER FUNNET</button>`:'<p>DERE HAR FUNNET EN LØSNING. BESTEM HVA HELTEN GJØR MED DEN.</p>'}</div>`:'';
+   const dice=physicalDiceHtml(puzzlePending?{...o.gm,roll:false}:o.gm,o.diceBand||'',`data-edice="${i}"`,o.diceValue||'');
+-  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px">${combatButton}<button class="small primary" data-eresolve="${i}">MØTET ER FERDIG</button></div></div>`;
++  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${progress}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px"><button class="small" data-eprogress="${i}">+ FREMGANG</button>${combatButton}<button class="small primary" data-eresolve="${i}">MØTET ER FERDIG</button></div></div>`;
+ }
+@@ -2986,5 +2986,6 @@
+ function renderRoom(){
+   const root=$('#roomContents'),r=currentRoom();if(!r)return;
+   if(state.scenario.completed){root.innerHTML=completedAdventureHtml();$$('[data-reward]').forEach(b=>b.onclick=()=>claimReward(+b.dataset.reward));$$('[data-next-adventure]').forEach(b=>b.onclick=()=>startAnotherAdventure(false));return;}
+-  if(!r.events.length){root.innerHTML=`<div class="helpBox"><strong>${r.beat||'PUSTEROM'}</strong><p>DET ER LOV AT INGENTING STORT SKJER HER. SE RUNDT, BESKRIV ÉN TING ELLER GÅ VIDERE.</p></div>`;return;}
+-  root.innerHTML=r.events.map((ev,i)=>{
++  const searchHtml=roomSearchHtml(r);
++  if(!r.events.length){root.innerHTML=`${searchHtml}<div class="helpBox"><strong>${r.beat||'PUSTEROM'}</strong><p>DET ER LOV AT INGENTING STORT SKJER HER. SE RUNDT, BESKRIV ÉN TING ELLER GÅ VIDERE.</p></div>`;bindRoomSearch();return;}
++  root.innerHTML=searchHtml+r.events.map((ev,i)=>{
+@@ -2996,3 +2996,4 @@
+     return `<div class="helpBox">${eventEntityHeader(o,EVENT_LABELS[o.type]||o.type,'')}<p>HVA VIL DU GJØRE?</p><button class="small primary" data-eresolve="${i}">FERDIG</button></div>`;
+   }).join('');
++  bindRoomSearch();
+   $$('[data-critical]').forEach(b=>b.onclick=()=>handleCritical(+b.dataset.critical,b.dataset.action));
+@@ -3011,3 +3011,4 @@
+   });
+   $$('[data-ecombat]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ecombat;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter('MONSTER',r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i);ev.combatStarted=true;addLog(`${ev.name||'MONSTERET'}: BARNET VALGTE KAMP.`);save();renderRoom();renderMap();renderScenario()});
++  $$('[data-eprogress]').forEach(b=>b.onclick=()=>{const i=+b.dataset.eprogress;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});if(!Number.isFinite(ev?.maxProgress))return;ev.progress=Math.min(ev.maxProgress,Math.max(0,ev.progress||0)+1);if(ev.progress>=ev.maxProgress)addLog(`${ev.name||'MØTET'} HAR FULL FREMGANG. FORTELLEREN AVGJØR HVORDAN DET AVSLUTTES.`);save();renderRoom();renderScenario()});
+   $$('[data-ehit]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ehit;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter('MONSTER',r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i);if(ev.combatStarted!==true)return;ev.hp=Math.max(0,(ev.hp??ev.maxHp??1)-1);if(ev.hp===0)addLog(`${ev.name||'MONSTERET'} HAR INGEN HJERTER IGJEN.`);save();renderRoom();renderMap()});
