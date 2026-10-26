@@ -2,6 +2,36 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Interaction shells present explicit actions; they do not own story logic
+Some story actions should use focused player-facing popups/overlays (“interaction shells”), but the shell is presentation + action submission, not a source of hidden requirements or completion rules.
+
+Reference: a gate/machine requiring red, blue and yellow stones/crystals.
+- required slots become visible only after the story reveals them,
+- owning the matching resources never auto-fills the slots,
+- child explicitly places resources one at a time,
+- wrong resource is not silently consumed,
+- partial placement persists when fiction supports it,
+- all slots filled either completes the Storylet or enables a separate authored activation action,
+- the promised world effect must actually open/activate/change the target,
+- future undo must restore target state and inventory atomically.
+
+This generalizes the existing child-agency rule: **possessing a solution is not performing the action.**
+
+Initial shell families may include slot/assembly, locked-object item use, NPC favor/dialogue, merchant/trade, puzzle, combat, reward choice and search/inspect. Player shells may expose only currently known player-visible state and must never leak narrator-only facts or hidden answers.
+
+## 2026-10-26 - No external game/dungeon framework is adopted during current architecture transition
+A limited open-source survey identified useful reference projects, but no dependency is adopted now.
+
+Study-only candidates:
+- `boardgame.io` for move/state-transition, logs, time-travel/undo and multiplayer patterns,
+- `Colyseus` for authoritative state sync/reconnect patterns,
+- `rot.js` for classic roguelike generation/pathfinding/RNG algorithms,
+- `Epoch Mapper` for structured dungeon events/quests/interactions and standalone-player patterns.
+
+Current bottleneck is story/state semantics, not missing generic dungeon technology. Importing or replacing frameworks before Narrative Graph and the canonical action model are proven would add migration risk.
+
+Any future adoption requires an explicit ADR/spike covering exact value, license, maintenance, bundle/offline impact, save compatibility, Adventure Code determinism, LAN/shared-session implications and an exit strategy.
+
 ## 2026-10-26 - Critical requirements have explicit reachable provider routes
 A requirement and its acquisition path are separate graph concepts. Storylets may consume or require resources/states, while provider Storylets supply them.
 
