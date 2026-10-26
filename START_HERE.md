@@ -13,12 +13,15 @@ The active runtime branch is still:
 
 UX5A remains unmerged because physical iPad/mobile playtest is not green yet.
 
-Latest UX5A runtime follow-up is patch 11:
-`patches/v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
+Latest UX5A runtime follow-ups are:
+- patch 11: `patches/v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
+- patch 12: `patches/v0.12.3_playtest_single_location_name_ux5a.patch`
 
-It implements a new durable child-agency rule: a locked obstacle must present the problem before the app applies a possessed solution. For a keyed story door, tapping the door only establishes that it is locked. The child must deliberately choose an action such as `BRUK` on the matching key. The narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` if needed.
+Patch 11 implements a durable child-agency rule: a locked obstacle must present the problem before the app applies a possessed solution. For a keyed story door, tapping the door only establishes that it is locked. The child deliberately chooses an action such as `BRUK` on the matching key. The narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` if needed.
 
-Patch 11 is automated-runtime green but still needs fresh browser interaction QA and physical device retest.
+Patch 12 implements a durable location-identity rule: one physical room has one visible canonical place name. Internal zone/biome metadata remains available to generation/tone, but the player-facing UI, continue summary and current narrator location use the room name only.
+
+Patch 12 automated runtime is green, but fresh browser certification and physical device retest are still open.
 
 ## Read in this order
 1. `PROJECT_STATE.md`
@@ -40,14 +43,17 @@ Live playtest of `CRYSTAL_MACHINE` showed that the current collect planner is st
 
 A later playtest exposed the temporal version of the same problem: `SKYGGEHEKSA`, whose dramatic purpose was to make an active objective harder, could still first appear after that objective had already been completed. Content can therefore be individually valid while still be dramatically obsolete.
 
-Continued UX5A review exposed a related interaction principle: even when the system knows the obvious solution, the app should not take the child's decision away. A locked door with the correct key already owned must still invite the child to decide what to try.
+Continued UX5A review exposed two related product principles:
+- even when the system knows the obvious solution, the app should not take the child's decision away,
+- internal world metadata should not create competing player-facing identities for the same physical place.
 
 The intended critical-story replacement remains a hybrid Narrative Graph + curated Storylet Matrix:
 - humans curate strong small narrative modules and compatibility rules,
-- the generator chooses only compatible modules and places them on a procedural map,
+- generator chooses only compatible modules and places them on a procedural map,
 - critical story causality is validated before ambient content is added,
 - story beats have explicit dramatic timing and may expire when their purpose is gone,
-- UI/interaction presents constraints and affordances without silently choosing the child's solution.
+- UI presents constraints/affordances without silently choosing the child's solution,
+- future story UI should maintain one clear visible identity for each physical location.
 
 ## Reference target
 `CRYSTAL_MACHINE` is the first and only blueprint to convert initially.
@@ -80,6 +86,7 @@ A complication whose purpose is to hinder crystal collection may be valid during
 - do not implement Narrative Graph runtime.
 
 Current device retest must include:
+- each room presents one clear visible location name,
 - keyed door tap remains locked and does not auto-use the key,
 - scenario key exposes explicit protected `BRUK`,
 - explicit key use opens but does not traverse,
@@ -97,11 +104,12 @@ Current device retest must include:
 7. begin `WP-NG1` exactly as defined in `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`.
 
 ### If physical UX5A is YELLOW/RED
-Stay on UX5A. Fix, regress, and physically retest. Narrative Graph implementation remains blocked.
+Stay on UX5A. Fix, regress and physically retest. Narrative Graph implementation remains blocked.
 
 ## Critical architecture/product decisions
 - Story quality beats combinatorial volume.
 - Child proposes actions; app does not silently apply a possessed solution.
+- One physical location has one visible canonical name; internal zone metadata does not compete with it.
 - A smaller bank of coherent adventures with controlled variation is preferred to many disconnected combinations.
 - Critical nodes use `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
 - Critical beats have valid dramatic time windows; obsolete complications expire.
