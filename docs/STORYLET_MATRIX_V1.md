@@ -9,7 +9,8 @@ The matrix is a compatibility and **meaning** contract. It separates:
 - what enables an action from the child actually choosing it,
 - a scene being present from the scene having a meaningful function,
 - a UI counter from authored fictional progress,
-- tracked authored story logic from intentionally open narrator improvisation.
+- tracked authored story logic from intentionally open narrator improvisation,
+- the fictional subject/skin from the narrative role it performs in this adventure.
 
 ## Storylet contract
 Each Storylet must declare at least:
@@ -43,6 +44,7 @@ criticalSafe
 `payoff` is what narrator/player should experience after completion. `worldEffects[]` is the actual game-state change that makes that payoff true.
 
 Optional:
+- `subjectId`
 - `progressStages[]`
 - `narratorImprov`
 - `npcRole`
@@ -57,6 +59,8 @@ Optional:
 - `consumesResource`
 - `openHint`
 - `strongerHint`
+
+`subjectId` identifies the recurring fictional subject/presentation independently from `id`, which identifies the actual Storylet role/logic. This allows one curated subject to support several compatible authored roles without making saves or causal state depend on presentation skin.
 
 `progressStages[]` is allowed only when each stage names a real meaningful fictional change. There is no default “normal = 3 / exciting = 4” storylet duration.
 
@@ -98,6 +102,29 @@ Examples: `DEAD_END_OK`, `NEEDS_ADJACENT_ROOM`, `NEEDS_SEARCHABLE_PROP`, `NEEDS_
 
 ### Tone
 Examples: `LYS`, `MØRK`, `BLANDET`, `RAR`.
+
+## Subject / role separation
+A Storylet subject is a reusable fictional presentation, not a permanently fixed gameplay function.
+
+Reference subject: `BOKA SOM SKRIVER TILBAKE`.
+Compatible authored role examples may include:
+- optional narrator-improvisation mystery,
+- NPC-like conversational encounter with motive/response,
+- tracked clue/reveal source,
+- puzzle carrier whose solved state opens an authored gate,
+- item/reward holder whose payoff explicitly grants the tracked resource.
+
+The same pattern may be used for compatible magical subjects such as `DEN SNAKKENDE DUKKEN`, `DET LEVENDE BILDET`, enchanted mirrors, statues or similar entities. These are not automatically equivalent; each subject declares compatible role families/tags.
+
+Hard rules:
+- generator chooses only a pre-authored compatible subject + Storylet-role pairing,
+- an ambient subject cannot become critical merely because a random role is available,
+- a puzzle/gate/resource role carries explicit payload, completion and world effect,
+- a subject's open-improv version cannot silently satisfy a critical role,
+- role diversity and subject diversity are scored separately,
+- repeat the same recognizable subject sparingly within one adventure/recent play unless repetition itself is authored as meaningful.
+
+This model creates variation through **curated role reuse**, not through unrestricted combinatorial mixing.
 
 ## Purpose/world-effect rule
 The `REGNBUENETTET` UX5A finding is a hard authoring lesson: “interesting text + buttons” is not a complete scene.
@@ -147,7 +174,9 @@ Reject before map materialization if:
 - blocking Storylet can softlock without retreat/fail-forward,
 - random puzzle/mechanic is attached without authored contextual role,
 - prose implies a hidden authored answer but payload is absent and no explicit narrator-improv contract exists,
-- critical state depends on a narrator-invented fact that is not represented in graph state.
+- critical state depends on a narrator-invented fact that is not represented in graph state,
+- subject/role pairing is not explicitly compatible,
+- the same subject is reused repetitively only to inflate variation count.
 
 ## Agency / affordance rule
 Authored approaches are possibilities, not answer buttons.
@@ -165,7 +194,8 @@ After hard filtering, score valid Storylets by:
 3. contrast with adjacent beats,
 4. room/map fit,
 5. age-band fit,
-6. recent repetition penalty.
+6. recent role repetition penalty,
+7. recent subject repetition penalty.
 
 Do not score invalid combinations into validity.
 
@@ -202,6 +232,7 @@ A critical Storylet is not accepted because schema validates. It must answer:
 - Does world state actually reflect that change?
 - Can narrator understand scene without inventing missing logic or filler steps?
 - If narrator is invited to invent a detail, is that responsibility explicitly labelled and safely scoped?
+- Is the chosen subject genuinely compatible with this role rather than merely cosmetically interchangeable?
 - Does UI leave room for an unlisted plausible child solution?
 
 If answers are weak, Storylet remains editorially unapproved even if code is green.
