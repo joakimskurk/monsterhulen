@@ -7,90 +7,97 @@ An old crystal machine is sealed behind a story gate. The machine visibly lacks 
 
 The child should understand the objective from the fiction before the UI expects them to act on it.
 
+A resource being known or owned only makes an action possible. It does not mean the app performs the action. The child remains the one who decides what to try.
+
 ## Beat 1 - reveal the requirement
-The first meaningful encounter with the gate/machine must describe the missing parts in-world.
+The first meaningful encounter with gate/machine must describe missing parts in-world.
 
 Reference narration:
-
 > I steinen er det tre små tomme fester. Rundt det ene gløder en rød ring, rundt det andre en blå og rundt det tredje en gul.
 
 Narrator guidance:
 - describe what is visible,
-- do not immediately tell the child the solution,
-- allow the child to infer that three matching objects are missing,
-- after this reveal, the quest tracker may show red/blue/yellow crystal as known targets.
+- do not immediately tell child the solution,
+- allow child to infer that three matching objects are missing,
+- after reveal, quest tracker may show red/blue/yellow crystal as known targets.
 
-Before this reveal, the UI must not behave as if the child already knows the exact three-part requirement.
+Before reveal, UI must not behave as if child already knows exact requirement.
 
 ## Beat 2 - hidden crystal
 One crystal is acquired through `SEARCH_SECRET`.
 
 Required qualities:
-- the room contains a concrete sign before the child searches,
-- the sign is related to the crystal color/material,
-- the crystal name is not leaked before discovery,
+- concrete sign before child searches,
+- sign related to crystal color/material,
+- crystal name not leaked before discovery,
 - uncertain search may use physical D6,
-- one low result strengthens the clue,
-- repeated low searching fail-forwards and cannot softlock the critical item.
+- first low strengthens clue,
+- repeated low fails forward,
+- discovery still requires an explicit search/take interaction; merely entering room does not silently add crystal.
 
 Reference fiction:
 - colored light flashes through a crack,
-- small matching shards lie nearby,
-- touching the wall makes the light move.
+- matching shards lie nearby,
+- touching wall makes light move.
 
 ## Beat 3 - NPC crystal
 One crystal is acquired through `NPC_FAVOR`.
 
 Required qualities:
-- the NPC visibly has, wears, guards or knows how to reach the crystal,
-- the NPC has a concrete reason not to simply hand it over immediately,
-- the favor refers to a real reachable dependency generated into the map,
-- the favor is short enough to feel like a branch inside the adventure, not a second full campaign,
-- helping the NPC causes an explicit payoff and transfers the crystal.
+- NPC visibly has/wears/guards/knows how to reach crystal,
+- concrete reason not to hand it over immediately,
+- favor refers to real reachable dependency,
+- favor short enough to be branch, not second campaign,
+- helping NPC causes explicit payoff and transfer.
 
 Reference structure:
 1. Meet NPC with crystal.
-2. NPC explains a small problem.
-3. A linked room/resource is revealed.
-4. Child solves the problem in any plausible way.
-5. NPC gives crystal with a reason.
+2. NPC explains small problem.
+3. Linked room/resource is revealed.
+4. Child solves problem in any plausible way.
+5. Child returns/interacts as fiction requires.
+6. NPC explicitly gives crystal with a reason.
 
-The dependency may not be the same crystal, may not be behind the final gate and may not rely on a random optional UX5A find.
+Completing the dependency does not silently teleport reward into inventory unless a specific storylet explicitly authors such a payoff.
 
 ## Beat 4 - guardian crystal
 One crystal is acquired through `GUARDIAN`.
 
 Required qualities:
-- the crystal is visibly connected to the creature/guardian,
-- the creature has a motive, not merely hit points,
-- at least one non-combat affordance is authored,
+- crystal visibly connected to guardian,
+- creature has motive, not merely hit points,
+- at least one non-combat affordance authored,
 - free-form child solutions remain valid,
-- combat appears only if the child chooses combat or fiction naturally escalates there.
+- combat only if child chooses it or fiction naturally escalates,
+- learning guardian's motive does not auto-resolve it; child acts on that knowledge.
 
 Reference guardian:
 A creature contains or protects the glowing crystal and reacts strongly to light, music, food, play, fear, friendship or another concrete motive. The child can use that motive to change the situation.
 
 ## Beat 5 - return and assemble
 After all three crystals are acquired:
-- the graph marks the gate requirement as satisfied,
-- returning to the machine should matter,
-- the child should get to place/activate the parts in fiction,
-- the app must not silently auto-complete the assembly just because inventory contains all three.
+- graph marks all acquisition requirements satisfied,
+- `ASSEMBLE` becomes actionable but remains incomplete,
+- returning to machine matters,
+- child gets to place/activate parts in fiction,
+- app must not silently auto-complete assembly just because inventory contains all three.
 
 Reference narration:
-
 > De tre tomme festene lyser i de samme fargene som krystallene dere bærer.
 
 The child may decide which crystal goes in first unless order is an authored puzzle.
 
-## Beat 6 - payoff
-Once assembled:
-- machine reacts clearly,
-- gate/path opens,
-- the story acknowledges the three different things the child did to get here,
-- climax becomes reachable only now.
+This is the reference example for the project-wide agency rule: **availability is not action**.
 
-## Knowledge states
+## Beat 6 - payoff
+Only after explicit assembly:
+- machine reacts clearly,
+- `MACHINE_ASSEMBLED` becomes true,
+- gate/path opens,
+- story acknowledges the different things child did,
+- climax becomes reachable.
+
+## Knowledge/action states
 Suggested states:
 - `CRYSTAL_REQUIREMENT_UNKNOWN`
 - `CRYSTAL_REQUIREMENT_REVEALED`
@@ -98,30 +105,45 @@ Suggested states:
 - `BLUE_KNOWN / BLUE_FOUND`
 - `YELLOW_KNOWN / YELLOW_FOUND`
 - `ALL_CRYSTALS_FOUND`
+- `ASSEMBLY_AVAILABLE`
 - `MACHINE_ASSEMBLED`
 
-A resource may be discoverable before the main reveal, but the narrator/UI must then describe it as an interesting object rather than retroactively pretending the child already knew its purpose.
+`ALL_CRYSTALS_FOUND` and `MACHINE_ASSEMBLED` must remain distinct.
+
+A resource may be discoverable before main reveal, but narrator/UI then describes it as an interesting object rather than pretending child already knew its purpose.
+
+## Hinting rule
+When child is stuck, guidance should normally escalate gradually:
+1. restate visible fiction,
+2. ask what child wants to try,
+3. point to a category of affordance (`KANSKJE NOE DERE HAR KAN HJELPE?`),
+4. only become more explicit when actually needed.
+
+Do not immediately convert authored knowledge into a closed answer button.
 
 ## Structural acceptance
 Automated generation must prove:
-- all three acquisition nodes are reachable before the gate,
-- all dependencies of each acquisition node are also reachable before the gate,
+- all three acquisition nodes reachable before gate,
+- all dependencies reachable before gate,
 - no required resource depends on generic optional search loot,
-- no acquisition branch depends on itself or another later branch in a cycle,
-- at least three acquisition families are used by default,
+- no acquisition branch cycles,
+- at least three acquisition families by default,
 - each critical node has setup/signal/action/payoff metadata,
-- the gate is impossible to satisfy without the three actual resources,
-- secret paths cannot bypass the gate,
-- Adventure Code reconstruction produces the same critical graph.
+- action-bearing nodes have explicit completion semantics,
+- all crystals owned does not auto-complete `ASSEMBLE`,
+- gate impossible to satisfy before explicit assembly,
+- secret paths cannot bypass gate,
+- Adventure Code reconstruction produces same critical graph.
 
 ## Editorial acceptance
-Automated tests are necessary but insufficient. Before this architecture is copied to the other blueprints, manually play at least 10 generated Crystal Machine adventures and judge:
-- was the goal understood from the fiction,
+Before architecture is copied to other blueprints, manually play at least 10 generated Crystal Machine adventures and judge:
+- was goal understood from fiction,
 - did each crystal feel like a small story rather than loot,
-- did the three branches feel meaningfully different,
-- did the narrator know what to say and what mattered,
+- did branches feel meaningfully different,
+- did narrator know what to say and what mattered,
 - were there obvious free-form child solutions,
-- did returning to the machine feel like a payoff,
-- did any combination feel absurd even though it was structurally valid.
+- did UI leave child room to choose actions rather than auto-solving known dependencies,
+- did returning/assembly feel like payoff,
+- did any combination feel absurd despite structural validity.
 
-Any recurrent absurd combination must be fixed through storylet compatibility/editorial rules, not patched with ad-hoc narrator improvisation.
+Any recurrent absurd combination must be fixed through storylet compatibility/editorial rules, not ad-hoc narrator repair.
