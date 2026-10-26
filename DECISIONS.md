@@ -2,6 +2,14 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Story quality beats combinatorial volume
+Monsterhulen optimizes for coherent, memorable adventures, not for the largest possible number of procedural combinations. A few curated adventures that work very well are preferable to thousands of merely valid combinations.
+
+Critical story elements must therefore be bundled in curated Adventure Blueprints. The seed may vary safe details such as layout, valid placement and side content, but must not randomly remix the critical premise, clues, key/target/parts, world route and payoff. New blueprints are added only after the existing bank has been manually playtested.
+
+## 2026-10-26 - Adventure Code is offline-first and versioned
+Adventure Code V1 uses protocol tag `MH1`. The child device can export a code and a second device can reconstruct the same curated adventure plan without network synchronization. The code carries the exact successful layout seed as well as the blueprint ID. Live synchronization of current room/inventory/dice is deliberately deferred until offline two-device play has been validated.
+
 ## 2026-10-23 - GitHub is the permanent source of truth
 The connected `joakimskurk/monsterhulen` repository is the durable project workspace. Chat is temporary. No critical state, decision, test status or continuation point may exist only in chat.
 
@@ -16,7 +24,7 @@ Internal Eventyr*/HulerCharacterSystem names are intentionally retained unless a
 Canonical storage key is `monsterhulen_v120`; `eventyrkryper_v100` is the first legacy key. State schema remains 12. Legacy saves are normalized and copied forward; legacy storage is not silently destroyed.
 
 ## 2026-10-21 - Physical dice are core interaction
-The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. Screen input records only `1-2`, `3-4`, or `5-6` and never auto-completes the scene.
+The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. The playtest UI records the exact physical die face; internal consequence compatibility remains low/mid/high.
 
 ## 2026-10-21 - Identity and mechanics stay separate
 Hero type/species, selected trait and equipped start item are independent choices. Base hero art is state-neutral. Functional equipment is not baked into hero mechanics or inferred from species/archetype.
