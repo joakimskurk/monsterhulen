@@ -1,0 +1,132 @@
+--- Monsterhulen_TEST_v0.12.3_PLAYTEST_UX1/index.html	2026-10-26 10:54:34.000000000 +0100
++++ Monsterhulen_TEST_v0.12.3_PLAYTEST_UX2/index.html	2026-10-26 11:03:58.000000000 +0100
+@@ -132,14 +132,17 @@
+ .dicePanel{margin-top:9px;padding-top:8px;border-top:2px solid var(--pixel)}
+ .dicePrompt{font-size:9px;line-height:1.35;color:var(--muted);margin-bottom:6px}
+ .dicePrompt b{color:var(--text)}
+-.diceChoices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+-button.diceChoice{min-height:50px;padding:7px 4px;font-size:10px;line-height:1.15;box-shadow:2px 2px 0 var(--pixel)}
+-button.diceChoice .diceRange{display:block;font-size:14px;font-weight:900;margin-bottom:3px}
+-button.diceChoice.low{background:var(--red);color:#2f0000}
+-button.diceChoice.mid{background:var(--yellow);color:#271b00}
+-button.diceChoice.high{background:var(--green);color:#082410}
+-button.diceChoice.selected{outline:3px solid var(--cyan);outline-offset:1px}
++.diceChoices{display:grid;grid-template-columns:repeat(6,minmax(38px,1fr));gap:6px}
++button.dieFace{aspect-ratio:1/1;min-height:0;padding:6px;background:#f4f0dd;color:#111;border:3px solid #111;border-radius:7px;box-shadow:2px 2px 0 var(--pixel);display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);align-items:center;justify-items:center;position:relative;transition:transform .14s ease,filter .14s ease}
++button.dieFace:hover{filter:brightness(1.06)}
++button.dieFace.selected{outline:3px solid var(--cyan);outline-offset:2px;transform:translateY(-2px)}
++button.dieFace.diePulse{animation:dieStamp .34s ease-out}
++.diePip{width:8px;height:8px;background:#111;border-radius:50%;display:block}
++.diePip.p1{grid-column:1;grid-row:1}.diePip.p2{grid-column:2;grid-row:1}.diePip.p3{grid-column:3;grid-row:1}.diePip.p4{grid-column:1;grid-row:2}.diePip.p5{grid-column:2;grid-row:2}.diePip.p6{grid-column:3;grid-row:2}.diePip.p7{grid-column:1;grid-row:3}.diePip.p8{grid-column:2;grid-row:3}.diePip.p9{grid-column:3;grid-row:3}
++.diceResultFace{display:inline-grid;width:34px;height:34px;padding:4px;margin:0 8px 4px 0;vertical-align:middle;background:#f4f0dd;border:2px solid #111;border-radius:5px;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);align-items:center;justify-items:center}
++.diceResultFace .diePip{width:5px;height:5px}
++@keyframes dieStamp{0%{transform:scale(.82) rotate(-7deg)}55%{transform:scale(1.12) rotate(5deg)}100%{transform:scale(1) rotate(0)}}
++@media(max-width:680px){.diceChoices{grid-template-columns:repeat(3,minmax(54px,1fr))}button.dieFace{max-width:76px;width:100%;justify-self:center}}
+ .diceOutcome{margin-top:7px;padding:8px;border:2px solid var(--yellow);background:#15102d;font-size:11px;line-height:1.4;color:var(--text)}
+ .diceOutcome strong{display:block;color:var(--yellow);margin-bottom:3px}
+ .diceNarratorResult{border:2px solid var(--yellow);padding:7px!important;background:#15102d;color:var(--text)!important}
++.narratorGuide{margin:7px 0;padding:8px;border:2px solid var(--cyan);background:#0d1730;font-size:10px;line-height:1.4}.narratorGuide>b{color:var(--cyan)}.narratorGuide p{margin:5px 0;color:var(--text)}
+@@ -339,7 +342,7 @@
+-        <div class="helpBox"><strong>SPENNENDE OG USIKKERT</strong><p>KAST 1D6 FYSISK PÅ BORDET. TRYKK SÅ 1-2, 3-4 ELLER 5-6 PÅ SCENEN FOR Å VISE DEN KONKRETE KONSEKVENSEN.</p></div>
++        <div class="helpBox"><strong>SPENNENDE OG USIKKERT</strong><p>KAST 1D6 FYSISK PÅ BORDET. TRYKK SÅ PÅ DEN SAMME TERNINGSIDEN PÅ SKJERMEN FOR Å VISE DEN KONKRETE KONSEKVENSEN.</p></div>
+@@ -1150,6 +1153,15 @@
++  function narratorEncounterGuide(ev){
++    if(!ev)return '';
++    const common=`<p><b>SLIK KAN DU FORTELLE DET:</b><br>1. LES SCENEN HØYT.<br>2. LA FIGUREN ELLER VERDEN VISE HVA DEN VIL, UTEN Å AVSLØRE EN «RIKTIG» LØSNING.<br>3. SPØR: «HVA VIL DU GJØRE?»<br>4. GODTA PLANEN BARNET FINNER PÅ.<br>5. HVIS DET ÅPENBART VIRKER, LA DET VIRKE. KAST BARE NÅR DET ER SPENNENDE AT DET KAN GÅ FLERE VEIER.</p>`;
++    if(ev.type==='VENN')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>VENNLIG FIGUR.</b> IKKE EN FIENDE. FIGUREN HAR ET LITE PROBLEM ELLER ØNSKE OG KAN BLI EN FIN DEL AV HISTORIEN.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR Å SNAKKE, HILSE ELLER TILBY HJELP. KAST BARE HVIS BARNETS PLAN HAR ET USIKKERT UTFALL. EN ENKEL GOD IDÉ KAN BARE VIRKE.</p></div>`;
++    if(ev.type==='PERSON')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN PERSON MED EGET MÅL.</b> IKKE AUTOMATISK SNILL ELLER SLEM. SPILL PERSONEN SOM NYSGJERRIG, OPPTATT, REDD, STOLT ELLER TRAVEL UT FRA DET DEN VIL.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR VANLIG SAMTALE. KAST BARE NÅR BARNET PRØVER NOE SOM KAN GÅ FLERE INTERESSANTE VEIER.</p></div>`;
++    if(ev.type==='MONSTER')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN SKAPNING ELLER HINDRING, IKKE AUTOMATISK «SLEM».</b> DEN VIL NOE. VIS DET FØR DU TENKER KAMP.</p>${common}<p><b>NÅR KASTER DERE?</b> SNAKK, LURE PLANER OG PASSENDE TING KAN VIRKE UTEN KAMP. KAST NÅR UTFALLET FAKTISK ER USIKKERT.</p></div>`;
++    if(ev.type==='FELLE')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN FARE I MILJØET.</b> BESKRIV HVA BARNET KAN LEGGE MERKE TIL FØR NOE GÅR GALT.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR Å OPPDAGE NOE ÅPENBART. KAST NÅR BARNET UTFØRER EN RISIKABEL MANØVER ELLER TESTER EN USIKKER PLAN.</p></div>`;
++    if(ev.type==='MYSTISK')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>ET MYSTERIUM.</b> LA BARNET UNDERSØKE, SPØRRE OG TENKE. DU SKAL IKKE PRESSE FRAM ET KAST FOR SELVE GÅTEN.</p>${common}</div>`;
++    if(ev.type==='SKATT')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>ET VALGFRITT FUNN.</b> DET KAN TAS, IGNORERES ELLER BRUKES KREATIVT. DET ER IKKE EN SKJULT OBLIGATORISK NØKKEL.</p>${common}</div>`;
++    return '';
++  }
+@@ -1160,8 +1172,8 @@
+-    const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER REGISTRERT FYSISK KAST:</b> ${band==='low'?'1-2 · OI!':band==='mid'?'3-4 · DET GÅR':'5-6 · KJEMPEBRA'}<br>${ev.gm[band]}</p>`:'';
++    const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER KASTET:</b><br>${ev.gm[band]}</p>`:'';
+@@ -1163,7 +1175,7 @@
+-    const base=`<strong>${ev.name}</strong><p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${monsterRule}${puzzleBlock}`;
++    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${monsterRule}${puzzleBlock}`;
+@@ -1165,7 +1177,7 @@
+-    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>FORSLAG ETTER KAST</summary><p><b>1–2:</b> ${ev.gm.low}<br><b>3–4:</b> ${ev.gm.mid}<br><b>5–6:</b> ${ev.gm.high}</p></details>`;
++    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
+@@ -1461,7 +1473,7 @@
+-    const band=p.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER REGISTRERT FYSISK KAST:</b> ${band==='low'?'1-2 · OI!':band==='mid'?'3-4 · DET GÅR':'5-6 · KJEMPEBRA'}<br>${g[band]}</p>`:'';
++    const band=p.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER KASTET:</b><br>${g[band]}</p>`:'';
+@@ -1467,7 +1479,7 @@
+-      :`<p><b>TERNING:</b> BARE HVIS UTFALLET ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>FORSLAG ETTER KAST</summary><p><b>1–2:</b> ${g.low}<br><b>3–4:</b> ${g.mid}<br><b>5–6:</b> ${g.high}</p></details>`;
++      :`<p><b>TERNING:</b> BARE HVIS UTFALLET ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${g.low}<br><b>⚂ / ⚃</b> ${g.mid}<br><b>⚄ / ⚅</b> ${g.high}</p></details>`;
+@@ -2840,27 +2852,46 @@
+ const PHYSICAL_DICE_BANDS=Object.freeze({
+-  low:Object.freeze({range:'1-2',label:'OI!'}),
+-  mid:Object.freeze({range:'3-4',label:'DET GÅR'}),
+-  high:Object.freeze({range:'5-6',label:'KJEMPEBRA'})
++  low:Object.freeze({range:'1-2'}),
++  mid:Object.freeze({range:'3-4'}),
++  high:Object.freeze({range:'5-6'})
+ });
++const DIE_PIPS=Object.freeze({1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]});
+ function validDiceBand(band){return Object.prototype.hasOwnProperty.call(PHYSICAL_DICE_BANDS,band)}
++function bandForDie(value){const v=Number(value);return v<=2?'low':v<=4?'mid':'high'}
+ function diceOutcomeText(gm,band){return validDiceBand(band)&&gm?String(gm[band]||''):''}
+-function physicalDiceHtml(gm,selectedBand='',attrs=''){
++function dieFaceInner(value){return (DIE_PIPS[Number(value)]||[]).map(pos=>`<span class="diePip p${pos}"></span>`).join('')}
++function dieFaceButton(value,selectedValue='',attrs=''){const selected=Number(selectedValue)===Number(value);return `<button type="button" class="dieFace${selected?' selected':''}" data-die-value="${value}" ${attrs} aria-label="TERNINGSIDE MED ${value} PRIKKER">${dieFaceInner(value)}</button>`}
++function dieResultFace(value){return `<span class="diceResultFace" aria-label="TERNINGSIDE MED ${value} PRIKKER">${dieFaceInner(value)}</span>`}
++function physicalDiceHtml(gm,selectedBand='',attrs='',selectedValue=''){
+   if(!gm||gm.roll===false)return'';
+   const selected=validDiceBand(selectedBand)?selectedBand:'';
+-  const buttons=Object.entries(PHYSICAL_DICE_BANDS).map(([band,m])=>`<button type="button" class="diceChoice ${band}${selected===band?' selected':''}" data-dice-band="${band}" ${attrs}><span class="diceRange">${m.range}</span>${m.label}</button>`).join('');
+-  const outcome=selected?`<div class="diceOutcome"><strong>${PHYSICAL_DICE_BANDS[selected].range} · ${PHYSICAL_DICE_BANDS[selected].label}</strong><b>FORSLAG TIL HVA SOM SKJER:</b><br>${diceOutcomeText(gm,selected)}<div class="sub" style="margin-top:5px">FORTELLEREN KAN ENDRE KONSEKVENSEN SÅ DEN PASSER BARNETS PLAN.</div></div>`:'';
+-  return `<div class="dicePanel"><div class="dicePrompt"><b>FYSISK D6:</b> KAST BARE HVIS UTFALLET ER USIKKERT. VED 2D6 BRUKER DERE DEN HØYESTE TERNINGEN. TRYKK RESULTATET HER.</div><div class="diceChoices">${buttons}</div>${outcome}</div>`;
++  const buttons=[1,2,3,4,5,6].map(v=>dieFaceButton(v,selectedValue,attrs)).join('');
++  const outcome=selected?`<div class="diceOutcome">${selectedValue?dieResultFace(selectedValue):''}<b>FORSLAG TIL HVA SOM SKJER:</b><br>${diceOutcomeText(gm,selected)}<div class="sub" style="margin-top:5px">FORTELLEREN KAN ENDRE KONSEKVENSEN SÅ DEN PASSER BARNETS PLAN.</div></div>`:'';
++  return `<div class="dicePanel"><div class="dicePrompt"><b>FYSISK D6:</b> KAST BARE HVIS UTFALLET ER USIKKERT. VED 2D6 BRUKER DERE DEN HØYESTE TERNINGEN. TRYKK PÅ DEN SAMME TERNINGSIDEN HER.</div><div class="diceChoices">${buttons}</div>${outcome}</div>`;
+ }
+@@ -2860,9 +2891,15 @@
++let freeDiceValue='';
++function pulseDieButton(button,after){if(!button){after();return}button.classList.add('diePulse');setTimeout(()=>{button.classList.remove('diePulse');after()},260)}
+ function renderFreeRoll(){
+   const root=$('#freeRollBox');if(!root)return;
+   const selected=validDiceBand(freeDiceBand)?freeDiceBand:'';
+-  const buttons=Object.entries(PHYSICAL_DICE_BANDS).map(([band,m])=>`<button type="button" class="diceChoice ${band}${selected===band?' selected':''}" data-free-dice="${band}"><span class="diceRange">${m.range}</span>${m.label}</button>`).join('');
+-  const result=selected?`<div class="diceOutcome"><strong>${PHYSICAL_DICE_BANDS[selected].range} · ${PHYSICAL_DICE_BANDS[selected].label}</strong><b>FORSLAG:</b><br>${FREE_DICE_OUTCOMES[selected]}<div class="sub" style="margin-top:5px">DETTE ER IKKE FASIT. BRUK EN ANNEN KONSEKVENS HVIS DEN PASSER BEDRE TIL DET BARNET FANT PÅ.</div></div>`:'';
+-  root.innerHTML=`<strong>NÅR BARNET FINNER PÅ NOE APPEN IKKE HAR TENKT PÅ</strong><p>LETT / UFARLIG: LA DET BARE VIRKE. USIKKERT: KAST FYSISK 1D6. HVIS «EKSTRA GOD PÅ» PASSER: 2D6, BRUK HØYESTE. TRYKK RESULTATET HER.</p><div class="diceChoices" style="margin-top:8px">${buttons}</div>${result}`;
+-  $$('[data-free-dice]').forEach(b=>b.onclick=()=>{freeDiceBand=b.dataset.freeDice;renderFreeRoll();const meta=PHYSICAL_DICE_BANDS[freeDiceBand];toast(`${meta.range} · ${meta.label}`)});
++  const buttons=[1,2,3,4,5,6].map(v=>dieFaceButton(v,freeDiceValue,'data-free-die="1"')).join('');
++  const result=selected?`<div class="diceOutcome">${freeDiceValue?dieResultFace(freeDiceValue):''}<b>FORSLAG:</b><br>${FREE_DICE_OUTCOMES[selected]}<div class="sub" style="margin-top:5px">DETTE ER IKKE FASIT. BRUK EN ANNEN KONSEKVENS HVIS DEN PASSER BEDRE TIL DET BARNET FANT PÅ.</div></div>`:'';
++  root.innerHTML=`<strong>NÅR BARNET FINNER PÅ NOE APPEN IKKE HAR TENKT PÅ</strong><p>LETT / UFARLIG: LA DET BARE VIRKE. USIKKERT: KAST FYSISK 1D6. HVIS «EKSTRA GOD PÅ» PASSER: 2D6, BRUK HØYESTE. TRYKK PÅ DEN SAMME TERNINGSIDEN HER.</p><div class="diceChoices" style="margin-top:8px">${buttons}</div>${result}`;
++  $$('[data-free-die]').forEach(b=>b.onclick=()=>{const value=Number(b.dataset.dieValue);pulseDieButton(b,()=>{freeDiceValue=value;freeDiceBand=bandForDie(value);renderFreeRoll()})});
+ }
+-function registerEncounterDice(index,band){
+-  if(!validDiceBand(band))return;
++function registerEncounterDice(index,value){
++  const band=bandForDie(value);if(!validDiceBand(band))return;
+@@ -2873,11 +2910,10 @@
+-  ev.diceBand=band;
++  ev.diceBand=band;ev.diceValue=Number(value);
+   save();renderRoom();renderScenario();
+-  const meta=PHYSICAL_DICE_BANDS[band];toast(`${meta.range} · ${meta.label}`);
+ }
+-function registerClimaxDice(eventIndex,phaseIndex,band){
+-  if(!validDiceBand(band))return;
++function registerClimaxDice(eventIndex,phaseIndex,value){
++  const band=bandForDie(value);if(!validDiceBand(band))return;
+@@ -2882,9 +2918,8 @@
+-  ph.diceBand=band;
++  ph.diceBand=band;ph.diceValue=Number(value);
+   save();renderRoom();renderScenario();
+-  const meta=PHYSICAL_DICE_BANDS[band];toast(`${meta.range} · ${meta.label}`);
+ }
+@@ -2895,7 +2930,7 @@
+-  const dice=physicalDiceHtml(ph?.gm,ph?.diceBand||'',`data-cdice="${i}" data-cphase="${idx}"`);
++  const dice=physicalDiceHtml(ph?.gm,ph?.diceBand||'',`data-cdice="${i}" data-cphase="${idx}"`,ph?.diceValue||'');
+@@ -2923,7 +2958,7 @@
+-  const dice=physicalDiceHtml(puzzlePending?{...o.gm,roll:false}:o.gm,o.diceBand||'',`data-edice="${i}"`);
++  const dice=physicalDiceHtml(puzzlePending?{...o.gm,roll:false}:o.gm,o.diceBand||'',`data-edice="${i}"`,o.diceValue||'');
+@@ -2962,3 +2997,3 @@
+-  $$('[data-edice]').forEach(b=>b.onclick=()=>registerEncounterDice(+b.dataset.edice,b.dataset.diceBand));
++  $$('[data-edice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerEncounterDice(+b.dataset.edice,v))});
+@@ -2964,3 +2999,3 @@
+-  $$('[data-cdice]').forEach(b=>b.onclick=()=>registerClimaxDice(+b.dataset.cdice,+b.dataset.cphase,b.dataset.diceBand));
++  $$('[data-cdice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerClimaxDice(+b.dataset.cdice,+b.dataset.cphase,v))});
