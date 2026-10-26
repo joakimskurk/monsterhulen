@@ -27,11 +27,13 @@ Canonical order: `patches/README.md`.
 Latest additions:
 - patch 10: `v0.12.3_playtest_device_findings_hotfix_ux5a.patch`
 - patch 11: `v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
+- patch 12: `v0.12.3_playtest_single_location_name_ux5a.patch`
 
-Patch 11 exists because possessing a matching key must not make a locked door solve itself. Door tap presents the lock; child deliberately chooses `BRUK` on the story key.
+Patch 11 exists because possessing a matching key must not make a locked door solve itself. Patch 12 exists because room name + zone name looked like two competing names for one physical place.
 
-## Automated evidence after patch 11 - GREEN
-Executed against the fresh reconstructed patch-11 runtime:
+## Automated evidence after patch 12 - GREEN
+Executed against the reconstructed patch-12 runtime:
+- `tests/QA_SINGLE_LOCATION_NAME_UX5A.js`: **19 PASS / 0 FAIL**
 - `tests/QA_DEVICE_FINDINGS_UX5A.js`: **27 PASS / 0 FAIL**
 - `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2216 PASS / 0 FAIL**
 - `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**
@@ -39,12 +41,23 @@ Executed against the fresh reconstructed patch-11 runtime:
 - `tests/QA_CONTENT_REGRESSION.js`: **5960 PASS / 0 FAIL**
 - 11 inline JavaScript blocks: **0 syntax errors**
 
-Fresh patch-11 behavioral reconstruction SHA-256:
-`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
+Patch-12 behavioral reconstruction SHA-256:
+`79bea4f4b608c34ac6189aec6fcadbcd09978814625e94dc74e3654a58d9cd42`
 
-This hash is not a byte-identical release-baseline claim. Library text provenance remains repository-health debt.
+Patch-12 patch SHA-256:
+`0cd1e2b43f9e1add7d53bf188ed9688ca0694be4d45b35dda941fb3c18ca7f58`
 
-### Targeted patch-11 QA covers
+These hashes are reconstruction artifacts, not byte-identical release-baseline claims. Library text provenance remains repository-health debt.
+
+### Patch-12 QA covers
+- no second `OMRÅDE` location badge in player room banner,
+- render metadata does not expose zone as a second place name,
+- public continue/resume summary uses room name only,
+- current narrator location heading uses room name,
+- full narrator room list no longer presents zone name as a competing identity,
+- internal zone metadata remains intact and still contributes to deterministic generation.
+
+### Targeted patch-11 QA still covers
 - keyed locked door tap has a dedicated non-solving branch,
 - door tap only reports `DØREN ER LÅST`,
 - first lock log does not name the key solution,
@@ -70,30 +83,31 @@ This hash is not a byte-identical release-baseline claim. Library text provenanc
 - save schema remains 12.
 
 ## Browser evidence
-Before patch 11:
+Historical pre-patch-11 evidence:
 - broad Chromium UX5A smoke: **23 PASS / 0 FAIL**,
 - patch-10 focused Chromium smoke: **15 PASS / 0 FAIL**.
 
-The patch-10 key-door expectation (`first gate tap opens`) is now intentionally superseded. Therefore those results remain historical regression evidence but **do not certify the patch-11 explicit-key interaction**.
+Those results do not certify patch 11 or patch 12 because their interaction/presentation expectations changed afterwards.
 
-A fresh real-browser patch-11 interaction smoke is still required. In the current execution environment, local Chromium could not load the local test runtime and ended at `chrome-error://chromewebdata/`, so no new browser claim was recorded. This is a test-harness limitation, not evidence of an app failure.
+A fresh local Chromium attempt for the current build hit a browser/localStorage harness error before interaction QA could run. No fresh browser-green claim is made. This is a test-harness limitation, not evidence of an app failure.
 
 ## Required physical-device gate before UX5A merge
 On actual iPad/mobile verify:
-1. `GLASS_HEART` locked door remains locked when tapped even with `GLASSNØKKEL` owned,
-2. app does not reveal the key as the answer,
-3. child has space to propose a plan; narrator may optionally hint about the backpack,
-4. `GLASSNØKKEL` is protected but has `BRUK`,
-5. `BRUK` beside matching door opens and removes/archives key without moving hero,
-6. later door tap traverses,
-7. mystery puzzle help is immediately understandable and solve gives exactly one progress,
-8. `SE DEG RUNDT` feels exploratory rather than mandatory,
-9. 3-4 progress steps do not feel like excessive bookkeeping,
-10. hidden-find fail-forward and full-backpack flow work by touch,
-11. 3-heart normal / 4-heart `SPENNING` combat controls are comfortable,
-12. final `+ FREMGANG`, final heart and `LØST MED GOD IDÉ` interaction costs are acceptable,
-13. if possible, representative legacy active-combat save behaves correctly,
-14. Adventure Code copy/paste flow still works.
+1. each room has one clear visible location name rather than room + area competing,
+2. `GLASS_HEART` locked door remains locked when tapped even with `GLASSNØKKEL` owned,
+3. app does not reveal the key as the answer,
+4. child has space to propose a plan; narrator may optionally hint about the backpack,
+5. `GLASSNØKKEL` is protected but has `BRUK`,
+6. `BRUK` beside matching door opens and removes/archives key without moving hero,
+7. later door tap traverses,
+8. mystery puzzle help is immediately understandable and solve gives exactly one progress,
+9. `SE DEG RUNDT` feels exploratory rather than mandatory,
+10. 3-4 progress steps do not feel like excessive bookkeeping,
+11. hidden-find fail-forward and full-backpack flow work by touch,
+12. 3-heart normal / 4-heart `SPENNING` combat controls are comfortable,
+13. final `+ FREMGANG`, final heart and `LØST MED GOD IDÉ` interaction costs are acceptable,
+14. if possible, representative legacy active-combat save behaves correctly,
+15. Adventure Code copy/paste flow still works.
 
 Do not merge UX5A or implement Narrative Graph runtime until this gate is green.
 
