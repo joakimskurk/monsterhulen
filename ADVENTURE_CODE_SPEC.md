@@ -24,6 +24,34 @@ Only four blueprints are active for the first playtest:
 
 Do not add more blueprints until these have been manually playtested for narrative coherence.
 
+## Progression gate contract
+A curated finale must be **earned**, not merely discovered.
+
+Rules:
+- The finale/last encounter may never be freely enterable from the early map simply because layout adjacency allows it.
+- Every blueprint must define at least one explicit `finaleGate` prerequisite.
+- Valid gate types include: scenario key, completed NPC quest, solved puzzle, collected required parts, rescued target, discovered truth/clues, or another explicit story flag.
+- The map may visually reveal a locked/blocked finale entrance before the prerequisite is met, but traversal must be denied with a clear in-fiction reason.
+- The prerequisite itself must be reachable without entering the finale.
+- A critical prerequisite may not be accidentally consumed or permanently lost.
+- A high die result can resolve the current uncertain action well, but can never bypass an unmet story gate.
+- Failure must remain fail-forward: a bad roll may change the situation or require another route, but must not permanently softlock the blueprint.
+- Every story-critical finale must have at least one non-combat route available somewhere in the blueprint.
+
+Preferred blueprint shape:
+1. Hook / discovery.
+2. At least one meaningful middle objective.
+3. Obtain/earn the gate condition through exploration, NPC help, puzzle, clue chain or collection.
+4. Open the finale route.
+5. Resolve the finale.
+
+The narrator view must show:
+- what currently gates the finale,
+- where/how that prerequisite can be obtained,
+- which NPC/room/object can help,
+- which alternative non-combat approaches are actually supported by the generated map,
+- consequences that change encounter state without skipping the blueprint.
+
 ## Code payload
 The current `MH1.<base64url-json>` playtest code carries:
 
@@ -59,6 +87,8 @@ The narrator view exposes:
 - what to plant/foreshadow early
 - what payoff to preserve for later
 - critical plan
+- finale gate and prerequisite path
+- supported encounter solutions that actually exist in this adventure
 - all rooms with spoiler labels and critical markers
 
 This is support for the DM, not a mandatory script.
@@ -74,6 +104,9 @@ This is support for the DM, not a mandatory script.
 - all four blueprints manually played through at least once,
 - narrator device reconstructs the same map and critical plan for each,
 - no story-critical object can be accidentally consumed,
-- DM can understand premise, NPC/encounter role and later payoff before improvising,
+- no blueprint can reach/finish its finale before its explicit `finaleGate` is satisfied,
+- each finale has a reachable prerequisite path and at least one non-combat route,
+- high die results never bypass unmet story gates,
+- DM can understand premise, NPC/encounter role, available map-supported solutions and later payoff before improvising,
 - code generation remains deterministic across repeated runs,
 - current automated regressions remain green.
