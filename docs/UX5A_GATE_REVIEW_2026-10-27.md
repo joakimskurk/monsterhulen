@@ -1,183 +1,131 @@
 # UX5A gate review - 2026-10-27
 
-Status: **PATCH 15 IMPLEMENTED; EXACT-CANDIDATE REGRESSION + BROWSER + PHYSICAL RETEST OPEN**
+Status: **PATCH 15 MACHINE GREEN + CHROMIUM INTERACTION 22/0 + PHYSICAL RETEST OPEN**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 
-Purpose: walk the entire UX5A merge gate against the current indexed patch-14 source, close everything that can be established from source, record one discovered defect, and leave only claims that genuinely require exact runtime/browser/physical evidence.
+Purpose: walk the entire UX5A merge gate, close everything that can be established from source/runtime/browser automation, and leave only claims that genuinely require target-device/human evidence.
 
-## Verification vocabulary
-- **SOURCE VERIFIED**: current indexed source directly supports the behavior.
-- **AUTOMATED GREEN THROUGH P14**: previously reconstructed patch-14 test evidence exists.
-- **PATCH 15 PENDING REGRESSION**: new patch exists but has not been run against an exact reconstructed current candidate in this session.
-- **PHYSICAL REQUIRED**: usability/comprehension/touch feel cannot be certified from source.
+## Exact candidate under test
+The current indexed patch-14 source was reconstructed using line-segmented Project/Library materialization. Patch 15 applied cleanly.
 
-## Tooling/provenance limitation encountered
-The Project/Library search index exposes the current patch-14 source, including patch-14 strings and behavior. The available materialization path in this session returns an older backing representation instead of the exact indexed current candidate.
+Patch-15 candidate SHA-256:
+`f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
 
-Therefore no fresh current-browser or full patch-15 runtime claim is made from the stale export.
+## Machine verification - GREEN
+- single location **21/0**
+- explicit improv **20/0**
+- authored mysteries only **5136/0**
+- encounter purpose **4337/0**
+- device findings **27/0**
+- search/encounter **2328/0**
+- Adventure Code **405/0**
+- UX4 progression **1797/0**
+- content regression **5830/0**
+- focused patch-15 runtime gate **6844/0**
+- 11 inline scripts **0 syntax errors**
 
-This limitation is separate from repository-health debt: the full release/runtime asset tree is still not byte-reconstructable from ordinary repo files alone.
+The previously documented `QA_AUTHORED_MYSTERIES_ONLY_UX5A.js` was missing from the repository tree and has now been restored. Current result is 5136/0; the old 3075/0 remains historical evidence only.
+
+## Fresh Chromium interaction QA - 22/0
+Exact patch-15 HTML was injected into headless Chromium via DevTools because this container prevented Chromium from navigating to the local candidate through localhost or `file://`.
+
+The injected `about:blank` origin denies native localStorage, so the harness supplied a minimal in-memory localStorage shim before loading the unchanged app HTML.
+
+This browser smoke is valid for DOM/click/mobile-view behavior, but does not certify native persistence or clipboard.
+
+See `docs/UX5A_BROWSER_QA_2026-10-27.md`.
 
 ---
 
 ## Gate item 1 - Boka som skriver tilbake: authored vs improv responsibility
-**SOURCE VERIFIED; PHYSICAL REQUIRED**
+**MACHINE GREEN; PHYSICAL COMPREHENSION REQUIRED**
 
-Current source includes:
+Verified:
 - `FORTELLER-IMPROVISASJON`,
 - `INGEN SKJULT FASIT`,
-- explicit statement that no larger predetermined plan exists for the open detail,
-- a concrete per-scene improv prompt.
+- no larger predetermined hidden plan,
+- concrete per-scene prompt,
+- book remains optional/non-blocking.
 
-`BOKA SOM SKRIVER TILBAKE` specifically tells Forteller that there is no predetermined message in the app and suggests how to invent one.
+Physical question: does a real narrator understand this immediately during play?
 
-Physical question: does a real narrator understand this immediately during play without needing to reverse-engineer the app?
+## Gate item 2 - improv bounded / no mandatory state
+**MACHINE GREEN; PHYSICAL/EDITORIAL CLARITY REQUIRED**
 
-## Gate item 2 - improv is bounded and cannot create mandatory state
-**SOURCE VERIFIED; PHYSICAL/EDITORIAL REQUIRED FOR CLARITY**
-
-Source guardrails allow atmosphere, optional hint and side discovery, but forbid:
-- new mandatory story key,
-- contradiction of known app state,
-- pretending the app has hidden authored causality that does not exist.
-
-Physical question: is the wording useful rather than overly technical or restrictive?
+Verified guardrails allow atmosphere/optional hint/side discovery but forbid mandatory story keys or contradiction of tracked state.
 
 ## Gate item 3 - Regnbuenettet has no generic progress boxes
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14**
+**MACHINE GREEN**
 
-`encounterProgressHtml()` renders only when authored `progressStages` contains at least two stages. `REGNBUENETTET` has no such stages.
+Verified by encounter-purpose + focused runtime tests. `REGNBUENETTET` has no arbitrary 3/4 filler track.
 
-Expected result: no arbitrary 3/4 filler track.
+## Gate item 4 - narrator purpose / solve / payoff
+**MACHINE GREEN; PHYSICAL COMPREHENSION REQUIRED**
 
-## Gate item 4 - narrator understands purpose / solve / payoff
-**SOURCE VERIFIED; PHYSICAL REQUIRED FOR COMPREHENSION**
-
-Generated non-treasure encounters expose:
-- `HVA ER GREIA?`,
-- `NÅR ER DET LØST?`,
-- `HVA ENDRES DA?`.
-
-For traps the contract states that the obstacle blocks onward travel, gives a fictional completion condition, and promises route release.
+Verified current narrator semantics expose `HVA ER GREIA?`, `NÅR ER DET LØST?`, `HVA ENDRES DA?`.
 
 ## Gate item 5 - active trap blocks onward, retreat works, resolution frees route
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14; PHYSICAL REQUIRED**
+**MACHINE GREEN; BROWSER INTERACTION GREEN; PHYSICAL REQUIRED**
 
-Source behavior:
-- `FELLE` gets `blocksForward=true`,
-- movement checks `blockingForwardEncounter`,
-- target other than `previousRoomId` is blocked,
-- previous room remains reachable as retreat,
-- resolving the trap removes its event,
-- route is then free.
-
-Physical test should verify this feels obvious on map/touch controls.
+Real `move()` behavioral test proves active trap blocks forward, allows retreat, and clear state allows forward movement. Browser smoke confirms trap resolve interaction and no stale blocker controls after resolution.
 
 ## Gate item 6 - ambient mysteries do not receive disconnected random puzzles
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14**
+**MACHINE GREEN**
 
-Random puzzle attachment requires explicit `t.useRandomPuzzle===true`. Current inspected ambient mystery entries do not opt in.
-
-No generic category-based random puzzle attachment remains.
+Restored dedicated test samples 1024 mysteries and covers all six current subjects. No random puzzle attachment without explicit opt-in.
 
 ## Gate item 7 - one clear visible room identity
-**FAILED SOURCE REVIEW -> PATCH 15 IMPLEMENTED -> PENDING REGRESSION/PHYSICAL**
+**FOUND DEFECT -> PATCH 15 -> MACHINE GREEN -> BROWSER GREEN -> PHYSICAL REQUIRED**
 
-Discovered defect:
-- room banner used canonical `r.name`,
-- but player-visible `room.desc` still started with `${zone.name}. ${room.name}.`.
+Original remaining defect:
+`room.desc=${zone.name}. ${room.name}. ...`
 
-This meant patch 12 removed the separate area badge but did not fully keep zone identity internal.
+Patch 15 changes player-visible description to start with `${room.name}.` while retaining `zoneName` internally.
 
-Patch 15:
-`patches/v0.12.3_playtest_room_description_location_identity_ux5a.patch`
+Verified:
+- single-location **21/0**,
+- focused runtime test,
+- browser smoke rendered e.g. `ROM: STARTPORTEN` + `STARTPORTEN. ...` with no second area badge.
 
-Changes:
-```text
-room.desc=`${zone.name}. ${room.name}. `+
-```
-to:
-```text
-room.desc=`${room.name}. `+
-```
+## Gate item 8 - explicit story-key flow child-driven
+**MACHINE GREEN; PHYSICAL REQUIRED**
 
-Zone metadata remains intact internally.
-
-`tests/QA_SINGLE_LOCATION_NAME_UX5A.js` now rejects the old prefix and requires the new one.
-
-Do not claim the old **19/0** result certifies patch 15; those assertions were not present then.
-
-## Gate item 8 - explicit story-key flow remains child-driven
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14; PHYSICAL REQUIRED**
-
-A keyed locked-door tap:
-- only reports `DØREN ER LÅST`,
-- does not auto-use key,
-- does not unlock,
-- does not traverse.
-
-Explicit story-key use calls `tryUseStoryKey`, opens the lock, and still leaves traversal as a separate action.
+Verified locked-door tap only reports locked; key possession does not auto-use/unlock/traverse; explicit key use opens; movement remains separate.
 
 ## Gate item 9 - `SE DEG RUNDT` feels exploratory rather than compulsory
-**SOURCE SUPPORTS INTENT; PHYSICAL REQUIRED**
+**MACHINE/BROWSER FLOW GREEN; PHYSICAL JUDGEMENT REQUIRED**
 
-Source:
-- every searchable room offers the action without revealing whether loot exists,
-- generic finds are explicitly optional,
-- rooms with no find can simply be investigated and left.
-
-Whether children feel compelled to tap it in every room is a physical UX judgement and remains open.
+Browser smoke confirms control renders and transitions correctly. Whether children feel compelled to use it in every room remains a physical UX question.
 
 ## Gate item 10 - hidden-find fail-forward / full backpack by touch
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14; PHYSICAL TOUCH REQUIRED**
+**MACHINE GREEN; PHYSICAL TOUCH REQUIRED**
 
-Source:
-- first low uncertain search gives stronger hint,
-- repeated low reveals find,
-- full backpack returns `RYGGSEKKEN ER FULL` before marking find taken,
-- revealed find remains in room.
-
-Physical test must verify die buttons, take action and full-bag feedback are clear by touch.
+Verified first low strengthens clue, repeated low reveals, full backpack preserves find. Touch feel remains open.
 
 ## Gate item 11 - 3-heart normal / 4-heart SPENNING combat controls
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14; PHYSICAL TOUCH REQUIRED**
+**MACHINE GREEN; BROWSER INTERACTION GREEN; PHYSICAL TOUCH REQUIRED**
 
-`difficultyFor(room,'MONSTER')` returns:
-- 4 for `SPENNING`,
-- 3 otherwise.
-
-Combat state becomes active only after explicit `BARNET VELGER KAMP` or an existing already-damaged legacy fight.
+Verified 3/4 heart scale. Browser smoke started combat explicitly and rendered 3-heart combat state.
 
 ## Gate item 12 - final heart / non-combat resolution understandable
-**SOURCE VERIFIED; PHYSICAL REQUIRED**
+**MACHINE/BROWSER CONTROL AVAILABILITY GREEN; PHYSICAL COMPREHENSION REQUIRED**
 
-Before combat the UI offers `BARNET VELGER KAMP` plus non-combat encounter resolution. During combat hearts are explicit. Non-combat resolution remains a separate route.
-
-Comprehension cannot be certified from source alone.
+Browser smoke confirms explicit combat choice and non-combat resolve coexist. Human comprehension remains open.
 
 ## Gate item 13 - representative legacy active-combat save
-**SOURCE VERIFIED FOR MIGRATION RULE; TARGETED RUNTIME/PHYSICAL IF POSSIBLE**
+**MACHINE MIGRATION GREEN; PHYSICAL SAVE SMOKE IF AVAILABLE**
 
-Migration/enrichment logic recognizes an already-started fight when:
-- `combatStarted===true`, or
-- old `hp < oldMax`.
+Search/encounter regression verifies old active fights normalize max hearts without healing lost hearts.
 
-When normalizing old monsters to the current 3/4-heart target, it keeps current lost-heart state rather than healing a started fight to full.
+## Gate item 14 - Adventure Code copy/paste / persistence
+**AUTOMATED 405/0; BROWSER RENDER GREEN; NATIVE DEVICE BEHAVIOR REQUIRED**
 
-A real legacy save smoke remains desirable if available.
+Adventure Code generation/rendering is green. Current Chromium harness does not certify native clipboard or native localStorage persistence.
 
-## Gate item 14 - Adventure Code copy/paste
-**SOURCE VERIFIED; AUTOMATED GREEN THROUGH P14; BROWSER/PHYSICAL REQUIRED**
-
-Source contains:
-- `MH1` encode/decode,
-- deterministic adventure payload with layout seed + blueprint,
-- clipboard write with prompt fallback,
+Target device must test:
+- save/reload/resume,
+- code copy,
 - paste/open narrator flow.
-
-Prior automated result: **405/0**.
-
-Actual clipboard/prompt behavior must be tested on the exact current browser/device candidate.
 
 ---
 
@@ -188,26 +136,34 @@ Patch:
 Patch SHA-256:
 `f8cd1e6c746541961ebf9308e62763d58a27ae705bee42886d56c082ceb620a5`
 
-Updated QA:
+Updated location QA:
 `tests/QA_SINGLE_LOCATION_NAME_UX5A.js`
 
-Prepared QA source SHA-256:
-`c84bf6b16841c6795e589f49c08cf6287fa403aa08d2a8d77662e679d51d20d1`
+Restored mystery QA:
+`tests/QA_AUTHORED_MYSTERIES_ONLY_UX5A.js`
 
-QA syntax was checked locally before commit. Full runtime pass count is intentionally not claimed yet.
+Focused runtime QA:
+`tests/QA_PATCH15_GATE_RUNTIME.js`
 
-## Exact next machine gate
-1. Obtain/reconstruct exact current patch-14 candidate from a trustworthy current source.
-2. Apply patch 15.
-3. Run updated single-location QA.
-4. Run relevant automated regressions, including encounter-purpose, authored mysteries, device findings, search/encounter, Adventure Code, UX4 and content regression.
-5. Run fresh browser interaction QA on that exact patch-15 candidate.
-
-## Exact next human gate
-Run the 14 physical checks above on the same patch-15 candidate on iPad/mobile.
+## Exact remaining human gate
+On the exact patch-15 build, actual iPad/mobile must verify:
+1. Boka narrator responsibility is obvious,
+2. improv wording is useful/bounded,
+3. Regnbuenettet has no filler boxes,
+4. narrator understands purpose/solve/payoff,
+5. trap blocking/retreat/resolve feels clear by touch,
+6. ambient mysteries remain coherent in play,
+7. one visible location identity feels clear,
+8. key use feels child-driven,
+9. `SE DEG RUNDT` feels optional/exploratory,
+10. hidden-find/full-backpack flow is usable by touch,
+11. 3/4-heart combat controls are usable,
+12. final-heart/non-combat resolution is understandable,
+13. representative legacy active-combat save if available,
+14. native save/reload + Adventure Code copy/paste work.
 
 If any physical finding fails, patch UX5A only and repeat affected tests.
 
-If machine + browser + physical gates are all green, follow `START_HERE.md` transition exactly: record evidence -> merge UX5A to `main` -> verify `main` -> create `narrative/story-graph-v1` -> carry approved prep docs -> start NG1.
+If physical gate is green, follow `START_HERE.md`: record evidence -> confirm final regression -> merge UX5A to `main` -> verify `main` -> create `narrative/story-graph-v1` -> carry approved prep docs -> start NG1.
 
 Narrative Graph runtime, full DM Control Surface, UX5B and Multiscreen remain blocked until then.
