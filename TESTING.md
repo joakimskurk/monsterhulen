@@ -25,27 +25,40 @@ Against canonical V0.12.3:
 2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
 3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
 4. `patches/v0.12.3_playtest_adventure_code_v1.patch.gz.b64`
+5. `patches/v0.12.3_playtest_progression_gates_secret_doors.patch.gz.b64`
 
-`patches/README.md` documents how to reconstruct the final entry to a normal unified diff.
+`patches/README.md` documents reconstruction of compressed patches.
 
 ## Adventure Code V1 automated evidence
 `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**.
 
-Verified:
-- four blueprint IDs are stable,
-- each blueprint carries narrator premise/foreshadow/payoff metadata,
-- each blueprint uses its curated world route,
-- identical seed produces identical decorated dungeon JSON,
-- 128 repeated seed checks preserve blueprint/type/route determinism,
-- GLASS_HEART locks GLASSNØKKEL + KRYSTALLHJERTET,
-- WITCH_CAT locks HEKSEKATTEN rescue content,
-- CRYSTAL_MACHINE locks red/blue/yellow crystals + KRYSTALLMASKINEN,
-- ZOMBIE_DELIVERY locks its curated truth + three curated clues,
-- MH1 version tag, exact layout seed and blueprint ID are wired into the reproducibility contract,
-- copy/open code UI and full spoiler plan are wired.
+The QA now follows the same deterministic layout retry rule as runtime. A layout can be rejected when hidden extras would bypass a progression gate; the exact successful layout seed remains part of the Adventure Code contract.
 
-## Regression after Adventure Code patch
-All existing runtime QA passes after the patch:
+Verified:
+- four blueprint IDs stable,
+- narrator premise/foreshadow/payoff metadata present,
+- curated routes stable,
+- same adventure seed selects the same valid decorated dungeon and route through deterministic retry,
+- blueprint/type coherence preserved,
+- exact successful layout seed and blueprint ID remain wired into MH1,
+- two-device code UI and narrator spoiler plan remain wired.
+
+## UX4 progression / secret-door evidence
+`tests/QA_PROGRESSION_GATES_UX4.js`: **1797 PASS / 0 FAIL**.
+
+Across all four blueprints and 64 adventure seeds each, verified:
+- explicit progression gate exists,
+- gate starts locked,
+- final side is unreachable while the gate edge is blocked,
+- all prerequisite rooms remain reachable before the gate,
+- every blueprint carries an explicit prerequisite contract,
+- hidden shortcuts and secret doors are included as potential bypasses and cannot route around the gate,
+- secret doors use physical die-face input for uncertain discovery,
+- low secret-door result keeps the door hidden and gives fail-forward information,
+- successful discovery reveals the hidden connection,
+- narrator text states that a high roll cannot skip the story gate.
+
+## Full regression after UX4
 - Thing 67 / 0
 - Treasure 121 / 0
 - Puzzle 4665 / 0
@@ -53,20 +66,23 @@ All existing runtime QA passes after the patch:
 - Friend 4104 / 0
 - Pet 6069 / 0
 - Rescue 5070 / 0
+- Adventure Code 405 / 0
+- Progression / secret door 1797 / 0
 - 11 inline JavaScript blocks, 0 syntax errors
 
-The Rescue QA wiring check was updated to recognize the new seeded `pickRng(rescue.clues||RESCUE_CLUES,rng)` implementation as equivalent target-specific clue selection.
-
 ## Still manual / not certified
+- real iPad play through the new hard gate,
+- whether each prerequisite feels narratively earned rather than mechanical,
+- secret-door search clarity and fun on target device,
 - real iPad -> mobile Adventure Code copy/paste flow,
 - same-map visual comparison on two physical devices,
-- novice-DM usefulness of the full spoiler plan,
+- novice-DM usefulness of the narrator plan,
 - narrative quality of all four initial blueprints,
-- mobile layout of long code and spoiler plan,
+- mobile layout,
 - browser/mobile interaction remains not automated in this execution environment.
 
 ## Quality gate before adding blueprints
-Do not add more Adventure Blueprints until all four initial stories have been manually played and notes are recorded. A blueprint that is technically valid but narratively weak fails the gate.
+Do not add more Adventure Blueprints until all four initial stories have been manually played. A blueprint that is technically valid but narratively weak fails the gate. In particular, a middle prerequisite may need promotion into an NPC quest or puzzle if a simple find feels too thin.
 
 ## Repository verification
 Repository-health remains open. Before the next release checkpoint, the repository must reconstruct the full active source/assets/tests without chat or an external release ZIP.
