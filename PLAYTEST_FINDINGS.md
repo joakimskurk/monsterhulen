@@ -15,7 +15,8 @@ Implemented over successive UX layers:
 - ordinary `BRUK` does not consume items,
 - beginner narrator guidance,
 - six physical D6 faces record exact die input,
-- patch 13 now adds explicit purpose/stakes/resolution/payoff semantics to generated ambient encounters.
+- patch 13 adds explicit purpose/stakes/resolution/payoff semantics,
+- patch 14 explicitly labels intentional narrator-improvisation.
 
 Still open: eventual narrator mode should use actual graph/map-supported context after Narrative Graph V1.
 
@@ -48,53 +49,42 @@ UX5A:
 Manual question remains whether `SE DEG RUNDT` feels voluntary rather than compulsory.
 
 ## 7. Encounters need durable consequences, not generic duration
-Initial UX5A response to one-roll victories was to give generated non-treasure encounters a generic 3/4-step progress track. This prevented a die result from directly erasing a whole scene, but physical play later showed the model was too abstract.
+Initial UX5A response to one-roll victories was to give generated non-treasure encounters a generic 3/4-step progress track. Physical play later showed the model was too abstract.
 
 Patch 13 supersedes the generic progress assumption:
 - monster combat keeps explicit 3/4 hearts only after the child chooses combat,
 - non-combat encounters resolve through an authored fictional condition,
-- progress UI exists only if the content has explicit authored `progressStages`,
+- progress UI exists only if content has explicit authored `progressStages`,
 - one genuinely sufficient plan may solve a simple encounter directly,
 - dice determine uncertainty of an attempted action, not encounter duration.
 
-This preserves durable state without asking the DM to manufacture filler beats.
-
 ## 8. Critical prerequisites are structurally valid but narratively disconnected
-Observed in `CRYSTAL_MACHINE`: three required crystals could be three isolated `DEL` pickups with no clear fictional requirement reveal, setup or payoff.
+Observed in `CRYSTAL_MACHINE`: three required crystals could be isolated `DEL` pickups with no clear fictional requirement reveal, setup or payoff.
 
-Decision: Narrative Graph V1 + curated Storylet Matrix. Critical graph is validated before ambient content. Truth and player knowledge are separate. Initial reference mix: `SEARCH_SECRET`, `NPC_FAVOR`, `GUARDIAN`, followed by deliberate return/assembly.
+Decision: Narrative Graph V1 + curated Storylet Matrix. Initial reference mix: `SEARCH_SECRET`, `NPC_FAVOR`, `GUARDIAN`, followed by deliberate return/assembly.
 
 ## 9. Physical device finding: ready story gate felt cosmetic
 Observed: hero with `GLASSNØKKEL` could tap a gate and both unlock + traverse; key looked unused.
 
-Patch 10 initially changed this to open-first/traverse-second and explicit key consumption. Continued review found that even this still let the app choose the solution automatically. See finding 12.
+Patch 10 initially changed this to open-first/traverse-second. Continued review found that even this let the app choose the solution automatically. See finding 12.
 
 ## 10. Physical device finding: random puzzle can be logically valid but fictionally irrelevant
 Observed example: `DEN HVISKENDE VEGGEN` + unrelated-looking `STEINTRINNENE` puzzle.
 
-Patch 10 improved the narrator presentation, but patch 13 identifies the deeper root cause: a generic `MYSTISK` encounter should not receive a random puzzle merely because the puzzle bank exists.
-
-Current rule after patch 13:
+Patch 13 establishes the deeper rule:
 - ambient random puzzles are opt-in, not automatic,
-- a puzzle requires an authored contextual role,
-- thinking/answering still needs no die,
-- solving a puzzle does not automatically award a generic progress point,
-- fiction decides whether the puzzle clue also resolves the whole mystery.
+- puzzle requires an authored contextual role,
+- thinking/answering needs no die,
+- solving a puzzle does not award generic progress,
+- fiction decides what the clue changes.
 
 ## 11. Story complication can arrive after its dramatic purpose is gone
 Observed: `SKYGGEHEKSA`, meant to make the main task harder, could appear only after the task was already complete.
 
-Decision for Narrative Graph V1:
-- explicit phases `INTRO`, `QUEST_ACTIVE`, `RETURN`, `CLIMAX`, `AFTERMATH`,
-- critical complications declare valid phases/expiry,
-- a complication cannot first activate after the objective it exists to hinder is resolved,
-- later reuse requires a separately authored role,
-- ambient text referencing unfinished objectives must also be filtered after resolution.
+Narrative Graph V1 therefore requires explicit phases/expiry and separately authored later roles.
 
 ## 12. Possessing the solution must not make the app choose the action
-Continued physical-review judgement:
-- patch 10 still auto-used `GLASSNØKKEL` when the locked door was tapped,
-- desired interaction is: see lock -> think/propose -> choose item/action -> observe result.
+Observed: patch 10 still auto-used `GLASSNØKKEL` when the locked door was tapped.
 
 Patch 11:
 - keyed locked-door tap only says `DØREN ER LÅST`,
@@ -115,66 +105,73 @@ Patch 12:
 - internal `zoneName` remains for deterministic generation/tone.
 
 ## 14. `ANNEN LØSNING` progress boxes had no fictional meaning
-Observed during continued physical play with `REGNBUENETTET`:
-- the card showed four empty boxes under `ANNEN LØSNING`,
-- it was unclear whether Forteller was expected to invent four separate things the child had to do,
+Observed with `REGNBUENETTET`:
+- four empty boxes looked like Forteller had to invent four separate tasks,
 - the net did not actually prevent travel,
-- completing the track gave no meaningful reward or world-state change,
-- therefore the encounter could be ignored with no consequence and “solving” it had no payoff.
+- completing the track changed nothing.
 
-This exposed a system-level flaw, not a wording issue. The 3/4-box model was a generic duration mechanic added before each encounter's dramatic function had been authored.
+Patch 13 changes the model:
+- every generated non-treasure encounter declares `purpose`, `stakes`, `resolvedWhen`, `payoff`,
+- generic 3/4 boxes are removed,
+- progress renders only for authored `progressStages`,
+- narrator answers `HVA ER GREIA?`, `NÅR ER DET LØST?`, `HVA ENDRES DA?`,
+- traps are real forward obstacles while active but allow retreat,
+- resolving trap frees the route,
+- ambient `MYSTISK` puzzles are not attached randomly.
 
-### Patch 13 - encounter purpose contract
-`patches/v0.12.3_playtest_encounter_purpose_contract_ux5a.patch` changes the model:
-- every generated non-treasure encounter declares `purpose`, `stakes`, `resolvedWhen` and `payoff`,
-- generic `ANNEN LØSNING` 3/4 boxes are removed,
-- a progress track is rendered only when authored `progressStages` exist,
-- narrator mode explicitly answers `HVA ER GREIA?`, `NÅR ER DET LØST?`, `HVA ENDRES DA?`,
-- narrator guidance explicitly says not to invent filler steps,
-- traps are actual forward obstacles while active,
-- retreat to the previous room stays possible,
-- resolving the trap removes it and actually frees the route,
-- resolve-button text reflects the scene role (`HINDRINGEN ER LØST`, `MYSTERIET ER LØST`, `LØST UTEN KAMP`, etc.),
-- ambient `MYSTISK` puzzles are no longer attached randomly.
+`REGNBUENETTET` reference flow: obstacle -> child's plan -> die only if uncertain -> `HINDRINGEN ER LØST` when fiction supports it -> route becomes available.
 
-### `REGNBUENETTET` reference behavior
-The intended physical flow now is:
-1. party enters the room and sees the net,
-2. route onward is genuinely blocked,
-3. retreat remains possible,
-4. child proposes how to get through/free themselves/make the trap safe,
-5. use physical die only if that particular attempt is uncertain,
-6. one sufficiently good plan may solve the obstacle; there is no requirement to invent four sub-actions,
-7. Forteller presses `HINDRINGEN ER LØST` only when the fiction satisfies the solve condition,
-8. the trap disappears and the onward route becomes available.
+## 15. Intentional improvisation looked like missing hidden content
+Observed during continued physical play with `BOKA SOM SKRIVER TILBAKE`:
+- the book says it is trying to tell the party something,
+- the three repeated words imply there may be an authored message,
+- the app did not actually contain that message or a larger plan,
+- Forteller therefore could not tell whether they were expected to discover app-authored content or invent the answer.
 
-This is the desired depth: every encounter must have a reason to exist and resolution must cause an observable change.
+User judgement clarified the intended design: **improvisation is completely acceptable, but it must be explicit in Forteller-delen.**
 
-## Verification after finding 14
-Patch-13 reconstructed runtime automated evidence:
+This is importantly different from missing story logic. Ambient content may deliberately hand creative authorship to Forteller; the app must simply be honest about that handoff.
+
+### Patch 14 - explicit narrator improvisation
+`patches/v0.12.3_playtest_explicit_improv_guidance_ux5a.patch`:
+- gives intentionally open ambient mysteries a per-scene `improvisePrompt`,
+- labels them internally `VALGFRITT IMPROVISASJONSMYSTERIUM`,
+- narrator panel shows `FORTELLER-IMPROVISASJON`,
+- explicitly says `INGEN SKJULT FASIT`,
+- explicitly says there is no larger predetermined plan for the missing detail,
+- tells Forteller what to invent for that particular mystery,
+- encourages reuse of already established adventure details where useful,
+- allows atmosphere, optional hints and side discoveries,
+- forbids invented content from becoming a new mandatory story key or contradicting known app state,
+- keeps the child-facing fiction immersive; the meta distinction is narrator-only.
+
+For `BOKA SOM SKRIVER TILBAKE`, Forteller now invents what the repeated three words become. There is intentionally no hidden sentence in the app.
+
+## Verification after finding 15
+Patch-14 reconstructed runtime automated evidence:
+- explicit-improvisation QA: **20 / 0**,
 - encounter-purpose QA: **4337 / 0**,
+- authored-mysteries-only QA: **3075 / 0**,
 - single-location QA: **19 / 0**,
 - targeted device QA: **27 / 0**,
-- searchable-room/encounter QA: **2295 / 0**,
+- searchable-room/encounter QA: **2328 / 0**,
 - Adventure Code: **405 / 0**,
 - UX4 progression: **1797 / 0**,
-- content regression: **5809 / 0**,
+- content regression: **5830 / 0**,
 - 11 inline scripts: **0 syntax errors**.
 
-Patch-13 runtime SHA-256:
-`e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
+Patch-14 runtime SHA-256:
+`7e9f9ba1d80aed2fe55865dbca860e2754d706b7cd89266dd2007d25fd4e0737`
 
-Patch-13 SHA-256:
-`74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
+Patch-14 SHA-256:
+`123daf1a12fc4f6a38d5d3dc401b7403c21005263c32811e0c0eeac24877fd2c`
 
-The purpose QA executes the actual `move()` implementation in a three-room harness and proves active trap -> forward blocked, retreat allowed, trap absent/resolved -> forward allowed.
-
-Fresh browser certification remains open. Physical retest is required.
+Fresh browser certification remains open. Physical retest is required; automated green does not prove that the narrator handoff feels natural in play.
 
 ## Priority now
-1. Physically retest patch-13 build, especially `REGNBUENETTET` as a real obstacle with retreat + payoff.
-2. Judge whether narrator purpose/solve/payoff guidance is immediately understandable without knowing the implementation model.
-3. Continue remaining UX5A device smoke.
+1. Physically retest patch-14 build, especially `BOKA SOM SKRIVER TILBAKE`: can Forteller immediately tell what is authored vs what they are invited to invent?
+2. Verify the improv framing helps without breaking immersion or creating a new closed answer list.
+3. Continue `REGNBUENETTET` obstacle/payoff test and remaining UX5A device smoke.
 4. Run fresh browser interaction QA when the local Chromium harness is usable.
 5. If physical gate is green, record evidence and merge UX5A to `main`.
 6. Create real `narrative/story-graph-v1` from merged `main` and start `WP-NG1`.
