@@ -1,0 +1,63 @@
+--- index.html
++++ index.html
+@@ -84,8 +84,20 @@
+ .frame-hero{background:linear-gradient(180deg,#44317d,#261a4c)}.frame-friendly{background:linear-gradient(180deg,#24445a,#1d2946);border-color:var(--cyan)}.frame-danger{background:linear-gradient(180deg,#4a203f,#26162e);border-color:var(--pink)}.frame-object{background:linear-gradient(180deg,#4c4024,#2a2419);border-color:var(--yellow)}.frame-mystery{background:linear-gradient(180deg,#34255f,#1b1737);border-color:var(--mist)}.frame-scene{background:linear-gradient(180deg,#28334d,#191a2d);border-color:var(--steel)}.frame-symbolic{background:linear-gradient(180deg,#274350,#1a2735);border-color:var(--green)}.frame-neutral{background:linear-gradient(180deg,var(--panel2),var(--panel3))}
+ .entityTextRow{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px;align-items:start}.eventEntityHeader{display:grid;grid-template-columns:auto minmax(0,1fr);gap:9px;align-items:start;margin-bottom:4px}.eventEntityHeader.noEntity{display:block}.eventEntityHeader p{margin:4px 0 0}.eventEntityHeader strong{display:block}
+ .entityPopupBox{width:min(620px,100%);position:relative}.entityPopupClose{position:absolute;right:10px;top:10px;z-index:2}.entityPopupStage{min-height:214px;margin:4px 0 12px;display:flex;align-items:center;justify-content:center;border:3px solid var(--pixel);background:radial-gradient(circle at 50% 35%,rgba(107,74,176,.25),rgba(21,17,42,.92) 58%,rgba(7,5,13,.98));overflow:hidden}.entity-large{border-width:3px;padding:5px}.entity-character.entity-large{--entity-w:160px;--entity-h:160px}.entity-item.entity-large,.entity-symbolic.entity-large{--entity-w:132px;--entity-h:132px}.entity-scene.entity-large{--entity-w:270px;--entity-h:180px}.entityPopupKind{font-size:10px;font-weight:900;letter-spacing:.12em;color:var(--cyan);margin-bottom:5px}.entityPopupBox h1{padding-right:70px}.entityPopupCaption{font-size:12px;line-height:1.5;color:var(--muted);margin:8px 0 0}.entityPopupHint{font-size:9px;color:var(--muted);margin-top:10px;border-top:1px solid rgba(255,255,255,.12);padding-top:8px}
+-.tile .doorN,.tile .doorS,.tile .doorE,.tile .doorW{position:absolute;background:var(--yellow)}
++.tile .doorN,.tile .doorS,.tile .doorE,.tile .doorW{position:absolute;background:var(--yellow);z-index:2}
+ .doorN,.doorS{width:30%;height:4px;left:35%}.doorN{top:0}.doorS{bottom:0}.doorE,.doorW{height:30%;width:4px;top:35%}.doorE{right:0}.doorW{left:0}
++.tile.mapReachable{box-shadow:inset 0 0 0 2px rgba(108,224,255,.45)}
++.mapRoomTap{position:absolute;inset:0;z-index:4;border:0!important;box-shadow:none!important;background:transparent!important;padding:0!important;min-height:0!important;cursor:pointer}
++.mapRoomTap:focus-visible{outline:3px solid var(--cyan);outline-offset:-3px}
++.mapExitProbe{position:absolute;inset:7%;z-index:6;display:flex;align-items:center;justify-content:center;border:2px solid var(--pixel)!important;box-shadow:2px 2px 0 var(--pixel)!important;background:var(--yellow)!important;color:#271b00!important;padding:0!important;min-height:0!important;font-size:clamp(14px,3.4vw,25px)!important;font-weight:900;line-height:1;cursor:pointer}
++.mapExitProbe.locked{background:var(--red)!important;color:#2f0000!important;font-size:clamp(11px,2.6vw,19px)!important}
++.mapExitProbe:not(.locked){animation:mapQuestionPulse 1.65s steps(2,end) infinite}
++.mapExitProbe:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
++.navHint{border:2px solid var(--cyan);background:var(--panel2);padding:7px 8px;font-size:10px;font-weight:900;line-height:1.45}
++.fallbackControls{opacity:.72}
++.fallbackControls:focus-within,.fallbackControls:hover{opacity:1}
++@keyframes mapQuestionPulse{0%,100%{transform:scale(1)}50%{transform:scale(.9)}}
++@media (prefers-reduced-motion:reduce){.mapExitProbe:not(.locked){animation:none}}
+ .eventBadge{position:absolute;left:3px;right:3px;bottom:3px;font-size:8px;line-height:1.15;padding:2px 3px;background:rgba(0,0,0,.45);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@@ -218,7 +230,8 @@
+       </div>
+       <div class="map" id="map"></div>
+-      <div class="controls">
++      <div class="navHint">TRYKK PÅ <b>?</b> FOR Å UTFORSKE. TRYKK PÅ ET KJENT NABOROM FOR Å GÅ TILBAKE. 🔒 BETYR LÅST.</div>
++      <div class="controls fallbackControls">
+@@ -2782,16 +2795,38 @@
+ function renderMap(){
+   const d=state.dungeon,b=d.bounds,minX=Math.max(0,b.minX-1),minY=Math.max(0,b.minY-1),maxX=Math.min(d.mapW-1,b.maxX+1),maxY=Math.min(d.mapH-1,b.maxY+1);
+   const w=maxX-minX+1,h=maxY-minY+1,map=$('#map');map.innerHTML='';map.style.setProperty('--map-w',w);map.style.aspectRatio=`${w}/${h}`;
++  const currentExits=connectionsFor(state.currentRoomId).map(c=>{
++    const fromA=c.a===state.currentRoomId,dir=fromA?c.aDir:c.bDir,target=roomById(otherRoomId(c,state.currentRoomId)),targetCell=fromA?c.bCell:c.aCell;
++    return {c,dir,target,targetCell,locked:c.locked&&!c.unlocked};
++  }).filter(x=>x.target&&x.targetCell);
+   for(let y=minY;y<=maxY;y++)for(let x=minX;x<=maxX;x++){
+     const r=roomAtCell(x,y),visible=r?.revealed,el=document.createElement('div');el.className='tile';
+-    if(!visible){el.classList.add('fog');map.appendChild(el);continue;}
++    const exitAtCell=currentExits.find(info=>info.targetCell.x===x&&info.targetCell.y===y);
++    if(!visible){
++      el.classList.add('fog');
++      if(exitAtCell){
++        const label=exitAtCell.locked?`LÅST DØR ${DIR_LABEL[exitAtCell.dir]}`:`UTFORSK ${DIR_LABEL[exitAtCell.dir]}`;
++        el.innerHTML=`<button type="button" class="mapExitProbe${exitAtCell.locked?' locked':''}" data-map-move="${exitAtCell.dir}" aria-label="${label}">${exitAtCell.locked?'🔒':'?'}</button>`;
++      }
++      map.appendChild(el);continue;
++    }
+@@
+     for(const di of cellDoorInfo(r,x,y))el.innerHTML+=`<i class="door${di.dir.toUpperCase()}${di.locked?' locked':''}${di.shortcut?' shortcut':''}${di.secret?' secret':''}"></i>`;
++    const roomExit=currentExits.find(info=>info.target.id===r.id);
++    if(roomExit){
++      if(roomExit.locked&&exitAtCell){
++        el.innerHTML+=`<button type="button" class="mapExitProbe locked" data-map-move="${roomExit.dir}" aria-label="LÅST DØR ${DIR_LABEL[roomExit.dir]}">🔒</button>`;
++      }else if(!roomExit.locked){
++        el.classList.add('mapReachable');
++        el.innerHTML+=`<button type="button" class="mapRoomTap" data-map-move="${roomExit.dir}" aria-label="GÅ TIL ${String(r.name||DIR_LABEL[roomExit.dir]).replace(/&/g,'OG')}"></button>`;
++      }
++    }
+     map.appendChild(el);
+   }
++  $$('[data-map-move]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();move(b.dataset.mapMove)});
+ }
