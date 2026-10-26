@@ -24,6 +24,8 @@ A progress track is allowed only when the encounter has authored `progressStages
 
 **Improvisation is allowed and desirable when it is explicit.** If an ambient scene deliberately leaves a detail for Forteller to invent, narrator mode must say there is no hidden app answer or larger predetermined plan, say what to improvise, and give guardrails. Optional improvisation may add atmosphere, a side discovery or a non-critical hint. It may not silently create a new mandatory story prerequisite or contradict known app state.
 
+**Encounter subject and narrative role are separate.** A recognizable subject such as `BOKA SOM SKRIVER TILBAKE` may support several different *authored compatible* roles across adventures: open mystery/improvisation, NPC-like conversation, tracked clue source, puzzle/gate carrier or item/reward wrapper. Compatible magical subjects such as a talking doll or living portrait can follow the same model. This is curated role reuse, not arbitrary random mixing. Critical roles remain tracked Storylets; subject identity and Storylet identity stay separate/stable; repetition of the same recognizable subject should be penalized when alternatives exist.
+
 Physical dice report uncertainty about an attempted action. A die result never substitutes for an unmet story prerequisite, automatically resolves a whole encounter or automatically removes a monster heart.
 
 Critical story contract remains **SETUP -> SIGNAL -> ACTION -> PAYOFF**. Narrative Graph V1 will add explicit story beats, resources, prerequisites, player-knowledge state and dramatic timing.
@@ -114,9 +116,9 @@ At minimum verify on target device:
 Do not merge UX5A until this physical gate is green.
 
 ## Narrative architecture finding
-`CRYSTAL_MACHINE` exposed causal weakness in critical content; `SKYGGEHEKSA` exposed temporal invalidity; `REGNBUENETTET` exposed missing encounter purpose/payoff; `BOKA SOM SKRIVER TILBAKE` exposed the need to distinguish deliberately open narrator improvisation from missing authored logic.
+`CRYSTAL_MACHINE` exposed causal weakness in critical content; `SKYGGEHEKSA` exposed temporal invalidity; `REGNBUENETTET` exposed missing encounter purpose/payoff; `BOKA SOM SKRIVER TILBAKE` exposed both the need to distinguish deliberately open narrator improvisation from missing authored logic and the opportunity to separate a memorable subject from its narrative role.
 
-Narrative Graph V1 therefore requires explicit purpose/stakes/resolution/payoff semantics and an explicit authoring mode for any intentionally improvised detail. Critical causal state, prerequisites and world effects may not depend on an untracked improvised fact.
+Narrative Graph V1 therefore requires explicit purpose/stakes/resolution/payoff semantics, explicit authoring mode for intentionally improvised details, and subject/Storylet-role separation. Critical causal state, prerequisites and world effects may not depend on an untracked improvised fact or on an arbitrary presentation skin.
 
 ## CRYSTAL_MACHINE reference experiment
 Target:
@@ -146,6 +148,8 @@ Repository-health remains open. Complete runtime/source/assets are not yet direc
 - Ambient puzzles require an authored contextual role; do not attach them randomly.
 - Intentional narrator improvisation is explicitly labeled and scoped.
 - Optional improvisation never creates hidden mandatory story state.
+- Subject identity is distinct from Storylet role; reuse is curated, not arbitrary.
+- Do not repeat a recognizable subject merely to inflate variation.
 - No digital die roller.
 - Relevant `EKSTRA GOD PÅ` is the only source of 2D6.
 - Items/friends/pets are affordances, not numeric bonuses.
@@ -159,6 +163,7 @@ Repository-health remains open. Complete runtime/source/assets are not yet direc
 ## Exact next action
 Stay on UX5A while physical testing is open:
 - physically retest the patch-14 build, especially narrator clarity for `BOKA SOM SKRIVER TILBAKE`,
+- continue editorial review of current encounter subjects/roles before adding new bank volume,
 - continue `REGNBUENETTET`, explicit-key, single-location and remaining device smoke,
 - run fresh browser QA when the Chromium harness is usable,
 - record/fix any new UX5A findings on `ux5/searchable-rooms-encounter-tracks`,
