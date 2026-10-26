@@ -2,6 +2,18 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Dice report uncertainty; encounter state resolves encounters
+A physical die result may suggest a consequence, but may not automatically remove a normal encounter or fill its progress track. Normal generated encounters use explicit narrator-controlled progress, while monster combat uses explicit hearts only after the child chooses combat.
+
+New normal monster encounters use 3 hearts; `SPENNING` encounters use 4. Non-treasure generated encounters use 3 progress steps; `SPENNING` uses 4. The narrator records progress only when the child's action meaningfully changes the situation. A genuinely decisive plan may resolve the whole encounter directly through an explicit narrator action.
+
+This preserves free-form play: a clever solution is allowed to be decisive, but a lucky 5/6 is not itself a universal one-roll victory.
+
+## 2026-10-26 - Searchable-room finds are optional affordances
+Room search may reveal curated useful objects, but these finds are side resources, never hidden mandatory scenario keys. The UI must not reveal in advance which rooms contain loot. Uncertain search uses the physical D6 rule; low results fail forward with stronger information.
+
+A revealed find is part of the room until collected. A full backpack may not destroy or silently consume it.
+
 ## 2026-10-26 - Finales must be earned
 A story-critical finale may never be freely reachable just because the generated map places it nearby. Every curated Adventure Blueprint must have an explicit progression gate. The prerequisite must be reachable before the gate, cannot be permanently lost, and a high die result may never bypass an unmet gate.
 
@@ -30,6 +42,8 @@ Internal Eventyr*/HulerCharacterSystem names are intentionally retained unless a
 
 ## 2026-10-22 - Save migration remains backward compatible
 Canonical storage key is `monsterhulen_v120`; `eventyrkryper_v100` is the first legacy key. State schema remains 12. Legacy saves are normalized and copied forward; legacy storage is not silently destroyed.
+
+UX5A does not bump the schema. Untouched legacy monster encounters may be normalized to the new 3/4-heart defaults, but an already-started legacy fight must not be healed during migration.
 
 ## 2026-10-21 - Physical dice are core interaction
 The app never rolls dice digitally. Uncertain action uses physical 1D6. Relevant `EKSTRA GOD PÅ` uses physical 2D6 and highest die. The playtest UI records the exact physical die face; internal consequence compatibility remains low/mid/high.
