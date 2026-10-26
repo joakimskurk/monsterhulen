@@ -1,64 +1,60 @@
 # MONSTERHULEN - CURRENT STATUS
 
 DATO: 2026-10-26
-STATUS: V0.12.3 + UX5A AUTOMATED/BROWSER VERIFIED + DEVICE GATE ÅPEN + REPOSITORY HEALTH ÅPEN
+STATUS: UX5A PATCH 11 AUTOMATED GREEN + FRESH BROWSER/PHYSICAL RETEST PENDING + NARRATIVE GRAPH V1 PREPARED + REPOSITORY HEALTH ÅPEN
 
-> `PROJECT_STATE.md` er den kanoniske korte handoff-filen. Denne filen beholdes som kompatibilitets-/oversiktsfil.
+> `PROJECT_STATE.md` er kanonisk handoff. `START_HERE.md` på `narrative/story-graph-v1-prep` peker til riktig leserekkefølge.
 
 ## BASELINE
 - Produkt: Monsterhulen
 - Release-baseline: V0.12.3 Lasting Thing Identity Pass
 - State schema: 12
 - Storage: `monsterhulen_v120`
-- Asset Contract: 2.4.0
-- Aktiv branch: `ux5/searchable-rooms-encounter-tracks`
-- Aktiv kandidat: UX5A Searchable Rooms + Encounter State
-- Automatisert runtime + Chromium: verifisert
-- Fysisk iPad/mobile: pending
+- Aktiv runtime-branch: `ux5/searchable-rooms-encounter-tracks`
+- Prep-branch: `narrative/story-graph-v1-prep`
+- UX5A er ikke merget til `main`.
 
-## UX5A KANDIDAT
-- alle rom kan undersøkes uten å avsløre loot på forhånd,
-- KORT/VANLIG/STORT målretter 1/2/3 kuraterte valgfrie skjulte funn,
-- fysisk D6 brukes ved usikkert søk,
-- første 1-2 gir hint; gjentatt lavt resultat fail-forwarder og avslører funnet,
-- full sekk sletter aldri funnet,
-- normale monster: 3 hjerter, `SPENNING` 4,
-- andre genererte encounters: 3 fremgangssteg, `SPENNING` 4,
-- terningresultat auto-løser aldri encounter og endrer ikke HP/fremgang,
-- eksplisitt `+ FREMGANG`, siste hjerte eller `LØST MED GOD IDÉ` styrer løsning.
+## NYESTE UX5A-FUNN
+En låst story-dør skal presentere problemet, ikke automatisk bruke en nøkkel barnet allerede eier.
 
-## VERIFISERING
-Kjørt mot rekonstruert aktiv UX5A-runtime:
-- UX5A search/encounter QA: **2216 / 0**
+Patch 11 gjør derfor keyed gates eksplisitte:
+- trykk på låst dør -> bare `DØREN ER LÅST`,
+- ingen automatisk key-use/unlock/traversal,
+- scenario-nøkkel er fortsatt beskyttet, men har `BRUK`,
+- barnet/Forteller velger aktivt å bruke nøkkelen,
+- nøkkelbruk åpner uten traversal,
+- neste trykk går gjennom,
+- Forteller kan gi et åpent hint: `KANSKJE DU HAR NOE I SEKKEN?`.
+
+Dette er en varig child-agency-regel: appen viser hinder og affordances; barnet foreslår handlingen.
+
+## VERIFISERING ETTER PATCH 11
+Automated runtime:
+- targeted device QA: **27 / 0**
+- UX5A search/encounter: **2216 / 0**
 - Adventure Code: **405 / 0**
-- UX4 progression/secret-door: **1797 / 0**
-- ny varig content regression: **5960 / 0**
-- 11 inline scriptblokker: **0 syntaksfeil**
-- Chromium UX5A smoke: **23 / 0**
+- UX4 progression: **1797 / 0**
+- content regression: **5960 / 0**
+- 11 inline scripts: **0 syntax errors**
 
-Chromium-smoken dekker blant annet tomt rom, skjult funn uten forhåndslekkasje, dobbelt lavt søk, full sekk, fysisk 6 uten state-endring, full fremgang, smart løsning, 4-hjertes `SPENNING`-kamp, slutt på siste hjerte og 3-hjertes normalmonster.
+Fresh reconstructed runtime SHA-256:
+`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
 
-Historisk V0.12.3 release-evidens beholdes separat:
-- Lasting thing: 67 / 0
-- Treasure: 121 / 0
-- Puzzle: 4665 / 0
-- NPC: 4935 / 0
-- Friend: 4104 / 0
-- Pet: 6069 / 0
-- Rescue: 5070 / 0
+Dette er behavioral reconstruction, ikke byte-identisk release-provenance.
 
-## GITHUB REALITY
-`joakimskurk/monsterhulen` er permanent source of truth, men repository-health-gaten er ikke lukket før komplett runtime/source/assets kan rekonstrueres direkte fra repoet.
+Patch 10 hadde Chromium **15 / 0**, men den gamle key-door-forventningen er nå erstattet. Patch 11 trenger derfor en **ny** browser interaction smoke. Fysisk iPad/mobile-retest er fortsatt påkrevd.
 
-Library-kilden kan nå materialiseres som tekst og brukes til å rekonstruere/teste UX5A, men den er ikke byte-identisk med den opprinnelige V0.12.3-manifest-hashen. Komplett asset-tree mangler fortsatt som ordinære repo-filer.
+## NESTE ARKITEKTUR
+Etter UX5A fysisk grønn + merge til `main`: **Narrative Graph V1** før UX5B.
 
-Rekonstruert UX5A runtime SHA-256:
-`289e8c4194217b723ee8595635e147647a5853e8bc990f2037716f566b2659ca`
+Reference først: `CRYSTAL_MACHINE` med synlig krav-reveal, `SEARCH_SECRET`, `NPC_FAVOR`, `GUARDIAN`, retur/assembly og gate først etter assembly. Temporal story coherence/expiry er også obligatorisk.
 
-## NESTE
-1. fysisk smoke-test UX5A på iPad/mobile,
-2. vurder om `SE DEG RUNDT` føles som utforsking og ikke tvungen knapp,
-3. vurder om 3-4 encounter-steg føles bra for barn,
-4. hvis grønt: merge UX5A til `main`,
-5. start deretter UX5B kartbevisst løsningsgraf,
-6. fortsett Repository Health før neste release checkpoint.
+## GITHUB / REPOSITORY HEALTH
+GitHub-repoet er permanent source of truth. Komplett byte-identisk runtime/source/assets baseline er fortsatt ikke direkte rekonstruerbar fra ordinære repo-filer, så repository-health er åpen.
+
+## EXACT NEXT
+1. browser-test patch 11 når real browser-harness er tilgjengelig,
+2. fysisk test explicit key flow + puzzle flow + resten av UX5A-smoken,
+3. ved nye funn: klassifiser som UX/story-coherence/arkitektur før patch,
+4. hvis fysisk GREEN: dokumenter evidens, regress, merge UX5A, verifiser `main`, opprett `narrative/story-graph-v1`, flytt godkjente prep-docs, start `WP-NG1`,
+5. ikke start UX5B først.
