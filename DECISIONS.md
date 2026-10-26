@@ -2,6 +2,23 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Intentional narrator improvisation must be explicit
+Improvisation is allowed and can be desirable, but it must be an authored mode rather than an accidental gap in the content.
+
+If a scene intentionally leaves a detail for Forteller to invent, narrator mode must:
+- clearly label that detail as Forteller-improvisation,
+- state that the app has no hidden answer or larger predetermined plan for that detail,
+- say what kind of thing Forteller should invent,
+- give enough boundaries that the improvisation cannot silently rewrite the adventure's required logic.
+
+Ambient improvisation may add atmosphere, a funny or mysterious side discovery, or an optional hint tied to facts already established in the adventure. It may **not** create a new mandatory story key, introduce an untracked prerequisite, contradict known app state, or pretend that the app has authored causal logic it does not actually have.
+
+The child-facing view does not need meta text saying that something is improvised. This contract is for the narrator so the fiction can remain immersive while the DM knows what responsibility is theirs.
+
+`BOKA SOM SKRIVER TILBAKE` is the reference case. There is intentionally no hidden sentence in the app. Forteller invents what the repeated words become, and the narrator panel explicitly says so.
+
+Critical Storylets may contain bounded improvisational color, but critical prerequisites, completion conditions, payoff and world effects must remain explicit and tracked.
+
 ## 2026-10-26 - Encounter mechanics require a fictional purpose contract
 An encounter may not receive mechanics merely because its type supports them. Before a generated non-treasure encounter is considered usable it must state:
 - `purpose`: what role this scene serves,
