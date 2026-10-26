@@ -56,6 +56,24 @@ Implemented for playtest in `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
 - Exact `diceValue` is stored for the scene while the existing low/mid/high consequence bands remain the internal compatibility model.
 - Consequence preview uses die-face glyphs instead of visible `1-2 / 3-4 / 5-6` labels.
 
+## 4. Finale can be reached too early
+Observed in UX3:
+- A generated route allowed the player to reach the final encounter almost immediately.
+- A high roll then resolved the finale and ended the adventure before the story had developed.
+- A curated finale is not sufficient if map adjacency allows it to be entered before the middle objective has been completed.
+
+Required correction before Adventure Code V1 can lock:
+- Every blueprint must define an explicit finale progression gate.
+- The final room/encounter may be visible early, but it must be blocked until the required story condition is satisfied.
+- The prerequisite may be a scenario key, NPC quest, puzzle, collected parts, clue/truth chain, rescue or other explicit story flag.
+- The prerequisite must be reachable without passing through the finale.
+- A high die result must never bypass an unmet finale gate.
+- The narrator view must show what gates the finale, where/how to earn it, and which map-supported alternatives can help.
+- Important encounters should expose multiple supported routes, including at least one non-combat route for story-critical finales.
+- Failure should alter the situation and available approaches, not softlock the adventure.
+
+This is now a blocker for UX3 acceptance, not an optional polish item.
+
 ## Verification so far
 - 11 inline JavaScript blocks: 0 syntax errors.
 - Existing Thing, Treasure, Puzzle, NPC, Friend, Pet and Rescue runtime QA still pass with no new failures.
@@ -67,4 +85,4 @@ Implemented for playtest in `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
 - Browser/mobile interaction is NOT certified by automation in this environment. Manual child/DM playtest is required before lock.
 
 ## Priority
-These UX changes take priority over locking additional content/art. Repository-health remains an independent technical gate, but all playtest implementations are stored as GitHub patches so they are not chat-only.
+These UX and progression changes take priority over locking additional content/art. Repository-health remains an independent technical gate, but all playtest implementations and critical findings are stored in GitHub so they are not chat-only.
