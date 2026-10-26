@@ -1,7 +1,7 @@
 # MONSTERHULEN - PLAYTEST FINDINGS
 
 Updated: 2026-10-26
-Status: active UX findings from live child/DM playtest. These are not yet locked implementation details, but must be addressed before the next major content lock.
+Status: active UX findings from live child/DM playtest. These are not locked until manually playtested.
 
 ## 1. Encounters are too ambiguous for the DM
 Observed:
@@ -10,29 +10,40 @@ Observed:
 - Items can feel like they are "used up" even when they should remain available narratively.
 - A DM may want to know important later dependencies, clues and scenario keys before improvising away something useful.
 
-Direction to implement/test:
-- Consequences shown by the app should be clearly labelled as suggestions for the narrator, not closed outcomes.
-- A FREE ROLL / FRITT KAST path should always be available for any action the child invents.
-- Physical dice rules remain unchanged: easy/safe actions just work; uncertain actions use 1D6; relevant EKSTRA GOD PÅ uses 2D6 and highest die.
-- Consider a DM adventure plan/spoiler overview that shows important scenario dependencies, clues, keys and useful callbacks.
-- Consider a deterministic adventure code/seed that lets a second device reconstruct the same DM plan.
-- Inventory should distinguish using an item in the fiction from actually consuming/removing it.
+Implemented for playtest in `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`:
+- Encounter and climax consequences are explicitly labelled as narrator suggestions, not fixed outcomes.
+- `FRITT KAST` is available in the narrator panel for any uncertain action the child invents.
+- FRITT KAST keeps the physical dice rule: easy/safe just works, uncertain = 1D6, relevant EKSTRA GOD PÅ = 2D6 highest.
+- FRITT KAST contains no digital RNG.
+- Inventory `BRUK` no longer removes an item.
+- `BRUK OPP / LEGG FRA` is the explicit removal action for ordinary bag items.
+- Scenario-critical items remain protected from removal.
+
+Still to design/test:
+- Expanded DM adventure plan/spoiler overview with important dependencies, clues, keys and useful callbacks.
+- Deterministic adventure code/seed contract so a second device can reconstruct the same DM plan.
 
 ## 2. Map navigation is not child-intuitive enough
 Observed:
 - Arrow controls are not the first thing a child tries.
 - The immediate instinct is to tap directly on the map where the next room should be.
 
-Direction to implement/test:
-- The map itself becomes the primary navigation surface.
-- The current room is clearly highlighted.
-- Every reachable unexplored exit shows a large tappable `?` directly outside the corresponding door.
-- Tapping the `?` moves into that adjacent room.
-- A visited reachable room replaces `?` with its known room representation/icon.
-- A locked exit shows a lock state, not `?`.
-- Non-adjacent/unreachable rooms are not tappable.
-- The `?` must reveal only that the exit is traversable, not what content waits beyond it.
-- Direction arrows may remain as a secondary/fallback control, but should no longer be the primary navigation model.
+Implemented for playtest in `patches/v0.12.3_playtest_map_navigation.patch`:
+- The map is now the primary navigation surface.
+- Reachable unexplored exits show a tappable `?` on the fog cell immediately beyond the door.
+- Locked exits show a tappable lock state instead of `?`.
+- Revealed adjacent rooms are tappable directly on the map.
+- Non-adjacent rooms are not made tappable.
+- Existing direction arrows remain as secondary fallback controls.
+- Existing `move()` logic is unchanged, so keys, locks, scenario progression and save behavior still use the known code path.
+
+## Verification so far
+- 11 inline JavaScript blocks: 0 syntax errors.
+- Targeted map navigation logic: 3/3 PASS (`?`, lock, known adjacent room all route to the expected existing move direction).
+- Existing `move()` function is byte-identical to V0.12.3.
+- FRITT KAST uses the existing three physical result bands and no digital die/RNG.
+- `BRUK` handler does not splice/remove inventory; only the explicit drop/consume handler does.
+- Browser/mobile interaction is NOT certified by automation in this environment because browser navigation is blocked by environment policy. Manual child/DM playtest is required before lock.
 
 ## Priority
-These findings affect the core table-play UX and should be resolved before additional content/art is treated as locked. Repository-health work remains the current technical gate, but the next implementation package after that should include these UX changes before or together with V0.12.4 content work.
+These UX changes now take priority over locking additional content/art. Repository-health remains an independent technical gate, but the playtest patches are stored in GitHub so the implementation is not chat-only.
