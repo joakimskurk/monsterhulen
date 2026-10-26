@@ -6,6 +6,8 @@ STATUS: V0.12.3 BASELINE + ACTIVE UX / ADVENTURE CODE PLAYTEST
 ## LÅSTE PRINSIPPER
 - Fortellingskvalitet slår kombinasjonsmengde. Få gode eventyr er bedre enn tusen middelmådige.
 - Kritisk historie bygges fra kuraterte Adventure Blueprints. Seed varierer bare trygge detaljer.
+- Finaler må opptjenes gjennom en eksplisitt story prerequisite.
+- Hemmelige dører må oppdages og kan aldri omgå story-gates.
 - Den samme Monsterhulen er litt annerledes hver gang man går inn.
 - Barnet foreslår handlinger; appen støtter, den bestemmer ikke fasiten.
 - Fysisk 1D6 ved usikker handling; relevant EKSTRA GOD PÅ gir fysisk 2D6, bruk høyeste.
@@ -31,7 +33,8 @@ STATUS: V0.12.3 BASELINE + ACTIVE UX / ADVENTURE CODE PLAYTEST
 1. Kartnavigasjon via tappbare `?` / lås / kjente nabrom.
 2. FRITT KAST, tydelig narrator-frihet og ikke-forbrukende `BRUK`.
 3. Nybegynner-DM-guide + seks faktiske D6-flater som input.
-4. **Adventure Code V1 + kuraterte blueprint-eventyr + separat fortellervisning.**
+4. Adventure Code V1 + kuraterte blueprint-eventyr + separat fortellervisning.
+5. **UX4: hard finale-progresjon + terningbasert oppdagelse av hemmelige dører.**
 
 ### Adventure Code V1 - første bank
 Kun fire eventyr er aktive før videre utvidelse:
@@ -42,9 +45,19 @@ Kun fire eventyr er aktive før videre utvidelse:
 
 Gate før flere blueprints:
 - spill alle fire manuelt,
-- bekreft at hovedhistorie, spor og payoff føles sammenhengende,
+- bekreft at finalen ikke kan nås før prerequisite,
+- vurder om prerequisite faktisk føles som et meningsfullt midtpunkt,
+- oppgrader enkle funn til NPC-quest/puzzle der historien trenger mer tyngde,
+- bekreft minst én reell ikke-voldelig vei gjennom story-kritiske encounters,
 - bekreft samme kode på iPad/mobil gir samme kart og kritiske plan,
-- dokumenter konkrete svakheter før flere kombinasjoner legges til.
+- dokumenter konkrete svakheter før flere eventyr legges til.
+
+## NESTE UX-PASS ETTER UX4-MANUELLTEST
+Forteller-visningen skal bli løsningsbevisst:
+- vis reelle ikke-voldelige løsninger som faktisk finnes i akkurat dette kartet,
+- vis items/NPC-er/rom som kan hjelpe et senere encounter,
+- vis hvilke tilnærminger som er forsøkt/feilet når encounter-state innføres,
+- behold barnets frie løsninger via FRITT KAST.
 
 ## REPOSITORY HEALTH GATE
 Repo-health-reparasjonen er fortsatt åpen parallelt. Neste release checkpoint skal ikke låses før repoet kan rekonstruere hele aktive baseline uten chat/ekstern ZIP.
