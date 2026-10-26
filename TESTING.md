@@ -21,6 +21,28 @@ The completed V0.12.3 release reported:
 
 This is historical release evidence. It is not a claim that the current GitHub `main` can rerun all those tests yet, because the full runtime/test snapshot is still being repaired into the repository.
 
+## Active playtest UX patch verification
+The current manual-test build is V0.12.3 plus these sequential patches:
+1. `patches/v0.12.3_playtest_map_navigation.patch`
+2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
+
+Verified in the working build:
+- 11 inline JavaScript blocks, 0 syntax errors.
+- Map navigation targeted logic: 3/3 PASS.
+  - open unexplored exit renders `?` and routes to the correct existing move direction,
+  - locked exit renders lock state and routes through the same existing move direction,
+  - revealed adjacent room is directly tappable and routes through the same existing move direction.
+- Existing `move()` function is byte-identical to V0.12.3.
+- FRITT KAST uses the existing physical result bands `1-2`, `3-4`, `5-6` and contains no digital RNG.
+- Inventory `BRUK` does not remove the item.
+- Only the explicit `BRUK OPP / LEGG FRA` handler removes an ordinary bag item.
+- Encounter/climax consequences are labelled as suggestions, not narrator mandates.
+
+Not verified yet:
+- automated real-browser interaction, because this execution environment blocks Chromium navigation to both localhost and `file://`,
+- manual mobile/tablet layout of the new map hit targets,
+- live child/DM comprehension of `?`, lock state, FRITT KAST and the revised inventory buttons.
+
 ## Repository verification
 For the repaired baseline, the repository must verify at minimum:
 - required project-memory files exist,
@@ -31,7 +53,7 @@ For the repaired baseline, the repository must verify at minimum:
 - current bank counts remain 13 start items, 8 narrator items and 5 scenario keys.
 
 ## Browser/mobile status
-V0.12.3 browser/mobile interaction QA was **not rerun**. Do not describe V0.12.3 as browser-certified or physical-device-certified until that testing actually happens.
+V0.12.3 browser/mobile interaction QA was **not rerun**. Do not describe V0.12.3 or the active UX patches as browser-certified or physical-device-certified until that testing actually happens.
 
 ## V0.12.4 acceptance gate
 For each of the seven pending item/key entities:
