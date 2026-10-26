@@ -2,6 +2,22 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Shared sessions are DM-hosted with one authoritative state
+Future multiscreen/live play uses a **DM Host / Player Client** model.
+
+- DM always starts the adventure/session.
+- The DM host owns the authoritative live story/world/session state.
+- Detached player view may run as touch client or display-only screen.
+- Player clients request allowed actions; host validates/applies them and broadcasts resulting state.
+- Same-Wi-Fi/LAN-first operation is the target so live play does not require internet.
+- Reconnect restores current state without replaying actions; stable action/event IDs prevent duplicate effects.
+- Narrator-only information is never player-visible.
+- Adventure Code remains offline reconstruction/sharing, not the live-sync protocol.
+
+The DM panel also needs explicit undo/action-history. Undo must be based on reversible events/state snapshots rather than ad hoc field edits, preserve save/content/story IDs, and immediately synchronize corrected state to all player/display surfaces.
+
+This is a future platform package. It must not jump ahead of UX5A or Narrative Graph V1; shared-session implementation waits until story/world-state transitions are explicit and stable enough to synchronize and reverse safely.
+
 ## 2026-10-26 - Encounter subject and narrative role are separate
 A memorable fictional subject is not permanently tied to one encounter function. The **subject** answers “what is this?”; the **Storylet role** answers “what does it do in this adventure?”.
 
