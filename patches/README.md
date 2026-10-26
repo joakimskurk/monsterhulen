@@ -2,7 +2,7 @@
 
 Active patches are applied in order against the canonical V0.12.3 baseline.
 
-## Compressed patches
+## Compressed historical patches
 
 The two larger historical patches are stored as gzip + base64 because the GitHub connector handles that representation more reliably:
 
@@ -37,7 +37,7 @@ out.write_bytes(gzip.decompress(base64.b64decode(p.read_bytes())))
 8. `v0.12.3_playtest_searchable_rooms_encounter_ui_ux5a.patch`
 9. `v0.12.3_playtest_searchable_rooms_encounter_render_ux5a.patch`
 
-Apply the standard unified diffs sequentially with a normal `patch` implementation. UX5A was deliberately split into four patches so engine/migration, narrator guidance, UI helpers, and render/state handlers have independent failure boundaries.
+Apply the standard unified diffs sequentially with a normal `patch` implementation. UX5A is deliberately split into four patches so engine/migration, narrator guidance, UI helpers, and render/state handlers have independent failure boundaries.
 
 ## UX5A candidate verification
 
@@ -45,9 +45,9 @@ The four UX5A patch files were applied sequentially in order to a realistic sour
 
 SHA-256 of the four plain UX5A patch files:
 
-- engine: `39df432794054082b6e5c5cbfc713dab5810f4085c0ead72d9634bf990c6533e`
-- narrator: `3018a00397b9ece7b379136d0a29a4da902457fd857e1b3f5dda6fbf12a228eb`
-- UI helpers: `b9b2d5a89a01a5b133c8d5347d22740fa877c7ec21a33394fc636a40f913e6ec`
-- render/state: `9b3e1ab495d3d6d00e54153daff7dc68e78188bb63b53928ab9f05b72ed15738`
+- engine: `ecba8350c03ce74cf2f649826b243f10eb42bbfea7aa6a8435d2e19c85a180ee`
+- narrator: `bb86a8a1bd59fc3191058e38f022d2ecf1ba54cfac9a7b476c74964740c03ade`
+- UI helpers: `87bccb1376d57621168416669287489857baeabf178f803411b5c680c410ee02`
+- render/state: `fc28ab10cfae898c62e384fa4b32d1d6a19aece98b80bacf239607488674ecfa`
 
 Full UX5A runtime QA remains **PENDING** until the canonical V0.12.3 runtime can be reconstructed as raw files, patches 1–9 can be applied to it, and the complete Node QA suite can be executed. Do not merge UX5A to `main` before that gate is green.
