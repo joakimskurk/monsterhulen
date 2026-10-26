@@ -2,118 +2,125 @@
 
 Status: required before UX5A merge and before Narrative Graph runtime work starts.
 
-Use the latest reconstructed UX5A build through patch 11 (`v0.12.3_playtest_explicit_story_key_use_ux5a.patch`) as `index.html` together with the existing V0.12.3 / UX4 `assets/` tree. Do not replace production yet.
+Use the latest reconstructed UX5A build through patch 13 (`v0.12.3_playtest_encounter_purpose_contract_ux5a.patch`). Do not replace production yet.
 
-## 1. Explicit locked-door / story-key flow
-Use `GLASS_HEART` and obtain `GLASSNØKKEL` before approaching the story gate.
-
-Pass if:
-- tapping the locked door only communicates that the door is locked,
-- the tap does not unlock, traverse or consume the key,
-- the app does not announce that the key in the backpack is the answer,
-- the child gets a real chance to propose what to do,
-- if needed, the narrator can give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?`,
-- `GLASSNØKKEL` is marked important in the backpack but exposes `BRUK`,
-- pressing `BRUK` beside the matching door opens it and removes/archives the key with clear fiction feedback,
-- pressing `BRUK` does not move the hero,
-- only a later tap on the open door traverses.
-
-Fail if possessing the correct key makes the door solve itself.
-
-## 2. Mystery puzzle narrator flow
-Play a `MYSTISK` encounter containing a puzzle.
+## 1. Encounter purpose / blocking trap
+Play until you meet a generated trap, preferably `REGNBUENETTET`.
 
 Pass if:
-- the puzzle feels framed as part of the current mystery rather than unrelated trivia,
-- `FORTELLERHJELP` makes it obvious what to read aloud,
-- hint and narrator-only answer are easy to find,
-- the child is not asked to roll merely for solving the puzzle,
-- `PUZZLET ER LØST` adds exactly one meaningful progress step,
-- free-form solutions remain available.
+- there is no generic `ANNEN LØSNING` 3/4-box track,
+- narrator can immediately understand `HVA ER GREIA?`, `NÅR ER DET LØST?`, `HVA ENDRES DA?`,
+- the trap actually blocks onward travel while active,
+- retreat to the previous room remains possible,
+- the child can invent a plan rather than choose from a closed solution list,
+- physical die is used only if that particular plan has an uncertain outcome,
+- one genuinely sufficient plan may solve the obstacle; narrator is not expected to invent filler steps,
+- after `HINDRINGEN ER LØST`, the trap is gone/resolved and onward travel actually works.
 
-## 3. Generic room investigation
+Fail if the scene can be ignored despite claiming to be an obstacle, if resolution changes nothing, or if narrator has to invent arbitrary repeated tasks.
+
+## 2. Explicit locked-door / story-key flow
+Use `GLASS_HEART` and obtain `GLASSNØKKEL`.
+
+Pass if:
+- tapping locked door only communicates locked state,
+- tap does not unlock/traverse/consume key,
+- app does not announce key as answer,
+- child gets chance to propose action,
+- narrator can optionally use open hint `KANSKJE DU HAR NOE I SEKKEN?`,
+- key is important/protected but exposes `BRUK`,
+- `BRUK` beside matching door opens/removes key with fiction feedback,
+- key use does not move hero,
+- later tap traverses.
+
+## 3. Ambient mystery / puzzle relationship
+Play newly generated `MYSTISK` ambient encounters.
+
+Pass if:
+- no unrelated random puzzle is automatically pasted onto the scene,
+- mystery can be investigated or left alone unless it has an authored reason to block something,
+- any puzzle that does appear because it is explicitly authored is fictionally connected,
+- thinking/answering does not require die,
+- puzzle solve does not automatically add generic progress; fiction decides what it changed.
+
+## 4. Single location identity
+Move through several rooms.
+
+Pass if each physical room has one clear player-facing place name. Internal zone/biome labels must not look like a second competing location name.
+
+## 5. Generic room investigation
 Start a VANLIG adventure and move through several rooms.
 
 Pass if:
 - every room can be investigated,
-- the app does not reveal in advance which rooms contain hidden finds,
-- `SE DEG RUNDT` feels like an invitation to explore rather than a compulsory button.
+- app does not reveal which rooms contain hidden finds before investigation,
+- `SE DEG RUNDT` feels exploratory rather than compulsory.
 
-## 4. Empty room
+## 6. Empty room
 Investigate a room without a hidden find.
 
-Pass if:
-- no meaningless die roll is requested,
-- the result feels natural and play can continue immediately.
+Pass if no meaningless die is requested and play continues naturally.
 
-## 5. Hidden find + fail-forward
-Reach a room where investigation suggests something may be hidden. Roll physical D6 and register a low result twice.
+## 7. Hidden find + fail-forward
+At a hidden-find room, register low physical D6 twice.
 
-Pass if:
-- the first 1-2 gives a stronger clue without revealing the item,
-- another low result keeps play moving and reveals the optional find,
-- the search cannot softlock.
+Pass if first 1-2 strengthens clue without reveal, repeated low reveals optional find/fails forward, and no softlock occurs.
 
-## 6. Full backpack
-Fill the backpack to six items and try to take a revealed room find.
+## 8. Full backpack
+Fill backpack to six and try to take a revealed room find.
 
-Pass if:
-- the app reports that the backpack is full,
-- the revealed find stays in the room and can be collected later.
+Pass if app reports full backpack and find remains available in room.
 
-## 7. Dice/state separation
-In a generated encounter, note hearts/progress, roll physical 6 and register 6.
+## 9. Dice/state separation
+In generated encounter, roll/register physical result.
 
-Pass if:
-- the exact die face is recorded,
-- hearts are unchanged,
-- progress is unchanged,
-- the encounter is not automatically completed.
+Pass if exact die face is recorded and it does not automatically remove HP or resolve the whole encounter. Dice describe uncertainty of the current attempt, not generic scene duration.
 
-## 8. Non-combat progress
-Use `+ FREMGANG` only when the child's action actually changes the situation.
-
-Pass if:
-- ordinary encounter uses 3 steps and `SPENNING` uses 4,
-- the final explicit progress step resolves the encounter,
-- `LØST MED GOD IDÉ` can directly resolve a genuinely decisive free-form solution,
-- the track feels useful rather than like bookkeeping.
-
-## 9. Combat
-Let the child explicitly choose combat with a monster.
+## 10. Combat
+Let child explicitly choose combat with monster.
 
 Pass if:
 - ordinary monster uses 3 hearts,
-- `SPENNING` monster uses 4 hearts,
-- the final explicit heart removal ends combat,
-- touch targets are comfortable on the target device.
+- `SPENNING` monster uses 4,
+- final explicit heart removal ends combat,
+- touch targets are comfortable.
 
-## 10. Adventure Code
-Recheck copy/paste reconstruction on the intended two-device flow.
+## 11. Non-combat resolution clarity
+Across PERSON/VENN/MYSTISK/MONSTER-without-combat/FELLE scenes, judge the role-specific resolve action.
 
-Pass if the same adventure plan reconstructs and the interaction remains understandable on both screens.
+Pass if:
+- narrator knows what “solved/finished” means from `resolvedWhen`,
+- one decisive plan can be enough when appropriate,
+- any staged progress shown corresponds to authored named fictional stages rather than blank boxes,
+- payoff described by narrator matches what actually changes in game/world state.
 
-## 11. Whole-play judgement
-Play a longer stretch without focusing on the checklist.
+## 12. Adventure Code
+Recheck copy/paste reconstruction on intended two-device flow.
+
+Pass if same adventure plan reconstructs and interaction remains understandable on both screens.
+
+## 13. Whole-play judgement
+Play a longer stretch without checklist focus.
 
 Record:
-- whether the app presents problems before applying solutions,
-- whether the child naturally checks inventory/items without being told a closed answer,
-- whether `SE DEG RUNDT` feels voluntary,
-- whether 3-4 encounter steps feel right for the target age,
-- whether narrator controls interrupt storytelling,
-- what the child naturally tries to tap,
-- any cramped or unclear iPad/mobile layout,
-- any event that is logically valid but narratively too early, too late or disconnected.
+- whether every encounter has an understandable reason to exist,
+- whether resolving scenes produces noticeable consequences/payoffs,
+- whether narrator ever feels forced to invent logic or filler actions,
+- whether app presents problems before applying solutions,
+- whether child naturally invents actions/checks items,
+- whether room investigation feels voluntary,
+- what child naturally taps,
+- any cramped/unclear mobile layout,
+- any content that is too early, too late, disconnected or mechanically pointless.
 
-Treat new findings as possible architecture/story-coherence problems first, not merely copy polish.
+Treat these as architecture/story-coherence findings first, not merely copy polish.
 
 ## Optional legacy-save check
-If a representative old save with an active 2-heart fight is available, load it and confirm the fight keeps its actual remaining heart count rather than being healed during migration.
+If representative old save with active 2-heart fight is available, confirm actual remaining hearts are preserved rather than healed.
 
 ## Result
-- GREEN: record physical evidence, verify relevant regressions, merge UX5A to `main`, verify `main`, create `narrative/story-graph-v1` from the merged head, carry approved prep docs, then start `WP-NG1`.
-- YELLOW: make concrete UX5A fixes, rerun relevant automated/browser regression, retest device.
-- RED: revise the interaction model before merge.
+- GREEN: record physical evidence, verify regressions, merge UX5A to `main`, verify, create `narrative/story-graph-v1`, carry approved prep docs, start `WP-NG1`.
+- YELLOW: fix concrete UX5A issue, rerun relevant tests/browser if available, retest device.
+- RED: revise interaction model before merge.
 
-Do not start UX5B. Narrative Graph V1 comes first after the UX5A gate.
+Do not start UX5B. Narrative Graph V1 comes first after UX5A gate.
