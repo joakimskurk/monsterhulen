@@ -22,18 +22,22 @@ UX5A remains unmerged because physical iPad/mobile playtest is not green yet.
 6. `docs/NARRATIVE_GRAPH_V1.md`
 7. `docs/STORYLET_MATRIX_V1.md`
 8. `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
-9. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
-10. `docs/UX5A_DEVICE_FINDINGS_2026-10-26.md`
+9. `docs/CRYSTAL_STORYLET_BANK_V1.md`
+10. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+11. `docs/UX5A_DEVICE_FINDINGS_2026-10-26.md`
 
 Repository is source of truth. Do not reconstruct architecture from old chat context if it conflicts with these files.
 
 ## Why the next plan changed
 Live playtest of `CRYSTAL_MACHINE` showed that the current collect planner is structurally safe but narratively weak. It places three required parts into three reachable critical rooms. Critical rooms are excluded from ambient encounters, so the three parts become isolated pickups rather than connected mini-stories.
 
+A later playtest exposed the temporal version of the same problem: `SKYGGEHEKSA`, whose dramatic purpose was to make an active objective harder, could still first appear after that objective had already been completed. Content can therefore be individually valid while still being dramatically obsolete.
+
 The intended replacement is a hybrid Narrative Graph + curated Storylet Matrix:
 - humans curate strong small narrative modules and compatibility rules,
 - the generator chooses only compatible modules and places them on a procedural map,
-- critical story causality is validated before ambient content is added.
+- critical story causality is validated before ambient content is added,
+- story beats also have explicit dramatic timing and may expire when their purpose is gone.
 
 ## Reference target
 `CRYSTAL_MACHINE` is the first and only blueprint to convert initially.
@@ -47,6 +51,19 @@ Target structure:
 6. only then does the gate/climax open.
 
 The exact content may vary. The causal structure and quality bar may not.
+
+## Dramatic timing rule
+Narrative Graph V1 uses explicit dramatic phases:
+`INTRO -> QUEST_ACTIVE -> RETURN -> CLIMAX -> AFTERMATH`.
+
+Story-critical nodes/storylets may define `validPhases`, activation dependencies and expiry conditions.
+
+Example:
+- a complication whose purpose is to hinder crystal collection may be valid during `QUEST_ACTIVE`,
+- it must expire when the crystal objective is completed/assembled,
+- if the same antagonist appears later, that later appearance must be a separately authored `CLIMAX` or `AFTERMATH` beat with a new dramatic purpose.
+
+The validator must reject stale critical complications that first activate after the objective they exist to obstruct is already resolved.
 
 ## Exact sequencing from here
 ### While UX5A physical test is still open
@@ -71,7 +88,9 @@ Stay on UX5A. Fix, regress, and physically retest. Narrative Graph implementatio
 
 ## Critical architecture decisions
 - Story quality beats combinatorial volume.
+- A smaller bank of coherent adventures with controlled variation is preferred to many disconnected combinations.
 - Critical nodes use `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
+- Critical beats have valid dramatic time windows; obsolete complications expire.
 - Truth and player knowledge are separate state.
 - Generic UX5A optional finds never satisfy story-critical requirements.
 - A required hidden object always has clue + fail-forward.
