@@ -2,10 +2,12 @@
 
 Updated: 2026-10-26
 Current baseline: **V0.12.3 Lasting Thing Identity Pass**
-Current work item: **Adventure Code V1 + quality-first curated blueprint playtest, while repository-health repair remains open**
+Current work item: **Adventure Code V1 progression-gate repair + quality-first curated blueprint playtest, while repository-health repair remains open**
 
 ## Product direction now locked
 Monsterhulen prioritizes a small number of coherent, memorable adventures over combinatorial volume. Story-critical elements are curated as Adventure Blueprints. Seeded variation is allowed only where it cannot break the story.
+
+A finale must be earned, not merely discovered. Every blueprint must have an explicit story progression gate before its final encounter can be entered/resolved.
 
 ## Active playtest patch chain
 1. `patches/v0.12.3_playtest_map_navigation.patch`
@@ -35,7 +37,19 @@ Only four are active:
 
 Do not expand this bank until all four have been manually played and judged narratively strong.
 
-## Automated verification for UX3
+## Critical UX3 finding
+Manual playtest reached a final encounter almost immediately and a high roll ended the adventure before the story had developed.
+
+This means UX3 is **not acceptable yet** even though Adventure Code determinism passes. Before further blueprint testing/expansion:
+- every blueprint must define an explicit `finaleGate`,
+- finale traversal must be blocked until the gate condition is satisfied,
+- the prerequisite must be reachable without entering the finale,
+- high die results must never bypass an unmet gate,
+- narrator mode must show the gate, prerequisite source and map-supported alternative approaches,
+- story-critical finales must include at least one non-combat route,
+- failure must remain fail-forward and must not softlock the blueprint.
+
+## Automated verification for current UX3 code
 - `tests/QA_ADVENTURE_CODE_V1.js`: Adventure Code V1 405 / 0.
 - Thing: 67 / 0.
 - Treasure: 121 / 0.
@@ -46,12 +60,16 @@ Do not expand this bank until all four have been manually played and judged narr
 - Rescue: 5070 / 0.
 - 11 inline JavaScript blocks: 0 syntax errors.
 
-## Manual verification still required
+These tests do not yet prove progression quality. A new progression-gate QA layer is required.
+
+## Manual verification still required after gate repair
 - child map behavior on target iPad,
 - novice-DM comprehension,
 - six die-face touch layout,
 - copy code on iPad -> paste on phone -> compare same map/critical plan,
-- play through each of the four blueprints for story coherence.
+- play through each of the four blueprints for story coherence,
+- verify final encounter cannot be reached/resolved before its prerequisite,
+- verify at least one non-combat route through each story-critical finale.
 
 ## Repository reality
 `main` contains durable project memory and reconstructable playtest patches, but repository-health is still not fully closed. The full active runtime/source/assets baseline is not yet present as ordinary directly usable project files. Do not call the next release checkpoint locked until that gate is closed.
@@ -63,6 +81,7 @@ Do not expand this bank until all four have been manually played and judged narr
 - Items/friends/pets are affordances, not numeric bonuses.
 - Stable IDs and save compatibility remain important.
 - Story quality beats procedural quantity.
+- Finale gates are story prerequisites, not dice difficulty checks.
 
 ## Exact next action
-Manual-playtest UX3 on two devices. Start each of the four initial blueprints across repeated adventures, compare child iPad and narrator phone using the Adventure Code, and record narrative weaknesses in `PLAYTEST_FINDINGS.md`. Fix weak blueprints before adding any new story combinations. Continue repo-health repair in parallel and close it before the next release checkpoint.
+Implement and test blueprint-level finale progression gates before continuing UX3 manual acceptance. Add automated checks that no blueprint can reach/finish its finale before its explicit prerequisite is satisfied, and expose the gate/prerequisite/alternative routes in narrator mode. Then resume two-device manual playtest of all four curated blueprints. Continue repo-health repair in parallel and close it before the next release checkpoint.
