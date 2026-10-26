@@ -10,29 +10,37 @@ let app=scripts[scripts.length-1];
 let prefix=app.split('function freshState',1)[0].replace('(()=>{','');
 vm.runInThisContext(prefix,{filename:'adventure-code-prefix'});
 const ids=['GLASS_HEART','WITCH_CAT','CRYSTAL_MACHINE','ZOMBIE_DELIVERY'];
+function build(seed,id=null){
+  let last=null;
+  for(let i=0;i<60;i++){
+    const layoutSeed=(seed+Math.imul(i,9973))>>>0;
+    try{const d=G.generateDungeon(layoutSeed,13);return {d:decorateDungeon(d,null,'VANLIG','YNGRE',seed,id),layoutSeed};}catch(e){last=e;}
+  }
+  throw last||new Error('no valid dungeon');
+}
 for(const id of ids){
-  const d=G.generateDungeon(12345,13),x=decorateDungeon(d,null,'VANLIG','YNGRE',12345,id),s=x.scenarioSpec;
+  const x=build(12345,id).d,s=x.scenarioSpec;
   ok(s.blueprintId===id,id+' stable blueprint id');
   ok(!!s.premise&&!!s.plant&&!!s.payoff,id+' narrator story metadata');
   ok(Array.isArray(x.world?.route)&&x.world.route.length===3,id+' curated route');
 }
-let a=(()=>{const d=G.generateDungeon(22222,13);return JSON.stringify(decorateDungeon(d,null,'VANLIG','YNGRE',22222,null));})();
-let b=(()=>{const d=G.generateDungeon(22222,13);return JSON.stringify(decorateDungeon(d,null,'VANLIG','YNGRE',22222,null));})();
+let a=JSON.stringify(build(22222,null).d);
+let b=JSON.stringify(build(22222,null).d);
 ok(a===b,'same seed produces byte-identical decorated dungeon JSON');
 for(let seed=1;seed<=128;seed++){
-  const d1=G.generateDungeon(seed,13),x1=decorateDungeon(d1,null,'VANLIG','YNGRE',seed,null);
-  const d2=G.generateDungeon(seed,13),x2=decorateDungeon(d2,null,'VANLIG','YNGRE',seed,null);
+  const x1=build(seed,null).d;
+  const x2=build(seed,null).d;
   ok(x1.scenarioSpec.blueprintId===x2.scenarioSpec.blueprintId,'blueprint deterministic '+seed);
   ok(JSON.stringify(x1.world.route)===JSON.stringify(x2.world.route),'route deterministic '+seed);
   ok(x1.scenarioSpec.type===ADVENTURE_BLUEPRINT_INDEX[x1.scenarioSpec.blueprintId].type,'blueprint type coherent '+seed);
 }
-const lock=(()=>{const d=G.generateDungeon(5,13);return decorateDungeon(d,null,'VANLIG','YNGRE',5,'GLASS_HEART').scenarioSpec})();
+const lock=build(5,'GLASS_HEART').d.scenarioSpec;
 ok(lock.keyName==='GLASSNØKKEL'&&lock.goalLabel==='KRYSTALLHJERTET','glass-heart critical pair locked');
-const rescue=(()=>{const d=G.generateDungeon(5,13);return decorateDungeon(d,null,'VANLIG','YNGRE',5,'WITCH_CAT').scenarioSpec})();
+const rescue=build(5,'WITCH_CAT').d.scenarioSpec;
 ok(rescue.target==='HEKSEKATTEN'&&rescue.clue&&rescue.rescue?.scene,'witch-cat rescue coherent');
-const collect=(()=>{const d=G.generateDungeon(5,13);return decorateDungeon(d,null,'VANLIG','YNGRE',5,'CRYSTAL_MACHINE').scenarioSpec})();
+const collect=build(5,'CRYSTAL_MACHINE').d.scenarioSpec;
 ok(collect.altar==='KRYSTALLMASKINEN'&&collect.parts.join('|')==='RØD KRYSTALL|BLÅ KRYSTALL|GUL KRYSTALL','crystal-machine critical set locked');
-const mystery=(()=>{const d=G.generateDungeon(5,13);return decorateDungeon(d,null,'VANLIG','YNGRE',5,'ZOMBIE_DELIVERY').scenarioSpec})();
+const mystery=build(5,'ZOMBIE_DELIVERY').d.scenarioSpec;
 ok(mystery.truth.includes('PRØVER Å LEVERE DET TILBAKE')&&mystery.clues.length===3,'zombie mystery curated truth and clues');
 ok(html.includes("const ADVENTURE_CODE_VERSION='MH1'"),'adventure code version locked');
 ok(html.includes('layoutSeed')&&html.includes('blueprintId')&&html.includes('openNarratorFromCode'),'code carries reproducibility contract');
