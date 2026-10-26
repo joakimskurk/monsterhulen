@@ -41,18 +41,21 @@ out.write_bytes(gzip.decompress(base64.b64decode(p.read_bytes())))
 12. `v0.12.3_playtest_single_location_name_ux5a.patch`
 13. `v0.12.3_playtest_encounter_purpose_contract_ux5a.patch`
 14. `v0.12.3_playtest_explicit_improv_guidance_ux5a.patch`
+15. `v0.12.3_playtest_room_description_location_identity_ux5a.patch`
 
-UX5A is deliberately split so engine/migration, narrator guidance, UI helpers and render/state handlers have independent failure boundaries. Patch 10 addressed first device findings. Patch 11 preserves child agency at keyed gates. Patch 12 removes the confusing second visible location identity. Patch 13 replaces generic encounter duration with authored purpose/solve/payoff semantics. Patch 14 keeps narrator improvisation as a valid play mode but makes it explicit and bounded instead of looking like missing hidden content.
+UX5A is deliberately split so engine/migration, narrator guidance, UI helpers and render/state handlers have independent failure boundaries. Patch 10 addressed first device findings. Patch 11 preserves child agency at keyed gates. Patch 12 removes the separate visible area badge and zone identity from narrator/status surfaces. Patch 13 replaces generic encounter duration with authored purpose/solve/payoff semantics. Patch 14 keeps narrator improvisation as a valid play mode but makes it explicit and bounded instead of looking like missing hidden content.
+
+Patch 15 closes a test-coverage gap found during the 2026-10-27 gate review: even after patch 12, the player-visible `room.desc` still began with `${zone.name}. ${room.name}.`, so a room could still present two competing place identities. Patch 15 changes only the player description prefix to `${room.name}.` while retaining `zoneName` internally for deterministic generation/tone. `tests/QA_SINGLE_LOCATION_NAME_UX5A.js` now checks this exact leak.
 
 ### Historical patch-format note
 
 Some earlier playtest patch files contain abbreviated `@@` separator hunks rather than a completely conventional unified-diff header on every block. Verified reconstruction therefore uses exact text/context application where necessary instead of assuming every historical patch can be fed blindly to GNU `patch`.
 
-Patches 10-14 are normal unified diffs against the preceding verified reconstructed layer.
+Patches 10-15 are normal unified diffs against the preceding verified reconstructed layer.
 
 ## UX5A patch hashes
 
-SHA-256 of the plain UX5A patch files:
+SHA-256 of the plain UX5A patch files already verified before patch 15:
 
 - engine: `49d7fb0ab1558caea18a3a2b4cb720efde21a79ba269bec33d82f684c7e3a48f`
 - narrator: `bb86a8a1bd59fc3191058e38f022d2ecf1ba54cfac9a7b476c74964740c03ade`
@@ -63,10 +66,14 @@ SHA-256 of the plain UX5A patch files:
 - single visible location identity: `0cd1e2b43f9e1add7d53bf188ed9688ca0694be4d45b35dda941fb3c18ca7f58`
 - encounter purpose contract: `74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
 - explicit narrator improvisation: `123daf1a12fc4f6a38d5d3dc401b7403c21005263c32811e0c0eeac24877fd2c`
+- room-description location identity patch: `f8cd1e6c746541961ebf9308e62763d58a27ae705bee42886d56c082ceb620a5`
+
+The updated single-location QA source prepared with patch 15 has SHA-256:
+`c84bf6b16841c6795e589f49c08cf6287fa403aa08d2a8d77662e679d51d20d1`
 
 ## UX5A runtime verification
 
-The indexed Library playtest `index.html` can be materialized as text and the patch chain reconstructed behaviorally. The original release-byte provenance remains separate repository-health debt.
+The indexed Library playtest source can be inspected and the patch-14 behavior is visible there. The original release-byte provenance remains separate repository-health debt.
 
 Historical behavioral reconstruction hashes:
 - pre-device-finding UX5A: `289e8c4194217b723ee8595635e147647a5853e8bc990f2037716f566b2659ca`
@@ -85,7 +92,7 @@ Against the reconstructed patch-14 runtime:
 - `tests/QA_EXPLICIT_IMPROV_GUIDANCE_UX5A.js`: **20 PASS / 0 FAIL**
 - `tests/QA_ENCOUNTER_PURPOSE_UX5A.js`: **4337 PASS / 0 FAIL**
 - `tests/QA_AUTHORED_MYSTERIES_ONLY_UX5A.js`: **3075 PASS / 0 FAIL**
-- `tests/QA_SINGLE_LOCATION_NAME_UX5A.js`: **19 PASS / 0 FAIL**
+- `tests/QA_SINGLE_LOCATION_NAME_UX5A.js`: **19 PASS / 0 FAIL** under the old coverage
 - `tests/QA_DEVICE_FINDINGS_UX5A.js`: **27 PASS / 0 FAIL**
 - `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2328 PASS / 0 FAIL**
 - `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**
@@ -103,25 +110,39 @@ Patch 14 specifically verifies:
 
 Patch 13 coverage remains active: purpose/stakes/resolution/payoff, authored-progress-only, real trap blocking/retreat/release, and no random ambient puzzle attachment.
 
+### Patch 15 verification status
+
+At this checkpoint:
+- source inspection found the exact remaining zone-name leak,
+- patch 15 is committed to the runtime branch,
+- `QA_SINGLE_LOCATION_NAME_UX5A.js` has two new assertions covering `room.desc`,
+- the updated QA file passes JavaScript syntax checking,
+- full patch-15 reconstruction/regression has **not** been rerun yet,
+- no patch-15 automated pass count is claimed,
+- no fresh patch-15 browser-green claim is made.
+
+Reason: the Project/Library search index exposes the current patch-14 source, but the available materialization path in this session returns an older backing representation rather than the exact indexed current candidate. Running browser/full-regression against that stale export would not certify patch 15.
+
 ### Browser evidence
 
 Earlier Chromium evidence remains historical regression evidence only:
 - broad pre-patch-11 UX5A: **23 / 0**,
 - patch-10 focused smoke: **15 / 0**.
 
-Fresh browser interaction QA for the current patch-14 candidate is still pending. The local Chromium harness previously hit a browser/localStorage error before current interaction QA could run. No browser-green claim is made for patches 11-14.
+Fresh browser interaction QA for the current patch-15 candidate is still pending. Do not use an older Library materialization to certify the current candidate.
 
 ## Remaining gate
 
 UX5A is **not merged to `main`**. Before merge:
-1. physically retest the patch-14 build on iPad/mobile,
-2. verify `BOKA SOM SKRIVER TILBAKE` clearly tells Forteller that the missing message is theirs to invent and not a hidden app plan,
-3. verify the improvisation scope/guardrails are understandable without reducing child freedom,
-4. verify `REGNBUENETTET` purpose/block/retreat/payoff semantics remain clear,
-5. verify one clear location name and explicit key use,
-6. continue remaining device smoke,
-7. run fresh browser interaction QA when the harness is usable,
-8. classify/fix any new findings before merge.
+1. reconstruct/apply patch 15 against the exact current candidate and rerun relevant automated regression,
+2. physically retest the patch-15 build on iPad/mobile,
+3. verify `BOKA SOM SKRIVER TILBAKE` clearly tells Forteller that the missing message is theirs to invent and not a hidden app plan,
+4. verify the improvisation scope/guardrails are understandable without reducing child freedom,
+5. verify `REGNBUENETTET` purpose/block/retreat/payoff semantics remain clear,
+6. verify the room description now exposes only the room identity, not the internal zone name,
+7. verify explicit key use, room search, backpack behavior, combat and Adventure Code,
+8. run fresh browser interaction QA on the exact current candidate,
+9. classify/fix any new findings before merge.
 
 Narrative Graph runtime remains blocked until UX5A is physically green and merged. UX5B remains deferred until Narrative Graph V1 is proven.
 
