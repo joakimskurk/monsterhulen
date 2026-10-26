@@ -13,6 +13,8 @@ Read in this order on this branch:
 4. `TESTING.md`
 5. `PLAYTEST_FINDINGS.md`
 6. `patches/README.md`
+7. `docs/UX5A_GATE_REVIEW_2026-10-27.md`
+8. `docs/UX5A_BROWSER_QA_2026-10-27.md`
 
 Then read architecture prep on branch `narrative/story-graph-v1-prep`:
 1. `START_HERE.md`
@@ -25,27 +27,48 @@ Then read architecture prep on branch `narrative/story-graph-v1-prep`:
 8. `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
 
 ## Current active work
-UX5A patch 15 verification + physical iPad/mobile retest before merge.
+UX5A patch 15 physical iPad/mobile retest before merge.
 
 Latest runtime patches:
 - patch 11 explicit story-key use,
 - patch 12 one visible location identity,
 - patch 13 encounter purpose/world-effect contract,
 - patch 14 explicit narrator-improvisation guidance,
-- patch 15 removes a remaining player-visible zone-name leak from `room.desc`.
+- patch 15 removes the remaining player-visible zone-name leak from `room.desc`.
 
-Patch 14 automated tests were green. During the 2026-10-27 gate review, the indexed patch-14 source showed that `room.desc` still began with `${zone.name}. ${room.name}.`, so a player could still see two competing place identities. Patch 15 changes the player description to start with the canonical room name only while retaining `zoneName` internally for generation/tone.
+## Patch 15 checkpoint
+The 2026-10-27 full gate review found that patch 12 had removed the separate area badge but the player room description still exposed `${zone.name}. ${room.name}.`.
 
-`tests/QA_SINGLE_LOCATION_NAME_UX5A.js` now explicitly rejects a zone prefix in `room.desc`.
+Patch 15 changes the visible description to `${room.name}.` while keeping `zoneName` internal for deterministic generation/tone.
 
-Patch 15 is source/static verified only at this checkpoint. Full reconstructed automated regression, fresh current browser QA, and physical target-device retest remain open. The Project/Library index exposes the current patch-14 source, but the raw/text materialization path currently returns an older backing representation, so do not claim browser or full runtime certification from that stale export.
+The current patch-15 candidate has now been reconstructed from the indexed current source and machine-tested.
 
-**Do not merge UX5A until patch 15 regression is green and the physical gate is green.**
+Automated evidence on patch 15:
+- single location **21/0**
+- explicit improv **20/0**
+- authored mysteries only **5136/0**
+- encounter purpose **4337/0**
+- device findings **27/0**
+- search/encounter **2328/0**
+- Adventure Code **405/0**
+- UX4 progression **1797/0**
+- content regression **5830/0**
+- focused patch-15 runtime gate **6844/0**
+- 11 inline scripts **0 syntax errors**
+
+Patch-15 reconstructed candidate SHA-256:
+`f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
+
+A fresh headless Chromium interaction smoke is also green **22/0** using the exact patch-15 HTML. Because this container denies native localStorage for the injected `about:blank` harness, the smoke used an in-memory localStorage shim. Therefore browser DOM/click/mobile-view interactions are fresh-current, but native persistence and real clipboard behavior are still not certified.
+
+**Remaining merge gate is physical iPad/mobile testing of the same patch-15 candidate, plus native persistence/clipboard behavior on real target browser.**
+
+Do not merge UX5A until the physical gate is green.
 
 Do not implement Narrative Graph runtime, full DM Control Surface, UX5B or Multiscreen while this gate remains open.
 
 ## Latest architecture direction captured in prep
-The content/editorial review now points to:
+Target chain:
 
 `SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
 
@@ -82,53 +105,26 @@ For a gate/machine requiring three colored stones:
 
 Detailed spec lives on prep branch in `docs/INTERACTION_SHELLS_V1.md`.
 
-## Future shared session direction
-Recorded only, not active:
-- DM always starts/hosts authoritative state,
-- detached player view can be touch or display-only,
-- same-Wi-Fi/LAN-first join by short code/QR,
-- host validates player action requests and broadcasts state,
-- reconnect/idempotency,
-- no narrator-only data leakage,
-- DM player-view preview,
-- action history + undo foundation.
-
 ## Open-source survey result
-No dependency adopted.
-
-Study-only references on prep branch:
-- boardgame.io,
-- Colyseus,
-- rot.js,
-- Epoch Mapper.
-
-Do not import a dungeon/game framework while current state/story architecture is unsettled.
+No dependency adopted. Study-only: boardgame.io, Colyseus, rot.js, Epoch Mapper.
 
 ## Content editorial continuation
-Review has progressed through:
-- Pannekakezombien,
-- Den bortkomne zombien,
-- Skjelettdanseren,
-- Skjelettvakten,
-- Sumptrollet,
-- Brotrollet.
+Reviewed through `BROTROLLET`.
 
-Next subject if continuing review in a new chat:
-
-**DEN LEVENDE RUSTNINGEN**
+Next subject if continuing review: **DEN LEVENDE RUSTNINGEN**.
 
 Do not expand Adventure Blueprint bank.
 
 ## Exact sequencing
 While UX5A physical test is open:
-- test/fix UX5A only on this branch,
-- first verify patch 15 against the current reconstructed candidate,
+- physical-test patch 15 on iPad/mobile,
+- patch UX5A defects only on this branch,
 - content review may continue as documentation,
 - architecture prep remains documentation-only.
 
-When user reports physical UX5A GREEN and patch 15 regression is green:
+When user reports physical UX5A GREEN:
 1. record physical evidence,
-2. rerun/confirm relevant automated + fresh browser tests,
+2. confirm final relevant automated/browser evidence,
 3. merge UX5A to `main`,
 4. verify `main`,
 5. create `narrative/story-graph-v1` from merged main,
