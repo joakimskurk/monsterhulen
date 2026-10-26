@@ -2,6 +2,28 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Encounter subject and narrative role are separate
+A memorable fictional subject is not permanently tied to one encounter function. The **subject** answers “what is this?”; the **role/storylet** answers “what does it do in this adventure?”.
+
+Example: `BOKA SOM SKRIVER TILBAKE` may, in different authored appearances, be:
+- an optional narrator-improvisation mystery,
+- an NPC-like conversational figure with a want/motive,
+- a source of a tracked clue,
+- the carrier of an authored puzzle that opens a gate,
+- the guardian/reward wrapper for an item.
+
+The same principle may apply to compatible magical subjects such as a talking doll, living portrait, whispering statue, enchanted mirror or similar figures. This is a controlled variation mechanism, not permission to assign arbitrary roles randomly.
+
+Rules:
+- role must be fictionally compatible with the subject,
+- critical roles are authored/tracked Storylets, never accidental ambient promotion,
+- if a subject carries a puzzle, clue, item or gate function, the payload and payoff must be explicit,
+- open narrator improvisation remains explicitly labelled and cannot create mandatory state,
+- generator should penalize repeating the same subject within one adventure/recent play when other compatible subjects exist,
+- stable subject identity and storylet/role identity remain separate so saves and authored logic can stay stable.
+
+This separation is intended to create more variety from a curated bank without multiplying shallow content. Story quality and causal coherence still outrank combinatorial volume.
+
 ## 2026-10-26 - Intentional narrator improvisation must be explicit
 Improvisation is allowed and can be desirable, but it must be an authored mode rather than an accidental gap in the content.
 
@@ -64,7 +86,7 @@ Critical story generation will therefore move to a hybrid model:
 
 Every critical objective must have `SETUP -> SIGNAL -> ACTION -> PAYOFF`. Truth and player knowledge are separate. Generic UX5A optional finds may never satisfy story-critical requirements. Critical hidden/search content must have explicit clues and fail-forward. Guardians must have at least one authored non-combat affordance. Three-part collect scenarios default to different play families rather than three copies of the same acquisition pattern.
 
-Live playtest also showed the temporal version of the same problem: `SKYGGEHEKSA`, whose purpose was to make the task harder, could be encountered after the task was already complete. Narrative Graph therefore has explicit dramatic phases and validity/expiry windows. A complication or antagonist may not first activate after the objective it exists to obstruct is resolved. Later reuse requires a separately authored role with new purpose.
+Live playtest also showed the temporal version of the same problem: `SKYGGEHEKSA`, whose purpose was to make the main task harder, could be encountered after the task was already complete. Narrative Graph therefore has explicit dramatic phases and validity/expiry windows. A complication or antagonist may not first activate after the objective it exists to obstruct is resolved. Later reuse requires a separately authored role with new purpose.
 
 The encounter-purpose finding generalizes the same architecture rule downward: Storylets and encounter-like graph nodes also need explicit purpose, stakes, resolution condition and payoff. Graph validity alone is not enough if a node does nothing meaningful in play.
 
