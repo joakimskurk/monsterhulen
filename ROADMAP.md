@@ -1,27 +1,25 @@
 # MONSTERHULEN - ROADMAP
 
 DATO: 2026-10-26
-STATUS: V0.12.3 BASELINE + UX5A AUTOMATED/BROWSER VERIFIED + PHYSICAL DEVICE HOTFIX RETEST PENDING + NARRATIVE GRAPH V1 PREPARED
+STATUS: V0.12.3 BASELINE + UX5A PATCH 11 AUTOMATED GREEN + FRESH BROWSER/PHYSICAL RETEST PENDING + NARRATIVE GRAPH V1 PREPARED
 
 ## LÅSTE PRINSIPPER
-- Fortellingskvalitet slår kombinasjonsmengde. Få gode eventyr er bedre enn tusen middelmådige.
-- Kritisk historie bygges fra kuraterte Adventure Blueprints.
-- Kritiske story-beats skal heretter modelleres som eksplisitt Narrative Graph med kuraterte Storylets og kompatibilitetsregler.
+- Fortellingskvalitet slår kombinasjonsmengde.
+- Barnet foreslår handlinger; appen støtter og presenterer affordances, men velger ikke løsningen automatisk.
+- Å eie riktig nøkkel betyr ikke at et trykk på en låst dør automatisk bruker nøkkelen.
+- Kritisk historie bygges fra kuraterte Adventure Blueprints og etter UX5A fra eksplisitt Narrative Graph + kuraterte Storylets.
 - Hvert kritisk mål må ha `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
-- Sannhet og spillerkunnskap er separate state. UI/Forteller kan ikke røpe story facts før de er avslørt i fiksjonen.
-- Seed kan variere layout, kompatible Storylets og trygg sidecontent, men ikke bryte årsak/virkning i historien.
-- Finaler må opptjenes gjennom en eksplisitt story prerequisite.
-- Hemmelige dører må oppdages og kan aldri omgå story-gates.
-- Den samme Monsterhulen er litt annerledes hver gang man går inn.
-- Barnet foreslår handlinger; appen støtter, den bestemmer ikke fasiten.
-- Fysisk 1D6 ved usikker handling; relevant EKSTRA GOD PÅ gir fysisk 2D6, bruk høyeste.
-- Appen genererer aldri terningresultat.
+- Sannhet og spillerkunnskap er separate state.
+- Kritiske beats har dramatisk timing; obsolete komplikasjoner må utløpe eller transformeres.
+- Finaler må opptjenes gjennom eksplisitte story prerequisites.
+- Hemmelige dører kan aldri omgå story-gates.
+- Fysisk 1D6/2D6 ved usikkerhet; appen genererer aldri terningresultat.
+- Et terningresultat alene løser aldri et normalt encounter eller erstatter et story prerequisite.
 - Puzzle/gjetning trenger ikke terning i seg selv.
-- Ting, venner og kjæledyr åpner muligheter, men gir ikke bonusdie.
-- Generiske UX5A-romfunn er valgfrie affordances og kan aldri bli story-critical requirements.
-- Kritisk skjult innhold må ha clue + fail-forward og kan aldri kreve ett vellykket kast for å unngå softlock.
+- Ting, venner og kjæledyr er affordances, ikke tallbonuser.
+- Generiske UX5A-romfunn er valgfrie og kan aldri bli story-critical requirements.
+- Kritisk skjult innhold må ha clue + fail-forward.
 - Guardians må ha minst én skrevet ikke-voldelig affordance.
-- Et terningresultat alene avslutter aldri et normalt encounter eller endrer encounter-state automatisk.
 - GitHub-repoet er permanent source of truth.
 
 ## FERDIG BASELINE
@@ -39,112 +37,100 @@ STATUS: V0.12.3 BASELINE + UX5A AUTOMATED/BROWSER VERIFIED + PHYSICAL DEVICE HOT
 ## PLAYTEST- OG ARKITEKTURREKKEFØLGE
 1. Kartnavigasjon via tappbare `?` / lås / kjente nabrom.
 2. FRITT KAST, tydelig narrator-frihet og ikke-forbrukende `BRUK`.
-3. Nybegynner-DM-guide + seks faktiske D6-flater som input.
-4. Adventure Code V1 + kuraterte blueprint-eventyr + separat fortellervisning.
-5. **UX4: hard finale-progresjon + terningbasert oppdagelse av hemmelige dører.** Runtime-verifisert.
-6. **UX5A: romundersøkelse + valgfrie skjulte funn + eksplisitt encounter-state.** Automated runtime + Chromium verified. Physical device test fant to konkrete UX-feil; hotfix er automated/Chromium green og fysisk retest pågår.
-7. **Narrative Graph V1: sammenhengende kritisk story + Storylet Matrix.** Ny neste arkitekturpakke etter grønn UX5A-device gate. Start kun med `CRYSTAL_MACHINE`.
-8. **UX5B: kartbevisst løsningsgraf i Forteller-visningen.** Nå utsatt til Narrative Graph V1 er bevist. UX5B skal lese den eksplisitte story graphen, ikke gjette sammenhenger fra løse rom/events.
+3. Nybegynner-DM-guide + seks faktiske D6-flater.
+4. Adventure Code V1 + kuraterte blueprint-eventyr.
+5. **UX4:** hard finale-progresjon + oppdagelse av hemmelige dører.
+6. **UX5A:** romundersøkelse + valgfrie skjulte funn + eksplisitt encounter-state + device-funn.
+7. **Narrative Graph V1:** sammenhengende kritisk story + Storylet Matrix. Neste arkitekturpakke etter grønn UX5A-device gate. Start kun med `CRYSTAL_MACHINE`.
+8. **UX5B:** kartbevisst løsningsgraf. Utsatt til Narrative Graph V1 er bevist; skal lese eksplisitt graph, ikke gjette fra løse rom-events.
 
 ## UX5A acceptance og gate
-Automatisert/browser-del før device hotfix var grønn:
-- searchable-room QA: 2216/0,
-- Adventure Code: 405/0,
-- UX4 progression: 1797/0,
-- combined content regression: 5960/0,
-- 11 inline scripts: 0 syntax errors,
-- Chromium interaction smoke: 23/0.
+Broad evidence før siste key-interaction-endring:
+- searchable-room QA 2216/0,
+- Adventure Code 405/0,
+- UX4 progression 1797/0,
+- combined content 5960/0,
+- 11 scripts 0 syntax errors,
+- Chromium broad 23/0,
+- patch-10 focused Chromium 15/0.
 
-Fysisk playtest fant:
-1. story-gate med riktig nøkkel ble låst opp og passert i samme trykk, slik at låsen føltes kosmetisk; brukt nøkkel ble dessuten stående i sekken,
-2. et generisk puzzle kunne være logisk gyldig, men uten tydelig fiksjonell kobling eller Forteller-instruks.
+Fysiske/UX-funn:
+1. key gate kunne unlock + traverse i ett trykk,
+2. mystery puzzle kunne være fictionally disconnected/DM-uklar,
+3. patch-10 brukte fortsatt nøkkelen automatisk og tok dermed barnets løsningsvalg.
 
-Hotfix-verifisering:
-- targeted Node: 19/0,
-- Chromium targeted smoke: 15/0,
-- første gate-trykk åpner uten traversal,
-- scenario-nøkkel fjernes med eksplisitt fiction-logg,
-- andre trykk traverserer,
-- puzzle har Fortellerhjelp, hint/fasit og eksplisitt `PUZZLET ER LØST` -> +1 fremgang.
+Patch 11:
+- keyed locked door tap viser bare at døren er låst,
+- scenario key har eksplisitt beskyttet `BRUK`,
+- key use åpner uten traversal,
+- Forteller kan gi et åpent backpack-hint ved behov.
+
+Automated after patch 11:
+- targeted device QA **27/0**,
+- searchable-room **2216/0**,
+- Adventure Code **405/0**,
+- UX4 progression **1797/0**,
+- combined content **5960/0**,
+- 11 scripts **0 syntax errors**.
+
+Patch 11 trenger ny browser interaction smoke og fysisk retest. Gamle patch-10 15/0 kan ikke brukes som proof for ny key-flow.
 
 Før UX5A kan merges:
-- disse hotfixene må bekreftes fysisk,
-- resten av UX5A-device smoke må fortsatt føles grønn,
-- eventuelle nye playtest-funn må enten fikses eller eksplisitt klassifiseres som senere scope.
+- explicit key flow må føles naturlig fysisk,
+- puzzle hotfix må være tydelig fysisk,
+- resten av device smoke må være grønn,
+- nye funn må fikses eller eksplisitt klassifiseres.
 
-## Narrative Graph V1 - hvorfor den kommer før UX5B
-Live playtest av `CRYSTAL_MACHINE` viste en mer fundamental svakhet enn løsningshints: dagens `COLLECT`-planner plasserer bare tre story-critical `DEL`-events i tre reachable rom. Disse rommene ekskluderes fra ambient encounter-generation. Resultatet er korrekt progresjon, men de tre delene kan oppleves som tre isolerte pickups uten setup, motivasjon eller payoff.
+## Narrative Graph V1 - hvorfor før UX5B
+`CRYSTAL_MACHINE` viste tre strukturelt sikre, men potensielt isolerte critical pickups. `SKYGGEHEKSA` viste at innhold også kan være dramatisk for sent.
 
-Dette kan ikke løses robust med mer tilfeldig ambient content. Kritiske deler trenger egne kuraterte story-funksjoner.
+Target architecture:
+- Adventure Blueprint = overordnet premiss/struktur,
+- Narrative Graph = beats, resources, prerequisites, knowledge-state, phases og payoff,
+- Storylet Matrix = hard compatibility mellom kuraterte moduler,
+- map generator = plasserer kun validert critical story,
+- ambient/optional content legges på etterpå.
 
-### Locked target architecture
-- Adventure Blueprint = overordnet premiss/struktur.
-- Narrative Graph = eksplisitte beats, ressurser, prerequisites, knowledge-state og payoff.
-- Storylet Matrix = hard compatibility mellom små kuraterte narrative moduler.
-- Map generator = plasserer bare allerede-validerte kritiske storylets i egnede rom.
-- Ambient/optional content legges på etterpå.
-
-### Reference: CRYSTAL_MACHINE
-Første eksperiment skal kunne generere en koherent variant med:
-- maskin/port som i fiksjonen viser tre tomme fargede fester,
-- én krystall via `SEARCH_SECRET` med clue + fail-forward,
-- én via `NPC_FAVOR` med en faktisk reachable avhengighet,
-- én via `GUARDIAN` med motivasjon og minst én ikke-voldelig affordance,
-- retur til maskinen,
-- bevisst innsetting/aktivering av krystallene,
+Reference `CRYSTAL_MACHINE`:
+- tre synlige fargede tomme fester,
+- `SEARCH_SECRET` med clue + fail-forward,
+- `NPC_FAVOR` med faktisk reachable dependency,
+- `GUARDIAN` med motive + non-combat route,
+- retur + bevisst assembly,
 - gate/climax først etter assembly.
 
-Fargene kan roteres mellom acquisition-familiene hvis teksten fortsatt henger sammen.
-
-### Work packages
-Canonical plan: `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`.
-
-- NG0: architecture/spec freeze
-- NG1: graph data model + validator
-- NG2: Storylet Matrix engine
-- NG3: Crystal Machine graph planner
-- NG4: room materialization + narrator knowledge
-- NG5: >=1000 structural generated QA cases
-- NG6: real Chromium interaction QA
-- NG7: 10-20 manual generated-adventure editorial playtests
-- NG8: accept/revise/abandon architecture gate
+Work packages:
+- NG0 architecture/spec freeze - COMPLETE,
+- NG1 graph data model + validator,
+- NG2 Storylet Matrix engine,
+- NG3 Crystal Machine graph planner,
+- NG4 room materialization + narrator knowledge,
+- NG5 >=1000 structural generated QA cases,
+- NG6 real browser interaction QA,
+- NG7 10-20 manual editorial playtests,
+- NG8 accept/revise/abandon architecture gate.
 
 Do not convert another blueprint before NG8.
 
-## UX5B scope etter Narrative Graph
-Når Narrative Graph er bevist skal Forteller-visningen bli løsningsbevisst:
-- vis reelle ikke-voldelige muligheter som faktisk støttes av dette kartet og story graphen,
-- vis items/NPC-er/rom/companions som faktisk er relevante,
-- skill mellom kjent/ukjent, eid/oppdagbart og tilgjengelig/blokkert,
-- vis forsøkte/feilede tilnærminger når encounter-state gjør det nyttig,
-- behold barnets frie løsninger via FRITT KAST,
-- aldri presenter en lukket fasitliste.
-
-## Adventure Code V1 - første bank
-Kun fire eventyr er aktive:
-- `GLASS_HEART`
-- `WITCH_CAT`
-- `CRYSTAL_MACHINE`
-- `ZOMBIE_DELIVERY`
-
-Ikke legg til flere blueprints nå.
-
-Ny kvalitetsgate:
-- `CRYSTAL_MACHINE` må først bevise Narrative Graph-modellen,
-- deretter kan eksisterende blueprints konverteres én om gangen,
-- alle fire må fortsatt spilles manuelt og vurderes narrativt før banken utvides.
+## Adventure Blueprint bank
+Kun fire aktive: `GLASS_HEART`, `WITCH_CAT`, `CRYSTAL_MACHINE`, `ZOMBIE_DELIVERY`. Ikke utvid banken nå.
 
 ## REPOSITORY HEALTH GATE
-Repo-health-reparasjonen er fortsatt åpen parallelt.
+Behavioral reconstruction fungerer, men original V0.12.3 baseline er ikke byte-reprodusert fra Library-representasjonen og komplett runtime asset-tree mangler som ordinære repo-filer.
 
-UX5A kan rekonstrueres og verifiseres behaviorally fra Library-tekst + repoets patchkjede, men den opprinnelige V0.12.3 baseline-hashen er ikke byte-reprodusert fra Library-representasjonen og komplett runtime asset-tree mangler fortsatt som ordinære repo-filer.
+## EXACT NEXT
+Mens fysisk UX5A-test er åpen:
+- patch kun UX5A-defekter på `ux5/searchable-rooms-encounter-tracks`,
+- Narrative Graph prep forblir documentation-only,
+- ikke merge UX5A,
+- ikke implementer Narrative Graph runtime,
+- ikke start UX5B.
 
-Repository-health må lukkes før neste release checkpoint kan kalles låst.
-
-## ETTER NARRATIVE GRAPH / UX-GATENE
-1. **V0.12.4: resterende start-/fortellerutstyr + scenario-nøkler - 7**
-2. Samledel-familier + EVNER - 15
-3. Feller + mysterier - 12
-4. Scenario-mål / samlingssteder / finale - 10
-
-Disse content-utvidelsene skal ikke brukes til å skjule svakheter i Narrative Graph. Først må kritisk story-sammenheng fungere.
+Når UX5A er fysisk GREEN:
+1. dokumenter fysisk evidens,
+2. rerun/confirm relevant automated + browser regression,
+3. merge UX5A til `main`,
+4. verifiser `main`,
+5. opprett `narrative/story-graph-v1` fra merged `main`,
+6. før approved prep-docs over,
+7. start `WP-NG1`.
