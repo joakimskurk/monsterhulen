@@ -9,12 +9,12 @@ Observed:
 - The child may propose actions that are not represented by the generated encounter.
 - Items can feel like they are "used up" even when they should remain available narratively.
 - A DM may want to know important later dependencies, clues and scenario keys before improvising away something useful.
-- A novice DM may meet a named figure such as SOPPPRINSEN and still not understand whether the figure is friendly, hostile or why a die roll is relevant.
+- A novice DM may meet a named figure and still not understand whether it is friendly, hostile or why a die roll is relevant.
 
 Implemented and runtime-verified before UX5A:
 - `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
   - Encounter and climax consequences are narrator suggestions, not fixed outcomes.
-  - `FRITT KAST` supports any uncertain action the child invents.
+  - `FRITT KAST` supports uncertain actions the child invents.
   - Inventory `BRUK` no longer removes an item.
   - `BRUK OPP / LEGG FRA` is explicit removal.
 - `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
@@ -75,46 +75,50 @@ Implemented in UX4:
 - successful result reveals the door,
 - secret doors are optional and cannot bypass a story-critical progression gate.
 
-## 6. Rooms need a reason to be investigated
-Lost-chat UX5 finding:
+## 6. Rooms need a reason to be investigated without becoming loot detectors
+UX5 finding:
 - entering a room should sometimes reward curiosity beyond the visible event,
 - useful items should be discoverable through play, not simply dumped into inventory,
-- searching must not create hidden mandatory keys or expose in advance that a room contains loot.
+- the UI must not tell the child in advance which room contains something,
+- searching must not create hidden mandatory keys.
 
-UX5A candidate:
-- every room offers an explicit investigation action,
-- standard 13-room adventures hide two deterministic curated optional finds,
-- find rooms exclude start/finale, critical rooms and rooms already holding ambient treasure,
-- only a room with an actual hidden find asks for a physical search roll after the child chooses to investigate,
-- 1-2 gives a stronger clue and permits another approach,
-- 3-6 reveals the item,
+UX5A branch candidate:
+- every generated room gets the same initial `UNDERSØK ROMMET / SE DEG RUNDT` affordance,
+- the first investigation action happens before the UI reveals whether a hidden find exists,
+- KORT/VANLIG/STORT target 2/3/4 deterministic curated optional finds,
+- actual find placement excludes start/finale, story-critical rooms and rooms already containing ambient treasure,
+- an empty room simply records that it was investigated; it does not ask for a meaningless die roll,
+- a room with a hidden find reveals that something may be hidden only after the child chooses to investigate,
+- uncertain hidden-item search uses the six physical D6 faces,
+- first 1-2 gives a stronger clue; repeated low searching fail-forwards and cannot permanently hide the optional find,
 - full backpack leaves the revealed find in place.
 
 Manual questions:
-- does searching feel like discovery or like a button that must be pressed in every room?
-- should some obvious child-described searches simply work without a die?
-- is two hidden finds right for a normal-length adventure?
+- does the generic `SE DEG RUNDT` action feel inviting or like a button that must be pressed in every room?
+- should obvious child-described searches bypass the die entirely more often?
+- are 2/3/4 optional finds the right density for KORT/VANLIG/STORT?
 
-## 7. Encounters need state, not one-roll victories
-Lost-chat UX5 finding:
+## 7. Encounters need durable state, not one-roll victories
+UX5 finding:
 - monster hearts were too small/underdeveloped,
 - non-combat approaches had prose but little durable state,
 - a single lucky result could feel as if it ended a whole encounter.
 
-UX5A candidate:
+UX5A branch candidate:
 - normal fresh monsters: 3 hearts,
 - `SPENNING`: 4 hearts,
 - generated non-treasure encounters: 3 progress steps, or 4 in `SPENNING`,
-- physical die result only records the consequence,
+- physical die result only records the die face and consequence suggestion,
 - narrator explicitly marks `+ FREMGANG` when an action genuinely changes the situation,
-- `LØST MED GOD IDÉ` exists for plans that naturally solve the whole problem,
-- old generic generated-encounter `MØTET ER FERDIG` shortcut is removed,
-- combat resolves when explicit heart state reaches zero.
+- filling the progress track resolves the encounter,
+- monster hearts appear only after the child chooses combat; the final explicit heart removal resolves combat,
+- `LØST MED GOD IDÉ` is the explicit narrator action for a genuinely decisive free-form solution,
+- an active legacy fight retains its remaining hearts during migration instead of being healed.
 
 Manual questions:
-- do 3-4 steps create satisfying escalation, or too much bookkeeping for a five-year-old?
-- should some encounter families have bespoke progress beats later?
-- is direct smart resolution obvious enough to the narrator without becoming a second generic “skip” button?
+- do 3-4 steps create satisfying escalation, or too much bookkeeping for young children?
+- should some encounter families later get bespoke progress beats rather than a generic track?
+- is `LØST MED GOD IDÉ` clear enough that it invites genuine creativity without becoming a generic skip button?
 
 ## Verification so far
 Last fully executed runtime regression remains UX4:
@@ -129,11 +133,11 @@ Last fully executed runtime regression remains UX4:
 - Adventure Code 405 / 0.
 - UX4 progression/secret-door QA 1797 / 0.
 
-UX5A candidate:
-- QA syntax check PASS,
-- isolated search/progress/migration model PASS,
-- compressed patch round-trip PASS,
-- full reconstructed-runtime QA pending.
+UX5A branch candidate:
+- four split unified patches apply sequentially to a realistic source reconstruction with no rejects,
+- patched reconstruction passes `git diff --check`,
+- UX5A QA has been authored/updated for the final candidate behavior,
+- full canonical-runtime QA and browser/iPad smoke test remain pending.
 
 ## Priority
 Finish UX5A runtime verification and manual smoke test before beginning UX5B. Then build the narrator solution graph from actual map resources rather than generic suggestion text. Do not add more blueprints yet.
