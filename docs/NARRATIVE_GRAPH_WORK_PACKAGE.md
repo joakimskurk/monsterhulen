@@ -26,6 +26,7 @@ Exit criteria met:
 - UX5B is explicitly deferred until Narrative Graph V1 proves coherent critical stories,
 - Crystal Machine reference acceptance is explicit,
 - automated and manual/editorial evidence are separate gates,
+- temporal causality is explicit: complications/antagonists have valid phases and cannot appear after the objective they exist to hinder is already resolved unless separately authored as climax/aftermath,
 - no runtime code has changed on this prep branch.
 
 ## WP-NG1 - graph data model + validator - NEXT AFTER DEVICE GATE
@@ -36,6 +37,8 @@ Required:
 - `StoryNode`
 - resource dependency edges
 - knowledge reveal state
+- dramatic phase state (`INTRO`, `QUEST_ACTIVE`, `RETURN`, `CLIMAX`, `AFTERMATH`)
+- per-node/storylet phase windows and expiry rules
 - storylet IDs/roles
 - graph validator
 
@@ -46,7 +49,10 @@ Validator must reject:
 - critical dependency on optional UX5A find,
 - required hidden item without fail-forward clue path,
 - guardian with no authored non-combat route,
-- quest knowledge exposed before reveal.
+- quest knowledge exposed before reveal,
+- complication/antagonist whose first valid activation is after the objective it is defined to obstruct has already resolved,
+- unresolved pre-resolution story beat that remains active after its expiry flag,
+- ambient story text that references an unresolved objective after that objective has been completed.
 
 No UI change required for this subpackage.
 
@@ -66,6 +72,8 @@ Initial editorial target:
 - 3 approved `GUARDIAN` variants.
 
 Nine strong storylets are better than fifty weak templates.
+
+Every storylet must also declare when it is valid and when it expires. Reusing the same character later is allowed only through a separately authored storylet with a new dramatic function.
 
 ## WP-NG3 - Crystal Machine graph planner
 Replace the current three-room bare `DEL` plan for `CRYSTAL_MACHINE` only.
@@ -96,7 +104,9 @@ Required:
 - NPC dependency points to actual generated resource/room,
 - guardian resource is visibly tied to the guardian,
 - required search has clue + fail-forward,
-- assembly requires a deliberate child/narrator interaction rather than inventory auto-completion.
+- assembly requires a deliberate child/narrator interaction rather than inventory auto-completion,
+- resolving/assembling the objective expires obsolete quest complications immediately,
+- post-resolution encounters are either neutral ambient content or explicitly authored `CLIMAX`/`AFTERMATH` beats.
 
 ## WP-NG5 - automated graph generation QA
 Generate at least 1000 `CRYSTAL_MACHINE` adventures across layout/adventure seeds and all supported lengths where valid.
@@ -108,6 +118,9 @@ Check at minimum:
 - three acquisition families by default,
 - no optional-find dependency,
 - no story gate bypass,
+- no stale complication can first appear after its target objective is resolved,
+- objective completion expires all dependent pre-resolution complications,
+- separately authored climax/aftermath beats may legally reuse a character only with a new role/purpose,
 - same Adventure Code reconstructs same critical graph,
 - deterministic seeded storylet selection,
 - save/re-enrichment idempotence where applicable,
@@ -124,7 +137,9 @@ Use Chromium interaction smoke to test at least:
 - all crystals acquired,
 - deliberate assembly,
 - gate open only after assembly,
-- no premature UI knowledge.
+- no premature UI knowledge,
+- a quest complication available before resolution is gone or transformed immediately after resolution,
+- no obsolete antagonist encounter appears by later navigation.
 
 ## WP-NG7 - manual editorial playtest
 Manually play 10-20 generated Crystal Machine adventures before converting another blueprint.
@@ -132,12 +147,14 @@ Manually play 10-20 generated Crystal Machine adventures before converting anoth
 Record for each:
 - goal clarity,
 - causal coherence,
+- temporal coherence,
 - repeated patterns,
 - absurd combinations,
 - narrator burden,
 - child-led solution quality,
 - whether each crystal felt earned differently,
-- whether return/assembly paid off setup.
+- whether return/assembly paid off setup,
+- whether any encounter felt too early, too late or obsolete after the story had moved on.
 
 If repeated narrative problems remain, improve matrix/storylets first. Do not compensate by adding more random content.
 
@@ -168,7 +185,7 @@ That makes UX5B simpler and more reliable because it can show:
 Stop implementation and reassess if:
 - storylet compatibility rules become more complex than authoring a small full scenario bank,
 - manual playtest still requires the narrator to invent causal links frequently,
-- procedural variation repeatedly harms setup/payoff,
+- procedural variation repeatedly harms setup/payoff or dramatic ordering,
 - graph generation becomes valid only by reducing stories to generic interchangeable text.
 
 The system exists to improve story quality, not to preserve procedural generation at all costs.
