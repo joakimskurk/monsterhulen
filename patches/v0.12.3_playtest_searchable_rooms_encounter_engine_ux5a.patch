@@ -1,0 +1,94 @@
+--- index.html
++++ index.html
+@@ -214,4 +214,8 @@
+ .puzzleBox .puzzleMeta{font-size:11px;opacity:.78;margin-bottom:5px}
+ .puzzleBox.solved{border-style:dashed;opacity:.88}
+ .puzzleNarrator{border:1px dashed currentColor;padding:9px;margin:9px 0}
++.searchBox{border:2px solid var(--cyan);padding:9px;margin:9px 0;background:rgba(99,242,255,.06)}
++.searchBox.found{border-color:var(--yellow);background:rgba(255,217,92,.07)}
++.encounterTrack{margin:7px 0;padding:7px;border:2px solid var(--cyan);background:rgba(13,23,48,.62);font-size:10px;line-height:1.35}
++.encounterTrack b{color:var(--cyan)}.trackPips{font-size:18px;letter-spacing:3px;color:var(--cyan)}
+ </style>
+@@ -1078,9 +1078,35 @@
+   function pick(arr,rng){return arr[Math.floor(rng()*arr.length)]}
+   function suitable(list,tone){const filtered=list.filter(x=>!x.tones||x.tones.includes(tone));return filtered.length?filtered:list}
+   function difficultyFor(room,type){
+-    if(type==='MONSTER') return room.beat==='SPENNING'?2:room.beat==='MØTE'?2:1;
++    if(type==='MONSTER') return room.beat==='SPENNING'?4:3;
+     if(type==='FELLE') return room.beat==='SPENNING'?2:1;
+     return 1;
++  }
++  function progressFor(room,type){
++    if(type==='SKATT')return null;
++    if(type==='MONSTER')return difficultyFor(room,type);
++    return room.beat==='SPENNING'?4:3;
++  }
++  function eventType(ev){return typeof ev==='string'?ev:ev?.type}
++  function planSearchables(dungeon,seed){
++    const wanted=dungeon.rooms.length<=9?2:dungeon.rooms.length>=17?4:3;
++    const occupiedItems=new Set();
++    for(const room of dungeon.rooms)for(const ev of room.events||[])if(eventType(ev)==='SKATT'&&ev?.item)occupiedItems.add(ev.item);
++    const candidates=dungeon.rooms.filter(room=>
++      room.id!==dungeon.startRoomId &&
++      !(room.events||[]).some(ev=>CRITICAL.has(eventType(ev)))
++    ).map(room=>({room,score:hashString(`${seed}|SEARCH_ROOM|${room.id}`)})).sort((a,b)=>a.score-b.score);
++    const chosen=candidates.slice(0,Math.min(wanted,candidates.length));
++    const used=new Set(occupiedItems);
++    for(const {room} of chosen){
++      let pool=suitable(TREASURES,room.tone).filter(t=>!used.has(t.name));
++      if(!pool.length)pool=TREASURES.filter(t=>!used.has(t.name));
++      if(!pool.length)pool=TREASURES;
++      const rng=mulberry32(hashString(`${seed}|SEARCH_FIND|${room.id}`));
++      const t=pick(pool,rng);used.add(t.name);
++      room.search={available:true,searched:false,attempts:0,revealed:false,taken:false,lastDiceValue:null,lastDiceBand:'',item:{entityId:t.entityId,name:t.name,role:t.role||'',intro:t.intro,findGuide:t.gm}};
++    }
++    return dungeon;
+   }
+   function sourceFor(type){return type==='MONSTER'?MONSTERS:type==='PERSON'?PEOPLE:type==='VENN'?FRIENDS:type==='FELLE'?TRAPS:type==='MYSTISK'?MYSTERIES:type==='SKATT'?TREASURES:null}
+   function makeEncounter(type,room,seedHint='',opts={}){
+@@ -1093,8 +1119,9 @@
+     const base={type,generated:true,name:t.name,intro:`${t.intro} ${detail}`,tone:room.tone,beat:room.beat,...(type==='MONSTER'?{family:familyOrEntry.family,entityId:familyOrEntry.entityId,variantId:t.id}:{entityId:familyOrEntry.entityId||null})};
+     if(type==='SKATT')return {...base,item:t.name,findRole:t.role||'',findGuide:t.gm,gm:{want:'ET VALGFRITT FUNN.',clue:t.gm,ways:'TA DEN, LA DEN LIGGE ELLER BRUK DEN KREATIVT. DEN ER ALDRI EN OBLIGATORISK NØKKEL.',low:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',mid:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',high:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.'}};
+     const difficulty=difficultyFor(room,type);
++    const progressMax=progressFor(room,type);
+     const puzzle=type==='MYSTISK'&&PZ?PZ.choose(String(seedHint)+'|'+(familyOrEntry.entityId||t.name),familyOrEntry.puzzleCats||[],opts.puzzleLevel||'YNGRE'):null;
+-    return {...base,...(puzzle?{puzzle,puzzleSolved:false}:{}),hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
++    return {...base,...(puzzle?{puzzle,puzzleSolved:false}:{}),hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,progress:progressMax===null?null:0,maxProgress:progressMax,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
+   }
+   function enrichDungeon(dungeon,opts={}){
+@@ -1115,6 +1142,7 @@
+         return out;
+       });
+     }
++    planSearchables(dungeon,seed);
+     return dungeon;
+   }
+   function validateEncounter(ev){
+@@ -1127,6 +1155,8 @@
+     if(!ev.gm)errors.push('MISSING GM');
+     else for(const k of ['want','clue','ways','low','mid','high'])if(!ev.gm[k])errors.push('MISSING GM '+k);
+     if(ev.type==='MONSTER'&&(!(ev.maxHp>=1)||!(ev.hp>=0)))errors.push('BAD HP');
++    if(ev.type==='MONSTER'&&(ev.maxHp<3||ev.maxHp>4))errors.push('BAD MONSTER HEART SCALE');
++    if(ev.type!=='SKATT'&&(!(ev.maxProgress>=3)||!(ev.progress>=0)))errors.push('BAD PROGRESS TRACK');
+     if(ev.type==='MONSTER'&&!ev.family)errors.push('MISSING FAMILY');
+     if(ev.type==='MONSTER'&&!ev.variantId)errors.push('MISSING VARIANT ID');
+     if(ev.type==='SKATT'&&!ev.item)errors.push('MISSING ITEM');
+@@ -1155,12 +1161,13 @@
+     const skill=heroSkill?` HVIS HELTEN BRUKER ${String(heroSkill).replaceAll('_',' ')} PÅ EN MÅTE SOM PASSER, KAST 2D6 OG BRUK DEN HØYESTE.`:'';
+     const gear=heroItem?`<p><b>MED:</b> ${heroItem.name} – ${heroItem.desc} UTSTYRET GIR IKKE EKSTRA TERNING.</p>`:'';
+     const matches=matchingItemHints(ev,heroItem,inventory,rewards);
+     const itemHelp=matches.length?`<p><b>TING SOM PASSER NÅ:</b><br>${matches.map(x=>`${x.source}: ${x.label} – ${x.hint}`).join('<br>')}</p><p class="sub">DETTE ER MULIGHETER, IKKE FASIT. EN ANNEN GOD IDÉ SKAL VIRKE LIKE GODT.</p>`:'';
++    const progress=Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)?`<p><b>ANNEN LØSNING:</b> ${Math.max(0,ev.progress)}/${Math.max(1,ev.maxProgress)} FREMGANG. BRUK SPORET NÅR BARNETS PLAN FAKTISK FORANDRER SITUASJONEN. EN EKSTRA GOD LØSNING KAN AVSLUTTE MØTET DIREKTE.</p>`:'';
+     const monsterRule=ev.type==='MONSTER'?'<p class="sub"><b>MONSTERHJERTER:</b> BARE HVIS BARNET SELV VELGER KAMP. SNAKK, MILJØ, EN GOD IDÉ ELLER EN PASSENDE TING KAN LØSE MØTET UTEN Å TA HJERTER.</p>':'';
+     const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER KASTET:</b><br>${ev.gm[band]}</p>`:'';
+     const puzzle=ev.puzzle;
+     const puzzleBlock=puzzle?`<div class="puzzleNarrator"><b>PUZZLE · ${puzzle.categoryLabel} · ${puzzle.levelLabel} ÅR</b><p><b>LES HØYT:</b> ${puzzle.scene} ${puzzle.prompt}</p><p><b>HINT HVIS BARNET STÅR FAST:</b> ${puzzle.hint}</p><details><summary>FASIT FOR FORTELLER</summary><p>${puzzle.answer}</p></details></div>`:'';
+-    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${monsterRule}${puzzleBlock}`;
++    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${progress}${monsterRule}${puzzleBlock}`;
+     if(puzzle&&!ev.puzzleSolved)return `${base}<p><b>TERNING:</b> IKKE FOR SELVE PUZZLET. LA BARNET TENKE, PRØVE, TEGNE ELLER FORKLARE. KAST BARE SENERE HVIS SELVE GJENNOMFØRINGEN ER RISIKABEL.</p>`;
+-    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
++    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. ET TERNINGKAST FLYTTER IKKE AUTOMATISK FREMGANGSSPORET OG FJERNER ALDRI ET MONSTERHJERTE. MARKER FREMGANG ELLER KAMP ETTER DET SOM FAKTISK SKJEDDE I FORTELLINGEN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
+   }
+ 
+-  const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
++  const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,planSearchables,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
