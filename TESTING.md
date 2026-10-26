@@ -7,6 +7,9 @@ Never conflate these states:
 - automated runtime tests passed
 - browser tested
 - physical device tested
+- editorial/manual narrative quality accepted
+
+A future Narrative Graph can be structurally perfect and still fail the last category.
 
 ## Historical V0.12.3 release evidence
 - Lasting thing 67 / 0
@@ -18,114 +21,97 @@ Never conflate these states:
 - Rescue 5070 / 0
 - 11 inline JavaScript blocks, 0 syntax errors
 
-These historical counts remain release evidence. The durable combined regression added during UX5A is listed separately below.
+## Active UX5A patch chain
+Canonical order: `patches/README.md`.
 
-## Active UX5A branch patch chain
-1. `patches/v0.12.3_playtest_map_navigation.patch`
-2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
-3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
-4. `patches/v0.12.3_playtest_adventure_code_v1.patch.gz.b64`
-5. `patches/v0.12.3_playtest_progression_gates_secret_doors.patch.gz.b64`
-6. `patches/v0.12.3_playtest_searchable_rooms_encounter_engine_ux5a.patch`
-7. `patches/v0.12.3_playtest_encounter_narrator_ux5a.patch`
-8. `patches/v0.12.3_playtest_searchable_rooms_encounter_ui_ux5a.patch`
-9. `patches/v0.12.3_playtest_searchable_rooms_encounter_render_ux5a.patch`
+Latest additions:
+- patch 10: `v0.12.3_playtest_device_findings_hotfix_ux5a.patch`
+- patch 11: `v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
 
-`patches/README.md` documents order and reconstruction.
+Patch 11 exists because possessing a matching key must not make a locked door solve itself. Door tap presents the lock; child deliberately chooses `BRUK` on the story key.
 
-## UX5A automated evidence - GREEN
-Executed against the reconstructed active UX5A runtime:
+## Automated evidence after patch 11 - GREEN
+Executed against the fresh reconstructed patch-11 runtime:
+- `tests/QA_DEVICE_FINDINGS_UX5A.js`: **27 PASS / 0 FAIL**
+- `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2216 PASS / 0 FAIL**
+- `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**
+- `tests/QA_PROGRESSION_GATES_UX4.js`: **1797 PASS / 0 FAIL**
+- `tests/QA_CONTENT_REGRESSION.js`: **5960 PASS / 0 FAIL**
+- 11 inline JavaScript blocks: **0 syntax errors**
 
-- `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2216 PASS / 0 FAIL**.
-- `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**.
-- `tests/QA_PROGRESSION_GATES_UX4.js`: **1797 PASS / 0 FAIL**.
-- `tests/QA_CONTENT_REGRESSION.js`: **5960 PASS / 0 FAIL**.
-- 11 inline JavaScript blocks: **0 syntax errors**.
+Fresh patch-11 behavioral reconstruction SHA-256:
+`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
 
-Reconstructed runtime SHA-256:
-`289e8c4194217b723ee8595635e147647a5853e8bc990f2037716f566b2659ca`
+This hash is not a byte-identical release-baseline claim. Library text provenance remains repository-health debt.
 
-### UX5A search/encounter QA covers
-- every room gets generic investigation state so hidden-find rooms are not pre-spoiled,
-- deterministic optional hidden finds for all four blueprints,
-- target find counts 1/2/3 for KORT/VANLIG/STORT when enough eligible rooms exist,
-- hidden finds avoid start/finale/story-critical/ambient-treasure rooms,
-- search state survives re-enrichment,
-- empty-room investigation survives re-enrichment,
-- first low result gives information but does not reveal the item,
-- repeated low search fail-forwards and cannot softlock the find,
-- full inventory leaves a revealed find untouched,
-- fresh monsters use 3-4 hearts,
-- generated non-treasure encounters use 3-4 progress steps starting at 0,
-- active legacy combat is not healed during migration,
-- untouched legacy monster upgrades to the new full scale,
-- physical encounter die registration cannot mutate progress or hearts,
-- full explicit progress resolves the encounter,
-- zero explicit monster hearts resolves combat,
-- `LØST MED GOD IDÉ` remains a narrator-controlled direct solution,
+### Targeted patch-11 QA covers
+- keyed locked door tap has a dedicated non-solving branch,
+- door tap only reports `DØREN ER LÅST`,
+- first lock log does not name the key solution,
+- door tap does not remove key from inventory,
+- scenario key remains protected but exposes explicit `BRUK`,
+- explicit key use requires an adjacent matching keyed locked connection,
+- successful key use removes key with fiction feedback,
+- successful key use opens but does not traverse,
+- child/narrator can still use ordinary inventory items narratively,
+- narrator has optional open hint `KANSKJE DU HAR NOE I SEKKEN?`,
+- puzzle `FORTELLERHJELP`, no-die guidance and exactly +1 progress remain intact.
+
+### Existing UX5A search/encounter QA covers
+- generic investigation without pre-spoiling find rooms,
+- deterministic 1/2/3 optional finds where eligible,
+- critical-room exclusion,
+- search persistence/fail-forward/full backpack,
+- 3/4-heart monsters,
+- 3/4-step progress tracks,
+- legacy active combat not healed,
+- dice cannot mutate hearts/progress,
+- explicit progress/combat/direct-solution resolution,
 - save schema remains 12.
 
-### Durable combined content regression
-`tests/QA_CONTENT_REGRESSION.js` was added because the older content QA existed only as historical execution evidence rather than durable repo scripts.
+## Browser evidence
+Before patch 11:
+- broad Chromium UX5A smoke: **23 PASS / 0 FAIL**,
+- patch-10 focused Chromium smoke: **15 PASS / 0 FAIL**.
 
-It verifies:
-- character trait/start-item build matrix,
-- all 36 puzzle templates at all three age bands,
-- 20 monster families / two variants each,
-- NPC/friend/trap/mystery/treasure content bank integrity,
-- generated encounter validation across tones and beats,
-- reward offers across histories/scenario contexts,
-- entity resolver integrity for scenario and narrator content,
-- all four Adventure Blueprints across KORT/VANLIG/STORT and all puzzle age bands,
-- generator, scenario, world, encounter and climax validators,
-- companion placement with owned friend + pet.
+The patch-10 key-door expectation (`first gate tap opens`) is now intentionally superseded. Therefore those results remain historical regression evidence but **do not certify the patch-11 explicit-key interaction**.
 
-## Chromium browser evidence - GREEN
-A real headless Chromium DOM/render smoke was executed against deterministic adventure seed `10` (`CRYSTAL_MACHINE`). Result: **23 PASS / 0 FAIL**.
+A fresh real-browser patch-11 interaction smoke is still required. In the current execution environment, local Chromium could not load the local test runtime and ended at `chrome-error://chromewebdata/`, so no new browser claim was recorded. This is a test-harness limitation, not evidence of an app failure.
 
-Verified through actual app controls:
-1. app starts and generic room investigation renders,
-2. empty-room investigation does not imply hidden loot,
-3. map navigation reaches a deterministic hidden-find room,
-4. hidden item name is not visible before investigation,
-5. search presents six physical D6 faces,
-6. first physical 1 gives hint only,
-7. second physical 1 reveals the find,
-8. backpack can be filled through narrator item controls,
-9. full backpack leaves the revealed find in the room,
-10. physical 6 is stored exactly and changes neither HP nor progress,
-11. final explicit `+ FREMGANG` removes/resolves the encounter,
-12. `LØST MED GOD IDÉ` resolves through its own path,
-13. `SPENNING` monster starts combat with 4 hearts,
-14. final explicit heart removal ends combat,
-15. a manually added normal monster in a `PUSTEROM` has 3 hearts and renders them.
+## Required physical-device gate before UX5A merge
+On actual iPad/mobile verify:
+1. `GLASS_HEART` locked door remains locked when tapped even with `GLASSNØKKEL` owned,
+2. app does not reveal the key as the answer,
+3. child has space to propose a plan; narrator may optionally hint about the backpack,
+4. `GLASSNØKKEL` is protected but has `BRUK`,
+5. `BRUK` beside matching door opens and removes/archives key without moving hero,
+6. later door tap traverses,
+7. mystery puzzle help is immediately understandable and solve gives exactly one progress,
+8. `SE DEG RUNDT` feels exploratory rather than mandatory,
+9. 3-4 progress steps do not feel like excessive bookkeeping,
+10. hidden-find fail-forward and full-backpack flow work by touch,
+11. 3-heart normal / 4-heart `SPENNING` combat controls are comfortable,
+12. final `+ FREMGANG`, final heart and `LØST MED GOD IDÉ` interaction costs are acceptable,
+13. if possible, representative legacy active-combat save behaves correctly,
+14. Adventure Code copy/paste flow still works.
 
-## Reconstruction / provenance note
-The indexed Library `index.html` could be materialized as text and already contained playtest layers 1-2. Repo patches 3-9 were applied sequentially. Adventure Code and UX4 compressed patches were recovered from Git blobs and decoded.
+Do not merge UX5A or implement Narrative Graph runtime until this gate is green.
 
-The resulting behavior reproduces the historical Adventure Code and UX4 test counts exactly. However, the Library text representation is not byte-identical to the original V0.12.3 manifest hash. This is a repository-health/provenance issue, not a currently observed runtime behavior failure.
+## Narrative Graph V1 future verification contract
+Canonical plan lives on `narrative/story-graph-v1-prep` in `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`.
 
-## Required physical-device gate before UX5B / merge
-Still required:
-1. smoke-test on actual iPad/mobile,
-2. confirm `SE DEG RUNDT` feels exploratory rather than mandatory,
-3. confirm 3-4 progress steps do not feel like excessive bookkeeping,
-4. verify hidden-find first-low / repeated-low interaction by touch,
-5. verify full-backpack behavior by touch,
-6. verify 3-heart normal and 4-heart `SPENNING` combat layout/tap targets,
-7. verify final `+ FREMGANG`, final heart and `LØST MED GOD IDÉ` interaction cost,
-8. if possible, load a representative old save with an active 2-heart fight and confirm remaining HP is preserved,
-9. recheck Adventure Code iPad -> mobile copy/paste flow.
+It must separately prove:
+- schema/static validity,
+- causal/resource/knowledge/phase validator rejection cases,
+- >=1000 generated `CRYSTAL_MACHINE` structural cases,
+- real browser interaction,
+- 10-20 manual editorial generated-adventure reviews,
+- final accept/revise/abandon architecture gate.
 
-## Still manual / not certified
-- whether each blueprint prerequisite feels narratively earned rather than mechanical,
-- secret-door search clarity and fun on target device,
-- novice-DM usefulness of the narrator plan,
-- narrative quality of all four initial blueprints,
-- mobile layout and touch ergonomics.
+Structural green never proves narrative quality.
+
+## UX5B relationship
+UX5B is deferred until Narrative Graph V1 is accepted. It should consume explicit graph/knowledge/resource state instead of inferring story logic from loose room events.
 
 ## Repository verification
-Repository-health remains open. Before the next release checkpoint, the repository must reconstruct the full active source/assets/tests without chat or an external release ZIP.
-
-## V0.12.4 acceptance gate
-For each of the seven pending item/key entities: stable resolver path, correct 64x64 / 32x32 RGBA item asset sizes, transparent 0/255 alpha, no embedded text/UI, recognizable thumbnail, no unintended schema/gameplay change, repo verification pass, and synchronized project memory.
+Repository-health remains open. Before the next release checkpoint is called locked, the repository must reconstruct the full active source/assets/tests without chat or an external release ZIP.
