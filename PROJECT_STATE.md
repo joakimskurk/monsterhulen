@@ -16,6 +16,8 @@ An encounter must have an authored fictional function before mechanics are attac
 
 Intentional narrator improvisation is a valid authored mode. When a scene deliberately leaves a detail open, Forteller must be told explicitly that there is no hidden app answer/larger predetermined plan for that detail, what to invent, and what boundaries apply. Optional improv may add atmosphere, optional hints or side discoveries; it may not create new mandatory story state or contradict tracked facts.
 
+A memorable **subject** and its **Storylet role** are separate. `BOKA SOM SKRIVER TILBAKE` may support several pre-authored compatible roles across adventures: open mystery/improv, NPC-like dialogue, tracked clue, puzzle/gate carrier or item/reward wrapper. Compatible magical subjects such as a talking doll or living portrait may use the same model. This is curated reuse, not arbitrary combinatorial mixing: critical roles remain tracked, subject/Storylet identities remain separate/stable, and repeated use of the same recognizable subject should be penalized when alternatives exist.
+
 Physical dice report uncertainty about a current attempt. A die result never substitutes for an unmet prerequisite or automatically resolves a whole encounter.
 
 Critical story contract remains **SETUP -> SIGNAL -> ACTION -> PAYOFF**.
@@ -72,9 +74,9 @@ At minimum verify:
 Do not merge UX5A until this physical gate is green.
 
 ## Narrative architecture implication
-`CRYSTAL_MACHINE` showed causal weakness, `SKYGGEHEKSA` temporal invalidity, `REGNBUENETTET` purpose/payoff failure, and `BOKA SOM SKRIVER TILBAKE` the need for an explicit boundary between authored/tracked story logic and intentional narrator creativity.
+`CRYSTAL_MACHINE` showed causal weakness, `SKYGGEHEKSA` temporal invalidity, `REGNBUENETTET` purpose/payoff failure, and `BOKA SOM SKRIVER TILBAKE` both the need for an explicit boundary between authored/tracked story logic and intentional narrator creativity and the usefulness of separating subject identity from narrative role.
 
-Narrative Graph V1 must therefore model dependencies/knowledge/phases plus purpose/stakes/resolution/payoff/world effect. Storylets may declare bounded narrator-improvisation, but critical causal state, prerequisites, completion and payoff cannot depend on an untracked improvised fact.
+Narrative Graph V1 must therefore model dependencies/knowledge/phases plus purpose/stakes/resolution/payoff/world effect. Storylets may declare bounded narrator-improvisation, but critical causal state, prerequisites, completion and payoff cannot depend on an untracked improvised fact. Subject/role pairing must be explicitly compatible rather than randomly interchangeable.
 
 ## CRYSTAL_MACHINE reference experiment
 Target:
@@ -99,6 +101,7 @@ Repository-health remains open. Complete runtime/source/assets are not yet direc
 While physical UX5A playtest continues:
 - fix UX5A defects only on `ux5/searchable-rooms-encounter-tracks`,
 - physically retest patch-14 candidate,
+- continue editorial review of current encounter subjects/roles before expanding the content bank,
 - keep Narrative Graph work documentation-only here,
 - do not merge UX5A,
 - do not implement Narrative Graph runtime,
