@@ -2,6 +2,38 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Required resources use explicit provider routes, not hopeful random spawning
+A Storylet requirement and the way that requirement can be obtained are separate graph concepts.
+
+Initial provider families include:
+- `ROOM_FIND`,
+- `MERCHANT_PURCHASE`,
+- `TRADE`,
+- `SOCIAL_BARGAIN`,
+- `NPC_REWARD`,
+- `PUZZLE_REWARD`,
+- `SEARCH_SECRET`,
+- `STARTING_OR_OWNED_RESOURCE` only when explicitly allowed.
+
+Food and ordinary items may appear semi-randomly in rooms when the location/scene makes thematic sense. Optional resources may be genuinely random. If a resource is required for critical progression, at least one acquisition route must instead be reserved/validated as reachable before the requirement. It may still *look* like a natural random room find to the player, but the story cannot depend on lucky spawning.
+
+A merchant is a provider Storylet, not necessarily a separate abstract economy. A merchant may accept concrete coins, treasures, trade goods, favors or other authored values, and may also support conversation, clues or recurring-character roles.
+
+`SOCIAL_BARGAIN` preserves free-form play: the child first says what they try; the DM may trigger a physical die interaction only if the negotiation outcome is genuinely uncertain. A low result should fail forward to another price, favor, trade or route. A critical resource may never be permanently locked behind one persuasion roll.
+
+Example: if a `SUMPTROLLET` Storylet requires `FOOD`, generation must bind and validate at least one reachable food-provider route before placing/activating the troll gate. `BROTROLLET` may choose among authored desired-object variants, but the chosen request fixes its dependency and requires an earlier reachable provider.
+
+## 2026-10-26 - DM controls resolve authored state; optional combat is a module
+The narrator/DM surface must operate on story semantics rather than internal flags.
+
+For authored encounters the DM should be able to see what the scene is, what it requires, where a requirement can be acquired, what counts as resolution, and what outcome/world effect follows. If the child proposes a plausible unlisted solution, the DM may explicitly accept it (`GODTA LØSNING` / equivalent); the Storylet's authored world effects are then applied so canonical graph state remains coherent.
+
+Negotiation may expose a DM-triggered `FORHANDLE / USIKKERT FORSØK` action that records the real physical die only when uncertainty exists.
+
+Combat is an optional resolution module, not the default meaning of a monster/guard/guardian. The child may propose fighting, but the DM explicitly starts combat only for Storylets marked `combatAllowed`. Critical guardians normally retain a non-combat authored route. Combat presentation is child-friendly and may end through surrender, retreat, distraction, friendship or another fictionally valid resolution rather than requiring a kill state.
+
+This DM action model is also the basis for later action history/undo and shared-session synchronization.
+
 ## 2026-10-26 - Shared sessions are DM-hosted with one authoritative state
 Future multiscreen/live play uses a **DM Host / Player Client** model.
 
