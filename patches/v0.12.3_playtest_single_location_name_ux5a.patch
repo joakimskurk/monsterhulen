@@ -1,0 +1,45 @@
+--- a/index.html
++++ b/index.html
+@@ -235,7 +235,6 @@
+         <div class="roomBanner">
+           <div class="badge" id="goalBadge">MÅL: FINN NOE MYSTISK</div>
+           <div class="badge" id="roomNameBadge">ROM: STARTROM</div>
+-          <div class="badge" id="roomToneBadge">OMRÅDE: --</div>
+           <div class="badge" id="exitBadge">DØRER: --</div>
+         </div>
+       </div>
+@@ -2133,7 +2132,7 @@
+     if(!state?.started||!state?.dungeon)return null;
+     const room=roomById(state.dungeon,state.currentRoomId),hero=state.hero||{};
+     const hp=Number.isFinite(hero.hp)?hero.hp:3,maxHp=Number.isFinite(hero.maxHp)?hero.maxHp:3;
+-    const location=room?`${safeText(room.name)}${room.zoneName?' · '+safeText(room.zoneName):''}`:'UKJENT STED';
++    const location=room?safeText(room.name):'UKJENT STED';
+     const goal=safeText(state.goal)||(state.scenario?.completed?'EVENTYRET ER FULLFØRT!':'FORTSETT EVENTYRET.');
+     const recent=meaningfulLog(state.log);
+     return {
+@@ -2987,7 +2986,6 @@
+   const r=currentRoom();if(!r)return;
+   $('#goalBadge').textContent='MÅL: '+state.goal;
+   $('#roomNameBadge').textContent='ROM: '+r.name;
+-  $('#roomToneBadge').textContent='OMRÅDE: '+(r.zoneName||'UKJENT');
+   $('#roomDesc').textContent=r.desc;
+   const exits=['n','e','s','w'].map(d=>{const c=connectionForDir(r.id,d);if(!c)return null;return DIR_LABEL[d]+(c.locked&&!c.unlocked?' LÅST':c.shortcut?' SNARVEI':c.secret?' HEMMELIG':'')}).filter(Boolean);
+   $('#exitBadge').textContent='DØRER: '+(exits.join(' / ')||'INGEN');
+@@ -3364,7 +3362,7 @@
+   const rows=state.dungeon.rooms.slice().sort((a,b)=>(dist[a.id]||0)-(dist[b.id]||0)).map(r=>{
+     const events=(r.events||[]).map(normalizeEvent),labels=events.map(e=>e.name||e.item||e.target||e.label||EVENT_LABELS[e.type]||e.type).filter(Boolean);
+     const critical=events.some(e=>['NØKKEL','KLIMAKS','REDNINGSSPOR','REDNING','DEL','SAMLESTED','SPOR','MYSTERIE_MÅL'].includes(e.type));
+-    return `<div style="border-top:1px solid var(--pixel);padding:7px 0"><b>${critical?'★ ':''}${r.name}</b> · ${r.zoneName} · ${r.beat}${labels.length?`<br><span class="sub">HER: ${labels.join(' · ')}</span>`:'<br><span class="sub">PUSTEROM / SIDEINNHOLD</span>'}</div>`;
++    return `<div style="border-top:1px solid var(--pixel);padding:7px 0"><b>${critical?'★ ':''}${r.name}</b> · ${r.beat}${labels.length?`<br><span class="sub">HER: ${labels.join(' · ')}</span>`:'<br><span class="sub">PUSTEROM / SIDEINNHOLD</span>'}</div>`;
+   }).join('');
+   return `<strong>${s.blueprintTitle||s.title}</strong><p>${s.premise||''}</p><p><b>PLANT TIDLIG:</b> ${s.plant||'INGEN EGEN FORESHADOWING.'}</p><p><b>TA VARE PÅ TIL SENERE:</b> ${s.payoff||'LA HOVEDMÅLET FÅ EN TYDELIG AVSLUTNING.'}</p><details open><summary>KRITISK PLAN</summary><p>${scenarioPlanDetails()}</p></details><details><summary>ALLE ROM · SPOILERE</summary>${rows}</details>`;
+ }
+@@ -3407,7 +3405,7 @@
+   const encounter=events.find(e=>e.generated&&e.gm);
+   const climaxHelp=climaxEvent&&s.climax?`<div style="border-top:2px solid var(--pixel);margin-top:9px;padding-top:9px">${C.gmSummary(s.climax,p.climaxPhase||0,state.hero.skill,CS.itemById(state.hero.startItemId))}</div>`:'';
+   const encounterHelp=!climaxHelp&&encounter?`<div style="border-top:2px solid var(--pixel);margin-top:9px;padding-top:9px">${E.gmSummary(encounter,state.hero.skill,CS.itemById(state.hero.startItemId),state.inventory,state.hero.rewards)}</div>`:'';
+-  return `<strong>${r.zoneName} · ${r.beat}</strong><p>${situationAdvice()}</p>${companionNarratorHtml()}${climaxHelp}${encounterHelp}<p class="sub">SCENARIO: ${s.title}${secretHere?' · HEMMELIGHET I NÆRHETEN':''}</p><details><summary>VIS PLAN</summary><p>${scenarioPlanDetails()}</p></details>`;
++  return `<strong>${r.name} · ${r.beat}</strong><p>${situationAdvice()}</p>${companionNarratorHtml()}${climaxHelp}${encounterHelp}<p class="sub">SCENARIO: ${s.title}${secretHere?' · HEMMELIGHET I NÆRHETEN':''}</p><details><summary>VIS PLAN</summary><p>${scenarioPlanDetails()}</p></details>`;
+ }
+ function renderScenario(){
+   $('#scenarioBox').innerHTML=scenarioHint();
