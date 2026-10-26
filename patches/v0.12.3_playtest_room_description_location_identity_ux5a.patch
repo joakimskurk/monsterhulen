@@ -1,0 +1,11 @@
+--- index.html
++++ index.html
+@@ -786,7 +786,7 @@
+       const suffix=idx>=names.length?' '+(Math.floor(idx/names.length)+1):'';
+       room.zoneId=key;room.zoneName=zone.name;room.zoneIndex=zi;room.tone=zone.tone;
+       room.name=room.id===d.startRoomId?'STARTPORTEN':names[idx%names.length]+suffix;
+-      room.desc=`${zone.name}. ${room.name}. `+
++      room.desc=`${room.name}. `+
+         (zone.tone==='LYS'?'HER ER DET LYST, RART OG EVENTYRLIG.':zone.tone==='MØRK'?'HER ER DET MØRKERE OG LITT SKUMMELT, MEN ALT KAN FORTSATT LØSES PÅ MANGE MÅTER.':zone.tone==='RAR'?'HER OPPFØRER VERDEN SEG LITT MERKELIG ENN VANLIG.':'HER BLANDES LYST OG MØRKT.');
+       room.revealed=room.id===d.startRoomId;room.visited=room.id===d.startRoomId;
+     }
