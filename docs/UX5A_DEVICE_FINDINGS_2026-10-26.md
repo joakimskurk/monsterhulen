@@ -1,75 +1,90 @@
 # UX5A physical device findings - 2026-10-26
 
-Status: **YELLOW - HOTFIX IMPLEMENTED, PHYSICAL RETEST REQUIRED**
-Branch: `ux5/searchable-rooms-encounter-tracks`
+Status: **YELLOW - FOLLOW-UP PATCH IMPLEMENTED, BROWSER + PHYSICAL RETEST REQUIRED**
+Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 
 Do not merge UX5A to `main` yet.
 
 ## Finding 1 - ready locked door was effectively skipped
-
 Observed during live playtest:
 - a locked story door was shown,
-- the hero already had `GLASSNØKKEL`,
-- tapping forward both unlocked the door and moved through it in the same interaction,
-- the key still appeared unused in inventory afterwards.
+- hero already had `GLASSNØKKEL`,
+- tapping forward both unlocked and moved through it,
+- key still appeared unused afterwards.
 
-This made the progression gate feel cosmetic even though the underlying prerequisite logic was correct.
-
-### Fix
-`patches/v0.12.3_playtest_device_findings_hotfix_ux5a.patch` changes the interaction contract:
-- first tap on a ready locked story gate opens it but does **not** move the hero,
-- the child therefore gets an explicit door-opening beat,
-- a scenario key is removed from the backpack when used,
-- the log explains that the key remains in the lock,
-- a second tap moves through the now-open door,
-- an unmet prerequisite still blocks movement exactly as before.
+Patch 10 initially changed this to open-first/traverse-second and consumed/archived the key. That fixed the one-tap bypass, but continued review exposed a deeper interaction problem; see finding 3.
 
 ## Finding 2 - mystery puzzle was not fictionally connected or DM-clear
-
 Observed example:
-- encounter: `DEN HVISKENDE VEGGEN`,
-- generated puzzle: `STEINTRINNENE`,
-- prompt: `1, 2, 3, 4. HVILKEN STEIN TRÅR DERE PÅ ETTER 3?`
+- encounter `DEN HVISKENDE VEGGEN`,
+- puzzle `STEINTRINNENE`,
+- narrator could infer the answer but not why the puzzle belonged to the mystery or what solving it should do.
 
-The mathematical answer is simply `4`, but the UI did not explain why the stepping-stone puzzle belonged to the whispering wall or what the narrator should do after the child answered. A novice DM should not have to infer this.
-
-### Fix
-The same hotfix now:
-- frames the generated puzzle as a clue produced by the current mystery,
-- adds a visible collapsed `FORTELLERHJELP` section to the puzzle card,
-- explicitly says to read the question aloud and let the child think without a die roll,
+Patch 10:
+- frames puzzle as a clue produced by the current mystery,
+- adds collapsed `FORTELLERHJELP`,
+- says to let child think without a die roll,
 - provides hint and narrator-only answer,
-- renames the action to `PUZZLET ER LØST`,
-- solving the puzzle automatically gives exactly `+1 FREMGANG`, because solving the clue is itself a meaningful change in the encounter,
-- if that final progress step completes the encounter, normal encounter resolution is used.
+- `PUZZLET ER LØST` gives exactly +1 progress,
+- free-form solutions and `LØST MED GOD IDÉ` remain valid.
 
-Free-form solutions and `LØST MED GOD IDÉ` remain valid. The puzzle is one possible path, not the only correct solution.
+## Finding 3 - app should present the lock, not auto-apply the solution
+Continued physical-review judgement:
+- even patch-10 two-step behavior still used the correct key automatically when the child tapped the locked door,
+- this removes an important child decision,
+- desired play is to notice the locked door, think of a solution and deliberately choose an item/action,
+- if child is stuck, narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` without naming the answer.
 
-## Verification
-Hotfixed reconstructed runtime SHA-256:
+This is a product-principle issue: **the app should expose the problem and preserve room for the child's idea before applying a known solution.**
 
-`fc1bf19ba8a95ccc25b7735a7da0cbc2f52187a37f0fdb357f043695377d72ca`
+### Follow-up fix - patch 11
+Runtime patch:
+`patches/v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
 
-Hotfix patch SHA-256:
+Behavior:
+- tapping a locked keyed door only reports `DØREN ER LÅST`,
+- tap does not unlock, traverse or consume key,
+- first discovery logs only that a locked door was found,
+- current scenario key remains protected from `BRUK OPP / LEGG FRA`,
+- scenario key has explicit `BRUK`,
+- `BRUK` performs special key action only when hero is beside matching locked story door,
+- successful use removes key, explains it remains in lock and opens door,
+- successful key use does not traverse,
+- later door/map tap traverses,
+- Forteller may suggest `KANSKJE DU HAR NOE I SEKKEN?` if help is needed but should not immediately give the solution.
 
-`1dd09c98a37234c418b60fd522808b28b23ce86f9054fc7d88b752d9deb55177`
+Non-key progression gates retain existing open-first/traverse-later behavior when their authored prerequisite is explicitly satisfied.
 
-Targeted Node regression `tests/QA_DEVICE_FINDINGS_UX5A.js`:
-- **19 PASS / 0 FAIL**
-- includes all 11 inline JavaScript blocks with 0 syntax errors.
+## Verification after patch 11
+Patch 11 SHA-256:
+`276711322f02586f481214011a85a236476d22a524c98c7e96a82c9d1533decf`
 
-Real Chromium interaction smoke:
-- **15 PASS / 0 FAIL**
-- verified mystery narrator help renders,
-- verified puzzle solve advances from 0 to 1 progress,
-- verified deterministic `GLASS_HEART` gate,
-- verified first lock tap opens without traversal,
-- verified used key leaves inventory with explicit fiction log,
-- verified second tap traverses the opened gate.
+Fresh text reconstruction through patch 11:
+`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
 
-## Exact next action
-Retest these two interactions on the physical iPad/mobile build:
-1. approach the `GLASS_HEART` story gate with `GLASSNØKKEL`; first tap must only open it and consume/archive the key, second tap may traverse,
-2. play a `MYSTISK` encounter with a puzzle; the narrator should understand what to read, what the child is trying to solve, where hint/fasit are, and that solving it gives one progress step.
+The runtime hash is a behavioral reconstruction artifact, not a byte-identical release-baseline claim.
 
-If these are green and the rest of the UX5A device smoke remains green, UX5A may be merged to `main`. Otherwise keep patching this branch.
+Automated evidence:
+- targeted device QA: **27 PASS / 0 FAIL**,
+- searchable-room/encounter QA: **2216 PASS / 0 FAIL**,
+- Adventure Code: **405 PASS / 0 FAIL**,
+- UX4 progression: **1797 PASS / 0 FAIL**,
+- combined content regression: **5960 PASS / 0 FAIL**,
+- 11 inline JavaScript blocks: **0 syntax errors**.
+
+Patch-10 focused Chromium was **15 PASS / 0 FAIL**, but the key-door expectation is superseded. Patch 11 therefore needs fresh browser interaction smoke; old 15/0 is not proof of the new key flow.
+
+## Exact next physical action
+On patch-11 build, test `GLASS_HEART`:
+1. obtain `GLASSNØKKEL`,
+2. approach matching locked story door,
+3. tap door: it must stay locked and only communicate that it is locked,
+4. give child time to suggest a solution,
+5. if genuinely stuck, narrator may say something open like `KANSKJE DU HAR NOE I SEKKEN?`,
+6. open backpack and verify `GLASSNØKKEL` is important but has `BRUK`,
+7. press `BRUK`: door opens, key leaves backpack with fiction feedback, hero remains in same room,
+8. tap now-open door: only now may hero traverse.
+
+Also retest a `MYSTISK` puzzle encounter: narrator should understand what to read, what child is trying to solve, where hint/fasit are, and that solving gives one progress step.
+
+If these and the rest of UX5A smoke are green, follow the exact merge transition in `START_HERE.md`. Otherwise keep patching UX5A; Narrative Graph runtime remains blocked.
