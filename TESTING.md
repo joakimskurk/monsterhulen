@@ -2,104 +2,229 @@
 
 ## Verification levels
 Never conflate:
-- implemented
-- static/source verified
-- automated runtime tests passed
-- browser tested
-- physical device tested
-- editorial/manual narrative quality accepted
+- implemented,
+- static/source verified,
+- automated runtime tests passed,
+- browser tested,
+- physical device tested,
+- editorial/manual narrative quality accepted.
 
 Structural green never proves narrative quality.
 
-## Historical V0.12.3 release evidence
-- Lasting thing 67 / 0
-- Treasure 121 / 0
-- Puzzle 4665 / 0
-- NPC 4935 / 0
-- Friend 4104 / 0
-- Pet 6069 / 0
-- Rescue 5070 / 0
-- 11 inline JavaScript blocks, 0 syntax errors
+## Current UX5A runtime evidence
+Runtime branch: `ux5/searchable-rooms-encounter-tracks`.
 
-## Current UX5A runtime candidate - patch 13
-Canonical runtime patch order is on `ux5/searchable-rooms-encounter-tracks` in `patches/README.md`.
+Patch-14 automated evidence:
+- explicit-improv **20/0**
+- encounter-purpose **4337/0**
+- authored-mysteries-only **3075/0**
+- single-location **19/0**
+- targeted device **27/0**
+- search/encounter **2328/0**
+- Adventure Code **405/0**
+- UX4 **1797/0**
+- content regression **5830/0**
+- 11 inline scripts **0 syntax errors**
 
-Latest layers:
-- patch 11 explicit story-key use,
-- patch 12 single visible location identity,
-- patch 13 encounter purpose contract.
+Historical browser results do not certify patches 11-14. Fresh current browser QA and physical target-device retest remain open.
 
-Patch 13 removes generic ambient 3/4 progress and requires purpose/stakes/resolvedWhen/payoff. Progress exists only for authored stages. Traps can be real forward obstacles with retreat and payoff. Ambient random mystery puzzles are disabled unless explicitly authored/opted in.
+Do not implement Narrative Graph runtime until UX5A physical gate is green and merged.
 
-Automated runtime evidence after patch 13:
-- encounter-purpose QA: **4337 / 0**,
-- single-location QA: **19 / 0**,
-- targeted device QA: **27 / 0**,
-- searchable-room/encounter QA: **2295 / 0**,
-- Adventure Code: **405 / 0**,
-- UX4 progression: **1797 / 0**,
-- combined content regression: **5809 / 0**,
-- 11 inline scripts: **0 syntax errors**.
+## Narrative Graph V1 validator contract
+Must reject:
+- missing setup/signal,
+- unavailable critical requirement,
+- provider behind consuming gate,
+- provider dependency cycle,
+- critical dependency on lucky optional spawn,
+- merchant price/trade dependency with no reachable source,
+- critical acquisition relying only on one mandatory persuasion roll,
+- required hidden resource without clue/fail-forward,
+- guardian without required non-combat route,
+- premature knowledge reveal,
+- stale/expired complication,
+- action completion caused merely by owning requirement,
+- auto-use of possessed solution,
+- missing purpose/stakes/resolvedWhen/payoff,
+- payoff with no coherent world effect,
+- generic progress count/filler stages,
+- unrelated puzzle/mechanic,
+- missing narrator-improv contract for intentionally open payload,
+- critical state depending on untracked narrator invention,
+- incompatible subject/role,
+- interaction shell revealing unrevealed requirement,
+- interaction shell allowing undeclared critical state mutation,
+- critical slot/gate auto-filled from inventory.
 
-Patch-13 runtime reconstruction SHA-256:
-`e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
+## Provider-system tests
+For critical resource plans verify:
+- at least one reachable provider before consumption,
+- nested provider dependencies reachable,
+- no circular provider chain,
+- no provider hidden behind target gate,
+- optional providers may vary without breaking guaranteed route,
+- thematic critical room-find reservation deterministic,
+- optional room finds may vary,
+- critical merchant offer has obtainable price/trade or alternate/fail-forward,
+- low social roll never removes all critical acquisition paths.
 
-Patch-13 SHA-256:
-`74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
+Reference cases:
+- `SUMPTROLLET requires FOOD`,
+- `BROTROLLET` selected request binds provider plan before map materialization.
 
-The content pass count decreased intentionally because ambient random mystery puzzles no longer generate, so fewer puzzle assertions execute.
+## Subject/role/outcome tests
+Verify:
+- only approved subject/role combinations selected,
+- subject ID stable/separate from Storylet ID,
+- outcome compatible with role,
+- critical outcome tracked + world effect applied,
+- ambient subject cannot silently become critical,
+- repetition penalties never override hard validity.
 
-The encounter-purpose regression executes the actual runtime `move()` function in a three-room harness and proves: active trap blocks forward movement, retreat works, clear/resolved trap allows forward movement.
+## Interaction shell / popup tests
+Canonical spec: `docs/INTERACTION_SHELLS_V1.md`.
 
-## Browser status
-Historical Chromium evidence:
-- broad pre-patch-11: **23 / 0**,
-- patch-10 focused: **15 / 0**.
+### SLOT_GATE / ASSEMBLY
+Automated:
+- slots hidden until knowledge reveal,
+- owning resources does not auto-place,
+- explicit `PLACE_RESOURCE` required,
+- wrong item not consumed,
+- correct placement target/inventory atomic,
+- partial placement persists save/reload,
+- full slots do not skip separate activation if authored,
+- activation applies exact gate/machine world effect,
+- repeated action ID cannot duplicate effect when idempotency layer exists,
+- undo restores target + inventory atomically when undo exists.
 
-These do not certify patches 11-13. Fresh browser interaction QA remains pending because the current local browser/localStorage harness failed before current interaction testing. Do not claim browser green.
+Browser/touch:
+- popup readable on iPad/mobile,
+- open/close/reopen preserves state,
+- placement understandable,
+- accidental double tap safe,
+- partial progress clear,
+- child still free to propose unlisted solution.
 
-## Physical UX5A gate
-Still required on target iPad/mobile:
-1. `REGNBUENETTET`/trap has no generic four-box progress,
-2. narrator immediately understands purpose, solve condition and payoff,
-3. trap blocks onward travel but permits retreat,
-4. one genuinely sufficient child plan may solve it,
-5. resolution actually restores onward travel,
-6. new ambient mysteries do not surface unrelated random puzzles,
-7. one clear location name remains,
-8. explicit key use remains child-driven,
-9. generic room search/backpack/combat/device ergonomics remain green,
-10. Adventure Code remains usable.
+### Player-data isolation
+Player-visible shell/state must not contain:
+- narrator-only answer,
+- hidden provider location,
+- future phase state,
+- unrevealed slot identity,
+- narrator improv guardrails,
+- secret map/story facts.
 
-Do not merge UX5A or implement Narrative Graph runtime until physical gate is green.
+## DM semantic-control tests
+When NG4 begins verify DM can understand/control scene without raw edits:
+- purpose,
+- requirements,
+- provider context,
+- outcomes,
+- resolvedWhen,
+- world effects,
+- authored vs improv boundary.
 
-## Narrative Graph V1 future verification contract
-Canonical implementation plan: `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`.
+Actions:
+- `GODTA LØSNING` applies canonical effects,
+- `FORHANDLE / USIKKERT FORSØK` triggers physical die only by DM choice,
+- low negotiation follows authored fail-forward,
+- `START KAMP` unavailable when `combatAllowed=false`,
+- `START KAMP` not presented as default child answer,
+- authored outcome controls cannot create impossible state.
 
-### Level 1 - schema/static
-Must prove StoryGraph/StoryNode schema, stable storylet IDs, resource/knowledge edges, setup/signal/action/payoff and encounter/storylet purpose semantics.
+## Optional combat tests
+- no auto-start from subject category,
+- DM explicit start required,
+- physical dice only,
+- non-combat route preserved for critical guardians where required,
+- surrender/retreat/distraction/friendship/etc. can resolve,
+- no required kill semantics,
+- child-friendly presentation physically/editorially reviewed.
 
-### Level 2 - validator
-Must reject cycles, unavailable requirements, optional-find critical dependencies, hidden critical nodes without clue/fail-forward, guardians without non-combat routes, premature knowledge, stale complications, obsolete ambient story text, and interactive nodes missing purpose/stakes/resolution/payoff where applicable.
+## Typed transition/action tests
+Once implemented:
+- preconditions validated before effects,
+- failed action causes no partial mutation,
+- composite effect atomic,
+- stable action ID,
+- duplicate request idempotent where applicable,
+- save/reload does not replay committed effect,
+- Adventure Code reconstructs deterministic initial graph/provider plan,
+- session progress remains save-state responsibility.
 
-Progress may exist only as authored semantic stages; generic duration counts are invalid.
+## NG5 structural volume
+Generate >=1000 `CRYSTAL_MACHINE` adventures across seeds/lengths.
 
-### Level 3 - generated structural QA
-Generate at least **1000** valid `CRYSTAL_MACHINE` adventures. Check reachability, acquisition diversity, dependency validity, gate integrity, determinism, temporal expiry, purpose/payoff completeness and existing regressions.
+Check:
+- graph validity,
+- provider validity,
+- knowledge timing,
+- acquisition-family diversity,
+- all crystals can be owned while assembly pending,
+- slot state does not auto-fill,
+- gate remains closed until authored assembly/activation,
+- no stale complication,
+- deterministic reconstruction,
+- world effects/payoff consistency,
+- existing UX regressions remain green.
 
-**1000/0 does not prove story quality.**
+1000/0 does not prove narrative quality.
 
-### Level 4 - real browser interaction QA
-Exercise requirement reveal, knowledge state, critical search fail-forward, NPC favor, guardian non-combat completion, deliberate assembly, gate ordering, expiry and observable payoff/world-state changes.
+## NG6 browser/touch QA
+Test actual flows:
+- quest reveal before slot knowledge,
+- provider acquisition,
+- NPC favor,
+- guardian non-combat,
+- merchant/social bargain if selected,
+- deliberate slot placement,
+- partial assembly,
+- return/activation/gate,
+- DM alternate-solution acceptance,
+- optional combat if selected,
+- no narrator-data leak.
 
-### Level 5 - manual editorial gate
-Manually play **10-20 generated CRYSTAL_MACHINE adventures** and judge goal clarity, causal/temporal coherence, encounter purpose, narrator burden, free child solutions, branch variety and payoff.
+## NG7 manual editorial/family playtest
+10-20 generated Crystal Machine adventures.
 
-### Level 6 - architecture decision gate
-Accept, revise or abandon Narrative Graph V1. Do not port other blueprints before this gate.
+Record:
+- goal clarity,
+- causal/temporal coherence,
+- provider naturalness,
+- DM cognitive load,
+- child agency/free solutions,
+- whether popups feel tangible/supportive vs overly videogame-like,
+- repetition,
+- payoff quality,
+- whether narrator repairs missing logic.
 
-## UX5B relationship
-UX5B is deferred until Narrative Graph V1 is accepted and should consume explicit graph/knowledge/resource state.
+## NG8 decision gate
+Accept / revise / abandon architecture.
+
+Do not convert another blueprint before NG8.
+
+## Future DM Control Surface verification
+If NG accepted:
+- novice-DM scene summary clarity,
+- player-view preview accuracy,
+- action history completeness,
+- undo movement/resolve/item placement-use/die face/encounter transition,
+- undo cannot duplicate rewards/items/payoffs,
+- corrected state remains save-compatible.
+
+## Future Multiscreen / Shared Session verification
+Only after canonical action/state model is stable:
+- DM host authoritative,
+- iPad touch client,
+- display-only external screen,
+- same-Wi-Fi join,
+- reconnect,
+- duplicate requests no duplicate effect,
+- narrator-only data never transmitted/rendered to player surface,
+- DM player preview correct,
+- undo re-syncs all clients,
+- save/reload mid-session,
+- physical family playtest without network administration burden.
 
 ## Repository verification
-Repository-health remains open. Before the next release checkpoint is called locked, repo must reconstruct full active source/assets/tests without chat or external release ZIP.
+Repository-health remains open. Full active source/assets/tests must eventually reconstruct without chat or external release ZIP.
