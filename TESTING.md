@@ -24,10 +24,12 @@ Against canonical V0.12.3:
 1. `patches/v0.12.3_playtest_map_navigation.patch`
 2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
 3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
-4. `patches/v0.12.3_playtest_adventure_code_v1.patch`
+4. `patches/v0.12.3_playtest_adventure_code_v1.patch.gz.b64`
+
+`patches/README.md` documents how to reconstruct the final entry to a normal unified diff.
 
 ## Adventure Code V1 automated evidence
-`QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**.
+`tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**.
 
 Verified:
 - four blueprint IDs are stable,
