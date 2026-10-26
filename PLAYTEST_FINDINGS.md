@@ -9,15 +9,22 @@ Observed:
 - The child may propose actions that are not represented by the generated encounter.
 - Items can feel like they are "used up" even when they should remain available narratively.
 - A DM may want to know important later dependencies, clues and scenario keys before improvising away something useful.
+- A novice DM may meet a named figure such as SOPPPRINSEN and still not understand whether the figure is friendly, hostile or why a die roll is relevant.
 
-Implemented for playtest in `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`:
-- Encounter and climax consequences are explicitly labelled as narrator suggestions, not fixed outcomes.
-- `FRITT KAST` is available in the narrator panel for any uncertain action the child invents.
-- FRITT KAST keeps the physical dice rule: easy/safe just works, uncertain = 1D6, relevant EKSTRA GOD PÅ = 2D6 highest.
-- FRITT KAST contains no digital RNG.
-- Inventory `BRUK` no longer removes an item.
-- `BRUK OPP / LEGG FRA` is the explicit removal action for ordinary bag items.
-- Scenario-critical items remain protected from removal.
+Implemented for playtest:
+- `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
+  - Encounter and climax consequences are explicitly labelled as narrator suggestions, not fixed outcomes.
+  - `FRITT KAST` is available for any uncertain action the child invents.
+  - FRITT KAST keeps the physical dice rule: easy/safe just works, uncertain = 1D6, relevant EKSTRA GOD PÅ = 2D6 highest.
+  - Inventory `BRUK` no longer removes an item.
+  - `BRUK OPP / LEGG FRA` is the explicit removal action for ordinary bag items.
+  - Scenario-critical items remain protected from removal.
+- `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
+  - VENN encounters are explicitly labelled as friendly figures, not enemies.
+  - PERSON encounters are described as people with their own goals, not automatically good or bad.
+  - MONSTER means creature/obstacle, not automatically evil.
+  - Narrator panel now contains a five-step beginner guide for how to tell the scene and when not to roll.
+  - Talking, greeting or offering help to a friendly figure does not itself require a roll.
 
 Still to design/test:
 - Expanded DM adventure plan/spoiler overview with important dependencies, clues, keys and useful callbacks.
@@ -37,13 +44,27 @@ Implemented for playtest in `patches/v0.12.3_playtest_map_navigation.patch`:
 - Existing direction arrows remain as secondary fallback controls.
 - Existing `move()` logic is unchanged, so keys, locks, scenario progression and save behavior still use the known code path.
 
+## 3. Dice input should look like a physical die
+Observed:
+- `OI!`, `DET GÅR`, `KJEMPEBRA` and range buttons feel like abstract game-state controls instead of recording the die that was actually rolled.
+- The desired interaction is to tap the same physical die face that was rolled.
+
+Implemented for playtest in `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`:
+- Encounter, climax and FRITT KAST now show six square D6 faces with pips.
+- The user taps the exact face rolled: one through six, represented visually by pips rather than visible numeric labels.
+- A short stamp/bounce animation plays before the consequence appears. This is feedback only; the app still never rolls digitally.
+- Exact `diceValue` is stored for the scene while the existing low/mid/high consequence bands remain the internal compatibility model.
+- Consequence preview uses die-face glyphs instead of visible `1-2 / 3-4 / 5-6` labels.
+
 ## Verification so far
 - 11 inline JavaScript blocks: 0 syntax errors.
+- Existing Thing, Treasure, Puzzle, NPC, Friend, Pet and Rescue runtime QA still pass with no new failures.
 - Targeted map navigation logic: 3/3 PASS (`?`, lock, known adjacent room all route to the expected existing move direction).
-- Existing `move()` function is byte-identical to V0.12.3.
-- FRITT KAST uses the existing three physical result bands and no digital die/RNG.
+- Existing `move()` function remains unchanged from V0.12.3.
+- FRITT KAST contains no digital die/RNG.
+- Dice-face mapping remains internally 1-2 -> low, 3-4 -> mid, 5-6 -> high while the UI presents six individual faces.
 - `BRUK` handler does not splice/remove inventory; only the explicit drop/consume handler does.
-- Browser/mobile interaction is NOT certified by automation in this environment because browser navigation is blocked by environment policy. Manual child/DM playtest is required before lock.
+- Browser/mobile interaction is NOT certified by automation in this environment. Manual child/DM playtest is required before lock.
 
 ## Priority
-These UX changes now take priority over locking additional content/art. Repository-health remains an independent technical gate, but the playtest patches are stored in GitHub so the implementation is not chat-only.
+These UX changes take priority over locking additional content/art. Repository-health remains an independent technical gate, but all playtest implementations are stored as GitHub patches so they are not chat-only.
