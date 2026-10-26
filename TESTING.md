@@ -19,16 +19,19 @@ Historical release evidence remains:
 - Rescue 5070 / 0
 - 11 inline JavaScript blocks, 0 syntax errors
 
-## Active playtest patch chain
+## Active UX5A branch patch chain
 Against canonical V0.12.3:
 1. `patches/v0.12.3_playtest_map_navigation.patch`
 2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
 3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
 4. `patches/v0.12.3_playtest_adventure_code_v1.patch.gz.b64`
 5. `patches/v0.12.3_playtest_progression_gates_secret_doors.patch.gz.b64`
-6. **UX5A candidate:** `patches/v0.12.3_playtest_search_progress_ux5a.patch.gz.b64`
+6. `patches/v0.12.3_playtest_searchable_rooms_encounter_engine_ux5a.patch`
+7. `patches/v0.12.3_playtest_encounter_narrator_ux5a.patch`
+8. `patches/v0.12.3_playtest_searchable_rooms_encounter_ui_ux5a.patch`
+9. `patches/v0.12.3_playtest_searchable_rooms_encounter_render_ux5a.patch`
 
-`patches/README.md` documents reconstruction of compressed patches.
+`patches/README.md` documents order, reconstruction and current SHA-256 values.
 
 ## Adventure Code V1 automated evidence
 `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**.
@@ -50,38 +53,38 @@ Across all four blueprints and 64 adventure seeds each, verified:
 - successful discovery reveals the hidden connection,
 - narrator text states that a high roll cannot skip the story gate.
 
-## UX5A search / encounter-state candidate
-`tests/QA_SEARCH_PROGRESS_UX5A.js` has been authored.
+## UX5A candidate test asset
+`tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js` is authored on `ux5/searchable-rooms-encounter-tracks`.
 
-Static/isolated verification completed in the authoring environment:
-- QA file: `node --check` PASS,
-- deterministic optional-find planning model PASS,
-- untouched legacy monster normalization to 3 hearts PASS,
-- active legacy combat preservation PASS,
-- `SPENNING` normalization to 4 hearts / 4 progress steps PASS,
-- compressed patch byte round-trip PASS,
-- uncompressed patch SHA-256: `454c0d2f9114ea1029717b3a283fe8729a481b3721c287bf1207d86b7f02ae8f`,
-- encoded artifact SHA-256: `a93972a2a99b2a37e6c52ded68160892cb585a8d798a520341452712ebd64e81`.
-
-The committed QA is designed to verify across all four blueprints and 64 seeds each:
-- two optional hidden room finds in a standard 13-room adventure,
-- no find in start/finale/critical/ambient-treasure rooms,
-- finds come from the curated treasure bank and never match progression requirements,
-- generated non-treasure encounters start at 0 and use 3-4 progress steps,
-- fresh monsters start full at 3-4 hearts,
-- room search uses six physical D6 faces,
-- 1-2 search is fail-forward and does not reveal loot,
-- 3-6 can reveal loot,
-- full inventory preserves a discovered find,
-- encounter die registration cannot mutate progress or resolve/remove the encounter,
-- generated encounters no longer expose the old generic `MØTET ER FERDIG` shortcut,
-- zero monster hearts resolve only through explicit combat handling,
+It is designed to verify:
+- every room has a generic investigation state so loot rooms are not pre-spoiled,
+- deterministic optional hidden-find placement for all four blueprints,
+- minimum hidden-find counts 2/3/4 for KORT/VANLIG/STORT,
+- hidden finds avoid start/finale/story-critical/ambient-treasure rooms,
+- hidden-find/search state survives re-enrichment,
+- empty-room investigation state survives re-enrichment,
+- first low search result does not reveal the item while repeated low search remains fail-forward,
+- full inventory leaves a revealed room find untouched,
+- fresh monsters use 3-4 hearts,
+- generated non-treasure encounters use 3-4 progress steps starting at 0,
+- an active legacy 2-heart fight is upgraded without restoring lost hearts,
+- an untouched legacy monster is upgraded to the new full scale,
+- physical encounter die registration cannot mutate progress or hearts,
+- full explicit progress resolves the encounter,
+- zero explicit monster hearts resolves combat,
+- `LØST MED GOD IDÉ` remains an explicit narrator-controlled direct solution,
 - save schema remains 12.
 
-**Not yet claimed:** automated UX5A runtime PASS. The repo still lacks the canonical runtime baseline as ordinary files, and the Library-held UX4 HTML/ZIP cannot currently be raw-materialized by this connector. The QA must be run after the six-patch chain is reconstructed.
+### UX5A verification completed in this branch session
+- Four UX5A unified diffs were applied sequentially to a realistic source reconstruction using GNU `patch` with **no rejected hunks**.
+- `git diff --check` passed on the reconstructed patched source.
+- The final UX5A patch chain was rechecked after the non-spoilery search change and after the active-legacy-combat migration fix.
+- The obsolete monolithic UX5A candidate patch was removed.
 
-## Full regression after UX4
-Last fully executed regression remains:
+### UX5A verification not yet completed
+Do **not** claim UX5A automated runtime PASS yet. The canonical full V0.12.3/UX4 runtime is not available in this execution environment as raw files, so the new QA and full regressions have not been executed against the real reconstructed app.
+
+The last fully executed runtime regression remains UX4:
 - Thing 67 / 0
 - Treasure 121 / 0
 - Puzzle 4665 / 0
@@ -93,25 +96,24 @@ Last fully executed regression remains:
 - Progression / secret door 1797 / 0
 - 11 inline JavaScript blocks, 0 syntax errors
 
-Do not relabel this as “after UX5A” until the candidate patch is applied and the full suite is rerun.
-
 ## Required UX5A runtime/manual gate
-Before UX5B:
-1. reconstruct canonical V0.12.3 + patches 1-6,
-2. run `node tests/QA_SEARCH_PROGRESS_UX5A.js <reconstructed-root>`,
+Before UX5B or merge to `main`:
+1. reconstruct canonical V0.12.3 + patches 1-9 as raw files,
+2. run `node tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js <reconstructed-root>`,
 3. rerun Adventure Code + UX4 + all existing content QA,
 4. syntax-check all inline scripts,
-5. browser smoke-test one empty room search, one successful hidden find and one 1-2 retry,
-6. verify full backpack leaves the item visibly in the room,
-7. verify normal monster shows 3 hearts and `SPENNING` monster 4,
-8. verify physical 5/6 alone does not remove an encounter,
-9. verify `+ FREMGANG`, `LØST MED GOD IDÉ` and combat-zero each resolve through their intended explicit path,
-10. verify an old save with active 2-heart combat does not gain hearts.
+5. browser smoke-test generic room investigation in both an empty room and a find room,
+6. test first low hidden-find roll and repeated-low fail-forward reveal,
+7. verify full backpack leaves a revealed find in the room,
+8. verify normal monster shows 3 hearts and `SPENNING` monster 4 after combat is chosen,
+9. verify a physical 5/6 alone changes neither hearts nor progress,
+10. verify final `+ FREMGANG`, final `- HJERTE`, and `LØST MED GOD IDÉ` each resolve through their intended explicit path,
+11. verify an old save with active 2-heart combat keeps its current remaining heart count,
+12. smoke-test on iPad/mobile for interaction cost and layout.
 
 ## Still manual / not certified
-- real iPad play through UX4/UX5A,
-- whether search feels exploratory rather than repetitive,
-- whether 3-4 progress steps are enough structure without becoming bookkeeping,
+- whether room investigation feels exploratory rather than like a mandatory button in every room,
+- whether 3-4 progress steps create satisfying escalation without too much bookkeeping,
 - whether each blueprint prerequisite feels narratively earned rather than mechanical,
 - secret-door search clarity and fun on target device,
 - real iPad -> mobile Adventure Code copy/paste flow,
