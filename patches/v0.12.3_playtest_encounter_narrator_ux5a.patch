@@ -1,0 +1,23 @@
+--- index.html
++++ index.html
+@@ -1204,16 +1204,17 @@
+     const gear=heroItem?`<p><b>MED:</b> ${heroItem.name} – ${heroItem.desc} UTSTYRET GIR IKKE EKSTRA TERNING.</p>`:'';
+     const matches=matchingItemHints(ev,heroItem,inventory,rewards);
+     const itemHelp=matches.length?`<p><b>TING SOM PASSER NÅ:</b><br>${matches.map(x=>`${x.source}: ${x.label} – ${x.hint}`).join('<br>')}</p><p class="sub">DETTE ER MULIGHETER, IKKE FASIT. EN ANNEN GOD IDÉ SKAL VIRKE LIKE GODT.</p>`:'';
++    const progress=Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)?`<p><b>ANNEN LØSNING:</b> ${Math.max(0,ev.progress)}/${Math.max(1,ev.maxProgress)} FREMGANG. BRUK SPORET NÅR BARNETS PLAN FAKTISK FORANDRER SITUASJONEN. EN EKSTRA GOD LØSNING KAN AVSLUTTE MØTET DIREKTE.</p>`:'';
+     const monsterRule=ev.type==='MONSTER'?'<p class="sub"><b>MONSTERHJERTER:</b> BARE HVIS BARNET SELV VELGER KAMP. SNAKK, MILJØ, EN GOD IDÉ ELLER EN PASSENDE TING KAN LØSE MØTET UTEN Å TA HJERTER.</p>':'';
+     const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER KASTET:</b><br>${ev.gm[band]}</p>`:'';
+     const puzzle=ev.puzzle;
+     const puzzleBlock=puzzle?`<div class="puzzleNarrator"><b>PUZZLE · ${puzzle.categoryLabel} · ${puzzle.levelLabel} ÅR</b><p><b>LES HØYT:</b> ${puzzle.scene} ${puzzle.prompt}</p><p><b>HINT HVIS BARNET STÅR FAST:</b> ${puzzle.hint}</p><details><summary>FASIT FOR FORTELLER</summary><p>${puzzle.answer}</p></details></div>`:'';
+-    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${monsterRule}${puzzleBlock}`;
++    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${progress}${monsterRule}${puzzleBlock}`;
+     if(puzzle&&!ev.puzzleSolved)return `${base}<p><b>TERNING:</b> IKKE FOR SELVE PUZZLET. LA BARNET TENKE, PRØVE, TEGNE ELLER FORKLARE. KAST BARE SENERE HVIS SELVE GJENNOMFØRINGEN ER RISIKABEL.</p>`;
+-    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
++    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. ET TERNINGKAST FLYTTER IKKE AUTOMATISK FREMGANGSSPORET OG FJERNER ALDRI ET MONSTERHJERTE. MARKER FREMGANG ELLER KAMP ETTER DET SOM FAKTISK SKJEDDE I FORTELLINGEN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
+   }
+ 
+-  const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
++  const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,planSearchables,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
+   if(typeof module!=='undefined'&&module.exports)module.exports=api;
+   root.EventyrEncounters=api;
+ })(typeof globalThis!=='undefined'?globalThis:this);
