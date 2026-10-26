@@ -1,7 +1,7 @@
 # MONSTERHULEN - TESTING
 
 ## Verification levels
-Never conflate these states:
+Never conflate:
 - implemented
 - static/source verified
 - automated runtime tests passed
@@ -9,7 +9,7 @@ Never conflate these states:
 - physical device tested
 - editorial/manual narrative quality accepted
 
-A future Narrative Graph can be structurally perfect and still fail the last category.
+A structurally perfect Narrative Graph can still fail editorial quality.
 
 ## Historical V0.12.3 release evidence
 - Lasting thing 67 / 0
@@ -21,83 +21,64 @@ A future Narrative Graph can be structurally perfect and still fail the last cat
 - Rescue 5070 / 0
 - 11 inline JavaScript blocks, 0 syntax errors
 
-These historical counts remain release evidence. The durable combined regression added during UX5A is listed separately below.
+## UX5A evidence before patch 11
+Broad automated/browser verification before the latest explicit-key correction:
+- searchable-room/encounter QA: **2216 / 0**
+- Adventure Code: **405 / 0**
+- UX4 progression: **1797 / 0**
+- combined content regression: **5960 / 0**
+- 11 inline scripts: **0 syntax errors**
+- Chromium broad UX5A smoke: **23 / 0**
+- patch-10 focused Chromium smoke: **15 / 0**
 
-## Active UX5A automated evidence
-Executed against the reconstructed active UX5A runtime before the latest device-findings hotfix:
+Patch 10 fixed puzzle narrator clarity and changed a ready gate to open-before-traverse, but continued review showed that a keyed gate still auto-applied the possessed key.
 
-- `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2216 PASS / 0 FAIL**
-- `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**
-- `tests/QA_PROGRESSION_GATES_UX4.js`: **1797 PASS / 0 FAIL**
-- `tests/QA_CONTENT_REGRESSION.js`: **5960 PASS / 0 FAIL**
-- 11 inline JavaScript blocks: **0 syntax errors**
+## Patch 11 - explicit story-key use
+Runtime patch on `ux5/searchable-rooms-encounter-tracks`:
+`patches/v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
 
-Reconstructed pre-hotfix runtime SHA-256:
-`289e8c4194217b723ee8595635e147647a5853e8bc990f2037716f566b2659ca`
+Required behavior:
+- tapping keyed locked door only establishes `DØREN ER LÅST`,
+- no auto key use, unlock, traversal or key removal,
+- scenario key remains protected but has explicit `BRUK`,
+- `BRUK` only opens an adjacent matching keyed story door,
+- successful key use removes/archives key with explicit fiction,
+- key use opens but does not traverse,
+- narrator may optionally hint `KANSKJE DU HAR NOE I SEKKEN?` without naming a closed solution.
 
-### UX5A search/encounter QA covers
-- generic investigation state without pre-spoiling hidden-find rooms,
-- deterministic optional hidden finds,
-- 1/2/3 target finds for KORT/VANLIG/STORT where eligible,
-- optional finds avoid story-critical rooms,
-- search state persistence,
-- first-low clue + repeated-low fail-forward,
-- full inventory preserves revealed find,
-- 3/4-heart monsters,
-- 3/4-step encounter progress,
-- legacy active combat not healed,
-- physical die registration cannot mutate hearts/progress,
-- explicit progress/combat/direct-solution resolution,
-- save schema remains 12.
+Automated evidence against fresh patch-11 reconstruction:
+- targeted device QA: **27 PASS / 0 FAIL**
+- searchable-room/encounter QA: **2216 PASS / 0 FAIL**
+- Adventure Code: **405 PASS / 0 FAIL**
+- UX4 progression: **1797 PASS / 0 FAIL**
+- combined content regression: **5960 PASS / 0 FAIL**
+- 11 inline scripts: **0 syntax errors**
 
-### Durable combined content regression
-`tests/QA_CONTENT_REGRESSION.js` verifies:
-- character trait/start-item build matrix,
-- all 36 puzzle templates at all three age bands,
-- 20 monster families / two variants each,
-- NPC/friend/trap/mystery/treasure content bank integrity,
-- generated encounter validation across tones and beats,
-- reward offers across histories/scenario contexts,
-- entity resolver integrity,
-- all four Adventure Blueprints across lengths and puzzle age bands,
-- generator/scenario/world/encounter/climax validators,
-- companion placement.
+Fresh behavioral reconstruction SHA-256:
+`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
 
-## Chromium browser evidence before latest device hotfix
-Real headless Chromium smoke against deterministic `CRYSTAL_MACHINE`: **23 PASS / 0 FAIL**.
+This hash is not a byte-identical release-baseline claim. Repository-health/provenance remains open.
 
-Covers actual controls for room investigation, hidden-find clue/reveal, full backpack, exact physical die input with state separation, progress resolution, smart solution, 4-heart SPENNING combat, zero-heart resolution and 3-heart normal monster rendering.
+### Browser status after patch 11
+The old patch-10 focused Chromium result **15 / 0** does not certify the new key interaction because its expectation is intentionally superseded.
 
-## Device-findings hotfix evidence
-Live physical playtest found:
-1. ready story gate unlocked + traversed in one tap and quest key appeared unused,
-2. embedded puzzle could be logically valid but fictionally unclear for a novice narrator.
+Fresh patch-11 browser interaction QA remains **pending**. In the current execution environment, local Chromium could not load the local test runtime and ended at `chrome-error://chromewebdata/`; this is a harness limitation, not evidence of an application failure.
 
-Hotfix automated evidence:
-- targeted Node regression: **19 PASS / 0 FAIL**
-- targeted real Chromium smoke: **15 PASS / 0 FAIL**
-
-Verified in Chromium:
-- first ready-gate tap opens without movement,
-- used scenario key leaves inventory with explicit fiction log,
-- second tap traverses,
-- puzzle narrator help renders,
-- puzzle solve advances exactly one progress step.
-
-Physical retest of these interactions is still required.
-
-## Required physical-device gate before UX5A merge
+### Physical device gate before UX5A merge
 Still required on actual iPad/mobile:
-1. verify gate open-first / traverse-second behavior,
-2. verify used quest key state is understandable,
-3. verify embedded puzzle narrator help is immediately understandable,
-4. confirm `SE DEG RUNDT` feels exploratory rather than mandatory,
-5. confirm 3-4 progress steps do not feel like excessive bookkeeping,
-6. verify hidden-find fail-forward and full-backpack flow by touch,
-7. verify 3-heart normal and 4-heart SPENNING combat tap targets,
-8. verify final `+ FREMGANG`, final heart and `LØST MED GOD IDÉ` interaction cost,
-9. if possible, check representative legacy active-combat save,
-10. recheck Adventure Code copy/paste flow.
+1. door tap remains locked even when `GLASSNØKKEL` is owned,
+2. app does not reveal key as answer,
+3. child gets room to propose what to do,
+4. key is protected but exposes explicit `BRUK`,
+5. key use opens/removes key without moving hero,
+6. later tap traverses,
+7. embedded puzzle narrator help is immediately understandable and solve gives exactly one progress,
+8. `SE DEG RUNDT` feels exploratory rather than mandatory,
+9. 3-4 progress steps do not feel like excessive bookkeeping,
+10. hidden-find fail-forward/full-backpack flows work by touch,
+11. combat tap targets and resolution flows are comfortable,
+12. Adventure Code flow still works,
+13. if possible, representative legacy active-combat save remains correct.
 
 Do not merge UX5A or implement Narrative Graph runtime until this gate is green.
 
@@ -105,81 +86,29 @@ Do not merge UX5A or implement Narrative Graph runtime until this gate is green.
 Canonical implementation plan: `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`.
 
 ### Level 1 - schema/static
-Must prove:
-- StoryGraph and StoryNode schema valid,
-- stable storylet IDs,
-- resource edges explicit,
-- knowledge reveal rules explicit,
-- all critical nodes declare setup/signal/action/payoff metadata.
+Must prove StoryGraph/StoryNode schema, stable storylet IDs, explicit resource/knowledge edges and setup/signal/action/payoff metadata.
 
 ### Level 2 - graph validator
-Must reject:
-- cycles in critical dependencies,
-- prerequisite behind its own gate,
-- story-critical dependency on generic UX5A optional find,
-- required hidden node without clue + fail-forward,
-- guardian without authored non-combat affordance,
-- NPC favor whose requirement does not exist/reach,
-- story fact exposed before reveal,
-- critical storylet silently degraded into a bare pickup.
+Must reject cycles, unavailable requirements, optional-find critical dependencies, hidden critical nodes without clue/fail-forward, guardians without non-combat routes, premature knowledge, stale complications and obsolete ambient story text.
+
+The same child-agency principle applies to future graph materialization: knowing the intended solution must not force the UI to apply it automatically. Storylets expose affordances; the child chooses what to try.
 
 ### Level 3 - generated structural QA
-For `CRYSTAL_MACHINE` generate **at least 1000** valid adventures across seeds/lengths where supported.
+Generate at least **1000** valid `CRYSTAL_MACHINE` adventures across supported seeds/lengths. Check reachability, acquisition diversity, dependency validity, gate integrity, determinism, temporal expiry and existing regressions.
 
-Must check:
-- three required crystals all reachable before assembly gate,
-- all secondary dependencies reachable,
-- default acquisition diversity uses three play families,
-- no dependency cycles,
-- no hidden optional-find dependency,
-- gate cannot be bypassed by secrets/shortcuts,
-- Adventure Code reconstructs same critical graph,
-- seeded storylet selection is deterministic,
-- existing UX4/UX5A regression remains green.
-
-**1000/0 does not mean story quality is accepted.**
+**1000/0 does not prove story quality.**
 
 ### Level 4 - real browser interaction QA
-Must exercise actual controls for:
-- quest requirement reveal,
-- knowledge state not leaking before reveal,
-- critical signalled search + fail-forward,
-- NPC favor reveal/dependency/completion,
-- guardian non-combat resolution,
-- acquisition of all three resources,
-- deliberate return/assembly,
-- gate opening only after assembly.
+Exercise requirement reveal, knowledge state, critical search fail-forward, NPC favor, guardian non-combat completion, deliberate assembly, gate ordering and expiry of obsolete complications.
 
 ### Level 5 - manual editorial gate
-Before converting a second blueprint, manually play **10-20 generated CRYSTAL_MACHINE adventures**.
-
-Record:
-- whether the goal is understood from fiction,
-- whether each crystal feels like a small story rather than loot,
-- whether the three branches feel different in play,
-- whether narrator guidance is sufficient without inventing missing causal links,
-- whether free child solutions remain natural,
-- whether return/assembly pays off setup,
-- repeated or absurd combinations.
-
-If manual play still requires frequent narrator repair, structural QA is not enough. Revise Storylet Matrix/storylets or abandon the architecture in favor of more hand-authored full scenarios.
+Manually play **10-20 generated CRYSTAL_MACHINE adventures** and judge goal clarity, causal/temporal coherence, narrator burden, free child solutions, branch variety and payoff.
 
 ### Level 6 - architecture decision gate
-Only after manual evidence choose:
-- accept Narrative Graph V1,
-- revise and repeat,
-- abandon in favor of more hand-authored scenario bank.
-
-Do not port `GLASS_HEART`, `WITCH_CAT` or `ZOMBIE_DELIVERY` before this gate.
+Accept, revise or abandon Narrative Graph V1. Do not port other blueprints before this gate.
 
 ## UX5B testing relationship
-UX5B is deferred until Narrative Graph V1 is accepted. When implemented, UX5B must consume explicit graph/knowledge/resource state instead of inferring critical story relationships from room placement alone.
-
-## Reconstruction / provenance note
-The Library text representation used for reconstructed runtime is behaviorally verified but not byte-identical to the original V0.12.3 manifest hash. This remains repository-health debt.
+UX5B is deferred until Narrative Graph V1 is accepted and should consume explicit graph/knowledge/resource state.
 
 ## Repository verification
-Repository-health remains open. Before the next release checkpoint, the repository must reconstruct the full active source/assets/tests without chat or an external release ZIP.
-
-## V0.12.4 acceptance gate
-Deferred behind current UX/Narrative Graph work. Content expansion must not be used to mask unresolved story architecture.
+Repository-health remains open. Before the next release checkpoint is called locked, the repo must reconstruct full active source/assets/tests without chat or external release ZIP.
