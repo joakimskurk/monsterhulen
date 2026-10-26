@@ -9,7 +9,7 @@
 +.encounterTrack{margin:7px 0;padding:7px;border:2px solid var(--cyan);background:rgba(13,23,48,.62);font-size:10px;line-height:1.35}
 +.encounterTrack b{color:var(--cyan)}.trackPips{font-size:18px;letter-spacing:3px;color:var(--cyan)}
  </style>
-@@ -1078,9 +1078,35 @@
+@@ -1078,9 +1078,44 @@
    function pick(arr,rng){return arr[Math.floor(rng()*arr.length)]}
    function suitable(list,tone){const filtered=list.filter(x=>!x.tones||x.tones.includes(tone));return filtered.length?filtered:list}
    function difficultyFor(room,type){
@@ -25,12 +25,21 @@
 +  }
 +  function eventType(ev){return typeof ev==='string'?ev:ev?.type}
 +  function planSearchables(dungeon,seed){
++    const existing=dungeon.rooms.filter(room=>room.search?.available);
++    if(existing.length){
++      for(const room of existing){
++        const s=room.search;
++        s.searched=!!s.searched;s.attempts=Math.max(0,Number.isInteger(s.attempts)?s.attempts:0);s.revealed=!!s.revealed;s.taken=!!s.taken;
++        s.lastDiceValue=Number.isFinite(s.lastDiceValue)?s.lastDiceValue:null;s.lastDiceBand=s.lastDiceBand||'';
++      }
++      return dungeon;
++    }
 +    const wanted=dungeon.rooms.length<=9?2:dungeon.rooms.length>=17?4:3;
 +    const occupiedItems=new Set();
 +    for(const room of dungeon.rooms)for(const ev of room.events||[])if(eventType(ev)==='SKATT'&&ev?.item)occupiedItems.add(ev.item);
 +    const candidates=dungeon.rooms.filter(room=>
 +      room.id!==dungeon.startRoomId &&
-+      !(room.events||[]).some(ev=>CRITICAL.has(eventType(ev)))
++      !(room.events||[]).some(ev=>CRITICAL.has(eventType(ev))||eventType(ev)==='SKATT')
 +    ).map(room=>({room,score:hashString(`${seed}|SEARCH_ROOM|${room.id}`)})).sort((a,b)=>a.score-b.score);
 +    const chosen=candidates.slice(0,Math.min(wanted,candidates.length));
 +    const used=new Set(occupiedItems);
@@ -46,7 +55,7 @@
    }
    function sourceFor(type){return type==='MONSTER'?MONSTERS:type==='PERSON'?PEOPLE:type==='VENN'?FRIENDS:type==='FELLE'?TRAPS:type==='MYSTISK'?MYSTERIES:type==='SKATT'?TREASURES:null}
    function makeEncounter(type,room,seedHint='',opts={}){
-@@ -1093,8 +1119,9 @@
+@@ -1093,8 +1128,9 @@
      const base={type,generated:true,name:t.name,intro:`${t.intro} ${detail}`,tone:room.tone,beat:room.beat,...(type==='MONSTER'?{family:familyOrEntry.family,entityId:familyOrEntry.entityId,variantId:t.id}:{entityId:familyOrEntry.entityId||null})};
      if(type==='SKATT')return {...base,item:t.name,findRole:t.role||'',findGuide:t.gm,gm:{want:'ET VALGFRITT FUNN.',clue:t.gm,ways:'TA DEN, LA DEN LIGGE ELLER BRUK DEN KREATIVT. DEN ER ALDRI EN OBLIGATORISK NØKKEL.',low:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',mid:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',high:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.'}};
      const difficulty=difficultyFor(room,type);
@@ -56,7 +65,25 @@
 +    return {...base,...(puzzle?{puzzle,puzzleSolved:false}:{}),hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,progress:progressMax===null?null:0,maxProgress:progressMax,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
    }
    function enrichDungeon(dungeon,opts={}){
-@@ -1115,6 +1142,7 @@
+@@ -1102,7 +1138,17 @@
+         const type=typeof ev==='string'?ev:ev?.type;
+         if(!AMBIENT.has(type)||CRITICAL.has(type))return ev;
+-        if(typeof ev==='object'&&ev.generated&&ev.name&&ev.gm){usedNames.add(ev.name);if(ev.type==='MONSTER'&&ev.family)usedMonsterFamilies.add(ev.family);return ev;}
++        if(typeof ev==='object'&&ev.generated&&ev.name&&ev.gm){
++          if(ev.type==='MONSTER'){
++            const target=difficultyFor(room,'MONSTER');
++            if(!Number.isFinite(ev.maxHp)||ev.maxHp<3){
++              const oldMax=Math.max(1,Number.isFinite(ev.maxHp)?ev.maxHp:target),oldHp=Math.max(0,Number.isFinite(ev.hp)?ev.hp:oldMax),damage=Math.max(0,oldMax-oldHp);
++              ev.maxHp=target;ev.hp=Math.max(0,target-damage);
++            }
++          }
++          if(ev.type!=='SKATT'&&!Number.isFinite(ev.maxProgress)){ev.maxProgress=progressFor(room,ev.type);ev.progress=0;}
++          usedNames.add(ev.name);if(ev.type==='MONSTER'&&ev.family)usedMonsterFamilies.add(ev.family);return ev;
++        }
+         let out=null;
+         for(let attempt=0;attempt<40;attempt++){
+           out=makeEncounter(type,room,seed+'|'+idx+'|'+attempt,opts);
+@@ -1115,6 +1161,7 @@
          return out;
        });
      }
@@ -64,7 +91,7 @@
      return dungeon;
    }
    function validateEncounter(ev){
-@@ -1127,6 +1155,8 @@
+@@ -1127,6 +1174,8 @@
      if(!ev.gm)errors.push('MISSING GM');
      else for(const k of ['want','clue','ways','low','mid','high'])if(!ev.gm[k])errors.push('MISSING GM '+k);
      if(ev.type==='MONSTER'&&(!(ev.maxHp>=1)||!(ev.hp>=0)))errors.push('BAD HP');
@@ -73,7 +100,7 @@
      if(ev.type==='MONSTER'&&!ev.family)errors.push('MISSING FAMILY');
      if(ev.type==='MONSTER'&&!ev.variantId)errors.push('MISSING VARIANT ID');
      if(ev.type==='SKATT'&&!ev.item)errors.push('MISSING ITEM');
-@@ -1155,12 +1161,13 @@
+@@ -1155,12 +1175,13 @@
      const skill=heroSkill?` HVIS HELTEN BRUKER ${String(heroSkill).replaceAll('_',' ')} PÅ EN MÅTE SOM PASSER, KAST 2D6 OG BRUK DEN HØYESTE.`:'';
      const gear=heroItem?`<p><b>MED:</b> ${heroItem.name} – ${heroItem.desc} UTSTYRET GIR IKKE EKSTRA TERNING.</p>`:'';
      const matches=matchingItemHints(ev,heroItem,inventory,rewards);
