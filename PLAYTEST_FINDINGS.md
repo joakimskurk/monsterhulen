@@ -1,94 +1,169 @@
 # MONSTERHULEN - PLAYTEST FINDINGS
 
 Updated: 2026-10-26
-Status: active UX/story findings. UX5A physical device retest remains open. Narrative Graph V1 is next only after UX5A is physically green and merged.
+Status: UX5A physical device retest remains open. Narrative Graph V1 is next only after UX5A is physically green and merged.
 
-## 1. Encounters are too ambiguous for the DM
-Observed: consequences/options can look mandatory, child actions may not match generated choices, and novice narrator may not understand what a scene is for.
+## 1. DM ambiguity exposed need for explicit scene semantics
+Successive UX layers established:
+- child actions may not match generated buttons,
+- narrator needs to know what a scene is for,
+- items should not be silently consumed/auto-used,
+- dice are only for genuine uncertainty,
+- scene needs purpose/stakes/resolution/payoff.
 
-Implemented across UX layers: `FRITT KAST`, non-consuming normal item use, beginner narrator guidance, physical D6 faces, and now patch 13 purpose/stakes/resolution/payoff guidance.
+Patch 13/14 address current runtime symptoms; graph-aware narrator remains future work.
 
-## 2. Map navigation is not child-intuitive enough
-Implemented map-primary navigation with tappable adjacent state; arrows remain fallback.
+## 2. Map navigation should follow child instinct
+Map-primary tappable navigation implemented; arrows remain fallback.
 
-## 3. Dice input should look like a physical die
-Implemented six D6 faces; no digital RNG.
+## 3. Physical dice are core interaction
+Six visible D6 faces record real die result; no digital RNG.
 
-## 4. Finale could be reached too early
-UX4 adds hard story progression gates. Later findings show structural gating alone does not prove narrative strength.
+## 4. Structural finale gating is necessary but not sufficient
+UX4 prevents early finale/bypass, but later playtest proved structurally valid dependencies can still be narratively weak.
 
 ## 5. Secret doors need discovery play
-Implemented clues, physical uncertainty when needed, fail-forward and no story-gate bypass.
+Clue/investigation/fail-forward implemented; secrets cannot bypass critical gates.
 
-## 6. Rooms need a reason to be investigated without becoming loot detectors
-UX5A provides generic investigation while keeping hidden finds optional, non-critical and fail-forward.
+## 6. Search should invite exploration without becoming a loot detector
+UX5A room search uses hidden deterministic optional finds/fail-forward/full-backpack preservation. Manual question remains whether search feels voluntary.
 
-## 7. Encounters need durable consequences, not generic duration
-Initial UX5A used generic 3/4-step progress to avoid one-roll victories. Physical play later proved this could become meaningless bookkeeping. Patch 13 supersedes the generic-progress model: non-combat resolution follows authored fiction; progress exists only when explicit meaningful stages are written.
+## 7. Generic encounter duration is not meaningful story
+Patch 13 removed arbitrary non-combat 3/4-box progress. Progress exists only for authored fictional stages.
 
-## 8. Critical prerequisites can be structurally valid but narratively disconnected
-`CRYSTAL_MACHINE` showed three required crystals could be isolated pickups. Decision: Narrative Graph V1 + curated Storylet Matrix.
+## 8. `CRYSTAL_MACHINE` exposed causal disconnect
+Three reachable parts can still be three unrelated pickups. Decision: Narrative Graph + curated Storylet Matrix + deliberate return/assembly.
 
-## 9. Ready story gate felt cosmetic
-Initial key gate could unlock + traverse in one tap. Patch 10 split opening/traversal, then finding 12 exposed remaining auto-solution issue.
+## 9. Ready key gate felt cosmetic
+Auto unlock/traverse made key invisible as player action.
 
-## 10. Random puzzle can be logical but fictionally irrelevant
-`DEN HVISKENDE VEGGEN` + unrelated `STEINTRINNENE` exposed that random puzzle attachment lacked context. Patch 13 now makes ambient puzzle use opt-in; puzzle must have an authored role and does not automatically grant generic progress.
+## 10. Random puzzle can be fictionally irrelevant
+Ambient puzzles now require authored contextual role rather than category match.
 
-## 11. Story complication can arrive after its dramatic purpose is gone
-`SKYGGEHEKSA` could surface after the objective it should hinder was complete. Narrative Graph requires phases/expiry/transform rules.
+## 11. `SKYGGEHEKSA` exposed timing/expiry problem
+A complication may not first appear after its purpose has expired. Narrative Graph needs phases/expiry/new later role.
 
-## 12. Possessing the solution must not make app choose the action
-Patch 11 makes keyed door present the lock first and requires deliberate `BRUK` on the key. General child-agency rule: obstacle/affordance first, child action second.
+## 12. Possessing solution must not choose action
+Patch 11: keyed door remains locked until child deliberately uses key. General principle applies to all action-bearing resources.
 
-## 13. Player-facing rooms had two competing names
-Patch 12 makes room name the single visible location identity while preserving internal zone metadata.
+## 13. One physical room should have one visible identity
+Patch 12: room name is canonical visible location; zone remains internal.
 
-## 14. `ANNEN LØSNING` progress boxes had no fictional meaning
-Observed with `REGNBUENETTET`:
-- four boxes appeared with no authored four-step sequence,
-- Forteller could reasonably think they had to invent four actions,
-- the net did not actually block travel,
-- completing the track changed nothing,
-- therefore solving the scene had no payoff.
+## 14. `REGNBUENETTET` exposed purpose/payoff failure
+Four boxes had no fiction, net did not block anything, completion changed nothing.
 
-This exposed a system flaw: mechanics existed before the scene's function had been authored.
+Patch 13 established purpose/stakes/resolvedWhen/payoff + real obstacle world effect + authored-progress-only.
 
-Patch 13 on runtime branch:
-- every generated non-treasure encounter declares `purpose`, `stakes`, `resolvedWhen`, `payoff`,
-- generic 3/4-box progress is removed,
-- progress exists only for authored `progressStages`,
-- narrator gets `HVA ER GREIA?`, `NÅR ER DET LØST?`, `HVA ENDRES DA?`,
-- traps block onward travel while active and permit retreat,
-- resolving a trap actually frees the route,
-- resolution action labels match scene role,
-- random ambient mystery puzzles are removed unless explicitly authored.
+## 15. `BOKA SOM SKRIVER TILBAKE` exposed authored-vs-improv ambiguity
+Intentional narrator improvisation is valid, but app must explicitly say when no hidden answer exists and bound what may be invented.
 
-`REGNBUENETTET` is reference behavior: party can be blocked/stuck, child invents how to escape/get through, die only if that attempt is uncertain, one sufficient plan may solve it, and resolution makes the onward route usable.
+Patch 14 implements current ambient reference.
 
-This finding must shape Narrative Graph V1. A graph/storylet node that has valid prerequisites but no meaningful purpose/payoff is still narratively invalid.
+## 16. Subject identity should not be locked to one narrative function
+Editorial review showed a stronger variation model:
+- Pannekakezombien may block route, grant item, reveal clue or puzzle-rule,
+- Den bortkomne zombien may support route/help/follow-clue/reward roles,
+- Skjelettdanseren may remain music/social with different payoffs,
+- Boka som skriver tilbake may be open improv, NPC-like, tracked clue, puzzle/gate or item wrapper.
 
-## Verification after finding 14
-Patch-13 runtime evidence:
-- encounter-purpose **4337/0**,
-- single-location **19/0**,
-- device **27/0**,
-- search/encounter **2295/0**,
-- Adventure Code **405/0**,
-- UX4 **1797/0**,
-- content **5809/0**,
-- 11 scripts **0 syntax errors**.
+Decision:
+- stable subject ID separate from Storylet ID,
+- only pre-authored compatible roles,
+- no unrestricted combinatorial role mixing,
+- repetition penalty rather than shallow volume.
 
-Patch-13 runtime SHA-256: `e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
+Candidate sibling subjects such as Den snakkende dukken / Det levende bildet remain ideas, not active-bank additions.
 
-Patch-13 SHA-256: `74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
+## 17. Required resources need provider planning
+`SUMPTROLLET` / `BROTROLLET` review established that requirements cannot rely on lucky random loot.
 
-Fresh browser certification is open. Physical retest is required.
+Initial provider families:
+- thematic `ROOM_FIND`,
+- `MERCHANT_PURCHASE`,
+- `TRADE`,
+- `SOCIAL_BARGAIN`,
+- `NPC_REWARD`,
+- `PUZZLE_REWARD`,
+- `SEARCH_SECRET`,
+- explicitly allowed starting/owned resource.
 
-## Priority now
-1. Physically retest patch-13, especially `REGNBUENETTET` block/retreat/solve/payoff flow.
-2. Judge whether narrator purpose guidance is understandable without prior system knowledge.
-3. Continue remaining UX5A smoke.
-4. Fresh browser QA when harness is usable.
-5. If physical gate is green, merge UX5A, then create real Narrative Graph branch and start WP-NG1.
-6. Do not start UX5B or expand blueprints first.
+Optional resources may be genuinely random when thematic.
+
+Critical resources need at least one reserved/validator-proven reachable route before consumption; nested provider dependencies must also be reachable/non-circular.
+
+Critical progression cannot depend on one mandatory persuasion roll.
+
+## 18. DM needs semantic scene control
+DM must be able to:
+- understand what scene requires and what it changes,
+- see where required resource can be obtained,
+- accept plausible unlisted solution,
+- trigger uncertainty/die only when needed,
+- start optional combat only when authored,
+- apply canonical outcome/world effect,
+- avoid raw state editing.
+
+This creates DM Control Surface direction and NG4 semantic-control requirement.
+
+## 19. Combat should be optional and DM-started
+Skjelettvakten is reference.
+
+Combat is a Storylet capability (`combatAllowed`), not default monster identity. Child may propose; DM explicitly starts. Critical guardians normally keep non-combat route. Child-friendly/non-graphic; surrender/retreat/friendship/etc. are valid outcomes.
+
+## 20. Some story actions need tangible interaction shells/popups
+Reference: gate/machine requiring red/blue/yellow resources.
+
+Desired flow:
+- reveal sockets first,
+- player taps target,
+- popup shows slots,
+- owned resources do not auto-fill,
+- child places explicitly,
+- wrong item not consumed,
+- partial placement persists,
+- full slots resolve or enable authored activation,
+- world effect opens/activates target,
+- later undo restores inventory + target atomically.
+
+This generalizes “possession != action”.
+
+Planned shell families: slot/assembly, locked item-use, NPC favor/dialogue, merchant/trade, puzzle, combat, reward choice, search/inspect.
+
+Player shell must never leak unrevealed/narrator-only information.
+
+## 21. Undo and Shared Session should reuse canonical action transitions
+Future DM-host/player-client sync, reconnect and undo all benefit from stable typed action IDs and one authoritative state transition boundary.
+
+Future only; do not implement before story/world state transitions are stable.
+
+## 22. Open source should inform patterns, not replace architecture now
+Limited survey candidates:
+- boardgame.io - state/log/undo patterns,
+- Colyseus - authoritative sync/reconnect,
+- rot.js - roguelike algorithms,
+- Epoch Mapper - structured dungeon events/quests/interactions.
+
+Decision: adopt nothing now. Current bottleneck is story/state semantics.
+
+## Current runtime verification
+Patch-14 automated evidence remains:
+- explicit-improv **20/0**
+- encounter-purpose **4337/0**
+- authored-mysteries-only **3075/0**
+- single-location **19/0**
+- targeted device **27/0**
+- search/encounter **2328/0**
+- Adventure Code **405/0**
+- UX4 **1797/0**
+- content regression **5830/0**
+- scripts **0 syntax errors**
+
+Fresh browser certification and physical retest remain open.
+
+## Priority / continuation
+1. Finish UX5A physical patch-14 retest.
+2. Fix UX5A defects only until green.
+3. Editorial review may continue as docs; current reviewed range ends after `BROTROLLET`.
+4. Next subject: **DEN LEVENDE RUSTNINGEN**.
+5. Do not expand Adventure Blueprint bank.
+6. When UX5A green: record -> regress -> merge -> verify -> create real Narrative Graph runtime branch -> start NG1.
