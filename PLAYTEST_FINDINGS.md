@@ -111,8 +111,27 @@ Patch 11 `v0.12.3_playtest_explicit_story_key_use_ux5a.patch`:
 
 This generalizes beyond keys: the app should present obstacles and affordances before applying possessed solutions. Child suggestions remain primary even when the authored prerequisite is hard.
 
-## Verification after finding 12
-Patch-11 reconstructed runtime automated evidence:
+## 13. Player-facing rooms had two competing names
+Observed during continued physical review:
+- every room showed both a room name and a zone/area name,
+- e.g. a child could see `ROM: SOPPSTIEN` and `OMRÅDE: SOPPSKOGEN`,
+- this made one physical place feel as if it had two names.
+
+This is a presentation/identity problem, not a generator-data problem.
+
+Patch 12 `v0.12.3_playtest_single_location_name_ux5a.patch`:
+- room name becomes the single visible location identity,
+- the separate `OMRÅDE` badge is removed,
+- public continue/resume summary uses room name only,
+- current narrator heading uses room name rather than zone name,
+- full narrator room list no longer presents zone name as a second location identity,
+- internal `zoneName` metadata remains intact for deterministic generation/tone logic.
+
+Durable rule: one visible place should have one canonical name. Internal biome/zone metadata must not compete with the child's location identity.
+
+## Verification after finding 13
+Patch-12 reconstructed runtime automated evidence:
+- single-location-name QA: **19 / 0**,
 - targeted device QA: **27 / 0**,
 - UX5A search/encounter: **2216 / 0**,
 - Adventure Code: **405 / 0**,
@@ -120,15 +139,19 @@ Patch-11 reconstructed runtime automated evidence:
 - content regression: **5960 / 0**,
 - 11 inline scripts: **0 syntax errors**.
 
-Fresh behavioral reconstruction SHA-256:
-`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
+Patch-12 behavioral reconstruction SHA-256:
+`79bea4f4b608c34ac6189aec6fcadbcd09978814625e94dc74e3654a58d9cd42`
 
-Patch 10 Chromium 15/0 remains historical evidence only; patch 11 needs fresh browser interaction QA. Physical retest remains required.
+Patch 12 patch SHA-256:
+`0cd1e2b43f9e1add7d53bf188ed9688ca0694be4d45b35dda941fb3c18ca7f58`
+
+Fresh Chromium certification is still open. A local headless harness attempt hit a browser/localStorage harness error, so no browser-green claim is made for patch 12. Physical retest remains required.
 
 ## Priority now
-1. Browser-test patch 11 when a usable real-browser harness is available.
-2. Physically retest explicit key flow + puzzle flow + full UX5A device smoke.
-3. If green, record evidence and merge UX5A to `main`.
-4. Create real `narrative/story-graph-v1` from merged `main` and start `WP-NG1`.
-5. Do not start UX5B first.
-6. Do not add more blueprints yet.
+1. Physically retest patch-12 build, especially single location identity, explicit key flow and puzzle flow.
+2. Continue the remaining UX5A device smoke.
+3. Run fresh browser interaction QA when the local Chromium harness is usable.
+4. If physical gate is green, record evidence and merge UX5A to `main`.
+5. Create real `narrative/story-graph-v1` from merged `main` and start `WP-NG1`.
+6. Do not start UX5B first.
+7. Do not add more blueprints yet.
