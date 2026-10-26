@@ -30,6 +30,24 @@ Physical dice report uncertainty about an attempted action. A die result never s
 
 Critical story contract remains **SETUP -> SIGNAL -> ACTION -> PAYOFF**. Narrative Graph V1 will add explicit story beats, resources, prerequisites, player-knowledge state and dramatic timing.
 
+## Future platform capability recorded
+`ROADMAP.md` now includes **MULTISCREEN / SHARED SESSION V1** as a future package, not current implementation work.
+
+Locked direction for that future package:
+- DM always starts the live session and owns the authoritative story/world state,
+- player view can detach to another browser/screen,
+- external player surface supports both touch-client and display-only modes,
+- player iPad/other device can join the DM-hosted session over local Wi-Fi/LAN,
+- client requests actions; DM host validates/applies them and broadcasts state,
+- reconnect restores current state without replay/duplication,
+- narrator-only information never leaks to player view,
+- DM panel gets player-view preview/status,
+- DM gets `ANGRE SISTE HANDLING`/action history based on reversible events or snapshots,
+- undo immediately re-syncs corrected state to every connected player/display surface,
+- save compatibility and stable IDs remain binding.
+
+This future package must not jump ahead of UX5A or Narrative Graph V1. It should be implemented only after story/world-state transitions are explicit/stable enough to sync and reverse safely.
+
 ## Active UX5A patch chain
 Canonical order: `patches/README.md`.
 
@@ -167,7 +185,8 @@ Stay on UX5A while physical testing is open:
 - continue `REGNBUENETTET`, explicit-key, single-location and remaining device smoke,
 - run fresh browser QA when the Chromium harness is usable,
 - record/fix any new UX5A findings on `ux5/searchable-rooms-encounter-tracks`,
-- keep Narrative Graph runtime blocked; prep branch remains documentation-only.
+- keep Narrative Graph runtime blocked; prep branch remains documentation-only,
+- do not start Multiscreen/Shared Session implementation yet.
 
 When user reports UX5A physical GREEN:
 1. record physical evidence,
