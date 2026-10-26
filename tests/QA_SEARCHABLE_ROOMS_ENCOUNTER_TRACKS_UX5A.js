@@ -53,11 +53,14 @@ for(const id of ids){
     }
     const monster=generated(d).find(ev=>ev.type==='MONSTER');
     if(monster){
-      monster.maxHp=2;monster.hp=1;delete monster.maxProgress;delete monster.progress;
+      monster.maxHp=2;monster.hp=1;monster.combatStarted=true;delete monster.maxProgress;delete monster.progress;
       E.enrichDungeon(d,{puzzleLevel:'YNGRE'});
-      ok(monster.maxHp>=3&&monster.maxHp<=4,`${id} ${seed} legacy monster heart scale migrates`);
-      ok(monster.hp===monster.maxHp-1,`${id} ${seed} legacy monster damage is preserved`);
+      ok(monster.maxHp>=3&&monster.maxHp<=4,`${id} ${seed} active legacy monster max hearts migrates`);
+      ok(monster.hp===1,`${id} ${seed} active legacy fight is not healed`);
       ok(monster.maxProgress>=3&&monster.maxProgress<=4&&monster.progress===0,`${id} ${seed} legacy encounter gains progress track`);
+      monster.maxHp=2;monster.hp=2;monster.combatStarted=false;delete monster.maxProgress;delete monster.progress;
+      E.enrichDungeon(d,{puzzleLevel:'YNGRE'});
+      ok(monster.maxHp>=3&&monster.maxHp<=4&&monster.hp===monster.maxHp,`${id} ${seed} untouched legacy monster upgrades full`);
     }
   }
   for(const length of ['KORT','STORT'])for(let seed=1;seed<=8;seed++){
