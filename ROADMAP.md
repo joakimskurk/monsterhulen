@@ -1,7 +1,7 @@
 # MONSTERHULEN - ROADMAP
 
 DATO: 2026-10-26
-STATUS: V0.12.3 BASELINE + UX5A SEARCH / ENCOUNTER-STATE CANDIDATE ON BRANCH
+STATUS: V0.12.3 BASELINE + UX5A AUTOMATED/BROWSER VERIFIED ON BRANCH + PHYSICAL DEVICE GATE PENDING
 
 ## LÅSTE PRINSIPPER
 - Fortellingskvalitet slår kombinasjonsmengde. Få gode eventyr er bedre enn tusen middelmådige.
@@ -36,28 +36,33 @@ STATUS: V0.12.3 BASELINE + UX5A SEARCH / ENCOUNTER-STATE CANDIDATE ON BRANCH
 3. Nybegynner-DM-guide + seks faktiske D6-flater som input.
 4. Adventure Code V1 + kuraterte blueprint-eventyr + separat fortellervisning.
 5. **UX4: hard finale-progresjon + terningbasert oppdagelse av hemmelige dører.** Runtime-verifisert.
-6. **UX5A: romundersøkelse + valgfrie skjulte funn + eksplisitt encounter-state.** Implementert som firepatch-kandidat; full runtime-QA gjenstår.
-7. **UX5B: kartbevisst løsningsgraf i Forteller-visningen.** Blokkert til UX5A er runtime-verifisert.
+6. **UX5A: romundersøkelse + valgfrie skjulte funn + eksplisitt encounter-state.** Automated runtime + Chromium verified; physical iPad/mobile gate remains.
+7. **UX5B: kartbevisst løsningsgraf i Forteller-visningen.** Neste work package etter grønn fysisk UX5A-smoke.
 
 ### UX5A acceptance
-Før UX5A kan markeres ferdig:
+Automatisert/browser-del er nå grønn:
 - alle rom kan undersøkes uten at UI røper hvilke rom som har skjulte funn,
-- KORT/VANLIG/STORT får henholdsvis minst 2/3/4 deterministiske valgfrie funn når nok rom er egnet,
+- KORT/VANLIG/STORT målretter 1/2/3 deterministiske valgfrie funn når nok rom er egnet,
 - funn ligger aldri i start/finale/story-critical/ambient-treasure-rom og kan aldri være story prerequisites,
 - første 1-2 på usikkert hidden-find-søk gir sterkere hint; gjentatt lavt resultat fail-forwarder og kan ikke softlocke funnet,
 - full sekk kan aldri slette et avslørt funn,
-- nye normale monster har 3 hjerter, `SPENNING` 4,
+- normale monster har 3 hjerter, `SPENNING` 4,
 - normale genererte ikke-skatt-encounters har 3 steg fremgang, `SPENNING` 4,
 - registrering av fysisk terning kan ikke automatisk fylle fremgang eller fjerne monsterhjerter/encounter,
 - siste eksplisitte fremgangssteg løser møtet,
 - siste eksplisitte monsterhjerte løser kamp etter at barnet har valgt kamp,
 - en virkelig avgjørende fri løsning kan markeres eksplisitt som `LØST MED GOD IDÉ`,
 - urørte legacy-monstre oppgraderes fullt, mens en allerede-startet legacy-kamp ikke får tilbake hjerter,
-- UX4/Adventure Code og eksisterende innholds-QA forblir grønne,
-- iPad-smoke-test bekrefter at undersøkelse og progress ikke føles som tvungen bookkeeping.
+- UX4/Adventure Code og varig combined content QA er grønne,
+- Chromium-smoke er 23/0.
+
+Før UX5A kan merges og UX5B kan starte:
+- fysisk iPad/mobile-smoke må bekrefte at undersøkelse og progress ikke føles som tvungen bookkeeping,
+- touch/layout må være god nok på målplattform,
+- gjerne verifiser legacy active-combat migration med en representativ gammel save.
 
 ### UX5B scope
-Når UX5A er grønn skal Forteller-visningen bli løsningsbevisst:
+Når device-gaten er grønn skal Forteller-visningen bli løsningsbevisst:
 - vis reelle ikke-voldelige muligheter som faktisk støttes av akkurat dette kartet,
 - vis items/NPC-er/rom/companions som kan hjelpe et senere encounter,
 - skill mellom ressurser helten har og ressurser som finnes et annet sted,
@@ -82,7 +87,11 @@ Gate før flere blueprints:
 - dokumenter konkrete svakheter før flere eventyr legges til.
 
 ## REPOSITORY HEALTH GATE
-Repo-health-reparasjonen er fortsatt åpen parallelt. UX5A kan ikke runtime-sertifiseres eller merges før den kanoniske runtime-baselinen kan rekonstrueres som faktiske filer og patchkjeden kan kjøres mot den.
+Repo-health-reparasjonen er fortsatt åpen parallelt.
+
+UX5A kan nå rekonstrueres og verifiseres behaviorally fra Library-tekst + repoets patchkjede, men den opprinnelige V0.12.3 baseline-hashen er ikke byte-reprodusert fra Library-representasjonen og komplett runtime asset-tree mangler fortsatt som ordinære repo-filer.
+
+Repository-health må lukkes før neste release checkpoint kan kalles låst.
 
 ## ETTER UX / ADVENTURE CODE-GATEN
 1. **V0.12.4: resterende start-/fortellerutstyr + scenario-nøkler - 7**
