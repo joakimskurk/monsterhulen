@@ -2,6 +2,13 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - One visible location identity per room
+Generated rooms may retain internal zone/biome metadata for deterministic generation, tone and authoring, but the player-facing app must not present both the room name and zone name as competing location names.
+
+The canonical visible place identity is the room name. Zone names remain internal metadata unless a future feature has a clearly labeled, non-competing use for them. Public continue/resume text, the room banner and current narrator location should therefore use the room name only.
+
+Rationale: live physical review found that labels such as `ROM: SOPPSTIEN` plus `OMRÅDE: SOPPSKOGEN` made every location appear to have two names, which was unnecessarily confusing.
+
 ## 2026-10-26 - Obstacles present problems before the app applies possessed solutions
 Possessing the authored solution to an obstacle does not mean the app should automatically use it when the obstacle is tapped.
 
