@@ -1,10 +1,11 @@
 --- index.html
 +++ index.html
-@@ -2950,4 +2950,46 @@
-   $$('[data-free-die]').forEach(b=>b.onclick=()=>{const value=Number(b.dataset.dieValue);pulseDieButton(b,()=>{freeDiceValue=value;freeDiceBand=bandForDie(value);renderFreeRoll()})});
-+}
+@@ -3004,2 +3004,54 @@
+ }
 +function roomSearchHtml(r){
 +  const s=r?.search;if(!s?.available)return'';
++  if(!s.searched)return `<div class="searchBox"><strong>UNDERSØK ROMMET</strong><p>SE NÆRMERE PÅ VEGGER, GULV, MØBLER ELLER DET BARNET ER NYSGJERRIG PÅ. APPEN RØPER IKKE OM DET FINNES ET FUNN HER.</p><button class="small" data-room-search-start="1">SE DEG RUNDT</button></div>`;
++  if(!s.item)return `<div class="searchBox"><strong>ROMMET ER UNDERSØKT</strong><p>DERE FINNER INGEN SKJULT TING Å TA MED HER. BESKRIV GJERNE ÉN LITEN DETALJ SOM GJØR ROMMET LEVENDE.</p></div>`;
 +  if(s.taken)return `<div class="searchBox found"><strong>ROMMET ER UNDERSØKT</strong><p>DET DERE FANT HER ER ALLEREDE TATT MED.</p></div>`;
 +  if(s.revealed){
 +    const item=s.item||{},ref=item.entityId?A.entity(item.entityId,{label:item.name,visualKind:'item'}):A.entityForItemName(item.name),visual=ref?A.entityHtml(ref,{interactive:true,label:item.name,caption:item.findGuide||findGuide(item.name)}):'';
@@ -12,13 +13,20 @@
 +  }
 +  const selected=s.lastDiceValue||'';
 +  const dice=[1,2,3,4,5,6].map(v=>dieFaceButton(v,selected,'data-room-search-die="1"')).join('');
-+  const lowHint=s.attempts>0?'<p><b>STERKERE HINT:</b> NOE I ROMMET SER UT SOM DET HAR BLITT FLYTTET ELLER GJEMT. BESKRIV ET KONKRET STED BARNET KAN UNDERSØKE NÆRMERE.</p>':'';
-+  return `<div class="searchBox"><strong>LET I ROMMET</strong><p>HVIS BARNET UNDERSØKER ET STED DER NOE KAN VÆRE GJEMT, KAST FYSISK D6 OG TRYKK SAMME SIDE HER. DETTE ER ALLTID ET VALGFRITT FUNN, ALDRI EN STORY-NØKKEL.</p>${lowHint}<div class="diceChoices">${dice}</div></div>`;
++  const lowHint=s.attempts>0?'<p><b>STERKERE HINT:</b> NOE I ROMMET SER UT SOM DET HAR BLITT FLYTTET ELLER GJEMT. BESKRIV ET KONKRET STED BARNET KAN UNDERSØKE NÆRMERE.</p>':'<p>NOE SER UT SOM DET KAN VÆRE GJEMT HER. HVIS DET ER USIKKERT OM HELTEN FINNER DET, KAST FYSISK D6.</p>';
++  return `<div class="searchBox"><strong>LET ETTER DET GJEMTE</strong>${lowHint}<p class="sub">DETTE ER ALLTID ET VALGFRITT FUNN, ALDRI EN STORY-NØKKEL.</p><div class="diceChoices">${dice}</div></div>`;
++}
++function beginRoomSearch(){
++  const r=currentRoom(),s=r?.search;if(!s?.available||s.searched)return;
++  s.searched=true;
++  if(s.item){addLog(`DERE UNDERSØKTE ${r.name}. NOE KAN VÆRE GJEMT HER.`);toast('NOE KAN VÆRE GJEMT HER ...');}
++  else{addLog(`DERE UNDERSØKTE ${r.name}.`);toast('DERE SER DERE RUNDT');}
++  save();renderRoom();renderScenario();
 +}
 +function registerRoomSearchDice(value){
-+  const r=currentRoom(),s=r?.search;if(!s?.available||s.taken||s.revealed)return;
++  const r=currentRoom(),s=r?.search;if(!s?.available||!s.searched||!s.item||s.taken||s.revealed)return;
 +  const band=bandForDie(value);if(!validDiceBand(band))return;
-+  s.searched=true;s.attempts=Math.max(0,s.attempts||0)+1;s.lastDiceValue=Number(value);s.lastDiceBand=band;
++  s.attempts=Math.max(0,s.attempts||0)+1;s.lastDiceValue=Number(value);s.lastDiceBand=band;
 +  if(band!=='low'||s.attempts>=2){
 +    s.revealed=true;
 +    addLog(`NOE BLE FUNNET VED Å LETE I ${r.name}: ${s.item?.name||'ET FUNN'}.`);
@@ -37,26 +45,22 @@
 +  addLog(`TOK MED ${item} FRA ${r.name}.`);save();render();toast('FUNNET ER I SEKKEN');
 +}
 +function bindRoomSearch(){
++  $$('[data-room-search-start]').forEach(b=>b.onclick=()=>beginRoomSearch());
 +  $$('[data-room-search-die]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerRoomSearchDice(v))});
 +  $$('[data-search-take]').forEach(b=>b.onclick=()=>takeRoomSearchFind());
 +}
 +function encounterProgressHtml(o){
 +  if(!Number.isFinite(o?.progress)||!Number.isFinite(o?.maxProgress))return'';
 +  const max=Math.max(1,o.maxProgress),n=Math.max(0,Math.min(max,o.progress));
-+  return `<div class="encounterTrack"><b>ANNEN LØSNING · ${n}/${max}</b><div class="trackPips">${'◆'.repeat(n)}${'◇'.repeat(max-n)}</div><span>${n>=max?'SITUASJONEN ER KLAR TIL Å AVSLUTTES. FORTELL HVA SOM SKJER.':'MARKER FREMGANG NÅR BARNETS PLAN FAKTISK ENDRER SITUASJONEN.'}</span></div>`;
- }
++  return `<div class="encounterTrack"><b>ANNEN LØSNING · ${n}/${max}</b><div class="trackPips">${'◆'.repeat(n)}${'◇'.repeat(max-n)}</div><span>MARKER FREMGANG NÅR BARNETS PLAN FAKTISK ENDRER SITUASJONEN.</span></div>`;
++}
  function registerEncounterDice(index,value){
-   const band=bandForDie(value);if(!validDiceBand(band))return;
-@@ -3009,10 +3051,11 @@
-   if(o.type==='SKATT')return `<div class="helpBox">${eventEntityHeader(o,o.name,o.intro,o.name)}<p><b>HVA VIL DU GJØRE?</b></p><div class="row"><button class="small primary" data-eaction="TA_SKATT" data-eindex="${i}">TA DEN</button></div></div>`;
-   const combat=o.type==='MONSTER'&&(o.combatStarted===true||(Number.isFinite(o.hp)&&Number.isFinite(o.maxHp)&&o.hp<o.maxHp));
+@@ -3066,2 +3118,3 @@
    const hp=combat?`<div style="margin:6px 0;color:var(--pink)">${hearts(o.hp||0,o.maxHp||1)} <span class="sub">KAMP</span></div>`:'';
 +  const progress=encounterProgressHtml(o);
    const returning=o.returning?'<div class="returningTag">KJENT VENN FRA HELTEBOKA</div>':'';
-   const combatButton=o.type==='MONSTER'?(combat?`<button class="small" data-ehit="${i}">− HJERTE</button>`:`<button class="small" data-ecombat="${i}">BARNET VELGER KAMP</button>`):'';
-   const puzzlePending=!!(o.puzzle&&!o.puzzleSolved);
-   const puzzle=o.puzzle?`<div class="puzzleBox${o.puzzleSolved?' solved':''}"><div class="puzzleMeta">${o.puzzle.categoryLabel} · ${o.puzzle.levelLabel} ÅR</div><strong>${o.puzzle.title}</strong>${puzzlePending?`<p>${o.puzzle.scene} ${o.puzzle.prompt}</p><p><b>HVA TROR DU?</b></p><button class="small" data-epuzzle="${i}">SVARET ER FUNNET</button>`:'<p>DERE HAR FUNNET EN LØSNING. BESTEM HVA HELTEN GJØR MED DEN.</p>'}</div>`:'';
+@@ -3071,3 +3124,3 @@
    const dice=physicalDiceHtml(puzzlePending?{...o.gm,roll:false}:o.gm,o.diceBand||'',`data-edice="${i}"`,o.diceValue||'');
 -  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px">${combatButton}<button class="small primary" data-eresolve="${i}">MØTET ER FERDIG</button></div></div>`;
-+  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${progress}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px"><button class="small" data-eprogress="${i}">+ FREMGANG</button>${combatButton}<button class="small primary" data-eresolve="${i}">MØTET ER FERDIG</button></div></div>`;
++  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${progress}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px"><button class="small" data-eprogress="${i}">+ FREMGANG</button>${combatButton}<button class="small primary" data-eresolve="${i}">LØST MED GOD IDÉ</button></div></div>`;
  }
