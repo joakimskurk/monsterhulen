@@ -3,7 +3,7 @@
 Updated: 2026-10-26
 Current baseline: **V0.12.3 Lasting Thing Identity Pass**
 Active runtime branch: **`ux5/searchable-rooms-encounter-tracks`**
-Current runtime work item: **UX5A patch 13 encounter-purpose follow-up + physical iPad/mobile retest before merge**
+Current runtime work item: **UX5A patch 14 explicit narrator-improvisation follow-up + physical iPad/mobile retest before merge**
 Next architecture work after green device gate: **Narrative Graph V1 + curated Storylet Matrix, starting only with `CRYSTAL_MACHINE`**
 Prep branch: `narrative/story-graph-v1-prep`
 
@@ -22,6 +22,8 @@ An encounter must have a **fictional purpose contract** before it earns mechanic
 
 A progress track is allowed only when the encounter has authored `progressStages`. Empty 3/4-box tracks may not be used as generic duration. The narrator must never be asked to invent filler actions merely to fill UI boxes.
 
+**Improvisation is allowed and desirable when it is explicit.** If an ambient scene deliberately leaves a detail for Forteller to invent, narrator mode must say there is no hidden app answer or larger predetermined plan, say what to improvise, and give guardrails. Optional improvisation may add atmosphere, a side discovery or a non-critical hint. It may not silently create a new mandatory story prerequisite or contradict known app state.
+
 Physical dice report uncertainty about an attempted action. A die result never substitutes for an unmet story prerequisite, automatically resolves a whole encounter or automatically removes a monster heart.
 
 Critical story contract remains **SETUP -> SIGNAL -> ACTION -> PAYOFF**. Narrative Graph V1 will add explicit story beats, resources, prerequisites, player-knowledge state and dramatic timing.
@@ -34,7 +36,8 @@ Latest layers:
 - patch 10: first device findings,
 - patch 11: explicit story-key use,
 - patch 12: single visible location identity,
-- patch 13: `v0.12.3_playtest_encounter_purpose_contract_ux5a.patch`.
+- patch 13: `v0.12.3_playtest_encounter_purpose_contract_ux5a.patch`,
+- patch 14: `v0.12.3_playtest_explicit_improv_guidance_ux5a.patch`.
 
 ### Patch 11 - explicit key use
 - keyed door tap only establishes `DØREN ER LÅST`,
@@ -49,55 +52,61 @@ Latest layers:
 - internal zone metadata remains intact.
 
 ### Patch 13 - encounter purpose contract
-Physical review of `REGNBUENETTET` exposed that the generic `ANNEN LØSNING` 3/4-box track had no authored meaning. The DM could reasonably interpret it as “invent four things”, and resolving the track changed nothing in the world.
+Physical review of `REGNBUENETTET` exposed that the generic `ANNEN LØSNING` 3/4-box track had no authored meaning. Patch 13 removes generic ambient progress, renders progress only for authored `progressStages`, adds purpose/stakes/solve/payoff guidance, makes traps real forward obstacles with safe retreat, restores forward travel on resolution, and stops random ambient puzzles from being attached to generic `MYSTISK` scenes.
 
-Patch 13 therefore:
-- removes generic ambient 3/4-box progress,
-- renders progress only for encounters with authored `progressStages`,
-- adds purpose/stakes/solve/payoff guidance to narrator mode,
-- makes generated traps real forward obstacles while active,
-- preserves retreat to the room the party came from,
-- restores forward movement when the trap is resolved,
-- gives purpose-specific resolution actions such as `HINDRINGEN ER LØST`,
-- makes ambient `MYSTISK` puzzles opt-in instead of automatically attaching a random puzzle,
-- makes solving a puzzle a clue-state action rather than an automatic generic `+1 FREMGANG`.
+`REGNBUENETTET` is the reference example: it blocks the route onward, does not prevent retreat, one credible plan may solve it, and resolution explicitly frees the route.
 
-`REGNBUENETTET` is now the reference example: it blocks the route onward, does not prevent retreat, one credible plan may solve it, and resolution explicitly frees the route. No four invented sub-actions are required.
+### Patch 14 - explicit narrator improvisation
+Physical review of `BOKA SOM SKRIVER TILBAKE` exposed a different ambiguity: the scene sounded as if the app knew a hidden message, but no message or larger plan existed. The desired fix is not to remove improvisation; Forteller is allowed to invent details, but the app must say when that is the contract.
 
-## UX5A verification after patch 13
-Automated evidence against reconstructed patch-13 runtime:
-- encounter-purpose QA: **4337 PASS / 0 FAIL**,
+Patch 14 therefore:
+- marks open ambient mysteries as intentional narrator-improvisation scenes,
+- carries a per-mystery `improvisePrompt`,
+- shows narrator-only `FORTELLER-IMPROVISASJON`,
+- explicitly says `INGEN SKJULT FASIT` and that no larger predetermined plan exists for that detail,
+- tells Forteller what kind of detail may be invented,
+- allows ties to already established adventure content,
+- forbids improvised details from becoming new mandatory story keys or contradicting known state,
+- leaves player-facing mystery fiction intact rather than exposing meta implementation detail to the child.
+
+`BOKA SOM SKRIVER TILBAKE` is the reference case: Forteller invents what the repeated three words become, with no hidden app answer.
+
+## UX5A verification after patch 14
+Automated evidence against the reconstructed patch-14 runtime:
+- explicit-improvisation QA: **20 PASS / 0 FAIL**,
+- encounter-purpose QA: **4337 / 0**,
+- authored-mysteries-only QA: **3075 / 0**,
 - single-location QA: **19 / 0**,
 - targeted device QA: **27 / 0**,
-- searchable-room/encounter QA: **2295 / 0**,
+- searchable-room/encounter QA: **2328 / 0**,
 - Adventure Code: **405 / 0**,
 - UX4 progression: **1797 / 0**,
-- combined content regression: **5809 / 0**,
+- combined content regression: **5830 / 0**,
 - 11 inline scripts: **0 syntax errors**.
 
-Patch-13 behavioral reconstruction SHA-256:
-`e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
+Patch-14 behavioral reconstruction SHA-256:
+`7e9f9ba1d80aed2fe55865dbca860e2754d706b7cd89266dd2007d25fd4e0737`
 
-Patch-13 SHA-256:
-`74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
+Patch-14 SHA-256:
+`123daf1a12fc4f6a38d5d3dc401b7403c21005263c32811e0c0eeac24877fd2c`
 
-The content-regression pass count is lower than patch 12 intentionally because random ambient mystery puzzles were removed; fewer generated-puzzle assertions execute. These hashes are behavioral reconstruction artifacts, not byte-identical release-baseline claims.
+These hashes are behavioral reconstruction artifacts, not byte-identical release-baseline claims.
 
 Browser distinction:
 - broad pre-patch-11 Chromium: **23 / 0**,
 - patch-10 focused Chromium: **15 / 0**,
 - these are historical only,
 - fresh current-browser QA remains pending because the local harness hit a browser/localStorage failure before interaction QA,
-- patch 13 is **not browser-certified yet**.
+- patch 14 is **not browser-certified yet**.
 
 ## Physical UX5A gate now
 At minimum verify on target device:
-1. `REGNBUENETTET` has no generic four-box `ANNEN LØSNING` track,
-2. narrator can immediately understand `HVA ER GREIA?`, `NÅR ER DET LØST?` and `HVA ENDRES DA?`,
-3. an active net/trap blocks travel onward but allows retreat,
-4. child proposes a solution; one genuinely sufficient plan may solve it,
-5. after `HINDRINGEN ER LØST`, the trap disappears and route onward is actually available,
-6. newly generated ambient `MYSTISK` scenes do not receive unrelated random puzzles,
+1. `BOKA SOM SKRIVER TILBAKE` narrator view makes it immediately clear that Forteller invents the missing message and there is no hidden larger plan,
+2. the improv prompt is useful without becoming a closed answer,
+3. improvised details feel optional and do not appear to create mandatory story state,
+4. `REGNBUENETTET` has no generic four-box track and its obstacle/payoff behavior remains clear,
+5. active trap blocks onward travel but allows retreat; resolution frees the route,
+6. ambient `MYSTISK` scenes do not receive unrelated random puzzles,
 7. each room has one clear visible location name,
 8. `GLASS_HEART` explicit-key flow remains natural,
 9. search/full-backpack/combat/device ergonomics remain green.
@@ -105,9 +114,9 @@ At minimum verify on target device:
 Do not merge UX5A until this physical gate is green.
 
 ## Narrative architecture finding
-`CRYSTAL_MACHINE` exposed causal weakness in critical content; `SKYGGEHEKSA` exposed temporal invalidity; `REGNBUENETTET` exposed the same principle at encounter scale: a scene can be structurally present and mechanically interactive while still having no meaningful role or payoff.
+`CRYSTAL_MACHINE` exposed causal weakness in critical content; `SKYGGEHEKSA` exposed temporal invalidity; `REGNBUENETTET` exposed missing encounter purpose/payoff; `BOKA SOM SKRIVER TILBAKE` exposed the need to distinguish deliberately open narrator improvisation from missing authored logic.
 
-Narrative Graph V1 therefore requires not only dependencies and phases but explicit purpose/stakes/resolution/payoff semantics for storylets and encounter-like nodes. Mechanics must follow authored fictional state, not create arbitrary work for the narrator.
+Narrative Graph V1 therefore requires explicit purpose/stakes/resolution/payoff semantics and an explicit authoring mode for any intentionally improvised detail. Critical causal state, prerequisites and world effects may not depend on an untracked improvised fact.
 
 ## CRYSTAL_MACHINE reference experiment
 Target:
@@ -135,6 +144,8 @@ Repository-health remains open. Complete runtime/source/assets are not yet direc
 - No generic progress count without authored stages.
 - Resolving an obstacle changes the world in a way the player can perceive/use.
 - Ambient puzzles require an authored contextual role; do not attach them randomly.
+- Intentional narrator improvisation is explicitly labeled and scoped.
+- Optional improvisation never creates hidden mandatory story state.
 - No digital die roller.
 - Relevant `EKSTRA GOD PÅ` is the only source of 2D6.
 - Items/friends/pets are affordances, not numeric bonuses.
@@ -147,8 +158,8 @@ Repository-health remains open. Complete runtime/source/assets are not yet direc
 
 ## Exact next action
 Stay on UX5A while physical testing is open:
-- physically retest patch-13 build, especially `REGNBUENETTET` block/retreat/resolve/payoff semantics,
-- continue remaining device smoke,
+- physically retest the patch-14 build, especially narrator clarity for `BOKA SOM SKRIVER TILBAKE`,
+- continue `REGNBUENETTET`, explicit-key, single-location and remaining device smoke,
 - run fresh browser QA when the Chromium harness is usable,
 - record/fix any new UX5A findings on `ux5/searchable-rooms-encounter-tracks`,
 - keep Narrative Graph runtime blocked; prep branch remains documentation-only.
