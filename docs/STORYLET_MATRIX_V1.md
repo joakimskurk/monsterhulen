@@ -5,18 +5,24 @@ Status: **DESIGN LOCK CANDIDATE - prep only**
 ## Purpose
 The Storylet Matrix defines which curated narrative modules may satisfy which story functions. It prevents individually valid content from combining into incoherent critical story.
 
-The matrix is a compatibility and **meaning** contract. It separates:
-- what enables an action from the child actually choosing it,
-- a scene being present from the scene having a meaningful function,
-- a UI counter from authored fictional progress,
-- tracked authored story logic from intentionally open narrator improvisation,
-- the fictional subject/skin from the narrative role it performs in this adventure.
+The matrix separates:
+- subject identity from narrative role,
+- prerequisite availability from child action completion,
+- requirements from the provider routes that can satisfy them,
+- authored state from narrator improvisation,
+- scene presence from meaningful purpose/payoff,
+- optional combat capability from monster identity.
+
+Target model:
+
+`SUBJECT -> ROLE -> REQUIREMENTS + PROVIDERS -> CHILD ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
 
 ## Storylet contract
-Each Storylet must declare at least:
+Each interactive Storylet declares at least:
 
 ```text
 id
+subjectId
 role
 provides[]
 requires[]
@@ -28,211 +34,263 @@ signal
 purpose
 stakes
 narratorGoal
-clue
 approachFamilies[]
 failForward
 completionRule
 resolvedWhen
+outcomes[]
 payoff
 worldEffects[]
 knowledgeReveals[]
 criticalSafe
 ```
 
-`requires[]` enables the beat. `completionRule`/`resolvedWhen` says what explicit fictional/state transition completes it. Satisfying requirements must not silently complete an action-bearing beat.
+Optional fields include:
 
-`payoff` is what narrator/player should experience after completion. `worldEffects[]` is the actual game-state change that makes that payoff true.
+```text
+providerFamilies[]
+resourceRequests[]
+merchantStock[]
+tradeAccepts[]
+socialBargain
+combatAllowed
+progressStages[]
+narratorImprov
+npcRole
+monsterFamilyAllow[]
+monsterFamilyDeny[]
+itemHooks[]
+puzzleTags[]
+toneAllow[]
+zoneAllow[]
+minAgeBand
+maxAgeBand
+consumesResource
+openHint
+strongerHint
+```
 
-Optional:
-- `subjectId`
-- `progressStages[]`
-- `narratorImprov`
-- `npcRole`
-- `monsterFamilyAllow[]`
-- `monsterFamilyDeny[]`
-- `itemHooks[]`
-- `puzzleTags[]`
-- `toneAllow[]`
-- `zoneAllow[]`
-- `minAgeBand`
-- `maxAgeBand`
-- `consumesResource`
-- `openHint`
-- `strongerHint`
+`subjectId` is stable presentation identity. `id` is the Storylet logic/role identity. The same subject may support several compatible authored Storylets.
 
-`subjectId` identifies the recurring fictional subject/presentation independently from `id`, which identifies the actual Storylet role/logic. This allows one curated subject to support several compatible authored roles without making saves or causal state depend on presentation skin.
+`requires[]` makes an action/beat possible. It never silently performs the child action.
 
-`progressStages[]` is allowed only when each stage names a real meaningful fictional change. There is no default “normal = 3 / exciting = 4” storylet duration.
+`outcomes[]` and `worldEffects[]` state what completion actually changes. Critical outcomes are tracked; optional outcomes are still explicit enough for DM to understand.
 
-`narratorImprov`, when present, declares an intentionally open narrator detail. It must state what Forteller is invited to invent, what scope is allowed, and what is forbidden. The narrator view must state that there is no hidden app answer for the open detail. Critical requirements/completion/payoff/world effects may not depend on an untracked improvised fact.
+`progressStages[]` is allowed only for named meaningful fictional state changes; no generic 3/4 duration.
 
-Hints should normally progress from open prompt to affordance-level hint rather than immediately exposing a closed answer.
+`narratorImprov` explicitly declares open narrator-owned detail. Critical requirements/completion/outcomes/world effects cannot depend on untracked improv.
 
-## Initial acquisition families
+## Subject / role compatibility
+Subjects are reusable fictional wrappers, not fixed mechanics.
 
-| Family | What it does | Must require | Must provide | Critical-safe rule |
-| --- | --- | --- | --- | --- |
-| `VISIBLE_FIND` | obvious discovery | authored scene + explicit take/receive action | target resource | only for deliberately simple beats, never three times in one collect quest |
-| `SEARCH_SECRET` | resource hidden but signalled | clue + searchable location + fail-forward | target resource | required search cannot rely on one lucky die roll |
-| `NPC_FAVOR` | NPC controls resource | motive + concrete reachable favor | target resource after explicit acknowledgement | dependency exists/reachable; payoff changes relationship/resource state |
-| `GUARDIAN` | creature controls access | motive + non-combat affordance | resource/access after resolution | combat cannot be only authored route |
-| `PUZZLE_REWARD` | coherent puzzle reveals resource | puzzle causally tied to fiction + narrator hint/answer | target resource | unrelated generic puzzle is rejected |
-| `ENVIRONMENT` | spatial/physical obstacle | concrete room feature | resource/access | must state what is blocked/at stake and what changes after resolution |
-| `TRADE` | exchange | obtainable desired condition/resource | target resource after explicit exchange | no circular requirement |
-| `RESCUE_REWARD` | helping someone yields resource | rescue problem | target resource after explicit payoff | rescue cannot require reward itself |
-| `FOLLOW_CLUE` | clue chain | prior clue + destination | next clue/resource | chain progresses/terminates, never loops |
-
-## Default diversity rule
-For three required parts, choose three distinct acquisition families unless blueprint explicitly overrides. Preferred reference mix:
-- `SEARCH_SECRET`
-- `NPC_FAVOR`
-- `GUARDIAN`
-
-Avoid three bare pickups/guardians/puzzles/searches/fetch quests by default. Goal is variety in play mode, not nouns.
-
-## Compatibility dimensions
-### Subject type
-Examples: `CRYSTAL`, `KEY`, `CLUE`, `LOST_PERSON`, `MAGIC_OBJECT`, `MACHINE_PART`, `RUNE`.
-
-### Narrative role
-Examples: `ACQUIRE`, `REVEAL`, `HELP`, `GUARD`, `DECODE`, `RETURN`.
-
-### Room affordance
-Examples: `DEAD_END_OK`, `NEEDS_ADJACENT_ROOM`, `NEEDS_SEARCHABLE_PROP`, `NEEDS_NPC_SPACE`, `NEEDS_MONSTER_SPACE`, `NEEDS_WATER`, `NEEDS_ALTAR`.
-
-### Tone
-Examples: `LYS`, `MØRK`, `BLANDET`, `RAR`.
-
-## Subject / role separation
-A Storylet subject is a reusable fictional presentation, not a permanently fixed gameplay function.
-
-Reference subject: `BOKA SOM SKRIVER TILBAKE`.
-Compatible authored role examples may include:
-- optional narrator-improvisation mystery,
-- NPC-like conversational encounter with motive/response,
-- tracked clue/reveal source,
-- puzzle carrier whose solved state opens an authored gate,
-- item/reward holder whose payoff explicitly grants the tracked resource.
-
-The same pattern may be used for compatible magical subjects such as `DEN SNAKKENDE DUKKEN`, `DET LEVENDE BILDET`, enchanted mirrors, statues or similar entities. These are not automatically equivalent; each subject declares compatible role families/tags.
+Reference examples:
+- `PANNEKAKEZOMBIEN` may support `BLOCK_PATH`, `ITEM_HOLDER`, `CLUE_SOURCE`, `TRADE` or similar authored roles.
+- `BORTKOMNE_ZOMBIEN` may support help/follow-clue/NPC/payoff roles.
+- `SKJELETTDANSEREN` may support music/social/clue roles.
+- `SKJELETTVAKTEN` may support guardian/gatekeeper roles and optional combat capability.
+- `SUMPTROLLET` may support gatekeeper/favor/trade roles requiring food or other authored resources.
+- `BROTROLLET` may support variable authored desired-object requests.
+- `BOKA_SOM_SKRIVER_TILBAKE` may support open improv, NPC-like dialogue, clue, puzzle/gate or item/reward roles.
 
 Hard rules:
-- generator chooses only a pre-authored compatible subject + Storylet-role pairing,
-- an ambient subject cannot become critical merely because a random role is available,
-- a puzzle/gate/resource role carries explicit payload, completion and world effect,
-- a subject's open-improv version cannot silently satisfy a critical role,
-- role diversity and subject diversity are scored separately,
-- repeat the same recognizable subject sparingly within one adventure/recent play unless repetition itself is authored as meaningful.
+- generator chooses only pre-authored compatible subject + role pairings,
+- ambient presentation cannot accidentally become critical logic,
+- subject/role repetition is scored separately,
+- critical role payload/outcome remains tracked regardless of presentation skin.
 
-This model creates variation through **curated role reuse**, not through unrestricted combinatorial mixing.
+## Resource requirement / provider contract
+A required resource/state and the way it can be obtained are separate graph objects.
 
-## Purpose/world-effect rule
-The `REGNBUENETTET` UX5A finding is a hard authoring lesson: “interesting text + buttons” is not a complete scene.
+Initial provider families:
 
-Every interactive Storylet must answer:
+| Provider family | Meaning | Critical-safe requirement |
+| --- | --- | --- |
+| `ROOM_FIND` | item appears in a thematically suitable room | if critical, placement is reserved/reachable rather than lucky spawn |
+| `MERCHANT_PURCHASE` | seller offers item for authored value | price/value dependency must be reachable or alternate route exists |
+| `TRADE` | exchange a concrete item/category | no circular request; trade item obtainable first |
+| `SOCIAL_BARGAIN` | child negotiates for gift/loan/discount | cannot be sole critical route behind one roll; fail-forward required |
+| `NPC_REWARD` | help/favor yields resource | task dependency reachable; reward explicit |
+| `PUZZLE_REWARD` | authored contextual puzzle yields resource | puzzle causally fits Storylet; hint/fail-forward appropriate |
+| `SEARCH_SECRET` | signalled hidden resource | clue + fail-forward; not one lucky search roll |
+| `STARTING_OR_OWNED_RESOURCE` | already available | only when blueprint explicitly allows it |
+
+### Thematic room finds
+Ordinary food/items may appear seeded or semi-random when room/zone/scene tags make sense. Optional resources may be truly variable.
+
+For a critical requirement, a `ROOM_FIND` may still feel incidental to the player, but generation must reserve at least one valid placement before the consuming gate. “Maybe the randomizer happens to spawn food” is invalid critical design.
+
+### Merchant providers
+Merchant is a Storylet/provider role, not necessarily a separate economy subsystem.
+
+A merchant may accept:
+- concrete coins,
+- treasure/valuable objects,
+- trade goods,
+- a favor,
+- another authored resource.
+
+Prefer concrete fiction-rich value over large generic currency totals until there is a proven need for a numerical economy.
+
+Merchant subjects may simultaneously carry dialogue/clue/favor/recurring-character semantics when explicitly authored.
+
+### Social bargaining
+`socialBargain` defines an optional negotiation affordance.
+
+Flow:
+1. child says what they try/say,
+2. DM decides whether outcome is uncertain,
+3. only then may DM trigger physical D6 / applicable physical 2D6,
+4. result affects the negotiation attempt,
+5. low result fails forward to higher price, small favor, alternative trade, partial benefit or another route.
+
+A critical resource may never be permanently unavailable because one persuasion roll failed.
+
+### Critical provider invariant
+For every critical `requires[]` resource/state:
+1. at least one guaranteed reachable provider route exists before consumption,
+2. provider is not behind the gate the resource must open,
+3. nested provider dependencies are themselves reachable,
+4. no circular chain exists,
+5. success does not depend on one mandatory uncertain roll,
+6. optional secondary providers may add flexibility and replay variation.
+
+Reference:
+
+`SUMPTROLLET requires FOOD`
+-> choose provider plan before map placement
+-> e.g. reserved thematic `ROOM_FIND: HONNINGKJEKS` and optional `MERCHANT_PURCHASE: EPLE`
+-> validate provider reachability
+-> only then materialize troll gate.
+
+`BROTROLLET` may randomize which authored object category it wants, but the selected request fixes `requires[]` and provider constraints before materialization.
+
+## Outcomes
+Initial outcome families include:
+- `UNBLOCK_PATH`
+- `GRANT_OPTIONAL_ITEM`
+- `GRANT_CRITICAL_RESOURCE`
+- `REVEAL_CLUE`
+- `REVEAL_PUZZLE_ANSWER_OR_RULE`
+- `REVEAL_LOCATION`
+- `BECOME_FRIEND`
+- `OPEN_GATE`
+- `SET_RELATIONSHIP_STATE`
+
+Storylets may offer a small authored set of outcomes when fiction supports genuine variation. DM controls choose only between those authored state transitions; they are not debug edits.
+
+## Alternative child solutions / DM resolution
+Authored approaches are possibilities, not answer buttons.
+
+If the child invents a plausible unlisted solution that satisfies `resolvedWhen`, DM may explicitly accept it. The engine then applies the same authored outcome/world effects as the Storylet's normal resolution path.
+
+DM should never need to hand-edit inventory, graph flags or map state to reward legitimate free-form play.
+
+## Optional combat capability
+Combat is a Storylet capability, not a subject category.
+
+- `combatAllowed=true` permits DM to start a combat module when fiction/child choice supports it.
+- A monster/vakt/guardian does not auto-start combat.
+- Child may propose fighting; DM explicitly invokes `START KAMP`.
+- Critical guardians normally include at least one non-combat authored approach.
+- Combat presentation remains child-friendly/non-graphic.
+- Valid resolutions can include surrender, retreat, distraction, friendship, escape or other authored state; no required kill semantics.
+
+## Purpose / world-effect rule
+Every interactive Storylet answers:
 - Why is this here?
-- What does it prevent, threaten, offer or change **now**?
-- What fictional condition means problem/opportunity is resolved?
+- What is constrained/threatened/offered now?
+- What fictional state counts as resolved?
 - What changes after success?
-- Does game state actually implement that change?
+- Does game state implement that change?
 
-For `ENVIRONMENT`, a Storylet claiming to block a path must actually produce a map/world block while unresolved and corresponding release effect on completion. It must also have fail-forward/retreat policy so it cannot softlock.
-
-For `PUZZLE_REWARD`, puzzle must be caused by or meaningfully embedded in Storylet. Selecting arbitrary puzzle because category/type matches is invalid.
+A blocking Storylet must actually block relevant world state and provide safe retreat/fail-forward. A claimed reward must actually be granted/revealed. A puzzle must belong to the Storylet rather than being randomly pasted on.
 
 ## Narrator-improvisation rule
-The `BOKA SOM SKRIVER TILBAKE` UX5A finding establishes that **improvisation itself is not the problem; invisible responsibility is.**
+If a Storylet intentionally leaves detail open:
+- narrator UI says there is no hidden answer for that detail,
+- prompt tells Forteller what may be invented,
+- allowed scope can add atmosphere/optional side discovery/optional hint using already valid facts,
+- forbidden scope includes mandatory resources, graph completion, critical location choice, phase changes or promised world effects unless separately tracked.
 
-A Storylet may intentionally include open details for Forteller. If it does:
-- `narratorImprov` declares that openness,
-- narrator UI says there is no hidden answer/larger predetermined plan for that detail,
-- prompt tells Forteller what can be invented,
-- allowed scope can include atmosphere, cosmetic detail, optional side discovery or optional hint that reuses already-valid facts,
-- forbidden scope includes new mandatory resources, prerequisites, completion state, phase changes and promised world effects unless separately authored/tracked,
-- player-facing fiction remains immersive and need not expose meta implementation language.
-
-For critical Storylets, tracked payload always wins. Example: if the Storylet must reveal `CRYSTAL_BLUE_LOCATION`, that reveal must be authored/tracked; Forteller may improvise the book's wording around that fact, not invent which location is required.
+For critical Storylets, tracked payload wins. Narrator may improvise wording around a known critical clue, not invent the clue's required destination.
 
 ## Hard rejection examples
 Reject before map materialization if:
-- NPC favor asks for item no earlier node provides,
-- trade asks for same resource it rewards,
-- guardian has only combat route,
-- required hidden object has no clue,
-- puzzle lacks thematic/causal relation to Storylet,
-- Storylet requires unsupported room affordance,
-- clue points behind gate it must open,
-- branch depends on optional UX5A hidden find,
-- player must know fact before reveal,
-- action-bearing Storylet lacks explicit completion rule,
-- completion equals “all requirements owned/known” when fiction calls for child action,
-- possessed obvious item is auto-applied,
-- interactive Storylet lacks `purpose`, `stakes`, `resolvedWhen` or `payoff`,
-- promised payoff has no coherent `worldEffects[]`,
-- Storylet has generic progress count with no named `progressStages[]`,
-- progress stage is merely filler/repetition rather than changed fictional state,
+- subject/role pairing is incompatible,
+- interactive Storylet lacks purpose/stakes/resolution/payoff,
+- promised payoff has no world effect,
+- required resource has no provider plan,
+- critical provider is unreachable or appears only after consuming gate,
+- provider dependency forms a cycle,
+- merchant requires currency/item/favor with no reachable source,
+- critical acquisition depends solely on one persuasion roll,
+- required hidden object has no clue/fail-forward,
+- NPC favor asks for unavailable item,
+- guardian has no allowed non-combat route when blueprint requires one,
+- puzzle lacks thematic/causal relation,
+- action-bearing Storylet completes merely because requirements are owned,
+- possessed item is auto-applied,
+- generic progress count exists without meaningful stages,
 - blocking Storylet can softlock without retreat/fail-forward,
-- random puzzle/mechanic is attached without authored contextual role,
-- prose implies a hidden authored answer but payload is absent and no explicit narrator-improv contract exists,
-- critical state depends on a narrator-invented fact that is not represented in graph state,
-- subject/role pairing is not explicitly compatible,
-- the same subject is reused repetitively only to inflate variation count.
-
-## Agency / affordance rule
-Authored approaches are possibilities, not answer buttons.
-
-Examples:
-- owned key + locked door -> key usable; door stays locked until chosen,
-- NPC favor fulfilled -> child still returns/interacts unless remote completion explicitly authored,
-- guardian motive discovered -> new plan becomes possible; no auto-resolve,
-- crystals owned -> `ASSEMBLE` becomes actionable; machine not assembled.
+- prose implies hidden app answer but no payload/improv contract exists,
+- critical state depends on narrator-invented fact,
+- repeated subject exists only to inflate variation count.
 
 ## Matrix scoring
-After hard filtering, score valid Storylets by:
+After hard filtering, score valid choices by:
 1. play-family diversity,
-2. thematic fit,
-3. contrast with adjacent beats,
-4. room/map fit,
-5. age-band fit,
-6. recent role repetition penalty,
-7. recent subject repetition penalty.
+2. provider/acquisition diversity,
+3. thematic fit,
+4. contrast with adjacent beats,
+5. room/map fit,
+6. age-band fit,
+7. recent role repetition penalty,
+8. recent subject repetition penalty.
 
-Do not score invalid combinations into validity.
+Invalid combinations are rejected, never “scored into validity.”
 
-## CRYSTAL_MACHINE reference matrix
+## CRYSTAL_MACHINE reference
 Required resources:
 - `CRYSTAL_RED`
 - `CRYSTAL_BLUE`
 - `CRYSTAL_YELLOW`
 
-Allowed V1 families:
+Initial reference acquisition families remain:
 - `SEARCH_SECRET`
 - `NPC_FAVOR`
 - `GUARDIAN`
-- `PUZZLE_REWARD`
-- `ENVIRONMENT`
 
-Reference acceptance must produce one signalled search, one NPC favor with real dependency and one guardian with non-combat possibility. Exact color assignment may rotate if copy remains coherent.
+All three crystals owned makes `ASSEMBLE` available, not complete. Child deliberately assembles/activates machine, producing tracked `MACHINE_ASSEMBLED` before gate/climax.
 
-All crystals owned enables separate `ASSEMBLE`; it does not auto-complete assembly.
+Each branch must have explicit provider/dependency reachability, purpose, solve condition, payoff and world effect. Bounded narrator-improv may color dialogue but may not determine crystal existence/location/completion.
 
-Each chosen acquisition Storylet must have a distinct comprehensible purpose and observable payoff, not merely a different method label.
+## DM materialization requirements
+NG4/narrator layer must expose enough metadata for a novice DM to understand:
+- `HVA ER GREIA?`
+- `HVA KREVES?`
+- `HVOR KAN DET SKAFFES?`
+- `HVA KAN SKJE?`
+- `NÅR ER DET LØST?`
+- `HVA ENDRES DA?`
 
-Bounded narrator-improv may color dialogue, descriptions or optional side details, but it cannot determine whether a crystal exists, where a required clue points, whether a favor is complete or whether the gate can open.
+It must also provide safe semantic actions for accepted alternative solution, negotiation uncertainty, optional combat and authored outcomes without exposing raw graph/debug state.
 
 ## Storylet authoring quality bar
 A critical Storylet is not accepted because schema validates. It must answer:
 - Why is this thing here?
 - What is at stake now?
-- How can child notice what matters?
-- What does character/creature/world want or do?
+- How does child notice what matters?
+- What does subject want/do?
 - What can child reasonably try?
-- What explicit state transition completes beat?
-- What changes when child succeeds?
-- Does world state actually reflect that change?
-- Can narrator understand scene without inventing missing logic or filler steps?
-- If narrator is invited to invent a detail, is that responsibility explicitly labelled and safely scoped?
-- Is the chosen subject genuinely compatible with this role rather than merely cosmetically interchangeable?
+- If a resource is required, how can it actually be obtained earlier?
+- Are provider routes thematic and non-circular?
+- Does any critical social roll fail forward?
+- What completes the beat?
+- What changes on success?
+- Does world state reflect it?
+- Can narrator understand it without inventing missing logic?
+- Is narrator-owned improv explicitly scoped?
+- Is subject compatible with role?
 - Does UI leave room for an unlisted plausible child solution?
 
-If answers are weak, Storylet remains editorially unapproved even if code is green.
+If answers are weak, Storylet remains editorially unapproved even if structural tests are green.
