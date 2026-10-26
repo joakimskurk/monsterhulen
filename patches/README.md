@@ -38,14 +38,15 @@ out.write_bytes(gzip.decompress(base64.b64decode(p.read_bytes())))
 9. `v0.12.3_playtest_searchable_rooms_encounter_render_ux5a.patch`
 10. `v0.12.3_playtest_device_findings_hotfix_ux5a.patch`
 11. `v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
+12. `v0.12.3_playtest_single_location_name_ux5a.patch`
 
-UX5A is deliberately split into four primary implementation patches so engine/migration, narrator guidance, UI helpers, and render/state handlers have independent failure boundaries. Patch 10 addressed the first physical device findings. Patch 11 is a follow-up interaction correction from continued physical review: a locked key door must present a problem before the app applies the solution.
+UX5A is deliberately split so engine/migration, narrator guidance, UI helpers and render/state handlers have independent failure boundaries. Patch 10 addressed the first device findings. Patch 11 preserves child agency at keyed gates. Patch 12 removes the confusing second visible location identity while preserving internal zone metadata.
 
 ### Historical patch-format note
 
 Some earlier playtest patch files contain abbreviated `@@` separator hunks rather than a completely conventional unified-diff header on every block. Verified reconstruction therefore uses exact text/context application where necessary instead of assuming every historical patch can be fed blindly to GNU `patch`.
 
-Patches 10 and 11 are normal unified diffs against the preceding verified reconstructed layer.
+Patches 10-12 are normal unified diffs against the preceding verified reconstructed layer.
 
 ## UX5A patch hashes
 
@@ -57,6 +58,7 @@ SHA-256 of the plain UX5A patch files:
 - render/state: `fc28ab10cfae898c62e384fa4b32d1d6a19aece98b80bacf239607488674ecfa`
 - device-findings hotfix: `1dd09c98a37234c418b60fd522808b28b23ce86f9054fc7d88b752d9deb55177`
 - explicit story-key use: `276711322f02586f481214011a85a236476d22a524c98c7e96a82c9d1533decf`
+- single visible location identity: `0cd1e2b43f9e1add7d53bf188ed9688ca0694be4d45b35dda941fb3c18ca7f58`
 
 ## UX5A runtime verification
 
@@ -70,16 +72,21 @@ After patch 10, the previously recorded hotfixed reconstructed runtime SHA-256 w
 
 `fc1bf19ba8a95ccc25b7735a7da0cbc2f52187a37f0fdb357f043695377d72ca`
 
-A fresh text reconstruction through patch 11 in the current work session produced SHA-256:
+Fresh text reconstruction through patch 11 produced:
 
 `038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
 
-Do **not** treat that last hash as a byte-identical release baseline. The Library text representation is not byte-proven identical to the original V0.12.3 manifest; it is a behavioral reconstruction artifact.
+Fresh text reconstruction through patch 12 produced:
 
-### Automated verification after patch 11
+`79bea4f4b608c34ac6189aec6fcadbcd09978814625e94dc74e3654a58d9cd42`
 
-Against the reconstructed patch-11 runtime:
+Do **not** treat these reconstruction hashes as byte-identical release baselines. The Library text representation is not byte-proven identical to the original V0.12.3 manifest.
 
+### Automated verification after patch 12
+
+Against the reconstructed patch-12 runtime:
+
+- `tests/QA_SINGLE_LOCATION_NAME_UX5A.js`: **19 PASS / 0 FAIL**
 - `tests/QA_DEVICE_FINDINGS_UX5A.js`: **27 PASS / 0 FAIL**
 - `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2216 PASS / 0 FAIL**
 - `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**
@@ -87,25 +94,23 @@ Against the reconstructed patch-11 runtime:
 - `tests/QA_CONTENT_REGRESSION.js`: **5960 PASS / 0 FAIL**
 - all 11 inline JavaScript blocks: **0 syntax errors**
 
-Patch 11 targeted QA verifies:
-- tapping a keyed locked door does not unlock, traverse or consume the key,
-- the child receives only the locked-door state,
-- the scenario key remains protected but exposes an explicit `BRUK` action,
-- `BRUK` opens only an adjacent matching story-key gate,
-- successful key use removes the key with explicit fiction and does not traverse,
-- the narrator may optionally hint `KANSKJE DU HAR NOE I SEKKEN?` without naming the solution.
+Patch 12 targeted QA verifies that room name is the single visible place identity while internal zone metadata remains available to deterministic generation.
 
 ### Browser evidence
 
-The earlier focused Chromium smoke for patch 10 was **15 PASS / 0 FAIL**, but its key-door expectation is now superseded by patch 11. A new real-browser interaction smoke for the explicit-key flow is therefore still required. Do not count the old 15/0 as browser proof of patch 11.
+Earlier Chromium evidence remains historical regression evidence only:
+- broad pre-patch-11 UX5A: **23 / 0**,
+- patch-10 focused smoke: **15 / 0**.
+
+A fresh local Chromium attempt on the current build hit a browser/localStorage harness error before interaction QA could run. No browser-green claim is made for patches 11-12.
 
 ## Remaining gate
 
 UX5A is **not merged to `main`**. Before merge:
-1. browser-test patch 11 when a real browser harness is available,
-2. physically retest the explicit key-door flow and puzzle narrator flow on iPad/mobile,
-3. continue the rest of the UX5A device smoke,
-4. classify any new findings before merge.
+1. physically retest patch-12 build on iPad/mobile,
+2. verify one clear location name, explicit key use, puzzle narrator flow and remaining device smoke,
+3. run fresh browser interaction QA when the harness is usable,
+4. classify/fix any new findings before merge.
 
 Narrative Graph runtime remains blocked until UX5A is physically green and merged. UX5B remains deferred until Narrative Graph V1 is proven.
 
