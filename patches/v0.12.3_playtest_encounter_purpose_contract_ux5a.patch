@@ -1,0 +1,178 @@
+--- a/index.html
++++ b/index.html
+@@ -1093,10 +1093,18 @@
+     if(type==='FELLE') return room.beat==='SPENNING'?2:1;
+     return 1;
+   }
+-  function progressFor(room,type){
+-    if(type==='SKATT')return null;
+-    if(type==='MONSTER')return difficultyFor(room,type);
+-    return room.beat==='SPENNING'?4:3;
++  function encounterContract(type,entry={}){
++    const payoff=entry.payoff||entry.high||'';
++    if(type==='FELLE')return {purpose:'HINDRING',stakes:'SPERRER VEIEN VIDERE TIL DEN ER HÅNDTERT. DERE KAN TREKKE DERE TILBAKE.',resolvedWhen:'NÅR HELTEN HAR KOMMET FORBI, GJORT FELLEN TRYGG ELLER FUNNET EN ANNEN TROVERDIG LØSNING.',payoff:payoff||'VEIEN VIDERE ER FRI.',blocksForward:true};
++    if(type==='MYSTISK')return {purpose:'VALGFRITT MYSTERIUM',stakes:'KAN UNDERSØKES ELLER FORLATES. DET ER IKKE EN SKJULT STORY-PORT.',resolvedWhen:'NÅR BARNET HAR FUNNET EN TROVERDIG FORKLARING, AVSLØRING ELLER LØSNING.',payoff:payoff||'MYSTERIET GIR EN MENINGSFULL OPPDAGELSE I FORTELLINGEN.',blocksForward:false};
++    if(type==='PERSON')return {purpose:'VALGFRITT MØTE',stakes:'FIGUREN HAR ET LITE PROBLEM ELLER ØNSKE, MEN SPERRER IKKE AUTOMATISK VEIEN.',resolvedWhen:'NÅR SITUASJONEN HAR ENDRET SEG MENINGSFULLT, ELLER DERE VELGER Å GÅ VIDERE.',payoff:payoff||'FIGUREN REAGERER PÅ DET BARNET GJORDE OG KAN DELE ET RÅD ELLER EN RETNING.',blocksForward:false};
++    if(type==='VENN')return {purpose:'VALGFRITT VENNLIG MØTE',stakes:'KAN BLI EN FIN SCENE, MEN ER IKKE EN OBLIGATORISK PORT.',resolvedWhen:'NÅR FIGURENS LILLE SITUASJON ER HJULPET, FORSTÅTT ELLER DERE VELGER Å GÅ VIDERE.',payoff:payoff||'VENNEN REAGERER PÅ HJELPEN OG KAN DELE NOE NYTTIG ELLER MINNEVERDIG.',blocksForward:false};
++    if(type==='MONSTER')return {purpose:'SKAPNINGSMØTE',stakes:'BARNET KAN SNAKKE, LURE, UNNGÅ ELLER VELGE KAMP. KAMP ER IKKE STANDARDLØSNINGEN.',resolvedWhen:'NÅR SKAPNINGEN IKKE LENGER ER ET PROBLEM FOR DET BARNET PRØVER Å GJØRE.',payoff:payoff||'SITUASJONEN ER AVKLART OG EVENTYRET KAN FORTSETTE.',blocksForward:false};
++    return {purpose:'VALGFRITT MØTE',stakes:'KAN ENGASJERES ELLER FORLATES.',resolvedWhen:'NÅR SITUASJONEN ER MENINGSFULLT AVKLART.',payoff:payoff||'SITUASJONEN ER AVKLART.',blocksForward:false};
++  }
++  function authoredProgress(entry={}){
++    const stages=Array.isArray(entry.progressStages)?entry.progressStages.filter(Boolean):[];
++    return stages.length>=2?stages:null;
+   }
+   function eventType(ev){return typeof ev==='string'?ev:ev?.type}
+   function normalizeSearchState(room){
+@@ -1138,9 +1146,10 @@
+     const base={type,generated:true,name:t.name,intro:`${t.intro} ${detail}`,tone:room.tone,beat:room.beat,...(type==='MONSTER'?{family:familyOrEntry.family,entityId:familyOrEntry.entityId,variantId:t.id}:{entityId:familyOrEntry.entityId||null})};
+     if(type==='SKATT')return {...base,item:t.name,findRole:t.role||'',findGuide:t.gm,gm:{want:'ET VALGFRITT FUNN.',clue:t.gm,ways:'TA DEN, LA DEN LIGGE ELLER BRUK DEN KREATIVT. DEN ER ALDRI EN OBLIGATORISK NØKKEL.',low:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',mid:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.',high:'INGEN TERNING ER NØDVENDIG FOR Å PLUKKE DEN OPP.'}};
+     const difficulty=difficultyFor(room,type);
+-    const progressMax=progressFor(room,type);
+-    const puzzle=type==='MYSTISK'&&PZ?PZ.choose(String(seedHint)+'|'+(familyOrEntry.entityId||t.name),familyOrEntry.puzzleCats||[],opts.puzzleLevel||'YNGRE'):null;
+-    return {...base,...(puzzle?{puzzle,puzzleSolved:false}:{}),hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,progress:progressMax===null?null:0,maxProgress:progressMax,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
++    const stages=authoredProgress(t),contract=encounterContract(type,t);
++    // Ambient mysteries no longer receive a random unrelated puzzle. Puzzles are reserved for authored story/context links.
++    const puzzle=type==='MYSTISK'&&t.useRandomPuzzle===true&&PZ?PZ.choose(String(seedHint)+'|'+(familyOrEntry.entityId||t.name),familyOrEntry.puzzleCats||[],opts.puzzleLevel||'YNGRE'):null;
++    return {...base,...contract,...(puzzle?{puzzle,puzzleSolved:false}:{}),progressStages:stages,progress:stages?0:null,maxProgress:stages?stages.length:null,hp:type==='MONSTER'?difficulty:null,maxHp:type==='MONSTER'?difficulty:null,gm:{want:t.want,clue:t.clue,ways:t.ways,itemHooks:t.itemHooks||null,low:t.low,mid:t.mid,high:t.high}};
+   }
+   function enrichDungeon(dungeon,opts={}){
+     const seed=dungeon.seed||Date.now(),usedNames=new Set(),usedMonsterFamilies=new Set();
+@@ -1156,7 +1165,12 @@
+               ev.maxHp=target;ev.hp=started?Math.min(oldHp,target):target;
+             }
+           }
+-          if(ev.type!=='SKATT'&&!Number.isFinite(ev.maxProgress)){ev.maxProgress=progressFor(room,ev.type);ev.progress=0;}
++          if(ev.type!=='SKATT'){
++            const contract=encounterContract(ev.type,{high:ev.gm?.high,payoff:ev.payoff});
++            if(!ev.purpose)ev.purpose=contract.purpose;if(!ev.stakes)ev.stakes=contract.stakes;if(!ev.resolvedWhen)ev.resolvedWhen=contract.resolvedWhen;if(!ev.payoff)ev.payoff=contract.payoff;
++            if(typeof ev.blocksForward!=='boolean')ev.blocksForward=contract.blocksForward;
++            if(!Array.isArray(ev.progressStages)||ev.progressStages.length<2)ev.progressStages=null;
++          }
+           usedNames.add(ev.name);if(ev.type==='MONSTER'&&ev.family)usedMonsterFamilies.add(ev.family);return ev;
+         }
+         let out=null;
+@@ -1185,7 +1199,11 @@
+     else for(const k of ['want','clue','ways','low','mid','high'])if(!ev.gm[k])errors.push('MISSING GM '+k);
+     if(ev.type==='MONSTER'&&(!(ev.maxHp>=1)||!(ev.hp>=0)))errors.push('BAD HP');
+     if(ev.type==='MONSTER'&&(ev.maxHp<3||ev.maxHp>4))errors.push('BAD MONSTER HEART SCALE');
+-    if(ev.type!=='SKATT'&&(!(ev.maxProgress>=3)||!(ev.progress>=0)))errors.push('BAD PROGRESS TRACK');
++    if(ev.type!=='SKATT'){
++      for(const k of ['purpose','stakes','resolvedWhen','payoff'])if(!ev[k])errors.push('MISSING ENCOUNTER CONTRACT '+k);
++      if(ev.type==='FELLE'&&ev.blocksForward!==true)errors.push('TRAP MUST BLOCK FORWARD');
++      if(Array.isArray(ev.progressStages)&&ev.progressStages.length>=2){if(ev.maxProgress!==ev.progressStages.length||!(ev.progress>=0))errors.push('BAD AUTHORED PROGRESS');}
++    }
+     if(ev.type==='MONSTER'&&!ev.family)errors.push('MISSING FAMILY');
+     if(ev.type==='MONSTER'&&!ev.variantId)errors.push('MISSING VARIANT ID');
+     if(ev.type==='SKATT'&&!ev.item)errors.push('MISSING ITEM');
+@@ -1226,8 +1244,8 @@
+     if(ev.type==='VENN')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>VENNLIG FIGUR.</b> IKKE EN FIENDE. FIGUREN HAR ET LITE PROBLEM ELLER ØNSKE OG KAN BLI EN FIN DEL AV HISTORIEN.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR Å SNAKKE, HILSE ELLER TILBY HJELP. KAST BARE HVIS BARNETS PLAN HAR ET USIKKERT UTFALL. EN ENKEL GOD IDÉ KAN BARE VIRKE.</p></div>`;
+     if(ev.type==='PERSON')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN PERSON MED EGET MÅL.</b> IKKE AUTOMATISK SNILL ELLER SLEM. SPILL PERSONEN SOM NYSGJERRIG, OPPTATT, REDD, STOLT ELLER TRAVEL UT FRA DET DEN VIL.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR VANLIG SAMTALE. KAST BARE NÅR BARNET PRØVER NOE SOM KAN GÅ FLERE INTERESSANTE VEIER.</p></div>`;
+     if(ev.type==='MONSTER')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN SKAPNING ELLER HINDRING, IKKE AUTOMATISK «SLEM».</b> DEN VIL NOE. VIS DET FØR DU TENKER KAMP.</p>${common}<p><b>NÅR KASTER DERE?</b> SNAKK, LURE PLANER OG PASSENDE TING KAN VIRKE UTEN KAMP. KAST NÅR UTFALLET FAKTISK ER USIKKERT.</p></div>`;
+-    if(ev.type==='FELLE')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN FARE I MILJØET.</b> BESKRIV HVA BARNET KAN LEGGE MERKE TIL FØR NOE GÅR GALT.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR Å OPPDAGE NOE ÅPENBART. KAST NÅR BARNET UTFØRER EN RISIKABEL MANØVER ELLER TESTER EN USIKKER PLAN.</p></div>`;
+-    if(ev.type==='MYSTISK')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>ET MYSTERIUM.</b> LA BARNET UNDERSØKE, SPØRRE OG TENKE. DU SKAL IKKE PRESSE FRAM ET KAST FOR SELVE GÅTEN.</p>${common}</div>`;
++    if(ev.type==='FELLE')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>EN KONKRET HINDRING I MILJØET.</b> DEN SPERRER VEIEN VIDERE MENS DEN ER AKTIV, MEN DERE KAN TREKKE DERE TILBAKE. BESKRIV HVA BARNET KAN LEGGE MERKE TIL FØR NOE GÅR GALT.</p>${common}<p><b>NÅR KASTER DERE?</b> IKKE FOR Å OPPDAGE NOE ÅPENBART. KAST NÅR BARNET UTFØRER EN RISIKABEL MANØVER ELLER TESTER EN USIKKER PLAN.</p></div>`;
++    if(ev.type==='MYSTISK')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>ET VALGFRITT MYSTERIUM.</b> LA BARNET UNDERSØKE, SPØRRE OG TENKE. DET SPERRER IKKE VEIEN BARE FORDI DET FINNES HER. DU SKAL IKKE PRESSE FRAM ET KAST FOR SELVE GÅTEN.</p>${common}</div>`;
+     if(ev.type==='SKATT')return `<div class="narratorGuide"><b>HVA ER DETTE?</b><p><b>ET VALGFRITT FUNN.</b> DET KAN TAS, IGNORERES ELLER BRUKES KREATIVT. DET ER IKKE EN SKJULT OBLIGATORISK NØKKEL.</p>${common}</div>`;
+     return '';
+   }
+@@ -1237,14 +1255,16 @@
+     const gear=heroItem?`<p><b>MED:</b> ${heroItem.name} – ${heroItem.desc} UTSTYRET GIR IKKE EKSTRA TERNING.</p>`:'';
+     const matches=matchingItemHints(ev,heroItem,inventory,rewards);
+     const itemHelp=matches.length?`<p><b>TING SOM PASSER NÅ:</b><br>${matches.map(x=>`${x.source}: ${x.label} – ${x.hint}`).join('<br>')}</p><p class="sub">DETTE ER MULIGHETER, IKKE FASIT. EN ANNEN GOD IDÉ SKAL VIRKE LIKE GODT.</p>`:'';
+-    const progress=Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)?`<p><b>ANNEN LØSNING:</b> ${Math.max(0,ev.progress)}/${Math.max(1,ev.maxProgress)} FREMGANG. MARKER ET STEG NÅR BARNETS PLAN FAKTISK FORANDRER SITUASJONEN. NÅR SPORET FYLLES ER MØTET LØST. EN VIRKELIG AVGJØRENDE IDÉ KAN OGSÅ LØSE DET DIREKTE.</p>`:'';
++    const stages=Array.isArray(ev.progressStages)?ev.progressStages:[];
++    const progress=stages.length>=2&&Number.isFinite(ev.progress)?`<p><b>SKREVNE STEG:</b> ${Math.max(0,ev.progress)}/${stages.length}. ${stages.map((x,i)=>`${i<(ev.progress||0)?'✓':'○'} ${x}`).join(' · ')}</p>`:'';
++    const contract=ev.type!=='SKATT'?`<div class="narratorGuide"><b>HVA ER GREIA?</b><p><b>${ev.purpose||'MØTE'}:</b> ${ev.stakes||''}</p><p><b>NÅR ER DET LØST?</b> ${ev.resolvedWhen||''}</p><p><b>HVA ENDRES DA?</b> ${ev.payoff||''}</p>${stages.length?'<p><b>FREMGANGSSPOR:</b> BARE FORDI DETTE MØTET HAR SKREVNE STEG. DU SKAL IKKE FINNE PÅ TOMME FYLLSTEG.</p>':'<p><b>INGEN FREMGANGSRUTER:</b> DETTE MØTET HAR IKKE SKREVNE DELSTEG. ÉN GOD PLAN KAN VÆRE NOK.</p>'}</div>`:'';
+     const monsterRule=ev.type==='MONSTER'?'<p class="sub"><b>MONSTERHJERTER:</b> BARE HVIS BARNET SELV VELGER KAMP. SNAKK, MILJØ, EN GOD IDÉ ELLER EN PASSENDE TING KAN LØSE MØTET UTEN Å TA HJERTER.</p>':'';
+     const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER KASTET:</b><br>${ev.gm[band]}</p>`:'';
+     const puzzle=ev.puzzle;
+     const puzzleBlock=puzzle?`<div class="puzzleNarrator"><b>PUZZLE · ${puzzle.categoryLabel} · ${puzzle.levelLabel} ÅR</b><p><b>LES HØYT:</b> ${puzzle.scene} ${puzzle.prompt}</p><p><b>HINT HVIS BARNET STÅR FAST:</b> ${puzzle.hint}</p><details><summary>FASIT FOR FORTELLER</summary><p>${puzzle.answer}</p></details></div>`:'';
+-    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${progress}${monsterRule}${puzzleBlock}`;
++    const base=`<strong>${ev.name}</strong>${contract}${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${progress}${monsterRule}${puzzleBlock}`;
+     if(puzzle&&!ev.puzzleSolved)return `${base}<p><b>TERNING:</b> IKKE FOR SELVE PUZZLET. LA BARNET TENKE, PRØVE, TEGNE ELLER FORKLARE. KAST BARE SENERE HVIS SELVE GJENNOMFØRINGEN ER RISIKABEL.</p>`;
+-    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. ET TERNINGKAST FLYTTER IKKE AUTOMATISK FREMGANGSSPORET OG FJERNER ALDRI ET MONSTERHJERTE. MARKER FREMGANG ELLER KAMP ETTER DET SOM FAKTISK SKJEDDE I FORTELLINGEN.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
++    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. ET TERNINGKAST AVGJØRER HVA SOM SKJER MED FORSØKET, MEN LØSER IKKE AUTOMATISK HELE MØTET OG FJERNER ALDRI ET MONSTERHJERTE. NÅR FIKSJONEN FAKTISK OPPFYLLER «NÅR ER DET LØST?», MARKERER DU MØTET SOM LØST.</p>${registered}<details><summary>SE MULIGE KONSEKVENSER FØR KAST</summary><p><b>⚀ / ⚁</b> ${ev.gm.low}<br><b>⚂ / ⚃</b> ${ev.gm.mid}<br><b>⚄ / ⚅</b> ${ev.gm.high}</p></details>`;
+   }
+ 
+   const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,planSearchables,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
+@@ -3035,7 +3055,8 @@
+   $$('[data-map-move]').forEach(b=>b.onclick=e=>{e.preventDefault();e.stopPropagation();move(b.dataset.mapMove)});
+ }
+ function renderControls(){
+-  $$('[data-move]').forEach(b=>{const dir=b.dataset.move,c=connectionForDir(state.currentRoomId,dir);b.disabled=!c;if(!c)b.textContent='— '+DIR_LABEL[dir];else if(c.locked&&!c.unlocked)b.textContent='L '+DIR_LABEL[dir];else b.textContent=DIR_ARROW[dir]+' '+DIR_LABEL[dir];});
++  const blocker=blockingForwardEncounter(currentRoom());
++  $$('[data-move]').forEach(b=>{const dir=b.dataset.move,c=connectionForDir(state.currentRoomId,dir);const target=c?roomById(otherRoomId(c,state.currentRoomId)):null;const blockedByEncounter=!!(blocker&&state.previousRoomId&&target&&target.id!==state.previousRoomId);b.disabled=!c||blockedByEncounter;if(!c)b.textContent='— '+DIR_LABEL[dir];else if(blockedByEncounter)b.textContent='× '+DIR_LABEL[dir];else if(c.locked&&!c.unlocked)b.textContent='L '+DIR_LABEL[dir];else b.textContent=DIR_ARROW[dir]+' '+DIR_LABEL[dir];});
+ }
+ const PHYSICAL_DICE_BANDS=Object.freeze({
+   low:Object.freeze({range:'1-2'}),
+@@ -3127,9 +3148,21 @@
+   $$('[data-search-take]').forEach(b=>b.onclick=()=>takeRoomSearchFind());
+ }
+ function encounterProgressHtml(o){
+-  if(!Number.isFinite(o?.progress)||!Number.isFinite(o?.maxProgress))return'';
+-  const max=Math.max(1,o.maxProgress),n=Math.max(0,Math.min(max,o.progress));
+-  return `<div class="encounterTrack"><b>ANNEN LØSNING · ${n}/${max}</b><div class="trackPips">${'◆'.repeat(n)}${'◇'.repeat(max-n)}</div><span>MARKER FREMGANG NÅR BARNETS PLAN FAKTISK ENDRER SITUASJONEN.</span></div>`;
++  const stages=Array.isArray(o?.progressStages)?o.progressStages:[];
++  if(stages.length<2||!Number.isFinite(o?.progress))return'';
++  const max=stages.length,n=Math.max(0,Math.min(max,o.progress));
++  const next=stages[n]||'SITUASJONEN ER LØST';
++  return `<div class="encounterTrack"><b>SKREVNE STEG · ${n}/${max}</b><div class="trackPips">${'◆'.repeat(n)}${'◇'.repeat(max-n)}</div><span>NESTE MENINGSFULLE ENDRING: ${next}</span></div>`;
++}
++function encounterResolveLabel(o){
++  if(o?.type==='FELLE')return'HINDRINGEN ER LØST';
++  if(o?.type==='MYSTISK')return'MYSTERIET ER LØST';
++  if(o?.type==='MONSTER')return'LØST UTEN KAMP';
++  if(o?.type==='PERSON'||o?.type==='VENN')return'MØTET ER FERDIG';
++  return'SITUASJONEN ER LØST';
++}
++function blockingForwardEncounter(r=currentRoom()){
++  return (r?.events||[]).map(normalizeEvent).find(o=>o?.generated&&o.blocksForward===true)||null;
+ }
+ function registerEncounterDice(index,value){
+   const band=bandForDie(value);if(!validDiceBand(band))return;
+@@ -3200,9 +3233,10 @@
+   const returning=o.returning?'<div class="returningTag">KJENT VENN FRA HELTEBOKA</div>':'';
+   const combatButton=o.type==='MONSTER'?(combat?`<button class="small" data-ehit="${i}">− HJERTE</button>`:`<button class="small" data-ecombat="${i}">BARNET VELGER KAMP</button>`):'';
+   const puzzlePending=!!(o.puzzle&&!o.puzzleSolved);
+-  const puzzle=o.puzzle?`<div class="puzzleBox${o.puzzleSolved?' solved':''}"><div class="puzzleMeta">${o.puzzle.categoryLabel} · ${o.puzzle.levelLabel} ÅR</div><strong>${o.puzzle.title}</strong>${puzzlePending?`<p><b>MYSTERIET GIR DERE ET SPOR:</b> ${o.puzzle.scene} ${o.puzzle.prompt}</p><p><b>HVA TROR DU?</b></p><details class="puzzleNarrator"><summary>FORTELLERHJELP</summary><p><b>GJØR SLIK:</b> LES SPØRSMÅLET HØYT OG LA BARNET TENKE UTEN TERNING. NÅR SVARET ELLER EN GOD FORKLARING ER FUNNET, TRYKK «PUZZLET ER LØST». DET GIR 1 FREMGANG I MØTET.</p><p><b>HINT:</b> ${o.puzzle.hint}</p><p><b>FASIT:</b> ${o.puzzle.answer}</p></details><button class="small" data-epuzzle="${i}">PUZZLET ER LØST</button>`:'<p>PUZZLET ER LØST OG HAR GITT FREMGANG. BESTEM HVA HELTEN GJØR VIDERE.</p>'}</div>`:'';
++  const puzzle=o.puzzle?`<div class="puzzleBox${o.puzzleSolved?' solved':''}"><div class="puzzleMeta">${o.puzzle.categoryLabel} · ${o.puzzle.levelLabel} ÅR</div><strong>${o.puzzle.title}</strong>${puzzlePending?`<p><b>MYSTERIET GIR DERE ET SPOR:</b> ${o.puzzle.scene} ${o.puzzle.prompt}</p><p><b>HVA TROR DU?</b></p><details class="puzzleNarrator"><summary>FORTELLERHJELP</summary><p><b>GJØR SLIK:</b> LES SPØRSMÅLET HØYT OG LA BARNET TENKE UTEN TERNING. ET PUZZLE ER ET SPOR, IKKE ET AUTOMATISK FREMGANGSSTEG. HVIS SVARET FAKTISK LØSER MYSTERIET I FIKSJONEN, TRYKK OGSÅ «MYSTERIET ER LØST».</p><p><b>HINT:</b> ${o.puzzle.hint}</p><p><b>FASIT:</b> ${o.puzzle.answer}</p></details><button class="small" data-epuzzle="${i}">PUZZLET ER LØST</button>`:'<p>PUZZLET ER LØST. AVGJØR UT FRA FORTELLINGEN OM DET OGSÅ LØSTE HELE MYSTERIET.</p>'}</div>`:'';
+   const dice=physicalDiceHtml(puzzlePending?{...o.gm,roll:false}:o.gm,o.diceBand||'',`data-edice="${i}"`,o.diceValue||'');
+-  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${progress}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px"><button class="small" data-eprogress="${i}">+ FREMGANG</button>${combatButton}<button class="small primary" data-eresolve="${i}">LØST MED GOD IDÉ</button></div></div>`;
++  const progressButton=Array.isArray(o.progressStages)&&o.progressStages.length>=2?`<button class="small" data-eprogress="${i}">NESTE SKREVNE STEG</button>`:'';
++  return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${progress}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px">${progressButton}${combatButton}<button class="small primary" data-eresolve="${i}">${encounterResolveLabel(o)}</button></div></div>`;
+ }
+ function ensureRewardOffers(){
+   const p=state.scenario;if(!p?.completed||p.rewardClaimed)return p?.rewardOffers||[];
+@@ -3244,7 +3278,7 @@
+   $$('[data-climax]').forEach(b=>b.onclick=()=>advanceClimax(+b.dataset.climax));
+   $$('[data-edice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerEncounterDice(+b.dataset.edice,v))});
+   $$('[data-secret-dice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerSecretDoorDice(+b.dataset.secretDice,v))});
+-  $$('[data-epuzzle]').forEach(b=>b.onclick=()=>{const i=+b.dataset.epuzzle,r=currentRoom();let ev=r?.events?.[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});if(!ev?.puzzle||ev.puzzleSolved)return;ev.puzzleSolved=true;if(Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)){ev.progress=Math.min(ev.maxProgress,Math.max(0,ev.progress||0)+1);if(ev.progress>=ev.maxProgress){const name=ev.name||'MØTET';r.events.splice(i,1);addLog(`${name}: PUZZLET BLE LØST OG MØTET ER FERDIG.`);save();renderRoom();renderMap();renderScenario();toast('PUZZLET LØSTE MØTET');return;}addLog(`${ev.name}: PUZZLET BLE LØST. DET GIR 1 FREMGANG.`);}else addLog(`${ev.name}: PUZZLET BLE LØST.`);save();renderRoom();renderScenario();toast('PUZZLET ER LØST +1 FREMGANG')});
++  $$('[data-epuzzle]').forEach(b=>b.onclick=()=>{const i=+b.dataset.epuzzle,r=currentRoom();let ev=r?.events?.[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});if(!ev?.puzzle||ev.puzzleSolved)return;ev.puzzleSolved=true;addLog(`${ev.name}: PUZZLET BLE LØST. FORTELLINGEN AVGJØR OM HELE MYSTERIET OGSÅ ER LØST.`);save();renderRoom();renderScenario();toast('PUZZLET ER LØST')});
+   $$('[data-cdice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerClimaxDice(+b.dataset.cdice,+b.dataset.cphase,v))});
+   $$('[data-eaction]').forEach(b=>b.onclick=()=>{
+     const i=+b.dataset.eindex,o=normalizeEvent(r.events[i]);
+@@ -3254,9 +3288,9 @@
+     }
+   });
+   $$('[data-ecombat]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ecombat;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter('MONSTER',r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i);ev.combatStarted=true;addLog(`${ev.name||'MONSTERET'}: BARNET VALGTE KAMP.`);save();renderRoom();renderMap();renderScenario()});
+-  $$('[data-eprogress]').forEach(b=>b.onclick=()=>{const i=+b.dataset.eprogress;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});if(!Number.isFinite(ev?.maxProgress))return;ev.progress=Math.min(ev.maxProgress,Math.max(0,ev.progress||0)+1);if(ev.progress>=ev.maxProgress){const name=ev.name||'MØTET';r.events.splice(i,1);addLog(`${name} BLE LØST ETTER FLERE MENINGSFULLE STEG.`);save();renderRoom();renderMap();renderScenario();toast('MØTET ER LØST');return;}save();renderRoom();renderScenario()});
++  $$('[data-eprogress]').forEach(b=>b.onclick=()=>{const i=+b.dataset.eprogress;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});const stages=Array.isArray(ev?.progressStages)?ev.progressStages:[];if(stages.length<2)return;ev.maxProgress=stages.length;ev.progress=Math.min(stages.length,Math.max(0,ev.progress||0)+1);if(ev.progress>=stages.length){const name=ev.name||'MØTET';r.events.splice(i,1);addLog(`${name} BLE LØST ETTER DE SKREVNE STEGENE. ${ev.payoff||''}`);save();renderRoom();renderMap();renderScenario();toast('MØTET ER LØST');return;}save();renderRoom();renderScenario()});
+   $$('[data-ehit]').forEach(b=>b.onclick=()=>{const i=+b.dataset.ehit;let ev=r.events[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter('MONSTER',r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i);if(ev.combatStarted!==true)return;ev.hp=Math.max(0,(ev.hp??ev.maxHp??1)-1);if(ev.hp===0){const name=ev.name||'MONSTERET';r.events.splice(i,1);addLog(`${name} HAR INGEN HJERTER IGJEN. KAMPEN ER FERDIG.`);save();renderRoom();renderMap();renderScenario();toast('KAMPEN ER FERDIG');return;}save();renderRoom();renderMap();renderScenario()});
+-  $$('[data-eresolve]').forEach(b=>b.onclick=()=>{const i=+b.dataset.eresolve,o=normalizeEvent(r.events[i]);if(o.returning&&o.relationId&&state.scenario?.worldLinks?.friend?.id===o.relationId)state.scenario.worldLinks.friend.resolved=true;r.events.splice(i,1);addLog(`${o.returning?'GJENSYNET MED ':''}${o.name||EVENT_LABELS[o.type]||o.type} ER FERDIG I ${r.name}.`);save();renderRoom();renderMap();renderScenario()});
++  $$('[data-eresolve]').forEach(b=>b.onclick=()=>{const i=+b.dataset.eresolve,o=normalizeEvent(r.events[i]);if(o.returning&&o.relationId&&state.scenario?.worldLinks?.friend?.id===o.relationId)state.scenario.worldLinks.friend.resolved=true;r.events.splice(i,1);addLog(`${o.returning?'GJENSYNET MED ':''}${o.name||EVENT_LABELS[o.type]||o.type} ER LØST I ${r.name}. ${o.payoff||''}`);save();renderRoom();renderMap();renderScenario();toast(o.type==='FELLE'?'VEIEN VIDERE ER FRI':'SITUASJONEN ER LØST')});
+ }
+ function addFound(item){if(!state.scenario.found.includes(item))state.scenario.found.push(item)}
+ function addQuestItem(item){if(!state.inventory.includes(item)&&state.inventory.length<6)state.inventory.push(item)}
+@@ -3433,7 +3467,10 @@
+       render();return;
+     }
+   }
+-  const target=roomById(otherRoomId(c,state.currentRoomId));state.currentRoomId=target.id;target.revealed=true;target.visited=true;addLog(`GIKK TIL ${target.name}.`);
++  const target=roomById(otherRoomId(c,state.currentRoomId));
++  const blocker=blockingForwardEncounter(currentRoom());
++  if(blocker&&state.previousRoomId&&target.id!==state.previousRoomId){toast(`${blocker.name} SPERRER VEIEN VIDERE`);if(!blocker.blockNoticeLogged){blocker.blockNoticeLogged=true;addLog(`${blocker.name} SPERRER VEIEN VIDERE FRA ${currentRoom().name}. DERE KAN TREKKE DERE TILBAKE.`);save();}renderRoom();renderScenario();return;}
++  const fromRoomId=state.currentRoomId;state.currentRoomId=target.id;state.previousRoomId=fromRoomId;target.revealed=true;target.visited=true;addLog(`GIKK TIL ${target.name}.`);
+   const s=spec();
+   if(s.type==='RESCUE'&&state.scenario.rescued&&target.id===state.dungeon.startRoomId&&!state.scenario.completed){completeScenario(`${s.target} KOM TRYGT TILBAKE TIL START.`,s.climax?.ending);return;}
+   save();render();
