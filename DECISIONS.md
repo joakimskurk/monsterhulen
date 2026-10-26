@@ -2,6 +2,20 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Intentional narrator improvisation is an explicit authored mode
+Improvisation is allowed and useful, but it must be declared rather than inferred from missing content.
+
+If a scene intentionally leaves a detail open, narrator mode must tell Forteller:
+- there is no hidden app answer or larger predetermined plan for that detail,
+- what kind of thing they are invited to invent,
+- what boundaries protect tracked story logic.
+
+Ambient improvisation may add atmosphere, a side discovery or an optional hint. It may not create a new mandatory prerequisite, contradict known state or silently become critical causal logic.
+
+This rule carries into Narrative Graph V1. Storylets may include bounded narrator-improvisation fields for color/detail, but critical `requires`, `completion`, `payoff` and `worldEffects` must remain authored and tracked. The player-facing fiction does not need meta language; the explicit handoff is for Forteller.
+
+`BOKA SOM SKRIVER TILBAKE` is the UX5A reference: there is intentionally no hidden sentence; Forteller invents it within a safe frame.
+
 ## 2026-10-26 - Encounter mechanics require a fictional purpose contract
 An encounter may not receive mechanics merely because its type supports them. Before a generated non-treasure encounter is usable it must state:
 - `purpose`: what role this scene serves,
