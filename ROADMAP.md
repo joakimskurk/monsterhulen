@@ -1,12 +1,13 @@
 # MONSTERHULEN - ROADMAP
 
 DATO: 2026-10-26
-STATUS: V0.12.3 BASELINE + UX5A PATCH 11 AUTOMATED GREEN + FRESH BROWSER/PHYSICAL RETEST PENDING + NARRATIVE GRAPH V1 PREPARED
+STATUS: V0.12.3 BASELINE + UX5A PATCH 12 AUTOMATED GREEN + FRESH BROWSER/PHYSICAL RETEST PENDING + NARRATIVE GRAPH V1 PREPARED
 
 ## LÅSTE PRINSIPPER
 - Fortellingskvalitet slår kombinasjonsmengde.
 - Barnet foreslår handlinger; appen støtter og presenterer affordances, men velger ikke løsningen automatisk.
 - Å eie riktig nøkkel betyr ikke at et trykk på en låst dør automatisk bruker nøkkelen.
+- Ett fysisk sted har ett synlig kanonisk navn. Zone/biome-metadata kan være intern, men skal ikke konkurrere som et ekstra stedsnavn.
 - Kritiske stories bygges fra kuraterte Adventure Blueprints og etter UX5A fra eksplisitt Narrative Graph + kuraterte Storylets.
 - Hvert kritisk mål må ha `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
 - Sannhet og spillerkunnskap er separate state.
@@ -45,7 +46,7 @@ STATUS: V0.12.3 BASELINE + UX5A PATCH 11 AUTOMATED GREEN + FRESH BROWSER/PHYSICA
 8. **UX5B:** kartbevisst løsningsgraf. Utsatt til Narrative Graph V1 er bevist; skal lese eksplisitt graph, ikke gjette fra løse rom-events.
 
 ## UX5A acceptance og gate
-Broad automatisert/browser evidence før siste key-interaction-endring:
+Historisk broad evidence før de siste device-endringene:
 - searchable-room QA: 2216/0,
 - Adventure Code: 405/0,
 - UX4 progression: 1797/0,
@@ -54,10 +55,11 @@ Broad automatisert/browser evidence før siste key-interaction-endring:
 - Chromium broad smoke: 23/0,
 - patch-10 Chromium focused smoke: 15/0.
 
-Fysiske funn:
-1. ready key gate ble først låst opp + passert i ett trykk,
-2. mystery puzzle kunne være logisk gyldig, men fictionally disconnected/DM-uklar,
-3. selv patch-10 open-first-flow brukte nøkkelen automatisk og tok dermed barnets løsningsvalg.
+Fysiske/UX-funn:
+1. ready key gate kunne unlock + traverse i ett trykk,
+2. mystery puzzle kunne være fictionally disconnected/DM-uklar,
+3. patch-10 brukte fortsatt nøkkelen automatisk og tok dermed barnets løsningsvalg,
+4. romnavn + områdenavn gjorde ett fysisk sted til to konkurrerende identiteter.
 
 Patch 11 korrigerer punkt 3:
 - keyed locked door tap bare viser at døren er låst,
@@ -65,7 +67,14 @@ Patch 11 korrigerer punkt 3:
 - key use åpner uten traversal,
 - Forteller kan gi et åpent backpack-hint ved behov.
 
-Automated after patch 11:
+Patch 12 korrigerer punkt 4:
+- romnavn er eneste synlige location identity,
+- `OMRÅDE`-badge fjernes,
+- continue/resume og current narrator location bruker romnavn,
+- zone metadata beholdes internt for determinisme/tone.
+
+Automated after patch 12:
+- single-location QA: **19/0**,
 - targeted device QA: **27/0**,
 - searchable-room QA: **2216/0**,
 - Adventure Code: **405/0**,
@@ -73,11 +82,12 @@ Automated after patch 11:
 - combined content: **5960/0**,
 - 11 scripts: **0 syntax errors**.
 
-Patch 11 trenger ny browser interaction smoke og fysisk retest. Gamle 15/0 kan ikke brukes som bevis for den nye key-flowen.
+Patch 12 trenger fresh browser interaction smoke og fysisk retest. Historiske browser-resultater kan ikke alene sertifisere den nåværende kandidaten.
 
 Før UX5A kan merges:
-- eksplisitt key flow må føles naturlig fysisk,
-- puzzle hotfix må føles tydelig fysisk,
+- ett tydelig stedsnavn må føles riktig fysisk,
+- eksplisitt key flow må føles naturlig,
+- puzzle hotfix må være tydelig,
 - resten av device smoke må fortsatt være grønn,
 - nye funn må fikses eller eksplisitt klassifiseres.
 
@@ -127,6 +137,7 @@ Repo-health er fortsatt åpen. Behavioral reconstruction fungerer, men original 
 ## EXACT NEXT
 Mens fysisk UX5A-test er åpen:
 - patch kun UX5A-defekter på `ux5/searchable-rooms-encounter-tracks`,
+- fysisk test patch-12-kandidaten,
 - hold Narrative Graph runtime blokkert,
 - ikke start UX5B.
 
