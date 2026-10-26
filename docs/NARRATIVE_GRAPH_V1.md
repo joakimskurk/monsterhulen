@@ -2,60 +2,65 @@
 
 Status: **DESIGN LOCK CANDIDATE - prep only, no runtime implementation yet**
 Branch: `narrative/story-graph-v1-prep`
+Updated: 2026-10-26
+
+## Implementation gate
+Do not implement Narrative Graph runtime until UX5A physical device gate is green and UX5A is merged to `main`.
+
+The active runtime branch remains `ux5/searchable-rooms-encounter-tracks`.
+
+After green UX5A:
+1. merge to `main`,
+2. verify `main`,
+3. create `narrative/story-graph-v1` from merged main,
+4. carry approved prep docs,
+5. start WP-NG1.
 
 ## Why this exists
-Live playtest exposed several versions of the same architecture failure:
-- `CRYSTAL_MACHINE`: three required parts can be structurally reachable yet feel like unrelated pickups,
-- `SKYGGEHEKSA`: an individually valid complication can arrive after its dramatic purpose is gone,
-- keyed door: a valid dependency can be auto-applied instead of preserving the child's choice,
-- `REGNBUENETTET`: a mechanically interactive encounter can have no meaningful obstacle, solve condition or payoff,
-- `BOKA SOM SKRIVER TILBAKE`: intentionally open narrator creativity can look like missing hidden app content when the handoff is not explicit.
+Playtest/editorial review exposed one architecture problem at multiple scales:
+- `CRYSTAL_MACHINE`: reachable parts can still be causally disconnected,
+- `SKYGGEHEKSA`: content can arrive after its dramatic purpose expired,
+- keyed door: owning solution can wrongly auto-perform child action,
+- `REGNBUENETTET`: mechanics can exist without real stakes/payoff,
+- `BOKA SOM SKRIVER TILBAKE`: intentional improvisation can look like missing hidden content,
+- zombie/skjelett/troll review: a memorable subject needs multiple curated roles/outcomes without becoming random soup,
+- `SUMPTROLLET`/`BROTROLLET`: required resources need validated provider routes before the encounter,
+- DM needs semantic scene control rather than reverse-engineering generator intent,
+- some actions need tangible player interaction shells/popups rather than abstract buttons.
 
-Narrative Graph V1 replaces the mental model `scenario -> place required objects/events` with:
+Narrative Graph V1 replaces:
 
-`blueprint -> narrative functions -> compatible storylets -> map placement -> player knowledge -> child action -> world change/payoff`
+`scenario -> place required objects/events`
 
-The map remains procedural. Critical story causality does not. Possessing a resource enables an action; it does not perform the action. A node being mechanically present is not enough; it needs a reason to exist in the fiction. Narrator creativity is allowed, but the boundary between tracked story logic and intentional improvisation must be explicit.
+with:
 
-## Core rule
+`BLUEPRINT -> NARRATIVE FUNCTIONS -> SUBJECT + STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> MAP/KNOWLEDGE -> CHILD ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
+
+Supporting runtime layer:
+
+`INTERACTION SHELL -> VALIDATED ACTION -> STATE TRANSITION`
+
+## Core story rules
 Every story-critical objective must satisfy:
 
 **SETUP -> SIGNAL -> ACTION -> PAYOFF**
 
-Every interactive critical node/storylet must also answer:
-- **PURPOSE** - why this scene exists,
-- **STAKES** - what is affected while unresolved,
-- **RESOLVED WHEN** - what fictional state counts as completion,
-- **PAYOFF / WORLD EFFECT** - what changes after completion.
+Every interactive critical node/storylet must answer:
+- `PURPOSE`
+- `STAKES`
+- `RESOLVED WHEN`
+- `PAYOFF`
+- `WORLD EFFECTS`
 
-No required object, clue, NPC task, guardian, puzzle, obstacle or gate may exist only as an unexplained event marker or arbitrary progress counter.
-
-`ACTION` is real state. `requires[]` becoming true does not imply the child performed the action.
+A prerequisite becoming true does not mean the child acted.
 
 Examples:
-- owns `GLASSNØKKEL` -> key use becomes possible; door does not open,
-- owns all three crystals -> `ASSEMBLE` becomes possible; machine is not assembled,
-- understands guardian motive -> new approaches become possible; guardian does not auto-resolve.
+- owns `GLASSNØKKEL` -> key use possible; door remains locked,
+- owns three crystals -> assembly possible; machine remains unassembled,
+- owns food -> feeding troll possible; troll remains unresolved,
+- knows guardian motive -> new approaches possible; guardian remains unresolved.
 
-Story-critical beats also have valid dramatic time windows. A complication may not first activate after the objective it exists to affect is already resolved unless separately authored with a new later role.
-
-## Core concepts
-
-### StoryGraph
-Directed graph of story-critical beats for one generated adventure.
-
-Minimum fields:
-- `graphVersion`
-- `blueprintId`
-- `nodes[]`
-- `edges[]`
-- `knowledge[]`
-- `resources[]`
-- `gate`
-- `payoff`
-- `phase`
-
-### Dramatic phase
+## Dramatic phases
 Initial phases:
 - `INTRO`
 - `QUEST_ACTIVE`
@@ -63,211 +68,385 @@ Initial phases:
 - `CLIMAX`
 - `AFTERMATH`
 
-A node/storylet may declare:
+Nodes/storylets may declare:
 - `validPhases[]`
 - `activatesAfter[]`
 - `expiresAfter[]`
 
-### StoryNode
-A required or optional narrative beat.
+A complication may not first appear after the objective it exists to affect is complete unless a separately authored later role exists.
 
-Minimum fields:
-- stable `id`
-- `role`
-- `critical`
-- `storyletId`
-- `roomId`
-- `provides[]`
-- `requires[]`
-- `reveals[]`
-- `state`
-- `completion`
-- `purpose`
-- `stakes`
-- `resolvedWhen`
-- `payoff`
-- `worldEffects[]`
-- `validPhases[]`
-- optional `expiresAfter[]`
-- optional `progressStages[]`
-- optional `narratorImprov`
+## StoryGraph
+Directed critical-story graph for one generated adventure.
 
-`completion` is the explicit state transition that completes the node. Action-bearing nodes may not complete merely because requirements became available.
+Conceptual minimum fields:
 
-`progressStages[]` is optional and semantic. It may exist only when author can name actual meaningful intermediate state changes. A generic number such as “3 steps because normal / 4 because exciting” is invalid.
+```text
+graphVersion
+blueprintId
+nodes[]
+edges[]
+knowledge[]
+resources[]
+providerPlans[]
+gate
+payoff
+phase
+```
 
-`narratorImprov`, when present, is a bounded authoring contract for intentionally open details. Minimum conceptual fields:
-- `prompt`: what Forteller is invited to invent,
-- `allowedScope`: e.g. atmosphere, optional hint, side discovery, cosmetic motive/detail,
-- `forbiddenScope`: tracked prerequisites, mandatory resources, completion state, world effects unless separately authored,
-- `hiddenAnswer: false` for truly open details.
+## StoryNode
+Conceptual fields:
 
-The narrator view must expose this handoff. The child-facing fiction need not reveal the meta distinction.
+```text
+id
+role
+critical
+storyletId
+subjectId
+roomId
+provides[]
+requires[]
+providerPlanIds[]
+reveals[]
+state
+completion
+purpose
+stakes
+resolvedWhen
+outcomes[]
+payoff
+worldEffects[]
+validPhases[]
+expiresAfter[]?
+progressStages[]?
+narratorImprov?
+interactionShell?
+combatAllowed?
+```
 
-Initial roles:
-- `SETUP`
-- `QUEST_REVEAL`
-- `ACQUIRE`
+`requires[]` controls actionability, not completion.
+
+`outcomes[]` are authored allowed resolution results. `worldEffects[]` make those outcomes real in canonical state.
+
+`progressStages[]` is optional and may contain only meaningful fictional changes.
+
+`narratorImprov` explicitly declares bounded open detail. Critical state cannot depend on untracked improvisation.
+
+`interactionShell` selects a presentation/action shell for state already defined by the Storylet. It never defines hidden story logic itself.
+
+## Subject vs Storylet role
+`subjectId` is recognizable fictional identity. `storyletId` is logic/role identity.
+
+Examples of subjects:
+- `PANNEKAKEZOMBIEN`
+- `BORTKOMNE_ZOMBIEN`
+- `SKJELETTVAKTEN`
+- `SUMPTROLLET`
+- `BROTROLLET`
+- `BOKA_SOM_SKRIVER_TILBAKE`
+
+Examples of roles:
+- `BLOCK_PATH`
 - `NPC_FAVOR`
+- `TRADE`
 - `GUARDIAN`
-- `SEARCH_SECRET`
-- `PUZZLE_REWARD`
-- `ENVIRONMENT`
+- `CLUE_SOURCE`
+- `PUZZLE_CARRIER`
+- `ITEM_HOLDER`
+- `OPTIONAL_IMPROV`
+- `RESCUE`
 - `FOLLOW_CLUE`
-- `COMPLICATION`
 - `RETURN`
 - `ASSEMBLE`
 - `GATE`
+- `COMPLICATION`
 - `CLIMAX`
-- `AFTERMATH`
 
-### Storylet
-Curated small narrative module that declares compatibility, signals, approaches, completion semantics, timing and world effect.
+Generator selects only explicitly compatible subject/role pairings.
 
-A storylet is not a full adventure. Humans curate storylets; generator combines only compatible ones.
+A subject may have several curated Storylets, but presentation skin can never silently change critical logic.
 
-### Resource
-A thing/state the graph can require/provide, e.g. `CRYSTAL_RED`, `NPC_FAVOR_COMPLETE`, `GUARDIAN_RESOLVED`.
+## Resources and provider plans
+A `Resource` is a tracked item/state such as:
+- `FOOD`,
+- `CRYSTAL_RED`,
+- `TRADE_VALUE_X`,
+- `NPC_FAVOR_COMPLETE`,
+- `GUARDIAN_RESOLVED`.
 
-Resource availability and action completion are separate. Owning `CRYSTAL_RED` can satisfy a requirement for `ASSEMBLE`; it cannot complete `ASSEMBLE`.
+Requirement and acquisition route are separate.
 
-### Knowledge
-Truth and player knowledge are separate. UI/narrator may expose only facts whose reveal condition has happened.
+Initial provider families:
+- `ROOM_FIND`
+- `MERCHANT_PURCHASE`
+- `TRADE`
+- `SOCIAL_BARGAIN`
+- `NPC_REWARD`
+- `PUZZLE_REWARD`
+- `SEARCH_SECRET`
+- `STARTING_OR_OWNED_RESOURCE` when explicitly allowed.
 
-## Encounter/storylet purpose contract
-The UX5A `REGNBUENETTET` finding is an architecture invariant, not a local trap special case.
+### Critical provider invariant
+For every critical required resource/state:
+1. at least one provider route exists before consumption,
+2. provider is reachable without passing the consuming gate,
+3. nested provider requirements are themselves reachable,
+4. provider graph is acyclic,
+5. no single mandatory uncertain roll can permanently remove all routes,
+6. at least one route survives fail-forward outcomes.
 
-For any Storylet/node that creates an interactive scene:
-- `purpose` describes its dramatic/gameplay function,
-- `stakes` describes what is currently constrained, threatened, offered or changed,
-- `resolvedWhen` describes fictional state that qualifies as completion,
-- `payoff` describes narrated result,
-- `worldEffects[]` describes actual state transition used by game world.
+A critical `ROOM_FIND` may look random to the child, but placement is reserved/validated. Optional finds may be genuinely random.
 
-A claimed obstacle must actually constrain relevant world state. A claimed payoff must actually become true in state. A blocking net may prevent onward movement while allowing retreat; resolving it removes that block.
+### Merchant/social bargain
+Merchant is a provider Storylet, not automatically a numerical economy.
 
-A puzzle must have an authored relationship to its Storylet. “This node is MYSTISK, therefore choose any puzzle” is invalid.
+Concrete valuables/trade/favor are preferred over large abstract currency unless later playtest proves otherwise.
 
-Progress tracking is optional. If `progressStages[]` is absent, one sufficiently strong child plan may complete node if it satisfies `resolvedWhen`. If stages exist, each names an authored meaningful fictional transition; narrator is never asked to invent filler steps.
+Social bargain flow:
+- child proposes what to say/do,
+- DM decides whether uncertainty exists,
+- physical die only if uncertain,
+- low result fails forward,
+- critical resource cannot be permanently locked behind one persuasion roll.
 
-## Explicit narrator-improvisation contract
-The UX5A `BOKA SOM SKRIVER TILBAKE` finding establishes a second architecture invariant: **intentional openness is valid, ambiguous authorship responsibility is not.**
+## Knowledge
+Truth and player knowledge are separate.
 
-A Storylet may deliberately leave a detail for Forteller to invent. When it does:
-- this openness is authored and declared, not inferred from missing payload,
-- narrator view states that no hidden app answer/larger predetermined plan exists for the open detail,
-- narrator receives a scene-specific prompt and guardrails,
-- optional improvised detail may reuse established story facts for flavor or a non-critical hint,
-- child-facing presentation remains immersive,
-- no critical prerequisite, required resource, completion rule, phase transition or promised world effect may depend on an untracked improvised fact.
+Player-facing UI and interaction shells may expose only facts whose reveal conditions are satisfied.
 
-Example: an ambient writing book may let Forteller invent its sentence. A critical clue book that must reveal `CRYSTAL_BLUE_LOCATION` cannot simply say “Forteller invents a clue”; the required clue payload/reveal state must be authored and tracked. Forteller may still improvise wording/color around that tracked fact.
+Example: a three-color gate must not show red/blue/yellow slot requirements before the fiction has revealed those requirements.
+
+## Purpose / world-effect contract
+Every interactive Storylet/node declares:
+- why it exists,
+- what is affected now,
+- what fictional state resolves it,
+- what narrated payoff follows,
+- what state effects make payoff true.
+
+A claimed path blocker must actually block the authored path/state. Resolution must release it.
+
+A puzzle must belong causally/thematically to the Storylet.
+
+No generic 3/4 progress duration.
+
+## Explicit narrator improvisation
+Intentional openness is valid. Ambiguous responsibility is not.
+
+If narrator owns an open detail:
+- Storylet explicitly declares it,
+- narrator UI says there is no hidden answer for that detail,
+- prompt says what may be invented,
+- guardrails protect tracked state,
+- player fiction remains immersive.
+
+Critical prerequisites/resources/completion/outcomes/world effects remain authored/tracked.
+
+## Alternative child solutions
+Authored approaches are affordances, not answer buttons.
+
+A plausible unlisted child solution may be accepted by DM.
+
+If certain: DM can `GODTA LØSNING`.
+
+If genuinely uncertain: DM may trigger physical die flow.
+
+Accepted resolution applies canonical Storylet outcome/world effects. DM does not edit raw graph flags.
+
+## Optional combat capability
+Combat is a Storylet capability, not monster identity.
+
+- `combatAllowed=true` required,
+- no automatic combat entry,
+- child may propose fighting,
+- DM explicitly starts combat,
+- critical guardians normally retain non-combat route,
+- presentation child-friendly/non-graphic,
+- valid endings include surrender/retreat/distraction/friendship/escape,
+- no required kill semantics.
+
+## Interaction shells
+Canonical design lives in `docs/INTERACTION_SHELLS_V1.md`.
+
+Initial families:
+- `SLOT_GATE` / `ASSEMBLY`
+- `LOCKED_OBJECT`
+- `NPC_DIALOGUE_FAVOR`
+- `MERCHANT_TRADE`
+- `PUZZLE`
+- `COMBAT`
+- `REWARD_CHOICE`
+- `SEARCH_INSPECT`
+
+Shells present known state and submit typed actions. They do not infer or mutate hidden logic directly.
+
+### Three-slot reference
+For red/blue/yellow stones:
+- reveal first,
+- target tap opens three slots,
+- owned stones stay in inventory until explicitly placed,
+- placement is one action per item,
+- wrong item not consumed,
+- partial state persists,
+- full placement either resolves or enables separate activation according to Storylet,
+- undo reverses inventory + target state atomically.
+
+Possession never auto-fills slots.
+
+## Canonical action/state transition boundary
+Narrative Graph, DM controls, undo and future shared session should use one transition model.
+
+Conceptual event/action fields:
+
+```text
+actionId
+sequence
+actor
+type
+targetId
+payload
+preconditions[]
+effects[]
+undoPolicy
+resultRevision
+```
+
+Example action types:
+- `MOVE_ROOM`
+- `PLACE_RESOURCE`
+- `USE_ITEM`
+- `ACCEPT_SOLUTION`
+- `START_UNCERTAIN_ATTEMPT`
+- `RECORD_DIE_FACE`
+- `START_COMBAT`
+- `RESOLVE_COMBAT`
+- `BUY_ITEM`
+- `TRADE_ITEM`
+- `GRANT_REWARD`
+- `REVEAL_CLUE`
+- `OPEN_GATE`
+
+NG1 should define enough of this boundary to stop new features bypassing canonical transitions. Full action history/undo can mature later.
 
 ## Hard invariants
-1. Every critical node has an earlier setup/signal path.
-2. Every critical resource is obtainable before the gate requiring it.
-3. Generic UX5A optional finds never satisfy story-critical graph requirements.
-4. Critical hidden/search node has discoverable clue + fail-forward.
-5. Critical NPC task requirements exist and are reachable.
-6. Guardian has at least one authored non-combat resolution family.
-7. Required puzzle is thematically/causally connected and exposes narrator hint/answer guidance.
-8. Three-part collect defaults to distinct play families unless blueprint explicitly permits repetition.
-9. Critical storylets generate before ambient content.
-10. Hidden shortcuts never bypass unmet story gates.
-11. Physical dice report uncertainty only; lucky roll cannot replace unmet graph requirement.
-12. Free-form child solutions remain valid; authored approaches are affordances, not a closed list.
-13. Every critical obstacle/antagonist/complication has a valid dramatic time window.
-14. Objective completion expires/transforms dependent obsolete pre-resolution beats.
-15. Later reuse of a character requires explicitly authored later purpose.
-16. Ambient selection respects current phase/resolved story state.
-17. Resource availability is not action completion.
-18. Interactive critical node/storylet has `purpose`, `stakes`, `resolvedWhen`, `payoff`, coherent `worldEffects[]`.
-19. `worldEffects[]` must make promised payoff true; resolving node may not be UI-only bookkeeping.
-20. `progressStages[]`, if present, contains authored meaningful fictional stages. Generic default counts are invalid.
-21. A Storylet may not receive random puzzle/mini-mechanic without authored contextual role.
-22. Authored blocking obstacle has non-softlocking topology/state policy: safe retreat or explicit escape/fail-forward.
-23. Intentionally open narrator content declares a `narratorImprov`-style contract; missing payload must not masquerade as a hidden authored answer.
-24. Critical requirements/completion/payoff/world effects may not depend on untracked narrator improvisation.
-25. If an improvised detail is allowed to reference tracked story facts, those facts must already be known/valid; improvisation may phrase or color them but not invent contradictory state.
+1. Every critical node has earlier setup/signal path.
+2. Every critical resource has a reachable provider before consumption.
+3. Provider dependencies are acyclic and not behind consuming gate.
+4. Critical progression cannot depend on a single mandatory uncertain roll.
+5. Generic optional UX5A find never becomes hidden critical requirement unless promoted through an explicit guaranteed provider Storylet.
+6. Required hidden/search content has clue + fail-forward.
+7. Critical NPC favor dependencies exist and are reachable.
+8. Guardian normally has authored non-combat route.
+9. Required puzzle is causally connected and has narrator help.
+10. Three-part collect defaults to different play/provider families unless blueprint overrides.
+11. Critical story generates/validates before ambient content.
+12. Secret shortcuts never bypass unmet gates.
+13. Physical dice report uncertainty only; they do not create missing prerequisites.
+14. Child free-form solutions remain valid.
+15. Critical beat has valid dramatic timing/expiry.
+16. Resource availability is not action completion.
+17. Interactive node has purpose/stakes/resolvedWhen/payoff/worldEffects.
+18. Promised payoff is implemented in world state.
+19. Generic progress counts are invalid.
+20. Random unrelated puzzle/mechanic attachment is invalid.
+21. Blocking obstacle cannot softlock without retreat/fail-forward.
+22. Open narrator content has explicit improv contract.
+23. Critical state never depends on untracked improv.
+24. Subject/role pairing is explicitly compatible.
+25. Repeated subject/role is penalized unless repetition is meaningful.
+26. Interaction shell never leaks unrevealed knowledge.
+27. Possession never auto-fills/auto-uses an action-bearing slot/gate.
+28. Typed action is validated before state effect.
+29. Repeated action ID must not duplicate critical effect once idempotency is implemented.
+30. Undoable composite actions restore all affected resource/world state atomically.
 
 ## Generation pipeline
 1. Select Adventure Blueprint.
-2. Expand into narrative functions/phases.
-3. Select compatible Storylets.
-4. Validate resources, action completion, purpose contract, narrator-improv boundaries and phase windows before map placement.
-5. Allocate suitable rooms.
-6. Materialize storylet events, world effects and narrator metadata.
-7. Create knowledge reveal rules.
-8. Add gate/climax.
-9. Run graph validation including stale-event, resource-vs-action, purpose/payoff, authored-progress and improv-boundary checks.
-10. Add ambient encounters/optional secrets/search finds only after critical graph is valid.
-11. Filter ambient content against phase/resolved flags.
-12. Run world/map validation including bypass, temporal ordering and promised world effects.
+2. Expand narrative functions/phases.
+3. Select compatible subject + Storylets.
+4. Bind requirements and provider plans.
+5. Validate provider graph, phases, knowledge, purpose/payoff and improv boundaries.
+6. Allocate suitable rooms.
+7. Materialize Storylets, provider events, knowledge reveals and world effects.
+8. Materialize interaction shell declarations and semantic DM metadata.
+9. Add gate/climax.
+10. Run full graph/world validation.
+11. Add ambient encounters/optional finds only after critical graph is valid.
+12. Filter ambient content against phase/resolved state.
 
-## Interaction/materialization rule
-When a node becomes actionable, UI exposes fictional situation and relevant affordances without performing action.
+## Reference: CRYSTAL_MACHINE
+Target:
 
-Examples:
-- locked door + owned key -> show locked door; child may choose key,
-- owned crystals -> show sockets; child chooses placement/activation,
-- guardian motive known -> child acts on knowledge; no auto-resolution,
-- NPC requirement fulfilled -> return/interact for acknowledgement/reward unless explicitly authored otherwise,
-- blocking environment -> actually block authored path/state while unresolved; resolution releases it,
-- intentionally open ambient mystery -> child sees mystery; narrator sees explicit bounded improv prompt and knows there is no hidden answer.
-
-Narrator view should expose purpose/stakes/resolvedWhen/payoff in human language and explicitly label narrator-improvisation where authored.
-
-Hints should progress from open prompt (`HVA VIL DU GJØRE?`) to affordance-level hints before naming an intended solution.
-
-## Failure policy
-Generation fails/retries if hard invariants cannot be satisfied. It must not silently:
-- degrade critical Storylet to bare pickup,
-- leave obsolete complication active,
-- auto-complete child action from prerequisites,
-- attach unrelated puzzle,
-- add generic filler progress,
-- claim a world-state payoff without applying it,
-- imply a hidden authored answer when content is actually intentionally improvised,
-- delegate critical causal logic to untracked narrator improvisation.
-
-## Reference example: CRYSTAL_MACHINE
-Target graph:
-`SETUP -> QUEST_REVEAL -> {RED, BLUE, YELLOW acquisition branches} -> RETURN -> ASSEMBLE -> GATE -> CLIMAX`
+`SETUP -> QUEST_REVEAL -> {RED, BLUE, YELLOW acquisitions} -> RETURN -> ASSEMBLE -> GATE -> CLIMAX`
 
 Reference acquisition diversity:
-- one `SEARCH_SECRET`
-- one `NPC_FAVOR`
-- one `GUARDIAN`
+- one `SEARCH_SECRET`,
+- one `NPC_FAVOR`,
+- one `GUARDIAN`.
 
-All three crystals owned makes `ASSEMBLE` available, not complete. Deliberate assembly provides `MACHINE_ASSEMBLED`, which enables gate.
+All crystals owned makes `ASSEMBLE` available, not complete.
 
-Each acquisition Storylet states why scene exists, what is at stake, what completion looks like and what changes when crystal is acquired.
+Assembly uses `SLOT_GATE/ASSEMBLY` shell:
+- three sockets known only after reveal,
+- child places crystals deliberately,
+- partial placement persists,
+- activation/gate state follows authored completion rule.
 
-Bounded improv may color NPC dialogue, guardian personality or incidental details, but the actual crystal dependency, clue/reveal, completion and reward transfer remain tracked.
+Bounded improv may color dialogue but cannot determine crystal existence/location/completion.
 
-If antagonist interferes with collection, beat occurs during active collection and expires/changes purpose after assembly.
+## DM materialization
+Narrator/DM view must expose in human language:
+- `HVA ER GREIA?`
+- `HVA KREVES?`
+- `HVOR KAN DET SKAFFES?`
+- `HVA KAN SKJE?`
+- `NÅR ER DET LØST?`
+- `HVA ENDRES DA?`
+- authored vs improv boundary.
+
+Safe semantic controls include accepted solution, uncertainty/die, negotiation, optional combat and authored outcome application.
+
+## Failure policy
+Generation fails/retries rather than silently:
+- creating unavailable requirement,
+- creating circular provider chain,
+- relying on lucky critical loot,
+- relying on one mandatory social roll,
+- auto-completing action from owned resource,
+- attaching unrelated puzzle,
+- adding filler progress,
+- claiming payoff without state effect,
+- leaking hidden answer through shell,
+- delegating critical causality to narrator improv.
 
 ## Human vs procedural responsibility
 Humans curate:
-- premises/motives/clues,
+- subject identity/personality,
+- compatible roles,
 - purpose/stakes/resolution/payoff,
-- world effects,
-- meaningful progress stages,
-- compatibility/timing,
-- alternative approaches,
-- narrator-improv prompts/guardrails where intentionally open,
-- nonsensical combination bans.
+- requirements/provider compatibility,
+- outcomes/world effects,
+- puzzles/clues,
+- combat capability,
+- interaction-shell semantics,
+- narrator-improv bounds,
+- timing and nonsense bans.
 
-Generator may decide:
-- which compatible Storylet variant,
-- eligible room placement,
+Generator may choose:
+- compatible Storylet variant,
+- provider plan among valid routes,
+- eligible placement,
 - safe ordering among parallel branches,
 - cosmetic allowed variation,
-- ambient side content outside critical nodes.
+- ambient content after critical validation.
 
-Forteller may improvise only within explicit authored open spaces. Forteller is not responsible for repairing missing critical causality.
+Forteller improvises only within explicit authored open spaces and interprets plausible child actions. Forteller is not responsible for fixing missing causal logic.
 
-If coherent purpose/payoff cannot survive procedural combination without many special cases, prefer more hand-authored scenario skeletons.
+## Related canonical docs
+- `docs/ENCOUNTER_STORY_SYSTEM_PLAN_V1.md`
+- `docs/STORYLET_MATRIX_V1.md`
+- `docs/INTERACTION_SHELLS_V1.md`
+- `docs/CONTENT_REVIEW_HANDOFF_2026-10-26.md`
+- `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+- `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
 
-## Implementation gate
-Do not implement Narrative Graph runtime until UX5A physical device gate is green and UX5A is merged to `main`. This prep branch remains architecture/spec/test-design only.
+If procedural coherence requires growing special-case rules faster than a curated scenario bank would, prefer more hand-authored scenario skeletons.
