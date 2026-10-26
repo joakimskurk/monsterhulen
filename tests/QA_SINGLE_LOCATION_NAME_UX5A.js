@@ -6,6 +6,8 @@ const scripts=[...html.matchAll(/<script(?:[^>]*)>([\s\S]*?)<\/script>/g)].map(m
 for(let i=0;i<scripts.length;i++)try{new vm.Script(scripts[i]);pass.push(`script ${i+1} syntax`)}catch(e){fail.push(`script ${i+1} syntax: ${e.message}`)}
 ok(!html.includes('id="roomToneBadge"'),'child room banner has no second area-name badge');
 ok(!html.includes("$('#roomToneBadge').textContent"),'renderMeta does not render zone as a second location name');
+ok(!html.includes('room.desc=`${zone.name}. ${room.name}. `+'),'player room description does not expose zone as a second place name');
+ok(html.includes('room.desc=`${room.name}. `+'),'player room description starts with canonical room name only');
 ok(html.includes("const location=room?safeText(room.name):'UKJENT STED'"),'continue summary uses room name only');
 ok(!html.includes("const location=room?`${safeText(room.name)}${room.zoneName?"),'continue summary no longer appends zone name');
 ok(html.includes('return `<strong>${r.name} · ${r.beat}</strong>'),'narrator current-location heading uses canonical room name');
