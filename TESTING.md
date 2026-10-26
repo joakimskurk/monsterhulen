@@ -29,29 +29,46 @@ Latest additions:
 - patch 11: `v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
 - patch 12: `v0.12.3_playtest_single_location_name_ux5a.patch`
 - patch 13: `v0.12.3_playtest_encounter_purpose_contract_ux5a.patch`
+- patch 14: `v0.12.3_playtest_explicit_improv_guidance_ux5a.patch`
 
 Patch 13 exists because physical play showed that generic `ANNEN LØSNING` 3/4-box tracks could ask the narrator to invent meaningless filler while resolution changed nothing in the world.
 
-## Automated evidence after patch 13 - GREEN
-Executed against the reconstructed patch-13 runtime:
+Patch 14 exists because `BOKA SOM SKRIVER TILBAKE` sounded as if it had a hidden authored message, while in reality the missing message was intentionally open to narrator improvisation. Improvisation is accepted; unmarked narrator responsibility is not.
+
+## Automated evidence after patch 14 - GREEN
+Executed against the reconstructed patch-14 runtime:
+- `tests/QA_EXPLICIT_IMPROV_GUIDANCE_UX5A.js`: **20 PASS / 0 FAIL**
 - `tests/QA_ENCOUNTER_PURPOSE_UX5A.js`: **4337 PASS / 0 FAIL**
+- `tests/QA_AUTHORED_MYSTERIES_ONLY_UX5A.js`: **3075 PASS / 0 FAIL**
 - `tests/QA_SINGLE_LOCATION_NAME_UX5A.js`: **19 PASS / 0 FAIL**
 - `tests/QA_DEVICE_FINDINGS_UX5A.js`: **27 PASS / 0 FAIL**
-- `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2295 PASS / 0 FAIL**
+- `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2328 PASS / 0 FAIL**
 - `tests/QA_ADVENTURE_CODE_V1.js`: **405 PASS / 0 FAIL**
 - `tests/QA_PROGRESSION_GATES_UX4.js`: **1797 PASS / 0 FAIL**
-- `tests/QA_CONTENT_REGRESSION.js`: **5809 PASS / 0 FAIL**
+- `tests/QA_CONTENT_REGRESSION.js`: **5830 PASS / 0 FAIL**
 - 11 inline JavaScript blocks: **0 syntax errors**
 
-Patch-13 behavioral reconstruction SHA-256:
-`e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
+Patch-14 behavioral reconstruction SHA-256:
+`7e9f9ba1d80aed2fe55865dbca860e2754d706b7cd89266dd2007d25fd4e0737`
 
-Patch-13 SHA-256:
-`74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
+Patch-14 SHA-256:
+`123daf1a12fc4f6a38d5d3dc401b7403c21005263c32811e0c0eeac24877fd2c`
 
-The content-regression count is intentionally lower than patch 12 because ambient `MYSTISK` encounters no longer generate random puzzles, so fewer generated-puzzle assertions execute. This is an expected behavior change, not lost coverage elsewhere.
+These hashes are behavioral reconstruction artifacts, not byte-identical release-baseline claims.
 
-### Encounter-purpose QA covers
+### Explicit-improvisation QA covers
+- all active ambient `MYSTISK` templates declare an explicit narrator improvisation prompt when their missing payload is intentionally open,
+- `BOKA SOM SKRIVER TILBAKE` can be generated,
+- it is labelled internally as `VALGFRITT IMPROVISASJONSMYSTERIUM`,
+- it remains non-blocking and is not a story gate,
+- narrator summary prominently shows `FORTELLER-IMPROVISASJON`,
+- narrator summary says `INGEN SKJULT FASIT`,
+- narrator summary explicitly says there is no larger predetermined plan for the missing detail,
+- the book-specific prompt tells Forteller what to invent,
+- guardrails forbid turning the invented message into a new mandatory story key,
+- generated encounter state carries the authored improvisation prompt.
+
+### Encounter-purpose QA still covers
 Across hundreds of generated encounters:
 - non-treasure encounters have `purpose`, `stakes`, `resolvedWhen`, `payoff`,
 - generic blank progress is absent,
@@ -59,22 +76,16 @@ Across hundreds of generated encounters:
 - traps declare a real forward-blocking role,
 - other ambient encounter families do not become generic movement gates,
 - ambient mysteries do not receive random unrelated puzzles,
-- `REGNBUENETTET` can be generated and has explicit obstacle/solve/payoff semantics,
-- `REGNBUENETTET` has no arbitrary 3/4-box track,
-- UI has no generic `ANNEN LØSNING` track,
-- narrator explicitly says not to invent filler steps.
+- `REGNBUENETTET` has explicit obstacle/solve/payoff semantics and no arbitrary 3/4-box track.
 
-The regression also extracts and executes the real runtime `move()` function in a three-room harness and verifies:
-1. an active trap blocks movement onward,
-2. retreat to the previous room remains possible,
-3. once the blocking encounter is absent/resolved, movement onward works again.
+The regression extracts and executes real runtime `move()` in a three-room harness and verifies active trap -> onward blocked, retreat allowed, resolved/absent trap -> onward available.
 
 ### Search/encounter QA now covers
 - generic investigation without pre-spoiling find rooms,
 - deterministic optional finds and fail-forward,
 - full-backpack preservation,
 - 3/4-heart monster combat,
-- encounter purpose contract across generated active blueprints,
+- encounter purpose contract,
 - authored-progress-only rule,
 - traps as real obstacles,
 - no random ambient mystery puzzle,
@@ -82,10 +93,10 @@ The regression also extracts and executes the real runtime `move()` function in 
 - physical encounter dice cannot mutate HP/progress automatically,
 - save schema remains 12.
 
-### Device/key QA now covers
+### Device/key QA still covers
 - explicit keyed-door flow from patch 11,
 - scenario key protection + explicit `BRUK`,
-- puzzle help remains available for any authored/legacy puzzle,
+- puzzle help for authored/legacy puzzles,
 - puzzle solving does not feed a generic progress meter after patch 13.
 
 ### Single-location QA covers
@@ -97,24 +108,25 @@ Historical evidence before the latest interaction changes:
 - broad Chromium UX5A smoke: **23 PASS / 0 FAIL**,
 - patch-10 focused Chromium smoke: **15 PASS / 0 FAIL**.
 
-Those results do not certify patches 11-13. A fresh local Chromium attempt previously hit a browser/localStorage harness error before interaction QA could run. No current browser-green claim is made. This is a harness limitation, not evidence of an application failure.
+Those results do not certify patches 11-14. A fresh local Chromium attempt previously hit a browser/localStorage harness error before interaction QA could run. No current browser-green claim is made. This is a harness limitation, not evidence of an application failure.
 
 ## Required physical-device gate before UX5A merge
 On actual iPad/mobile verify:
-1. `REGNBUENETTET`/trap has no generic four-box `ANNEN LØSNING` track,
-2. narrator purpose panel makes it clear why the encounter exists, when it is solved and what changes,
-3. active trap blocks onward travel but allows retreat,
-4. one genuinely sufficient child plan can solve the obstacle; narrator is not forced to invent four actions,
-5. after `HINDRINGEN ER LØST`, onward route is actually available,
-6. newly generated ambient mysteries do not surface disconnected random puzzles,
-7. each room has one clear visible location name,
-8. `GLASS_HEART` explicit key-use flow remains natural,
-9. `SE DEG RUNDT` feels exploratory rather than mandatory,
-10. hidden-find fail-forward/full-backpack flows work by touch,
-11. 3-heart normal / 4-heart `SPENNING` combat controls are comfortable,
-12. final heart and non-combat resolution controls are understandable,
-13. if possible, representative legacy active-combat save behaves correctly,
-14. Adventure Code copy/paste flow still works.
+1. `BOKA SOM SKRIVER TILBAKE` narrator panel makes it obvious that the missing message is intentionally improvised and there is no hidden larger app plan,
+2. the improvisation prompt is useful and bounded rather than a hidden writing burden,
+3. improvised content remains optional and does not appear to create mandatory story state,
+4. `REGNBUENETTET`/trap has no generic four-box `ANNEN LØSNING` track,
+5. narrator purpose panel makes clear why encounter exists, when solved and what changes,
+6. active trap blocks onward travel but allows retreat; resolution frees route,
+7. newly generated ambient mysteries do not surface disconnected random puzzles,
+8. each room has one clear visible location name,
+9. `GLASS_HEART` explicit key-use flow remains natural,
+10. `SE DEG RUNDT` feels exploratory rather than mandatory,
+11. hidden-find fail-forward/full-backpack flows work by touch,
+12. 3-heart normal / 4-heart `SPENNING` combat controls are comfortable,
+13. final heart and non-combat resolution controls are understandable,
+14. if possible, representative legacy active-combat save behaves correctly,
+15. Adventure Code copy/paste flow still works.
 
 Do not merge UX5A or implement Narrative Graph runtime until this gate is green.
 
@@ -126,6 +138,8 @@ It must separately prove:
 - causal/resource/knowledge/phase validator rejection cases,
 - storylet/node purpose + stakes + resolution + payoff completeness,
 - no generic progress mechanic without authored stages,
+- intentionally open narrator details are explicitly declared as improvisation,
+- critical prerequisites/completion/payoff do not depend on untracked improvised facts,
 - >=1000 generated `CRYSTAL_MACHINE` structural cases,
 - real browser interaction,
 - 10-20 manual editorial generated-adventure reviews,
