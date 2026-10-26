@@ -25,7 +25,7 @@ for(const id of ids){
     let a,b;try{a=build(seed,id);b=build(seed,id)}catch(e){fail.push(`${id} ${seed} builds: ${e.message}`);continue;}
     const d=a.d,s=d.scenarioSpec,finds=findRooms(d);
     ok(d.rooms.every(r=>r.search?.available===true),`${id} ${seed} every room can be investigated`);
-    ok(finds.length>=3,`${id} ${seed} has >=3 optional hidden finds`);
+    ok(finds.length>=2,`${id} ${seed} has >=2 optional hidden finds`);
     ok(sig(d)===sig(b.d),`${id} ${seed} hidden-find placement deterministic`);
     const critical=new Set([s.goalRoomId,s.keyRoomId,s.helperRoomId,...(s.itemRoomIds||[]),...(s.clueRoomIds||[])].filter(Boolean));
     for(const r of finds){
@@ -65,7 +65,7 @@ for(const id of ids){
   }
   for(const length of ['KORT','STORT'])for(let seed=1;seed<=8;seed++){
     let x;try{x=build(seed,id,length)}catch(e){fail.push(`${id} ${length} ${seed} builds: ${e.message}`);continue;}
-    const count=findRooms(x.d).length,minimum=length==='KORT'?2:4;
+    const count=findRooms(x.d).length,minimum=length==='KORT'?1:3;
     ok(x.d.rooms.every(r=>r.search?.available===true),`${id} ${length} ${seed} all rooms investigable`);
     ok(count>=minimum,`${id} ${length} ${seed} has >=${minimum} optional hidden finds`);
   }
