@@ -2,97 +2,150 @@
 
 Updated: 2026-10-26
 Current baseline: **V0.12.3 Lasting Thing Identity Pass**
-Last automated/browser-verified playtest layer: **UX5A searchable rooms + encounter state**
-Current work item: **UX5A physical iPad/mobile playtest + repository-health repair before merge; UX5B remains next**
+Last automated/browser-verified playtest layer: **UX5A searchable rooms + encounter state + device-findings hotfix**
+Current runtime work item: **UX5A physical iPad/mobile hotfix retest before merge**
+Next architecture work after green device gate: **Narrative Graph V1 + curated Storylet Matrix, starting only with CRYSTAL_MACHINE**
+Prep branch: `narrative/story-graph-v1-prep`
 
 ## Product direction now locked
-Monsterhulen prioritizes a small number of coherent, memorable adventures over combinatorial volume. Story-critical elements are curated as Adventure Blueprints. Seeded variation is allowed only where it cannot break the story.
+Monsterhulen prioritizes a small number of coherent, memorable adventures over combinatorial volume.
 
-A finale must be earned, not merely discovered. Secret doors are hidden discoveries and may not bypass story progression.
+A story is not considered strong merely because all required rooms/items exist and the finale is structurally gated. Critical beats must have understandable causal relationships in the fiction.
 
-Physical dice report uncertainty. A die result never automatically finishes a normal encounter, advances encounter progress or removes a monster heart.
+New critical-story contract:
+**SETUP -> SIGNAL -> ACTION -> PAYOFF**.
 
-## Active playtest patch chain on the UX5A branch
-1. `patches/v0.12.3_playtest_map_navigation.patch`
-2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
-3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
-4. `patches/v0.12.3_playtest_adventure_code_v1.patch.gz.b64`
-5. `patches/v0.12.3_playtest_progression_gates_secret_doors.patch.gz.b64`
-6. `patches/v0.12.3_playtest_searchable_rooms_encounter_engine_ux5a.patch`
-7. `patches/v0.12.3_playtest_encounter_narrator_ux5a.patch`
-8. `patches/v0.12.3_playtest_searchable_rooms_encounter_ui_ux5a.patch`
-9. `patches/v0.12.3_playtest_searchable_rooms_encounter_render_ux5a.patch`
+Adventure Blueprints remain the large-scale curated frame. Narrative Graph V1 will add explicit story beats, resources, prerequisites and player-knowledge state. Humans curate Storylets and compatibility rules; the generator may choose and place only compatible Storylets.
 
-`patches/README.md` is the canonical patch-order/reconstruction note.
+Physical dice report uncertainty. A die result never substitutes for an unmet story prerequisite, automatically finishes a normal encounter, advances encounter progress or removes a monster heart.
 
-## UX5A implemented on branch
+## Active runtime branch
+`ux5/searchable-rooms-encounter-tracks`
+
+Do not merge it yet. Physical target-device testing is still open after a live playtest hotfix.
+
+The UX5A patch chain includes the earlier UX1-UX4 layers, the four UX5A layers and the device-findings hotfix. `patches/README.md` on the runtime branch is canonical for reconstruction.
+
+## UX5A implemented
 ### Room investigation
-- Every generated room gets an investigation state, so the UI does **not** identify loot rooms in advance.
-- `SE DEG RUNDT` is available before the app reveals whether a hidden find exists.
-- Optional hidden finds are deterministic and use the curated treasure/affordance bank.
-- Target find counts are 1 for KORT, 2 for VANLIG and 3 for STORT when enough eligible rooms exist.
-- Hidden finds are never placed in start/finale/story-critical/ambient-treasure rooms.
-- If an investigation discovers signs of a hidden find, uncertain searching uses the six physical D6 faces already used elsewhere.
-- First 1-2 gives a stronger clue without revealing the find; a second low attempt fails forward and reveals it rather than creating a softlock.
-- A revealed find remains in the room when the backpack is full.
-- Hidden room finds are optional affordances and may never become scenario prerequisites.
+- Every generated room gets the same initial investigation affordance so the UI does not reveal hidden-find rooms in advance.
+- KORT/VANLIG/STORT target 1/2/3 deterministic optional finds when enough rooms are eligible.
+- Optional finds never overlap story-critical rooms and never become story prerequisites.
+- Hidden-find search uses physical D6 only when uncertainty remains.
+- First low result strengthens the clue; repeated low searching fail-forwards.
+- Full backpack preserves the revealed find in the room.
 
 ### Encounter state
-- Fresh normal monsters use 3 hearts; `SPENNING` monsters use 4.
-- Generated non-treasure encounters use 3 progress steps; `SPENNING` uses 4.
-- `+ FREMGANG` is a narrator action used only after the fiction actually changes.
-- Filling the progress track explicitly resolves the encounter.
-- Monster hearts appear only after the child chooses combat; reaching zero through the explicit heart control resolves combat.
-- `LØST MED GOD IDÉ` is the explicit route for a genuinely decisive free-form solution.
-- Physical encounter dice only record the exact die face and consequence suggestion; they never mutate hearts/progress themselves.
+- normal fresh monsters: 3 hearts,
+- `SPENNING`: 4 hearts,
+- generated non-treasure encounters: 3 progress steps, 4 in `SPENNING`,
+- dice input records die/consequence state only,
+- narrator explicitly marks progress,
+- combat begins only if child chooses combat,
+- `LØST MED GOD IDÉ` remains available for genuinely decisive free-form solutions.
 
-### Save compatibility
-State schema remains 12. Re-enrichment is idempotent:
-- room investigation/find state is retained,
-- untouched legacy monsters can be upgraded to the new full 3/4-heart scale,
-- an already-started legacy fight keeps its actual remaining hearts and is not healed,
-- old generated non-treasure encounters receive a progress track when missing.
+### Device-findings hotfix
+Live playtest found:
+1. a ready story gate unlocked and traversed in one tap, making the lock feel cosmetic; used quest key also appeared unchanged in inventory,
+2. a generic puzzle could be logically valid but fictionally disconnected and unclear for a novice narrator.
 
-## UX5A verification status
-Automated/runtime/browser verification is green on the reconstructed playtest runtime:
-- `tests/QA_SEARCHABLE_ROOMS_ENCOUNTER_TRACKS_UX5A.js`: **2216 / 0**.
-- `tests/QA_ADVENTURE_CODE_V1.js`: **405 / 0**.
-- `tests/QA_PROGRESSION_GATES_UX4.js`: **1797 / 0**.
-- `tests/QA_CONTENT_REGRESSION.js`: **5960 / 0**.
-- 11 inline JavaScript blocks: **0 syntax errors**.
+Hotfix now:
+- first gate tap opens but does not traverse,
+- used scenario key leaves inventory with explicit fiction log,
+- second tap traverses,
+- puzzle card contains Fortellerhjelp, hint/fasit and explicit `PUZZLET ER LØST`,
+- solving the embedded puzzle advances exactly one encounter progress step.
+
+Targeted verification:
+- Node hotfix QA: **19 / 0**,
+- Chromium hotfix interaction smoke: **15 / 0**.
+
+Physical retest remains required.
+
+## Existing broad verification evidence
+Before the device hotfix:
+- UX5A search/encounter QA: **2216 / 0**,
+- Adventure Code: **405 / 0**,
+- UX4 progression: **1797 / 0**,
+- combined content regression: **5960 / 0**,
+- 11 inline scripts: **0 syntax errors**,
 - Chromium UX5A smoke: **23 / 0**.
 
-Chromium smoke verified empty-room investigation, hidden-find non-spoiling, repeated-low fail-forward, full-backpack preservation, exact physical die recording, dice/state separation, full progress resolution, direct smart-solution resolution, 4-heart `SPENNING` combat, zero-heart combat resolution and a 3-heart normal monster added in a `PUSTEROM`.
+## New playtest finding: story structure is still too loose
+`CRYSTAL_MACHINE` exposed a deeper architecture problem.
 
-Reconstructed UX5A runtime SHA-256:
-`289e8c4194217b723ee8595635e147647a5853e8bc990f2037716f566b2659ca`
+Current planner behavior:
+- chooses three reachable pre-gate rooms,
+- places one required `DEL` event in each,
+- marks those rooms critical,
+- world/ambient generation then skips those critical rooms.
 
-Important distinction: the Library-materialized source is behaviorally verified but is not byte-proven identical to the original V0.12.3 manifest baseline. Repository-health / baseline provenance therefore remains open.
+This is safe against softlocks and random overwrites, but it means required parts can become three isolated pickups. The current architecture cannot reliably produce a desired structure such as:
+- one crystal hidden through signalled exploration,
+- one crystal earned from an NPC favor,
+- one crystal controlled by a guardian with several solution types.
+
+This is now treated as an architecture limitation, not a text-polish issue.
+
+## Narrative Graph V1 prep
+Canonical prep docs on `narrative/story-graph-v1-prep`:
+- `START_HERE.md`
+- `docs/NARRATIVE_GRAPH_V1.md`
+- `docs/STORYLET_MATRIX_V1.md`
+- `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
+- `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+
+### Locked principles
+- humans curate small Storylets and compatibility rules,
+- generator combines only compatible Storylets,
+- critical graph is validated before ambient content,
+- truth and player knowledge are separate,
+- generic UX5A optional finds never satisfy critical requirements,
+- required hidden/search beats always have clue + fail-forward,
+- guardians have at least one authored non-combat affordance,
+- three-part collect defaults to three different play families,
+- free child solutions remain valid,
+- if this still needs frequent human repair in manual playtest, prefer more hand-authored full scenarios rather than forcing procedural generation.
+
+## CRYSTAL_MACHINE is the reference experiment
+Initial desired graph:
+
+`SETUP -> QUEST_REVEAL -> three parallel acquisitions -> RETURN -> ASSEMBLE -> GATE -> CLIMAX`
+
+Reference diversity:
+- `SEARCH_SECRET`
+- `NPC_FAVOR`
+- `GUARDIAN`
+
+The machine/gate must reveal the three colored missing sockets in fiction before the UI assumes the child knows what to search for. Return/assembly must be a deliberate story beat, not automatic inventory completion.
+
+Do not convert another blueprint until at least 1000 generated structural cases pass and 10-20 generated Crystal Machine adventures have been manually judged for actual narrative quality.
+
+## UX5B is deferred
+The previous next package, map-aware solution graph, is no longer immediate next work.
+
+After Narrative Graph V1 is proven, UX5B should consume the explicit graph so it can distinguish:
+- known vs unknown facts,
+- owned vs discoverable resources,
+- actual NPC/guardian dependencies,
+- map-supported non-combat affordances,
+- attempted approaches.
+
+This is more reliable than inferring story logic from loose room events after generation.
 
 ## Initial Adventure Blueprint bank
-Only four are active:
+Only four remain active:
 - `GLASS_HEART`
 - `WITCH_CAT`
 - `CRYSTAL_MACHINE`
 - `ZOMBIE_DELIVERY`
 
-Do not expand this bank until all four have been manually played and judged narratively strong.
-
-## UX5B after UX5A device gate
-The next encounter pass is the map-aware solution graph:
-- narrator mode should show actual non-combat possibilities supported by this exact map,
-- include useful possessed items plus discoverable NPCs, rooms, companions and other map resources,
-- distinguish resources already possessed from resources that exist elsewhere,
-- track attempted/failed approaches where useful,
-- never turn suggestions into a closed solution list,
-- preserve `FRITT KAST` and genuinely novel child solutions.
-
-Do not begin UX5B until the physical iPad/mobile UX5A smoke has been recorded.
+Do not expand the bank.
 
 ## Repository reality
-Repository-health is still open. The complete active runtime/source/assets baseline is not present as ordinary directly usable files on `main`.
+Repository-health remains open. The complete active runtime/source/assets baseline is not present as ordinary directly usable files on `main` and the Library-materialized V0.12.3 source is not byte-proven identical to the original manifest baseline.
 
-The indexed Library `index.html` can now be materialized as text and the active UX5A runtime can be reconstructed and tested. However, the original V0.12.3 release byte hash cannot be reproduced from that indexed text representation, and the complete runtime asset tree is still absent from normal repo files. Do not call the next release checkpoint locked until repository-health is closed.
+Do not call the next release checkpoint locked until repository-health is closed.
 
 ## Do not regress
 - Child proposes actions.
@@ -104,8 +157,22 @@ The indexed Library `index.html` can now be materialized as text and the active 
 - Finale gates are story prerequisites, not dice difficulty checks.
 - Secret paths never bypass story-critical progression.
 - Optional room finds never become hidden mandatory keys.
-- The UI must not reveal which rooms contain optional finds before investigation.
+- The UI must not reveal optional find contents before investigation.
 - A lucky physical die result never auto-finishes a normal encounter.
+- Critical story content may not degrade silently into a bare pickup when a richer Storylet fails to fit.
 
 ## Exact next action
-Physically playtest UX5A on iPad/mobile. Focus on whether `SE DEG RUNDT` feels exploratory rather than mandatory and whether 3-4 encounter steps feel satisfying rather than like bookkeeping. Also verify the full-backpack and 3/4-heart flows on the target device. Record findings. If the device gate is green, merge UX5A to `main` and begin UX5B. Continue repository-health repair in parallel.
+While physical UX5A playtest continues:
+- record/fix UX5A defects only on `ux5/searchable-rooms-encounter-tracks`,
+- keep Narrative Graph work documentation-only on `narrative/story-graph-v1-prep`.
+
+When user reports UX5A physical GREEN:
+1. record physical pass,
+2. rerun relevant regressions if the runtime changed,
+3. merge UX5A to `main`,
+4. verify main,
+5. create `narrative/story-graph-v1` from merged main,
+6. carry approved prep docs over,
+7. start `WP-NG1` graph data model + validator.
+
+Do not start UX5B first.
