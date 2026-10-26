@@ -1,6 +1,6 @@
 # START HERE - MONSTERHULEN
 
-Updated: 2026-10-26
+Updated: 2026-10-27
 Active branch: `ux5/searchable-rooms-encounter-tracks`
 
 ## Read this first in a new chat
@@ -25,17 +25,22 @@ Then read architecture prep on branch `narrative/story-graph-v1-prep`:
 8. `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
 
 ## Current active work
-UX5A patch 14 physical iPad/mobile retest before merge.
+UX5A patch 15 verification + physical iPad/mobile retest before merge.
 
 Latest runtime patches:
 - patch 11 explicit story-key use,
 - patch 12 one visible location identity,
 - patch 13 encounter purpose/world-effect contract,
-- patch 14 explicit narrator-improvisation guidance.
+- patch 14 explicit narrator-improvisation guidance,
+- patch 15 removes a remaining player-visible zone-name leak from `room.desc`.
 
-Patch 14 automated tests are green. Fresh current browser QA and physical device retest remain open.
+Patch 14 automated tests were green. During the 2026-10-27 gate review, the indexed patch-14 source showed that `room.desc` still began with `${zone.name}. ${room.name}.`, so a player could still see two competing place identities. Patch 15 changes the player description to start with the canonical room name only while retaining `zoneName` internally for generation/tone.
 
-**Do not merge UX5A until physical gate is green.**
+`tests/QA_SINGLE_LOCATION_NAME_UX5A.js` now explicitly rejects a zone prefix in `room.desc`.
+
+Patch 15 is source/static verified only at this checkpoint. Full reconstructed automated regression, fresh current browser QA, and physical target-device retest remain open. The Project/Library index exposes the current patch-14 source, but the raw/text materialization path currently returns an older backing representation, so do not claim browser or full runtime certification from that stale export.
+
+**Do not merge UX5A until patch 15 regression is green and the physical gate is green.**
 
 Do not implement Narrative Graph runtime, full DM Control Surface, UX5B or Multiscreen while this gate remains open.
 
@@ -117,10 +122,11 @@ Do not expand Adventure Blueprint bank.
 ## Exact sequencing
 While UX5A physical test is open:
 - test/fix UX5A only on this branch,
+- first verify patch 15 against the current reconstructed candidate,
 - content review may continue as documentation,
 - architecture prep remains documentation-only.
 
-When user reports physical UX5A GREEN:
+When user reports physical UX5A GREEN and patch 15 regression is green:
 1. record physical evidence,
 2. rerun/confirm relevant automated + fresh browser tests,
 3. merge UX5A to `main`,
