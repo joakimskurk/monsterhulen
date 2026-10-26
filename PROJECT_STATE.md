@@ -1,150 +1,42 @@
 # MONSTERHULEN - PROJECT STATE
 
 Updated: 2026-10-26
+Active runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Current baseline: **V0.12.3 Lasting Thing Identity Pass**
-Active runtime branch: **`ux5/searchable-rooms-encounter-tracks`**
-Current runtime work item: **UX5A patch 14 physical iPad/mobile retest before merge**
-Next architecture work after green device gate: **Narrative Graph V1 + curated Storylet Matrix, starting only with `CRYSTAL_MACHINE`**
+Current work item: **UX5A patch 14 physical iPad/mobile retest before merge**
 Prep branch: `narrative/story-graph-v1-prep`
+Next architecture after green UX5A: **Narrative Graph V1, starting only with `CRYSTAL_MACHINE`**
 
-## Current product direction
-Monsterhulen prioritizes coherent, memorable adventures over combinatorial volume.
+## Current gate
+UX5A patch 14 is automated green but not freshly browser-certified and not physically green yet.
 
-Binding rules:
-- child proposes actions; app does not silently apply known solutions,
-- one physical room has one visible canonical name,
-- encounter mechanics require `purpose`, `stakes`, `resolvedWhen`, `payoff` and real world effects,
-- generic filler progress is forbidden,
-- puzzles require authored contextual purpose,
-- intentional narrator improvisation is explicitly labelled/scoped,
-- critical state cannot depend on untracked improv,
-- physical dice report uncertainty and do not replace unmet prerequisites,
-- stable IDs/save compatibility remain binding,
-- critical story uses `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
+Do not merge UX5A or implement Narrative Graph runtime until physical gate is green.
 
-## New encounter/story architecture from editorial review
-The content review now establishes the intended model:
+While gate is open:
+- patch UX5A defects only on this branch,
+- editorial content review may continue as documentation,
+- do not implement full DM Control Surface, UX5B or Multiscreen.
 
-`SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> CHILD ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
-
-### Subject vs role
-Recognizable subjects are reusable identities, not fixed mechanics. Examples: Pannekakezombien, Den bortkomne zombien, Skjelettdanseren, Skjelettvakten, Sumptrollet, Brotrollet, Boka som skriver tilbake.
-
-A subject may support several **pre-authored compatible** roles such as `BLOCK_PATH`, `NPC_FAVOR`, `TRADE`, `GUARDIAN`, `CLUE_SOURCE`, `PUZZLE_CARRIER`, `ITEM_HOLDER`, `OPTIONAL_IMPROV`, `RESCUE`, `PAYOFF_CHARACTER`.
-
-This is curated reuse, not arbitrary combinatorial mixing. Subject ID and Storylet ID remain separate/stable.
-
-### Outcomes
-A subject can produce different authored outcomes in different Storylets, for example:
-- unblock route,
-- grant optional item,
-- grant critical resource,
-- reveal clue/location/puzzle rule,
-- become friend,
-- open gate,
-- change relationship state.
-
-Pannekakezombien may therefore block a door in one adventure, give an item in another, or reveal information elsewhere. The outcome must be explicit and tracked if critical.
-
-### Resource Provider system
-Requirements no longer imply one hardcoded item placement. They are satisfied through compatible provider routes.
-
-Initial providers:
-- `ROOM_FIND`,
-- `MERCHANT_PURCHASE`,
-- `TRADE`,
-- `SOCIAL_BARGAIN`,
-- `NPC_REWARD`,
-- `PUZZLE_REWARD`,
-- `SEARCH_SECRET`,
-- explicitly allowed starting/owned resource.
-
-Food/items may appear seeded/semi-random in rooms when thematically plausible. Optional resources can be genuinely random. If a resource is critical, at least one provider route must be reserved and validator-proven reachable before the consuming Storylet. It may still *look* like a natural random find to the player.
-
-Merchant provider rules:
-- seller may take concrete coins, treasures, trade goods, favor or other authored value,
-- prefer fiction-rich concrete values over large abstract currency unless later design needs otherwise,
-- merchant can also be clue/favor/recurring NPC,
-- if merchant is critical provider, price/trade dependency must itself be reachable or another fail-forward/provider must exist.
-
-Social bargaining:
-- child describes what they say/do first,
-- DM may trigger `FORHANDLE / USIKKERT FORSØK` only if outcome is actually uncertain,
-- use physical D6 / trait-enabled physical 2D6,
-- low results fail forward to higher price, small favor, alternative trade or another route,
-- no critical resource may be permanently lost behind one persuasion roll.
-
-Reference rule: if `SUMPTROLLET` requires `FOOD`, generation binds a provider plan before placement and validates at least one reachable route before the troll gate. `BROTROLLET` may randomize among authored wanted-object variants, but the chosen request fixes its dependency and provider needs before map materialization.
-
-### Alternative child solutions
-Authored approaches are affordances, not a closed answer list. DM will need a semantic action such as `GODTA LØSNING` / `OPPGAVEN ER LØST` to accept a plausible unlisted solution while applying the Storylet's normal authored world effects. DM should not edit raw flags/inventory/map by hand.
-
-### Optional combat module
-Skjelettvakten establishes combat as an optional resolution module:
-- monster/vakt/guardian does not automatically mean combat,
-- child may propose fighting,
-- DM explicitly starts combat only for Storylets with `combatAllowed`,
-- critical guardians normally retain a non-combat route,
-- presentation is child-friendly/non-graphic,
-- combat may resolve through surrender, retreat, distraction, friendship etc., not a required kill state.
-
-## DM Control Surface V1 - future package with NG4 prerequisites
-Roadmap now includes a dedicated DM control surface. It should show in human language:
-- `HVA ER GREIA?`
-- `HVA KREVES?`
-- `HVOR KAN DET SKAFFES?`
-- `HVA KAN SKJE?`
-- `NÅR ER DET LØST?`
-- `HVA ENDRES DA?`
-
-It should support:
-- authored state vs narrator-improv distinction,
-- `GODTA LØSNING`,
-- `FORHANDLE / USIKKERT FORSØK`,
-- merchant/trade information,
-- `START KAMP` only where allowed,
-- authored outcome controls,
-- player-view preview,
-- action history and later undo.
-
-NG4 must already materialize the necessary narrator/DM metadata, provider information and safe state transitions even though the polished control surface comes later.
-
-## Future Multiscreen / Shared Session V1
-Recorded future capability, not current implementation work:
-- DM always starts and owns authoritative live state,
-- player view can detach to touch client or display-only screen,
-- same-Wi-Fi/LAN-first join via simple code/QR,
-- client requests actions; host validates/broadcasts state,
-- reconnect is idempotent,
-- narrator-only data never leaks,
-- DM sees player-view preview/status,
-- `ANGRE SISTE HANDLING` uses reversible action/event history or snapshots and re-syncs corrected state,
-- Adventure Code remains offline reconstruction/sharing, not live sync.
-
-Do not implement this before the story/world action model is stable.
-
-## Active UX5A runtime
-Patch order remains canonical in `patches/README.md`.
-
-Latest patches:
+## Runtime patch chain
+Latest layers:
 - patch 11 explicit story-key use,
-- patch 12 single visible location identity,
-- patch 13 encounter purpose contract,
-- patch 14 explicit narrator improvisation.
+- patch 12 one visible location identity,
+- patch 13 encounter purpose/world-effect contract,
+- patch 14 explicit narrator-improvisation guidance.
 
-Patch 14 reference behavior: `BOKA SOM SKRIVER TILBAKE` narrator view explicitly says the missing message is intentional Forteller-improv, there is `INGEN SKJULT FASIT`, and optional improv cannot create mandatory story state.
+Patch 14 reference: `BOKA SOM SKRIVER TILBAKE` tells narrator that missing message is intentional improv, `INGEN SKJULT FASIT`, and optional improv cannot create mandatory story state.
 
-## UX5A automated verification after patch 14
-- explicit-improvisation QA: **20 / 0**,
-- encounter-purpose QA: **4337 / 0**,
-- authored-mysteries-only QA: **3075 / 0**,
-- single-location QA: **19 / 0**,
-- targeted device QA: **27 / 0**,
-- searchable-room/encounter QA: **2328 / 0**,
-- Adventure Code: **405 / 0**,
-- UX4 progression: **1797 / 0**,
-- combined content regression: **5830 / 0**,
-- 11 inline scripts: **0 syntax errors**.
+## Automated evidence after patch 14
+- explicit-improv **20/0**
+- encounter-purpose **4337/0**
+- authored-mysteries-only **3075/0**
+- single-location **19/0**
+- targeted device **27/0**
+- search/encounter **2328/0**
+- Adventure Code **405/0**
+- UX4 **1797/0**
+- content regression **5830/0**
+- 11 scripts **0 syntax errors**
 
 Patch-14 behavioral reconstruction SHA-256:
 `7e9f9ba1d80aed2fe55865dbca860e2754d706b7cd89266dd2007d25fd4e0737`
@@ -154,55 +46,267 @@ Patch-14 SHA-256:
 
 These are behavioral reconstruction artifacts, not byte-identical release provenance.
 
-Fresh current browser QA remains pending. Historical Chromium results do not certify patches 11-14. Physical iPad/mobile retest remains required.
+Historical Chromium results do not certify patches 11-14. Fresh current browser QA remains pending.
 
 ## Physical UX5A gate
 At minimum verify:
 1. `BOKA SOM SKRIVER TILBAKE` clearly communicates authored-vs-improv responsibility,
-2. improv prompt is useful without inventing mandatory story state,
+2. improv prompt helps without creating hidden mandatory state,
 3. `REGNBUENETTET` has real obstacle/payoff behavior and no generic boxes,
 4. active trap blocks forward and allows retreat; resolution opens route,
 5. ambient mysteries have no disconnected random puzzles,
 6. one visible room identity remains clear,
 7. explicit key flow remains child-driven,
-8. search/full-backpack/combat/device ergonomics remain green.
+8. search/full-backpack/combat/device ergonomics remain green,
+9. Adventure Code flow remains usable.
 
-Do not merge UX5A until this gate is green.
+## Binding product direction
+- story quality beats combinatorial volume,
+- child proposes actions; app does not silently apply owned solutions,
+- one physical room has one visible identity,
+- interactive mechanics require purpose/stakes/resolution/payoff/world effects,
+- no generic filler progress,
+- puzzles need authored contextual role,
+- narrator improvisation is explicit/scoped,
+- critical state never depends on untracked improv,
+- physical dice report uncertainty only,
+- stable IDs/save compatibility remain binding,
+- critical story uses `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
 
-## Narrative Graph V1 implications
-NG1/NG2 must model and validate:
-- subject/role compatibility,
-- resources and provider families,
-- reachable provider chains before critical requirements,
-- no circular provider dependencies,
-- no critical single-roll softlocks,
-- explicit outcomes/world effects,
-- optional combat capability,
-- action completion separate from prerequisite availability,
-- narrator-improv separate from tracked critical state.
+## Consolidated next architecture
+Detailed canonical plan is on prep branch:
+`docs/ENCOUNTER_STORY_SYSTEM_PLAN_V1.md`
 
-NG4 must expose enough semantic metadata for DM to understand and resolve scenes without reverse-engineering generator logic.
+Target chain:
 
-`CRYSTAL_MACHINE` remains the first and only blueprint conversion before NG8 acceptance.
+`SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
 
-## UX5B / repository health
-UX5B remains deferred until Narrative Graph V1 is proven.
+Supporting layers:
+- knowledge/reveal,
+- dramatic phase/expiry,
+- interaction shell/popup,
+- typed validated state transition,
+- later action history/undo/shared-session sync.
 
-Repository-health remains open: complete byte-identical runtime/source/assets are not yet reconstructable from ordinary repo files.
+### Subject != role
+Recognizable subjects are reusable identities, not fixed mechanics.
+
+Reviewed examples:
+- Pannekakezombien,
+- Den bortkomne zombien,
+- Skjelettdanseren,
+- Skjelettvakten,
+- Sumptrollet,
+- Brotrollet,
+- Boka som skriver tilbake.
+
+Candidate sibling subjects such as Den snakkende dukken / Det levende bildet are editorial candidates only, not active-bank additions.
+
+### Outcomes vary by authored Storylet
+Possible families include:
+- unblock route,
+- grant optional item,
+- grant critical resource,
+- reveal clue/location/puzzle rule,
+- become friend,
+- open gate,
+- change relationship state.
+
+Pannekakezombien may block a door in one Storylet, give an item in another, or reveal information elsewhere. Critical outcomes are explicit/tracked.
+
+## Resource provider system
+Requirement and acquisition route are separate graph concepts.
+
+Initial providers:
+- `ROOM_FIND`
+- `MERCHANT_PURCHASE`
+- `TRADE`
+- `SOCIAL_BARGAIN`
+- `NPC_REWARD`
+- `PUZZLE_REWARD`
+- `SEARCH_SECRET`
+- explicit allowed starting/owned resource.
+
+Optional resources may be genuinely variable when thematic.
+
+Critical resources require at least one reserved, validator-proven reachable provider before consumption. A critical room-find may still look incidental/random to player, but story cannot depend on lucky spawn.
+
+Merchant model:
+- concrete coins/valuables/trade goods/favors preferred over large abstract numerical economy,
+- merchant may also be clue/favor/recurring NPC,
+- critical merchant price/trade dependency must itself be reachable or fail-forward/alternate provider exists.
+
+Social bargain:
+- child describes what they say/do first,
+- DM triggers `FORHANDLE / USIKKERT FORSØK` only when outcome is genuinely uncertain,
+- physical D6 / trait-enabled 2D6,
+- low result fail-forwards,
+- no critical resource permanently locked behind one persuasion roll.
+
+Reference: if `SUMPTROLLET` requires `FOOD`, provider plan is bound/validated before troll gate. `BROTROLLET` may randomize among authored requested-object variants, but selected request fixes dependency/provider before map materialization.
+
+## Alternative child solutions
+Authored approaches are affordances, not closed answers.
+
+DM needs semantic `GODTA LØSNING` / uncertainty flow applying the same canonical Storylet world effects. DM should not hand-edit raw flags/inventory/map.
+
+## Optional combat
+Skjelettvakten establishes combat as optional Storylet capability:
+- no automatic combat from monster/vakt/guardian identity,
+- child may propose fighting,
+- DM explicitly starts only if `combatAllowed`,
+- critical guardians normally retain non-combat route,
+- child-friendly/non-graphic presentation,
+- surrender/retreat/distraction/friendship/escape can resolve encounter.
+
+## Planned interaction shells / popups
+Canonical spec on prep branch:
+`docs/INTERACTION_SHELLS_V1.md`
+
+Initial shells:
+- `SLOT_GATE / ASSEMBLY`
+- `LOCKED_OBJECT`
+- `NPC_DIALOGUE_FAVOR`
+- `MERCHANT_TRADE`
+- `PUZZLE`
+- `COMBAT`
+- `REWARD_CHOICE`
+- `SEARCH_INSPECT`
+
+Shell is presentation + typed action submission; Storylet owns hidden logic.
+
+### Three-color gate reference
+For red/blue/yellow stones:
+- story reveals sockets before shell shows them,
+- child taps target,
+- popup shows three slots,
+- owned stones never auto-fill,
+- child explicitly places items,
+- wrong item is not consumed,
+- partial placement persists,
+- full placement resolves or enables authored activation,
+- world effect opens/activates target,
+- future undo restores target + inventory atomically.
+
+This directly generalizes the existing “possessing solution != performing action” rule.
+
+## DM Control Surface direction
+DM pane should show:
+- `HVA ER GREIA?`
+- `HVA KREVES?`
+- `HVOR KAN DET SKAFFES?`
+- `HVA KAN SKJE?`
+- `NÅR ER DET LØST?`
+- `HVA ENDRES DA?`
+- `HVA ER SKREVET?`
+- `HVA KAN JEG IMPROVISERE?`
+
+Semantic controls:
+- `GODTA LØSNING`
+- `FORHANDLE / USIKKERT FORSØK`
+- physical die recording
+- `START KAMP` where allowed
+- authored outcome application
+- merchant/trade context
+- player-view preview
+- later action history + `ANGRE SISTE HANDLING`
+
+NG4 must include a minimal semantic DM layer sufficient to test Narrative Graph. Full DM Control Surface V1 polish is planned after NG8 if accepted and currently before UX5B.
+
+## Canonical action/state direction
+Narrative Graph, DM controls, undo and future shared sessions should converge on typed validated state transitions with stable action IDs.
+
+Conceptual fields:
+`actionId`, `sequence`, `actor`, `type`, `targetId`, `payload`, `preconditions[]`, `effects[]`, `undoPolicy`, `resultRevision`.
+
+Benefits:
+- safe undo,
+- idempotency,
+- reconnect,
+- deterministic tests,
+- fewer ad-hoc mutations.
+
+## Future Multiscreen / Shared Session V1
+Recorded only, not active:
+- DM always starts/hosts authoritative state,
+- detached player view can be touch client or display-only,
+- same-Wi-Fi/LAN-first join via short code/QR,
+- client requests actions; host validates/applies/broadcasts,
+- reconnect/idempotency,
+- narrator-only data never leaks,
+- DM player-view preview,
+- action history + undo re-sync corrected state.
+
+Adventure Code remains offline reconstruction/sharing, not live sync.
+
+## Open-source survey
+Canonical prep note:
+`docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
+
+No dependency adopted.
+
+Study-only candidates:
+- boardgame.io for reducer/log/undo/state patterns,
+- Colyseus for authoritative sync/reconnect,
+- rot.js for roguelike algorithms,
+- Epoch Mapper for structured events/quests/interaction/standalone patterns.
+
+Do not import a generic dungeon/game framework before a later explicit ADR/spike.
+
+## Updated future sequence after UX5A
+1. Narrative Graph V1 / NG0-NG8.
+2. If accepted: DM Control Surface V1 polish + action history/undo foundation.
+3. UX5B consuming accepted graph state.
+4. Additional blueprints one at a time after editorial gates.
+5. Multiscreen / Shared Session V1 once action/state model is stable.
+
+This supersedes earlier assumption that UX5B automatically precedes DM control polish.
+
+## Narrative Graph work packages
+- NG0 specs/docs - complete/updated on prep.
+- NG1 graph + provider + typed transition model/validator.
+- NG2 Storylet Matrix/provider engine.
+- NG3 Crystal Machine planner.
+- NG4 room materialization + narrator knowledge + minimal DM controls + required interaction shells.
+- NG5 >=1000 automated graph/state cases.
+- NG6 real browser/touch QA.
+- NG7 10-20 manual editorial/family playtests.
+- NG8 accept/revise/abandon.
+
+No second blueprint before NG8.
+
+## Content review continuation
+Canonical prep handoff:
+`docs/CONTENT_REVIEW_HANDOFF_2026-10-26.md`
+
+Reviewed through `BROTROLLET`.
+
+Next subject: **DEN LEVENDE RUSTNINGEN**.
+
+Do not expand Adventure Blueprint bank.
+
+Active blueprint bank remains:
+- `GLASS_HEART`
+- `WITCH_CAT`
+- `CRYSTAL_MACHINE`
+- `ZOMBIE_DELIVERY`
+
+## Repository health
+Still open. Complete runtime/source/assets are not yet byte-reconstructable from ordinary repo files alone.
 
 ## Exact next action
-While physical UX5A testing is open:
+While UX5A physical testing is open:
+- continue patch-14 physical retest,
 - patch UX5A defects only,
-- continue patch-14 physical playtest,
-- continue editorial subject/role/provider/outcome review,
+- continue editorial review as documentation if desired,
 - keep Narrative Graph runtime blocked,
-- do not implement DM Control Surface, UX5B or Multiscreen yet.
+- do not implement full DM Control Surface, UX5B or Multiscreen.
 
 When UX5A is physical GREEN:
 1. record physical evidence,
-2. confirm relevant automated/browser regression,
+2. confirm relevant automated + fresh browser regression,
 3. merge UX5A to `main`,
 4. verify `main`,
-5. create `narrative/story-graph-v1` from merged `main`,
+5. create `narrative/story-graph-v1` from merged main,
 6. carry approved prep docs,
-7. start NG1 graph data model + validator.
+7. start NG1.
