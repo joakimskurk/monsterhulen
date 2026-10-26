@@ -47,6 +47,59 @@ STATUS: V0.12.3 BASELINE + UX5A PATCH 14 AUTOMATED GREEN + FRESH BROWSER/PHYSICA
 6. **UX5A:** romundersøkelse + encounter-/world-state + fysiske UX-funn.
 7. **Narrative Graph V1:** sammenhengende kritisk story + Storylet Matrix. Neste arkitekturpakke etter grønn UX5A-device gate. Start kun med `CRYSTAL_MACHINE`.
 8. **UX5B:** kartbevisst løsningsgraf. Utsatt til Narrative Graph V1 er bevist.
+9. **MULTISCREEN / SHARED SESSION V1:** DM-hostet sesjon med detached spillerflate, lokal Wi-Fi-sync og DM undo. Planlegges etter at story/state-modellen er stabil nok; ikke trekkes foran UX5A/Narrative Graph.
+
+## FREMTIDIG PLATTFORMPAKKE - MULTISCREEN / SHARED SESSION V1
+Mål: ett eventyr kan kjøres fra DM-ens browser med en separat spillerflate på ekstern skjerm eller barnets egen enhet, uten at det oppstår to konkurrerende sannheter om state.
+
+### 1. Detached spillerflate
+- `SPILLERDEL` skal kunne løsnes fra DM-panelet og vises på en annen skjerm.
+- Ekstern skjerm kan være:
+  - **TOUCH CLIENT** - barnet kan trykke på tillatte spillerhandlinger,
+  - **DISPLAY ONLY** - TV/projektor/non-touch-skjerm viser spillerflaten, mens DM/barn bruker annen input.
+- Spillerflaten skal aldri vise narrator-only informasjon, skjulte svar, skjulte rom, improvisasjonsgrenser eller annen DM-state.
+- DM-panelet skal kunne vise en liten preview/status av hva spillerflaten ser akkurat nå.
+
+### 2. DM Host / Player Client over lokal Wi-Fi
+- DM starter alltid eventyret/sesjonen.
+- DM-enheten er **autoritativ host** for live story/world state.
+- Barnets iPad/annen enhet kan `JOIN`e en eksisterende DM-sesjon; klienten starter ikke en parallell autoritativ kopi.
+- Primær målarkitektur er lokal-nettverk/LAN-first slik at samme Wi-Fi er nok og internett ikke er et krav for selve spilløkten.
+- Join-flow bør være enkel for barn/familie, f.eks. kort kode og/eller QR.
+- Klienten mottar kun spiller-synlig state og sender tillatte spillerhandlinger tilbake til host for validering.
+- Host validerer handlingen, oppdaterer state og broadcaster den nye autoritative state til alle tilkoblede flater.
+- Reconnect må returnere klienten til korrekt nåværende state uten å starte eventyret på nytt.
+- Tap av spillerklient skal ikke ødelegge eller stoppe DM-sesjonen; DM skal kunne fortsette og klienten kan koble til igjen.
+
+### 3. Sync-kontrakt
+- Én autoritativ session-state, ingen last-write-wins mellom DM og spiller.
+- Alle viktige handlinger får stabil action/event-ID slik at dobbelttrykk/reconnect ikke utfører samme handling to ganger.
+- UI må skille mellom `forespurt handling`, `godkjent/applied state` og eventuelle avviste/stale handlinger.
+- Save compatibility og stabile content/story IDs beholdes; multiplayer/session-laget skal ligge over den samme kanoniske eventyrstaten, ikke lage en ny konkurrerende save-modell.
+- Adventure Code forblir nyttig for rekonstruksjon/offline deling, men er ikke i seg selv live-sync-protokollen.
+
+### 4. DM angre / action history
+- DM-panelet skal ha tydelig **ANGRE SISTE HANDLING** eller tilsvarende.
+- Angre skal baseres på en reversibel action/event-logg eller state snapshot-kontrakt, ikke håndredigering av tilfeldige felter.
+- Angre må kunne brukes på typiske feiltrykk: feil romflytting, feil `LØST`, feil item-bruk, feil registrert terningresultat, feil encounter-state osv.
+- Angre skal ikke skape dupliserte items, dobbelt-payoff eller inkonsistent Narrative Graph-state.
+- Når DM angrer, synkes korrigert state umiddelbart til spillerflaten.
+- Før implementasjon må vi definere hvilke handlinger som er trygt reversible og om enkelte irreversible/migrerende handlinger trenger bekreftelse i stedet.
+
+### 5. Acceptance senere
+Når denne pakken blir aktiv skal den minst testes for:
+- touch spillerklient på iPad,
+- display-only ekstern skjerm,
+- DM + spiller på samme Wi-Fi,
+- join/rejoin etter refresh eller kort nettverksbrudd,
+- samtidige/doble trykk uten duplisert effekt,
+- DM ser korrekt player-view-status,
+- narrator-only informasjon lekker aldri til spillerflate,
+- undo synkes korrekt på begge skjermer,
+- save/reload midt i delt sesjon,
+- fysisk familie-playtest der DM ikke må administrere nettverket under spill.
+
+Dette er en framtidig pakke. Den skal ikke implementeres før den underliggende story/world-state-modellen er stabil nok til at sync og undo kan bygges på eksplisitte state transitions.
 
 ## UX5A acceptance og gate
 Fysiske/UX-funn så langt:
