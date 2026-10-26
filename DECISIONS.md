@@ -2,6 +2,24 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Critical stories use Narrative Graph + curated Storylets
+Live playtest of `CRYSTAL_MACHINE` showed that structurally valid placement is not enough. Three required parts placed safely in three rooms can still feel like unrelated pickups with no causal story.
+
+Critical story generation will therefore move to a hybrid model:
+- Adventure Blueprints define the large dramatic structure,
+- a Narrative Graph defines causal story functions, dependencies, player knowledge and payoff,
+- humans curate small Storylets and compatibility rules,
+- seeded generation may choose and place only compatible Storylets,
+- ambient procedural content is added only after the critical graph is valid.
+
+Every critical objective must have `SETUP -> SIGNAL -> ACTION -> PAYOFF`. Truth and player knowledge are separate. Generic UX5A optional finds may never satisfy story-critical requirements. Critical hidden/search content must have explicit clues and fail-forward. Guardians must have at least one authored non-combat affordance. Three-part collect scenarios default to different play families rather than three copies of the same acquisition pattern.
+
+`CRYSTAL_MACHINE` is the first reference experiment. The initial target is one signalled hidden crystal, one NPC-favor crystal with a real reachable dependency and one guardian crystal with non-combat possibilities, followed by deliberate return/assembly before the gate opens.
+
+This is intentionally not pure procedural generation. If manual playtest still requires frequent narrator repair after the Storylet Matrix is implemented, prefer a more hand-authored scenario bank rather than preserving procedural variation at the cost of story quality.
+
+Implementation is blocked until UX5A physical device testing is green and UX5A has been merged to `main`. The previously planned UX5B map-aware solution graph is deferred until Narrative Graph V1 is proven, then should consume the explicit graph instead of inferring story logic after generation.
+
 ## 2026-10-26 - Dice report uncertainty; encounter state resolves encounters
 A physical die result may suggest a consequence, but may not automatically remove a normal encounter or fill its progress track. Normal generated encounters use explicit narrator-controlled progress, while monster combat uses explicit hearts only after the child chooses combat.
 
