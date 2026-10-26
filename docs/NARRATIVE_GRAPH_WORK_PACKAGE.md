@@ -1,6 +1,6 @@
 # Narrative Graph V1 Work Package
 
-Status: **PREPARED, BLOCKED ON UX5A PHYSICAL GREEN**
+Status: **WP-NG0 COMPLETE; WP-NG1 BLOCKED ON UX5A PHYSICAL GREEN**
 
 ## Purpose
 Replace bare critical-object placement with a validated narrative graph and curated storylet system, beginning only with `CRYSTAL_MACHINE`.
@@ -10,20 +10,25 @@ Replace bare critical-object placement with a validated narrative graph and cura
 - This document/spec work lives on `narrative/story-graph-v1-prep` only.
 - Do not implement runtime code on the prep branch.
 - After UX5A physical green: merge UX5A to `main`, verify `main`, then create the real implementation branch from that merged head, suggested name `narrative/story-graph-v1`.
+- Do not blindly merge the prep branch after later UX5A runtime commits. Carry the approved documentation onto the implementation branch from the new merged `main` head.
 
-## WP-NG0 - freeze architecture and baseline
-Deliverables:
+## WP-NG0 - freeze architecture and baseline - COMPLETE
+Deliverables completed:
+- `START_HERE.md`
 - `docs/NARRATIVE_GRAPH_V1.md`
 - `docs/STORYLET_MATRIX_V1.md`
 - `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
-- synchronized project state/roadmap/decisions/playtest findings
+- `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+- synchronized `PROJECT_STATE.md`, `CURRENT_STATUS.md`, `ROADMAP.md`, `DECISIONS.md`, `TESTING.md`, `PLAYTEST_FINDINGS.md`
 
-Exit criteria:
-- no ambiguity about human-curated vs procedural responsibility,
+Exit criteria met:
+- human-curated vs procedural responsibility is explicit,
 - UX5B is explicitly deferred until Narrative Graph V1 proves coherent critical stories,
-- no runtime change yet.
+- Crystal Machine reference acceptance is explicit,
+- automated and manual/editorial evidence are separate gates,
+- no runtime code has changed on this prep branch.
 
-## WP-NG1 - graph data model + validator
+## WP-NG1 - graph data model + validator - NEXT AFTER DEVICE GATE
 Implement data structures and validation only.
 
 Required:
