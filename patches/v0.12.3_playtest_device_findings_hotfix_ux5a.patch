@@ -1,0 +1,37 @@
+--- a/index.html
++++ b/index.html
+@@ -3196,7 +3196,7 @@
+   const returning=o.returning?'<div class="returningTag">KJENT VENN FRA HELTEBOKA</div>':'';
+   const combatButton=o.type==='MONSTER'?(combat?`<button class="small" data-ehit="${i}">− HJERTE</button>`:`<button class="small" data-ecombat="${i}">BARNET VELGER KAMP</button>`):'';
+   const puzzlePending=!!(o.puzzle&&!o.puzzleSolved);
+-  const puzzle=o.puzzle?`<div class="puzzleBox${o.puzzleSolved?' solved':''}"><div class="puzzleMeta">${o.puzzle.categoryLabel} · ${o.puzzle.levelLabel} ÅR</div><strong>${o.puzzle.title}</strong>${puzzlePending?`<p>${o.puzzle.scene} ${o.puzzle.prompt}</p><p><b>HVA TROR DU?</b></p><button class="small" data-epuzzle="${i}">SVARET ER FUNNET</button>`:'<p>DERE HAR FUNNET EN LØSNING. BESTEM HVA HELTEN GJØR MED DEN.</p>'}</div>`:'';
++  const puzzle=o.puzzle?`<div class="puzzleBox${o.puzzleSolved?' solved':''}"><div class="puzzleMeta">${o.puzzle.categoryLabel} · ${o.puzzle.levelLabel} ÅR</div><strong>${o.puzzle.title}</strong>${puzzlePending?`<p><b>MYSTERIET GIR DERE ET SPOR:</b> ${o.puzzle.scene} ${o.puzzle.prompt}</p><p><b>HVA TROR DU?</b></p><details class="puzzleNarrator"><summary>FORTELLERHJELP</summary><p><b>GJØR SLIK:</b> LES SPØRSMÅLET HØYT OG LA BARNET TENKE UTEN TERNING. NÅR SVARET ELLER EN GOD FORKLARING ER FUNNET, TRYKK «PUZZLET ER LØST». DET GIR 1 FREMGANG I MØTET.</p><p><b>HINT:</b> ${o.puzzle.hint}</p><p><b>FASIT:</b> ${o.puzzle.answer}</p></details><button class="small" data-epuzzle="${i}">PUZZLET ER LØST</button>`:'<p>PUZZLET ER LØST OG HAR GITT FREMGANG. BESTEM HVA HELTEN GJØR VIDERE.</p>'}</div>`:'';
+   const dice=physicalDiceHtml(puzzlePending?{...o.gm,roll:false}:o.gm,o.diceBand||'',`data-edice="${i}"`,o.diceValue||'');
+   return `<div class="helpBox">${returning}${eventEntityHeader(o,o.name,o.intro,o.name)}${hp}${progress}${puzzle}<p><b>HVA VIL DU GJØRE?</b></p>${dice}<div class="row" style="margin-top:8px"><button class="small" data-eprogress="${i}">+ FREMGANG</button>${combatButton}<button class="small primary" data-eresolve="${i}">LØST MED GOD IDÉ</button></div></div>`;
+ }
+@@ -3240,7 +3240,7 @@
+   $$('[data-climax]').forEach(b=>b.onclick=()=>advanceClimax(+b.dataset.climax));
+   $$('[data-edice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerEncounterDice(+b.dataset.edice,v))});
+   $$('[data-secret-dice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerSecretDoorDice(+b.dataset.secretDice,v))});
+-  $$('[data-epuzzle]').forEach(b=>b.onclick=()=>{const i=+b.dataset.epuzzle,r=currentRoom();let ev=r?.events?.[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});if(!ev?.puzzle)return;ev.puzzleSolved=true;addLog(`${ev.name}: PUZZLET BLE LØST.`);save();renderRoom();renderScenario();toast('PUZZLET ER LØST')});
++  $$('[data-epuzzle]').forEach(b=>b.onclick=()=>{const i=+b.dataset.epuzzle,r=currentRoom();let ev=r?.events?.[i];if(typeof ev==='string')ev=r.events[i]=E.makeEncounter(ev,r,(state.dungeon.seed||Date.now())+'|LEGACY|'+i,{puzzleLevel:state.settings?.puzzleLevel||'YNGRE'});if(!ev?.puzzle||ev.puzzleSolved)return;ev.puzzleSolved=true;if(Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)){ev.progress=Math.min(ev.maxProgress,Math.max(0,ev.progress||0)+1);if(ev.progress>=ev.maxProgress){const name=ev.name||'MØTET';r.events.splice(i,1);addLog(`${name}: PUZZLET BLE LØST OG MØTET ER FERDIG.`);save();renderRoom();renderMap();renderScenario();toast('PUZZLET LØSTE MØTET');return;}addLog(`${ev.name}: PUZZLET BLE LØST. DET GIR 1 FREMGANG.`);}else addLog(`${ev.name}: PUZZLET BLE LØST.`);save();renderRoom();renderScenario();toast('PUZZLET ER LØST +1 FREMGANG')});
+   $$('[data-cdice]').forEach(b=>b.onclick=()=>{const v=Number(b.dataset.dieValue);pulseDieButton(b,()=>registerClimaxDice(+b.dataset.cdice,+b.dataset.cphase,v))});
+   $$('[data-eaction]').forEach(b=>b.onclick=()=>{
+     const i=+b.dataset.eindex,o=normalizeEvent(r.events[i]);
+@@ -3398,10 +3398,12 @@
+   if(c.locked&&!c.unlocked){
+     const gate=progressionGateStatus(c);
+     if(gate.ready){
+-      c.unlocked=true;state.scenario.gateOpened=true;
+-      if(c.keyItem)addLog(`${c.keyItem} PASSER. DEN LÅSTE DØREN ÅPNER SEG.`);
+-      else addLog(`FORUTSETNINGEN ER OPPFYLT. VEIEN TIL FINALEN ÅPNER SEG.`);
+-      toast(c.keyItem?'NØKKELEN PASSER!':'VEIEN ÅPNER SEG!');
++      c.unlocked=true;state.scenario.gateOpened=true;state.scenario.seenGate=true;
++      if(c.keyItem){
++        const keyIndex=state.inventory.indexOf(c.keyItem);if(keyIndex>=0)state.inventory.splice(keyIndex,1);
++        addLog(`${c.keyItem} PASSER. NØKKELEN BLIR SITTENDE I LÅSEN, OG DØREN ÅPNER SEG.`);
++      }else addLog(`FORUTSETNINGEN ER OPPFYLT. VEIEN TIL FINALEN ÅPNER SEG.`);
++      save();render();toast(c.keyItem?'NØKKELEN PASSER - DØREN ER ÅPEN!':'VEIEN ÅPNER SEG!');return;
+     }else{
+       toast('VEIEN ER LÅST');
+       if(!state.scenario.seenGate){state.scenario.seenGate=true;addLog(`FANT EN LÅST VEI. ${gate.label}.`);save();}
