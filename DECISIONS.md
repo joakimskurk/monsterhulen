@@ -14,6 +14,8 @@ Critical story generation will therefore move to a hybrid model:
 
 Every critical objective must have `SETUP -> SIGNAL -> ACTION -> PAYOFF`. Truth and player knowledge are separate. Generic UX5A optional finds may never satisfy story-critical requirements. Critical hidden/search content must have explicit clues and fail-forward. Guardians must have at least one authored non-combat affordance. Three-part collect scenarios default to different play families rather than three copies of the same acquisition pattern.
 
+Live playtest also showed the temporal version of the same problem: `SKYGGEHEKSA`, whose purpose was to make the task harder, could be encountered after the task was already complete. Narrative Graph therefore has explicit dramatic phases and validity/expiry windows. A complication or antagonist may not first activate after the objective it exists to obstruct is resolved. Completing an objective expires or transforms dependent pre-resolution beats. A later appearance of the same character is allowed only as a separately authored `CLIMAX` or `AFTERMATH` beat with a new purpose.
+
 `CRYSTAL_MACHINE` is the first reference experiment. The initial target is one signalled hidden crystal, one NPC-favor crystal with a real reachable dependency and one guardian crystal with non-combat possibilities, followed by deliberate return/assembly before the gate opens.
 
 This is intentionally not pure procedural generation. If manual playtest still requires frequent narrator repair after the Storylet Matrix is implemented, prefer a more hand-authored scenario bank rather than preserving procedural variation at the cost of story quality.
