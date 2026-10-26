@@ -17,20 +17,21 @@ function build(adventureSeed,id,length='VANLIG'){
   }
   throw last||new Error('no valid dungeon');
 }
-function searches(d){return d.rooms.filter(r=>r.search?.available)}
-function sig(d){return searches(d).map(r=>`${r.id}:${r.search.item?.name||''}`).sort().join('|')}
+function findRooms(d){return d.rooms.filter(r=>r.search?.item?.name)}
+function sig(d){return findRooms(d).map(r=>`${r.id}:${r.search.item.name}`).sort().join('|')}
 function generated(d){return d.rooms.flatMap(r=>(r.events||[]).filter(e=>e&&typeof e==='object'&&e.generated))}
 for(const id of ids){
   for(let seed=1;seed<=32;seed++){
     let a,b;try{a=build(seed,id);b=build(seed,id)}catch(e){fail.push(`${id} ${seed} builds: ${e.message}`);continue;}
-    const d=a.d,s=d.scenarioSpec,search=searches(d);
-    ok(search.length>=3,`${id} ${seed} has >=3 searchable rooms`);
-    ok(sig(d)===sig(b.d),`${id} ${seed} searchable layout deterministic`);
+    const d=a.d,s=d.scenarioSpec,finds=findRooms(d);
+    ok(d.rooms.every(r=>r.search?.available===true),`${id} ${seed} every room can be investigated`);
+    ok(finds.length>=3,`${id} ${seed} has >=3 optional hidden finds`);
+    ok(sig(d)===sig(b.d),`${id} ${seed} hidden-find placement deterministic`);
     const critical=new Set([s.goalRoomId,s.keyRoomId,s.helperRoomId,...(s.itemRoomIds||[]),...(s.clueRoomIds||[])].filter(Boolean));
-    for(const r of search){
-      ok(!critical.has(r.id),`${id} ${seed} ${r.id} search is not story-critical`);
-      ok(!!r.search.item?.name,`${id} ${seed} ${r.id} has curated optional find`);
-      ok(r.search.revealed===false&&r.search.taken===false,`${id} ${seed} ${r.id} starts hidden and untaken`);
+    for(const r of finds){
+      ok(!critical.has(r.id),`${id} ${seed} ${r.id} hidden find is not story-critical`);
+      ok(r.id!==d.startRoomId&&r.id!==s.goalRoomId,`${id} ${seed} ${r.id} hidden find avoids start/finale`);
+      ok(r.search.searched===false&&r.search.revealed===false&&r.search.taken===false,`${id} ${seed} ${r.id} find starts undisclosed`);
     }
     const encounters=generated(d);
     for(const ev of encounters){
@@ -40,13 +41,15 @@ for(const id of ids){
         ok(ev.progress===0,`${id} ${seed} ${ev.name} progress starts 0`);
       }
     }
-    if(search[0]){
-      const before=sig(d),rs=search[0].search;
+    if(finds[0]){
+      const before=sig(d),rs=finds[0].search;
       rs.searched=true;rs.attempts=1;rs.revealed=true;rs.taken=true;rs.lastDiceValue=2;rs.lastDiceBand='low';
+      const empty=d.rooms.find(r=>!r.search?.item);if(empty)empty.search.searched=true;
       E.enrichDungeon(d,{puzzleLevel:'YNGRE'});
-      const kept=d.rooms.find(r=>r.id===search[0].id).search;
-      ok(sig(d)===before,`${id} ${seed} search plan stable after reenrich`);
-      ok(kept.searched===true&&kept.attempts===1&&kept.revealed===true&&kept.taken===true&&kept.lastDiceValue===2&&kept.lastDiceBand==='low',`${id} ${seed} search state survives reenrich`);
+      const kept=d.rooms.find(r=>r.id===finds[0].id).search;
+      ok(sig(d)===before,`${id} ${seed} hidden-find plan stable after reenrich`);
+      ok(kept.searched===true&&kept.attempts===1&&kept.revealed===true&&kept.taken===true&&kept.lastDiceValue===2&&kept.lastDiceBand==='low',`${id} ${seed} find state survives reenrich`);
+      if(empty)ok(empty.search.searched===true&&empty.search.item===null,`${id} ${seed} empty-room investigation survives reenrich`);
     }
     const monster=generated(d).find(ev=>ev.type==='MONSTER');
     if(monster){
@@ -59,20 +62,28 @@ for(const id of ids){
   }
   for(const length of ['KORT','STORT'])for(let seed=1;seed<=8;seed++){
     let x;try{x=build(seed,id,length)}catch(e){fail.push(`${id} ${length} ${seed} builds: ${e.message}`);continue;}
-    const count=searches(x.d).length,minimum=length==='KORT'?2:4;
-    ok(count>=minimum,`${id} ${length} ${seed} has >=${minimum} searchable rooms`);
+    const count=findRooms(x.d).length,minimum=length==='KORT'?2:4;
+    ok(x.d.rooms.every(r=>r.search?.available===true),`${id} ${length} ${seed} all rooms investigable`);
+    ok(count>=minimum,`${id} ${length} ${seed} has >=${minimum} optional hidden finds`);
   }
 }
-ok(html.includes('data-room-search-die'), 'search uses physical die-face input hook');
+ok(html.includes('data-room-search-start'), 'all-room investigation has explicit start hook');
+ok(html.includes('APPEN RØPER IKKE OM DET FINNES ET FUNN HER'), 'investigation does not pre-spoil loot rooms');
+ok(html.includes('data-room-search-die'), 'uncertain hidden find uses physical die-face input');
 ok(html.includes('function registerRoomSearchDice'), 'room-search dice registration exists');
-ok(html.includes("band!=='low'||s.attempts>=2"), 'search is fail-forward after repeated low result');
-ok(html.includes('DETTE ER ALLTID ET VALGFRITT FUNN, ALDRI EN STORY-NØKKEL'), 'search UI states finds are optional');
+ok(html.includes("band!=='low'||s.attempts>=2"), 'repeated low hidden-find search is fail-forward');
+ok(html.includes('DETTE ER ALLTID ET VALGFRITT FUNN, ALDRI EN STORY-NØKKEL'), 'hidden finds are explicitly optional');
+ok(html.includes("if(state.inventory.length>=6){toast('RYGGSEKKEN ER FULL');return;}"), 'full backpack leaves room find untouched');
 ok(html.includes('data-eprogress'), 'encounter progress control exists');
-ok(html.includes('ET TERNINGKAST FLYTTER IKKE AUTOMATISK FREMGANGSSPORET'), 'narrator explicitly separates dice from progress');
-ok(html.includes('FJERNER ALDRI ET MONSTERHJERTE'), 'narrator explicitly separates dice from monster hearts');
-ok(html.includes('if(existing.length)')&&html.includes('s.taken=!!s.taken'), 'search state has idempotent reenrich path');
+ok(html.includes('LØST MED GOD IDÉ'), 'decisive direct solution is an explicit narrator action');
+ok(html.includes('BLE LØST ETTER FLERE MENINGSFULLE STEG'), 'full progress explicitly resolves encounter');
+ok(html.includes('KAMPEN ER FERDIG'), 'zero monster hearts explicitly resolves combat');
+ok(html.includes('ET TERNINGKAST FLYTTER IKKE AUTOMATISK FREMGANGSSPORET'), 'narrator separates dice from progress');
+ok(html.includes('FJERNER ALDRI ET MONSTERHJERTE'), 'narrator separates dice from monster hearts');
+ok(html.includes('normalizeSearchState')&&html.includes('s.item=s.item||null'), 'all-room search state has idempotent normalization');
 const reg=(html.match(/function registerEncounterDice\([^]*?\n\}/)||[''])[0];
 ok(!/progress\s*(?:\+\+|\+=|=\s*[^;]*\+\s*1)/.test(reg), 'encounter die registration does not auto-advance progress');
 ok(!/hp\s*(?:--|-=|=\s*[^;]*-\s*1)/.test(reg), 'encounter die registration does not auto-remove hp');
+ok(html.includes('version:12'), 'save schema remains state 12');
 console.log(JSON.stringify({ok:fail.length===0,passCount:pass.length,failCount:fail.length,blueprints:ids,fail:fail.slice(0,60)},null,2));
 if(fail.length)process.exit(1);
