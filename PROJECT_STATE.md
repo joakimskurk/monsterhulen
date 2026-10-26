@@ -3,98 +3,114 @@
 Updated: 2026-10-26
 Current baseline: **V0.12.3 Lasting Thing Identity Pass**
 Active runtime branch: **`ux5/searchable-rooms-encounter-tracks`**
-Current runtime work item: **UX5A physical iPad/mobile retest after explicit-key + single-location follow-ups**
+Current runtime work item: **UX5A patch 13 encounter-purpose follow-up + physical iPad/mobile retest before merge**
 Next architecture work after green device gate: **Narrative Graph V1 + curated Storylet Matrix, starting only with `CRYSTAL_MACHINE`**
 Prep branch: `narrative/story-graph-v1-prep`
 
 ## Product direction now locked
 Monsterhulen prioritizes a small number of coherent, memorable adventures over combinatorial volume.
 
-The child proposes actions. The app presents problems, signals, constraints and affordances, but should not silently apply a possessed solution. A keyed story door therefore stays locked when tapped even if the correct key is already in the backpack; the child must deliberately choose an action such as using the key. Forteller may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` when needed.
+The child proposes actions. The app presents problems, signals, constraints and affordances, but should not silently apply a possessed solution. A keyed story door stays locked when tapped even if the correct key is owned; the child deliberately chooses what to try.
 
-A physical place should also have one clear visible identity. Generated zone/biome metadata may remain internal for generation and tone, but the player-facing location name is the room name. Do not show room name + zone name as two competing names for one location.
+A physical place has one clear visible identity: the room name. Zone/biome metadata may remain internal for generation/tone but may not compete as a second place name.
 
-Critical story contract: **SETUP -> SIGNAL -> ACTION -> PAYOFF**. Narrative Graph V1 will add explicit story beats, resources, prerequisites, player-knowledge state and dramatic timing. Humans curate Storylets and compatibility rules; generator may choose/place only compatible Storylets.
+An encounter must have a **fictional purpose contract** before it earns mechanics. Generated non-treasure encounters must state:
+- `purpose` - what role this scene serves,
+- `stakes` - what is actually affected while it is unresolved,
+- `resolvedWhen` - the fictional condition for resolution,
+- `payoff` - what changes when it is resolved.
 
-Physical dice report uncertainty. A die result never substitutes for an unmet story prerequisite, automatically finishes a normal encounter, advances encounter progress or removes a monster heart.
+A progress track is allowed only when the encounter has authored `progressStages`. Empty 3/4-box tracks may not be used as generic duration. The narrator must never be asked to invent filler actions merely to fill UI boxes.
+
+Physical dice report uncertainty about an attempted action. A die result never substitutes for an unmet story prerequisite, automatically resolves a whole encounter or automatically removes a monster heart.
+
+Critical story contract remains **SETUP -> SIGNAL -> ACTION -> PAYOFF**. Narrative Graph V1 will add explicit story beats, resources, prerequisites, player-knowledge state and dramatic timing.
 
 ## Active UX5A patch chain
 Canonical order: `patches/README.md`.
 
 Latest layers:
 - patches 6-9: searchable rooms + encounter state,
-- patch 10: device findings hotfix for puzzle clarity and open-before-traverse gate behavior,
-- patch 11: `v0.12.3_playtest_explicit_story_key_use_ux5a.patch`,
-- patch 12: `v0.12.3_playtest_single_location_name_ux5a.patch`.
+- patch 10: first device findings,
+- patch 11: explicit story-key use,
+- patch 12: single visible location identity,
+- patch 13: `v0.12.3_playtest_encounter_purpose_contract_ux5a.patch`.
 
-Patch 11:
+### Patch 11 - explicit key use
 - keyed door tap only establishes `DØREN ER LÅST`,
 - no automatic key use/unlock/traversal,
 - protected scenario key exposes explicit `BRUK`,
 - matching adjacent key use opens/removes key but does not traverse,
 - later door tap traverses.
 
-Patch 12:
+### Patch 12 - one visible place name
 - room name is the single visible location identity,
-- separate `OMRÅDE` badge removed,
-- public continue/resume text uses room name only,
-- current narrator location uses room name,
-- narrator room list no longer presents zone as a second location name,
-- internal zone metadata remains intact for deterministic generation/tone.
+- separate `OMRÅDE` identity is removed from normal player/narrator location presentation,
+- internal zone metadata remains intact.
 
-## UX5A verification after patch 12
-Automated evidence against reconstructed patch-12 runtime:
-- single-location-name QA: **19 PASS / 0 FAIL**,
-- targeted device QA: **27 PASS / 0 FAIL**,
-- searchable-room/encounter QA: **2216 PASS / 0 FAIL**,
-- Adventure Code: **405 PASS / 0 FAIL**,
-- UX4 progression: **1797 PASS / 0 FAIL**,
-- combined content regression: **5960 PASS / 0 FAIL**,
+### Patch 13 - encounter purpose contract
+Physical review of `REGNBUENETTET` exposed that the generic `ANNEN LØSNING` 3/4-box track had no authored meaning. The DM could reasonably interpret it as “invent four things”, and resolving the track changed nothing in the world.
+
+Patch 13 therefore:
+- removes generic ambient 3/4-box progress,
+- renders progress only for encounters with authored `progressStages`,
+- adds purpose/stakes/solve/payoff guidance to narrator mode,
+- makes generated traps real forward obstacles while active,
+- preserves retreat to the room the party came from,
+- restores forward movement when the trap is resolved,
+- gives purpose-specific resolution actions such as `HINDRINGEN ER LØST`,
+- makes ambient `MYSTISK` puzzles opt-in instead of automatically attaching a random puzzle,
+- makes solving a puzzle a clue-state action rather than an automatic generic `+1 FREMGANG`.
+
+`REGNBUENETTET` is now the reference example: it blocks the route onward, does not prevent retreat, one credible plan may solve it, and resolution explicitly frees the route. No four invented sub-actions are required.
+
+## UX5A verification after patch 13
+Automated evidence against reconstructed patch-13 runtime:
+- encounter-purpose QA: **4337 PASS / 0 FAIL**,
+- single-location QA: **19 / 0**,
+- targeted device QA: **27 / 0**,
+- searchable-room/encounter QA: **2295 / 0**,
+- Adventure Code: **405 / 0**,
+- UX4 progression: **1797 / 0**,
+- combined content regression: **5809 / 0**,
 - 11 inline scripts: **0 syntax errors**.
 
-Patch-12 behavioral reconstruction SHA-256:
-`79bea4f4b608c34ac6189aec6fcadbcd09978814625e94dc74e3654a58d9cd42`
+Patch-13 behavioral reconstruction SHA-256:
+`e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
 
-Patch-12 patch SHA-256:
-`0cd1e2b43f9e1add7d53bf188ed9688ca0694be4d45b35dda941fb3c18ca7f58`
+Patch-13 SHA-256:
+`74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
 
-These are behavioral reconstruction hashes, not byte-identical release-baseline claims. Repository-health/provenance remains open.
+The content-regression pass count is lower than patch 12 intentionally because random ambient mystery puzzles were removed; fewer generated-puzzle assertions execute. These hashes are behavioral reconstruction artifacts, not byte-identical release-baseline claims.
 
 Browser distinction:
 - broad pre-patch-11 Chromium: **23 / 0**,
 - patch-10 focused Chromium: **15 / 0**,
-- both are historical only for the current candidate,
-- fresh local Chromium attempt for patch 12 hit a browser/localStorage harness error before current interaction QA could run,
-- therefore patch 12 is **not browser-certified yet**.
+- these are historical only,
+- fresh current-browser QA remains pending because the local harness hit a browser/localStorage failure before interaction QA,
+- patch 13 is **not browser-certified yet**.
 
 ## Physical UX5A gate now
 At minimum verify on target device:
-1. each room has one clear visible location name,
-2. `GLASS_HEART`: locked door does not auto-use `GLASSNØKKEL`,
-3. child has space to propose what to do,
-4. `GLASSNØKKEL` has protected explicit `BRUK`,
-5. using it beside the door opens/removes key but does not move hero,
-6. later tap traverses,
-7. mystery puzzle narrator flow is understandable and `PUZZLET ER LØST` gives exactly one progress step,
-8. rest of UX5A device smoke remains green.
+1. `REGNBUENETTET` has no generic four-box `ANNEN LØSNING` track,
+2. narrator can immediately understand `HVA ER GREIA?`, `NÅR ER DET LØST?` and `HVA ENDRES DA?`,
+3. an active net/trap blocks travel onward but allows retreat,
+4. child proposes a solution; one genuinely sufficient plan may solve it,
+5. after `HINDRINGEN ER LØST`, the trap disappears and route onward is actually available,
+6. newly generated ambient `MYSTISK` scenes do not receive unrelated random puzzles,
+7. each room has one clear visible location name,
+8. `GLASS_HEART` explicit-key flow remains natural,
+9. search/full-backpack/combat/device ergonomics remain green.
 
 Do not merge UX5A until this physical gate is green.
 
 ## Narrative architecture finding
-`CRYSTAL_MACHINE` exposed a deeper architecture problem: legacy collect placement can produce three structurally valid but causally weak pickups. Later playtest exposed the temporal version when `SKYGGEHEKSA` could first appear after the objective she was meant to obstruct was already complete.
+`CRYSTAL_MACHINE` exposed causal weakness in critical content; `SKYGGEHEKSA` exposed temporal invalidity; `REGNBUENETTET` exposed the same principle at encounter scale: a scene can be structurally present and mechanically interactive while still having no meaningful role or payoff.
 
-Narrative Graph V1 therefore requires:
-- explicit causal nodes/resources/prerequisites,
-- truth separate from player knowledge,
-- dramatic phases and expiry,
-- critical graph validated before ambient content,
-- generic UX5A optional finds never satisfying critical requirements,
-- required hidden/search beats with clue + fail-forward,
-- guardians with authored non-combat affordances,
-- possessing a resource must not be conflated with having deliberately performed the action that uses it.
+Narrative Graph V1 therefore requires not only dependencies and phases but explicit purpose/stakes/resolution/payoff semantics for storylets and encounter-like nodes. Mechanics must follow authored fictional state, not create arbitrary work for the narrator.
 
 ## CRYSTAL_MACHINE reference experiment
-Initial target:
+Target:
 `SETUP -> QUEST_REVEAL -> three parallel acquisitions -> RETURN -> ASSEMBLE -> GATE -> CLIMAX`
 
 Reference acquisition diversity:
@@ -102,7 +118,7 @@ Reference acquisition diversity:
 - `NPC_FAVOR`,
 - `GUARDIAN`.
 
-The machine/gate must reveal the three colored missing sockets in fiction before UI assumes the child knows what to seek. Return/assembly must be deliberate, not automatic inventory completion.
+The machine/gate must reveal the three colored missing sockets before UI assumes the child knows what to seek. Return/assembly must be deliberate, not automatic inventory completion.
 
 Do not convert another blueprint until Narrative Graph passes structural/browser/manual editorial gates.
 
@@ -110,11 +126,15 @@ Do not convert another blueprint until Narrative Graph passes structural/browser
 UX5B is **not** next. After Narrative Graph V1 is proven, UX5B should consume explicit graph state rather than infer story logic from loose room events.
 
 ## Repository health
-Repository-health remains open. Complete runtime/source/assets are not yet directly reconstructable byte-identically from ordinary repo files. The Library-materialized source is behaviorally useful but is not byte-proven identical to the original V0.12.3 manifest baseline.
+Repository-health remains open. Complete runtime/source/assets are not yet directly reconstructable byte-identically from ordinary repo files. Library-materialized source is behaviorally useful but not byte-proven identical to the V0.12.3 manifest baseline.
 
 ## Do not regress
-- Child proposes actions; app does not silently choose obvious solution.
+- Child proposes actions; app does not silently choose an obvious solution.
 - One physical location has one visible canonical name.
+- Every encounter mechanic has an authored fictional purpose.
+- No generic progress count without authored stages.
+- Resolving an obstacle changes the world in a way the player can perceive/use.
+- Ambient puzzles require an authored contextual role; do not attach them randomly.
 - No digital die roller.
 - Relevant `EKSTRA GOD PÅ` is the only source of 2D6.
 - Items/friends/pets are affordances, not numeric bonuses.
@@ -123,13 +143,11 @@ Repository-health remains open. Complete runtime/source/assets are not yet direc
 - Finale gates are story prerequisites, not dice difficulty checks.
 - Secret paths never bypass story-critical progression.
 - Optional room finds never become hidden mandatory keys.
-- UI must not reveal optional finds before investigation.
-- A lucky die result never auto-finishes a normal encounter.
-- Critical story content may not degrade silently into a bare pickup.
+- A lucky die result never auto-finishes a whole encounter.
 
 ## Exact next action
 Stay on UX5A while physical testing is open:
-- physically retest patch-12 build, especially single-location identity + explicit key use + puzzle flow,
+- physically retest patch-13 build, especially `REGNBUENETTET` block/retreat/resolve/payoff semantics,
 - continue remaining device smoke,
 - run fresh browser QA when the Chromium harness is usable,
 - record/fix any new UX5A findings on `ux5/searchable-rooms-encounter-tracks`,
