@@ -27,7 +27,7 @@
 +    room.search=s;return s;
 +  }
 +  function planSearchables(dungeon,seed){
-+    const rooms=dungeon.rooms||[],wanted=rooms.length<=9?2:rooms.length>=17?4:3;
++    const rooms=dungeon.rooms||[],wanted=rooms.length<=9?1:rooms.length>=17?3:2;
 +    for(const room of rooms)normalizeSearchState(room);
 +    const occupiedItems=new Set();
 +    for(const room of rooms)for(const ev of room.events||[])if(eventType(ev)==='SKATT'&&ev?.item)occupiedItems.add(ev.item);
