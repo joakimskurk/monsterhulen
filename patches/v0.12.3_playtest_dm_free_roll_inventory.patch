@@ -1,0 +1,60 @@
+--- index.html
++++ index.html
+@@ -145,6 +145,7 @@
+ .inventory{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+ .slot{min-height:78px;background:var(--panel3);border:2px dashed #8a73c8;padding:6px;font-size:10px;text-align:center;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px}
++.invActions{width:100%;display:grid;grid-template-columns:1fr;gap:4px;margin-top:2px}.invActions button{width:100%;font-size:8px;padding:6px 4px;min-height:0}.invActions .consume{opacity:.72}
+@@ -304,6 +305,11 @@
+     </div>
+ 
+     <div class="dmSection">
++      <h3>FRITT KAST</h3>
++      <div class="helpBox" id="freeRollBox"></div>
++    </div>
++
++    <div class="dmSection">
+       <h3>LEGG TIL I ROMMET</h3>
+@@ -1151,12 +1157,12 @@
+-    const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>REGISTRERT FYSISK KAST:</b> ${band==='low'?'1-2 · OI!':band==='mid'?'3-4 · DET GÅR':'5-6 · KJEMPEBRA'}<br>${ev.gm[band]}</p>`:'';
++    const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER REGISTRERT FYSISK KAST:</b> ${band==='low'?'1-2 · OI!':band==='mid'?'3-4 · DET GÅR':'5-6 · KJEMPEBRA'}<br>${ev.gm[band]}</p>`:'';
+@@
+-    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p>${registered}<details><summary>HVIS DERE KASTER</summary><p><b>1–2:</b> ${ev.gm.low}<br><b>3–4:</b> ${ev.gm.mid}<br><b>5–6:</b> ${ev.gm.high}</p></details>`;
++    return `${base}<p><b>TERNING:</b> BARE HVIS UTFALLET AV HANDLINGEN ETTERPÅ ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>FORSLAG ETTER KAST</summary><p><b>1–2:</b> ${ev.gm.low}<br><b>3–4:</b> ${ev.gm.mid}<br><b>5–6:</b> ${ev.gm.high}</p></details>`;
+@@ -1452,10 +1458,10 @@
+-    const band=p.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>REGISTRERT FYSISK KAST:</b> ${band==='low'?'1-2 · OI!':band==='mid'?'3-4 · DET GÅR':'5-6 · KJEMPEBRA'}<br>${g[band]}</p>`:'';
++    const band=p.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER REGISTRERT FYSISK KAST:</b> ${band==='low'?'1-2 · OI!':band==='mid'?'3-4 · DET GÅR':'5-6 · KJEMPEBRA'}<br>${g[band]}</p>`:'';
+@@
+-      :`<p><b>TERNING:</b> BARE HVIS UTFALLET ER USIKKERT.${skill}</p>${registered}<details><summary>HVIS DERE KASTER</summary><p><b>1–2:</b> ${g.low}<br><b>3–4:</b> ${g.mid}<br><b>5–6:</b> ${g.high}</p></details>`;
++      :`<p><b>TERNING:</b> BARE HVIS UTFALLET ER USIKKERT.${skill}</p><p class="sub"><b>FORTELLER:</b> KONSEKVENSENE UNDER ER FORSLAG, IKKE FASIT. BYTT DEM UT HVIS NOE ANNET PASSER BEDRE TIL BARNETS PLAN.</p>${registered}<details><summary>FORSLAG ETTER KAST</summary><p><b>1–2:</b> ${g.low}<br><b>3–4:</b> ${g.mid}<br><b>5–6:</b> ${g.high}</p></details>`;
+@@ -2498,7 +2504,7 @@
+-let state=null,selectedHero='H14',selectedSkill='MODIG',selectedStartItem='ITEM_ROPE',selectedLength='VANLIG',selectedPuzzleLevel='YNGRE',loadedExistingSave=false;
++let state=null,selectedHero='H14',selectedSkill='MODIG',selectedStartItem='ITEM_ROPE',selectedLength='VANLIG',selectedPuzzleLevel='YNGRE',loadedExistingSave=false,freeDiceBand='';
+@@ -2842,9 +2848,22 @@
+-  const outcome=selected?`<div class="diceOutcome"><strong>${PHYSICAL_DICE_BANDS[selected].range} · ${PHYSICAL_DICE_BANDS[selected].label}</strong>${diceOutcomeText(gm,selected)}</div>`:'';
++  const outcome=selected?`<div class="diceOutcome"><strong>${PHYSICAL_DICE_BANDS[selected].range} · ${PHYSICAL_DICE_BANDS[selected].label}</strong><b>FORSLAG TIL HVA SOM SKJER:</b><br>${diceOutcomeText(gm,selected)}<div class="sub" style="margin-top:5px">FORTELLEREN KAN ENDRE KONSEKVENSEN SÅ DEN PASSER BARNETS PLAN.</div></div>`:'';
+   return `<div class="dicePanel"><div class="dicePrompt"><b>FYSISK D6:</b> KAST BARE HVIS UTFALLET ER USIKKERT. VED 2D6 BRUKER DERE DEN HØYESTE TERNINGEN. TRYKK RESULTATET HER.</div><div class="diceChoices">${buttons}</div>${outcome}</div>`;
+ }
++const FREE_DICE_OUTCOMES=Object.freeze({
++  low:'NOE GÅR SKEIVT ELLER KOSTER LITT, MEN HISTORIEN FORTSETTER. VIS GJERNE EN NY MULIGHET I DET SOM GIKK GALT.',
++  mid:'DET VIRKER, MEN MED EN LITEN KOSTNAD, FORSINKELSE, LYD, VALG ELLER NY KOMPLIKASJON.',
++  high:'DET VIRKER SKIKKELIG BRA. GI GJERNE EN LITEN EKSTRA FORDEL, NYTTIG INFORMASJON ELLER EN FIN FORTELLINGSDETALJ.'
++});
++function renderFreeRoll(){
++  const root=$('#freeRollBox');if(!root)return;
++  const selected=validDiceBand(freeDiceBand)?freeDiceBand:'';
++  const buttons=Object.entries(PHYSICAL_DICE_BANDS).map(([band,m])=>`<button type="button" class="diceChoice ${band}${selected===band?' selected':''}" data-free-dice="${band}"><span class="diceRange">${m.range}</span>${m.label}</button>`).join('');
++  const result=selected?`<div class="diceOutcome"><strong>${PHYSICAL_DICE_BANDS[selected].range} · ${PHYSICAL_DICE_BANDS[selected].label}</strong><b>FORSLAG:</b><br>${FREE_DICE_OUTCOMES[selected]}<div class="sub" style="margin-top:5px">DETTE ER IKKE FASIT. BRUK EN ANNEN KONSEKVENS HVIS DEN PASSER BEDRE TIL DET BARNET FANT PÅ.</div></div>`:'';
++  root.innerHTML=`<strong>NÅR BARNET FINNER PÅ NOE APPEN IKKE HAR TENKT PÅ</strong><p>LETT / UFARLIG: LA DET BARE VIRKE. USIKKERT: KAST FYSISK 1D6. HVIS «EKSTRA GOD PÅ» PASSER: 2D6, BRUK HØYESTE. TRYKK RESULTATET HER.</p><div class="diceChoices" style="margin-top:8px">${buttons}</div>${result}`;
++  $$('[data-free-dice]').forEach(b=>b.onclick=()=>{freeDiceBand=b.dataset.freeDice;renderFreeRoll();const meta=PHYSICAL_DICE_BANDS[freeDiceBand];toast(`${meta.range} · ${meta.label}`)});
++}
+@@ -3015,11 +3034,12 @@
+-    if(item){const quest=state.scenario.found.includes(item),ref=A.entityForItemName(item),visual=ref?A.entityHtml(ref,{interactive:true,label:item,caption:findGuide(item)}):A.slotHtml(A.item(item),{alt:item});el.innerHTML=`<div class="ico">${visual}</div><div>${item}</div>${quest?'<div class="sub">VIKTIG</div>':`<button class="small" data-use="${i}">BRUK</button>`}`;}
++    if(item){const quest=state.scenario.found.includes(item),ref=A.entityForItemName(item),visual=ref?A.entityHtml(ref,{interactive:true,label:item,caption:findGuide(item)}):A.slotHtml(A.item(item),{alt:item});el.innerHTML=`<div class="ico">${visual}</div><div>${item}</div>${quest?'<div class="sub">VIKTIG · KAN IKKE FJERNES</div>':`<div class="invActions"><button class="small" data-use="${i}">BRUK</button><button class="small ghost consume" data-drop="${i}">BRUK OPP / LEGG FRA</button></div>`}`;}
+@@
+-  $$('[data-use]').forEach(b=>b.onclick=()=>{const i=+b.dataset.use,item=state.inventory[i];if(!item)return;if(confirm(`BRUKE ${item}?`)){state.inventory.splice(i,1);addLog(`${item} BLE BRUKT.`);save();renderInv();toast('TINGEN BLE BRUKT')}});
++  $$('[data-use]').forEach(b=>b.onclick=()=>{const i=+b.dataset.use,item=state.inventory[i];if(!item)return;addLog(`${item} BLE BRUKT I HISTORIEN.`);save();toast('TINGEN ER FORTSATT MED')});
++  $$('[data-drop]').forEach(b=>b.onclick=()=>{const i=+b.dataset.drop,item=state.inventory[i];if(!item)return;if(confirm(`BRUKE OPP ELLER LEGGE FRA DEG ${item}? DEN FJERNES FRA SEKKEN.`)){state.inventory.splice(i,1);addLog(`${item} BLE BRUKT OPP ELLER LAGT FRA SEG.`);save();renderInv();toast('TINGEN ER FJERNET')}});
+@@ -3068,6 +3088,7 @@
+ function renderScenario(){
+   $('#scenarioBox').innerHTML=scenarioHint();
++  renderFreeRoll();
