@@ -2,6 +2,39 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Obstacles present problems before the app applies possessed solutions
+Possessing the authored solution to an obstacle does not mean the app should automatically use it when the obstacle is tapped.
+
+For a keyed story door:
+- tapping the locked door only establishes that it is locked,
+- the app does not announce that the matching key in the backpack is the answer,
+- the child gets to propose an action,
+- the scenario key is protected from accidental disposal but has an explicit `BRUK` action,
+- using the matching key beside the door opens it but does not traverse it,
+- the narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` if the child is stuck.
+
+This is a child-agency rule, not merely door polish. The app presents constraints, clues and affordances; the child chooses what to try. Authored solutions are not a closed answer list. A hard story gate still cannot be bypassed by a lucky die roll or accidental navigation, but a genuinely plausible free-form solution may be accepted explicitly by the narrator when the fiction supports it.
+
+## 2026-10-26 - Critical stories use Narrative Graph + curated Storylets
+Live playtest of `CRYSTAL_MACHINE` showed that structurally valid placement is not enough. Three required parts placed safely in three rooms can still feel like unrelated pickups with no causal story.
+
+Critical story generation will therefore move to a hybrid model:
+- Adventure Blueprints define the large dramatic structure,
+- a Narrative Graph defines causal story functions, dependencies, player knowledge and payoff,
+- humans curate small Storylets and compatibility rules,
+- seeded generation may choose and place only compatible Storylets,
+- ambient procedural content is added only after the critical graph is valid.
+
+Every critical objective must have `SETUP -> SIGNAL -> ACTION -> PAYOFF`. Truth and player knowledge are separate. Generic UX5A optional finds may never satisfy story-critical requirements. Critical hidden/search content must have explicit clues and fail-forward. Guardians must have at least one authored non-combat affordance. Three-part collect scenarios default to different play families rather than three copies of the same acquisition pattern.
+
+Live playtest also showed the temporal version of the same problem: `SKYGGEHEKSA`, whose purpose was to make the task harder, could be encountered after the task was already complete. Narrative Graph therefore has explicit dramatic phases and validity/expiry windows. A complication or antagonist may not first activate after the objective it exists to obstruct is resolved. Completing an objective expires or transforms dependent pre-resolution beats. A later appearance of the same character is allowed only as a separately authored `CLIMAX` or `AFTERMATH` beat with a new purpose.
+
+`CRYSTAL_MACHINE` is the first reference experiment. The initial target is one signalled hidden crystal, one NPC-favor crystal with a real reachable dependency and one guardian crystal with non-combat possibilities, followed by deliberate return/assembly before the gate opens.
+
+This is intentionally not pure procedural generation. If manual playtest still requires frequent narrator repair after the Storylet Matrix is implemented, prefer a more hand-authored scenario bank rather than preserving procedural variation at the cost of story quality.
+
+Implementation is blocked until UX5A physical device testing is green and UX5A has been merged to `main`. UX5B is deferred until Narrative Graph V1 is proven, then should consume the explicit graph instead of inferring story logic after generation.
+
 ## 2026-10-26 - Dice report uncertainty; encounter state resolves encounters
 A physical die result may suggest a consequence, but may not automatically remove a normal encounter or fill its progress track. Normal generated encounters use explicit narrator-controlled progress, while monster combat uses explicit hearts only after the child chooses combat.
 
