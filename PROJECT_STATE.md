@@ -22,6 +22,25 @@ Physical dice report uncertainty about a current attempt. A die result never sub
 
 Critical story contract remains **SETUP -> SIGNAL -> ACTION -> PAYOFF**.
 
+## Future platform capability recorded
+`ROADMAP.md` now includes **MULTISCREEN / SHARED SESSION V1** as a future platform package.
+
+Locked direction:
+- DM always starts and hosts the live session,
+- DM host owns the authoritative story/world/session state,
+- player view can detach to another browser/screen,
+- support touch client and display-only external screen,
+- child device joins over local Wi-Fi/LAN,
+- host validates player-requested actions and broadcasts resulting state,
+- reconnect restores current state without duplicated actions,
+- narrator-only data never leaks to player view,
+- DM sees player-view preview/status,
+- DM gets reversible `ANGRE SISTE HANDLING` / action history,
+- undo re-syncs corrected state to every connected surface,
+- save compatibility and stable IDs remain binding.
+
+This future package is deliberately not active yet. It must wait until UX5A is complete and Narrative Graph/story-state transitions are explicit and stable enough to synchronize and reverse safely.
+
 ## UX5A current runtime state
 Canonical patch order is on runtime branch in `patches/README.md`.
 
@@ -105,7 +124,7 @@ While physical UX5A playtest continues:
 - keep Narrative Graph work documentation-only here,
 - do not merge UX5A,
 - do not implement Narrative Graph runtime,
-- do not start UX5B.
+- do not start UX5B or Multiscreen/Shared Session implementation.
 
 When user reports UX5A physical GREEN:
 1. record physical pass,
