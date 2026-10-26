@@ -8,7 +8,8 @@ The Storylet Matrix defines which curated narrative modules may satisfy which st
 The matrix is a compatibility and **meaning** contract. It separates:
 - what enables an action from the child actually choosing it,
 - a scene being present from the scene having a meaningful function,
-- a UI counter from authored fictional progress.
+- a UI counter from authored fictional progress,
+- tracked authored story logic from intentionally open narrator improvisation.
 
 ## Storylet contract
 Each Storylet must declare at least:
@@ -43,6 +44,7 @@ criticalSafe
 
 Optional:
 - `progressStages[]`
+- `narratorImprov`
 - `npcRole`
 - `monsterFamilyAllow[]`
 - `monsterFamilyDeny[]`
@@ -57,6 +59,8 @@ Optional:
 - `strongerHint`
 
 `progressStages[]` is allowed only when each stage names a real meaningful fictional change. There is no default “normal = 3 / exciting = 4” storylet duration.
+
+`narratorImprov`, when present, declares an intentionally open narrator detail. It must state what Forteller is invited to invent, what scope is allowed, and what is forbidden. The narrator view must state that there is no hidden app answer for the open detail. Critical requirements/completion/payoff/world effects may not depend on an untracked improvised fact.
 
 Hints should normally progress from open prompt to affordance-level hint rather than immediately exposing a closed answer.
 
@@ -101,13 +105,26 @@ The `REGNBUENETTET` UX5A finding is a hard authoring lesson: “interesting text
 Every interactive Storylet must answer:
 - Why is this here?
 - What does it prevent, threaten, offer or change **now**?
-- What fictional condition means the problem/opportunity is resolved?
+- What fictional condition means problem/opportunity is resolved?
 - What changes after success?
 - Does game state actually implement that change?
 
-For `ENVIRONMENT`, a Storylet claiming to block a path must actually produce a map/world block while unresolved and a corresponding release effect on completion. It must also have a fail-forward/retreat policy so it cannot softlock.
+For `ENVIRONMENT`, a Storylet claiming to block a path must actually produce a map/world block while unresolved and corresponding release effect on completion. It must also have fail-forward/retreat policy so it cannot softlock.
 
-For `PUZZLE_REWARD`, the puzzle must be caused by or meaningfully embedded in the Storylet. Selecting an arbitrary puzzle because category/type matches is invalid.
+For `PUZZLE_REWARD`, puzzle must be caused by or meaningfully embedded in Storylet. Selecting arbitrary puzzle because category/type matches is invalid.
+
+## Narrator-improvisation rule
+The `BOKA SOM SKRIVER TILBAKE` UX5A finding establishes that **improvisation itself is not the problem; invisible responsibility is.**
+
+A Storylet may intentionally include open details for Forteller. If it does:
+- `narratorImprov` declares that openness,
+- narrator UI says there is no hidden answer/larger predetermined plan for that detail,
+- prompt tells Forteller what can be invented,
+- allowed scope can include atmosphere, cosmetic detail, optional side discovery or optional hint that reuses already-valid facts,
+- forbidden scope includes new mandatory resources, prerequisites, completion state, phase changes and promised world effects unless separately authored/tracked,
+- player-facing fiction remains immersive and need not expose meta implementation language.
+
+For critical Storylets, tracked payload always wins. Example: if the Storylet must reveal `CRYSTAL_BLUE_LOCATION`, that reveal must be authored/tracked; Forteller may improvise the book's wording around that fact, not invent which location is required.
 
 ## Hard rejection examples
 Reject before map materialization if:
@@ -128,7 +145,9 @@ Reject before map materialization if:
 - Storylet has generic progress count with no named `progressStages[]`,
 - progress stage is merely filler/repetition rather than changed fictional state,
 - blocking Storylet can softlock without retreat/fail-forward,
-- random puzzle/mechanic is attached without authored contextual role.
+- random puzzle/mechanic is attached without authored contextual role,
+- prose implies a hidden authored answer but payload is absent and no explicit narrator-improv contract exists,
+- critical state depends on a narrator-invented fact that is not represented in graph state.
 
 ## Agency / affordance rule
 Authored approaches are possibilities, not answer buttons.
@@ -169,6 +188,8 @@ All crystals owned enables separate `ASSEMBLE`; it does not auto-complete assemb
 
 Each chosen acquisition Storylet must have a distinct comprehensible purpose and observable payoff, not merely a different method label.
 
+Bounded narrator-improv may color dialogue, descriptions or optional side details, but it cannot determine whether a crystal exists, where a required clue points, whether a favor is complete or whether the gate can open.
+
 ## Storylet authoring quality bar
 A critical Storylet is not accepted because schema validates. It must answer:
 - Why is this thing here?
@@ -180,6 +201,7 @@ A critical Storylet is not accepted because schema validates. It must answer:
 - What changes when child succeeds?
 - Does world state actually reflect that change?
 - Can narrator understand scene without inventing missing logic or filler steps?
+- If narrator is invited to invent a detail, is that responsibility explicitly labelled and safely scoped?
 - Does UI leave room for an unlisted plausible child solution?
 
 If answers are weak, Storylet remains editorially unapproved even if code is green.
