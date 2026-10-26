@@ -30,7 +30,7 @@ Physical dice report uncertainty. A die result never automatically finishes a no
 - Every generated room gets an investigation state, so the UI does **not** identify loot rooms in advance.
 - `SE DEG RUNDT` is available before the app reveals whether the room contains a hidden find.
 - Optional hidden finds are deterministic for a reconstructed adventure and use the existing curated treasure/affordance bank.
-- Target find counts are 2 for KORT, 3 for VANLIG and 4 for STORT when enough eligible rooms exist.
+- Target find counts are 1 for KORT, 2 for VANLIG and 3 for STORT when enough eligible rooms exist.
 - Hidden finds are never placed in start/finale/story-critical/ambient-treasure rooms.
 - If an investigation discovers signs of a hidden find, uncertain searching uses the six physical D6 faces already used elsewhere.
 - First 1-2 gives a stronger clue without revealing the find; a second low attempt fails forward and reveals it rather than creating a softlock.
