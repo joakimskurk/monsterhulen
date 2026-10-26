@@ -51,7 +51,7 @@ Implemented in UX4:
 - hidden shortcuts/secret doors cannot bypass gate,
 - high rolls cannot skip unmet story gate.
 
-This fixed structural progression, but later playtest shows that a valid prerequisite can still be narratively weak. See finding 8.
+This fixed structural progression, but later playtest shows that a valid prerequisite can still be narratively weak. See findings 8 and 11.
 
 ## 5. Secret doors need discovery play
 Implemented in UX4:
@@ -167,6 +167,32 @@ Hotfix:
 
 Physical retest pending.
 
+## 11. Story complication can arrive after its dramatic purpose is already gone
+Observed in the same live playtest:
+- `SKYGGEHEKSA` was presented as a figure that should make the main task more difficult,
+- the encounter happened only after the player had already completed the task,
+- the encounter therefore had no causal role left and felt like leftover random content rather than part of an adventure.
+
+This is the temporal version of finding 8. A valid encounter is not enough; it must occur while its narrative function still exists.
+
+### Narrative Graph rule added
+Narrative Graph V1 now has explicit phases:
+- `INTRO`
+- `QUEST_ACTIVE`
+- `RETURN`
+- `CLIMAX`
+- `AFTERMATH`
+
+Critical complications/antagonists declare valid phases and expiry conditions.
+
+Hard rule:
+- a complication may not first activate after the objective it exists to obstruct has already resolved,
+- completion of that objective expires or transforms dependent unresolved beats,
+- later reuse of the same character requires a separately authored `CLIMAX` or `AFTERMATH` storylet with a new narrative purpose,
+- ambient content whose prose references an unfinished objective must also be filtered after that objective is complete.
+
+Automated NG1/NG5 validation and browser/manual tests must explicitly cover this case.
+
 ## Verification evidence
 Broad reconstructed UX5A before latest device hotfix:
 - search/encounter QA: **2216 / 0**,
@@ -186,7 +212,7 @@ Byte-identical V0.12.3 baseline provenance and complete assets remain a reposito
 1. Finish physical UX5A hotfix/device smoke.
 2. If green, merge UX5A to `main`.
 3. Create real `narrative/story-graph-v1` branch from merged main.
-4. Implement `WP-NG1` graph model + validator.
+4. Implement `WP-NG1` graph model + validator, including temporal phase/expiry validation.
 5. Convert only `CRYSTAL_MACHINE` through the work package.
 6. Do not start old UX5B until Narrative Graph V1 has passed structural, Chromium and manual editorial gates.
 7. Do not add more blueprints yet.
