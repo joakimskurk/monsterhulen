@@ -1,13 +1,10 @@
 --- index.html
 +++ index.html
-@@ -1204,16 +1204,17 @@
-     const gear=heroItem?`<p><b>MED:</b> ${heroItem.name} – ${heroItem.desc} UTSTYRET GIR IKKE EKSTRA TERNING.</p>`:'';
-     const matches=matchingItemHints(ev,heroItem,inventory,rewards);
+@@ -1261,2 +1261,3 @@
      const itemHelp=matches.length?`<p><b>TING SOM PASSER NÅ:</b><br>${matches.map(x=>`${x.source}: ${x.label} – ${x.hint}`).join('<br>')}</p><p class="sub">DETTE ER MULIGHETER, IKKE FASIT. EN ANNEN GOD IDÉ SKAL VIRKE LIKE GODT.</p>`:'';
-+    const progress=Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)?`<p><b>ANNEN LØSNING:</b> ${Math.max(0,ev.progress)}/${Math.max(1,ev.maxProgress)} FREMGANG. BRUK SPORET NÅR BARNETS PLAN FAKTISK FORANDRER SITUASJONEN. EN EKSTRA GOD LØSNING KAN AVSLUTTE MØTET DIREKTE.</p>`:'';
++    const progress=Number.isFinite(ev.progress)&&Number.isFinite(ev.maxProgress)?`<p><b>ANNEN LØSNING:</b> ${Math.max(0,ev.progress)}/${Math.max(1,ev.maxProgress)} FREMGANG. MARKER ET STEG NÅR BARNETS PLAN FAKTISK FORANDRER SITUASJONEN. NÅR SPORET FYLLES ER MØTET LØST. EN VIRKELIG AVGJØRENDE IDÉ KAN OGSÅ LØSE DET DIREKTE.</p>`:'';
      const monsterRule=ev.type==='MONSTER'?'<p class="sub"><b>MONSTERHJERTER:</b> BARE HVIS BARNET SELV VELGER KAMP. SNAKK, MILJØ, EN GOD IDÉ ELLER EN PASSENDE TING KAN LØSE MØTET UTEN Å TA HJERTER.</p>':'';
-     const band=ev.diceBand,registered=band&&['low','mid','high'].includes(band)?`<p class="diceNarratorResult"><b>FORSLAG ETTER KASTET:</b><br>${ev.gm[band]}</p>`:'';
-     const puzzle=ev.puzzle;
+@@ -1265,8 +1266,8 @@
      const puzzleBlock=puzzle?`<div class="puzzleNarrator"><b>PUZZLE · ${puzzle.categoryLabel} · ${puzzle.levelLabel} ÅR</b><p><b>LES HØYT:</b> ${puzzle.scene} ${puzzle.prompt}</p><p><b>HINT HVIS BARNET STÅR FAST:</b> ${puzzle.hint}</p><details><summary>FASIT FOR FORTELLER</summary><p>${puzzle.answer}</p></details></div>`:'';
 -    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${monsterRule}${puzzleBlock}`;
 +    const base=`<strong>${ev.name}</strong>${narratorEncounterGuide(ev)}<p><b>VIL:</b> ${ev.gm.want}</p><p><b>HINT I VERDEN:</b> ${ev.gm.clue}</p><p><b>KAN LØSES MED:</b> ${ev.gm.ways}</p>${gear}${itemHelp}${progress}${monsterRule}${puzzleBlock}`;
@@ -19,5 +16,3 @@
 -  const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
 +  const api={makeEncounter,enrichDungeon,validateEncounter,validateDungeon,gmSummary,planSearchables,AMBIENT,CRITICAL,MONSTERS,PEOPLE,FRIENDS,TRAPS,MYSTERIES,TREASURES};
    if(typeof module!=='undefined'&&module.exports)module.exports=api;
-   root.EventyrEncounters=api;
- })(typeof globalThis!=='undefined'?globalThis:this);
