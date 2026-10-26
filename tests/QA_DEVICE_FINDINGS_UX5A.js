@@ -20,8 +20,9 @@ ok(renderInv.includes('VIKTIG · KAN IKKE FJERNES')&&renderInv.includes('data-us
 ok(html.includes('KANSKJE DU HAR NOE I SEKKEN?'),'narrator has optional open hint without naming the solution');
 ok(html.includes('<summary>FORTELLERHJELP</summary>'),'puzzle card exposes narrator help');
 ok(html.includes('LA BARNET TENKE UTEN TERNING'),'puzzle explicitly says no die for the puzzle itself');
-ok(html.includes('DET GIR 1 FREMGANG I MØTET'),'puzzle narrator help explains progress consequence');
-ok(html.includes('PUZZLET ER LØST +1 FREMGANG'),'puzzle solve gives explicit progress feedback');
-ok(html.includes("ev.progress=Math.min(ev.maxProgress,Math.max(0,ev.progress||0)+1)"),'puzzle solve advances exactly one encounter progress step');
+ok(html.includes('ET PUZZLE ER ET SPOR, IKKE ET AUTOMATISK FREMGANGSSTEG'),'puzzle narrator help does not invent generic progress');
+ok(html.includes("toast('PUZZLET ER LØST')"),'puzzle solve gives explicit puzzle feedback');
+const puzzleHandler=(html.split("$$('[data-epuzzle]')")[1]||'').split('\n')[0];
+ok(!puzzleHandler.includes('ev.progress='),'puzzle solve does not mutate generic encounter progress');
 console.log(JSON.stringify({ok:fail.length===0,passCount:pass.length,failCount:fail.length,fail},null,2));
 if(fail.length)process.exit(1);
