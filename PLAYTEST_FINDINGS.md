@@ -1,7 +1,7 @@
 # MONSTERHULEN - PLAYTEST FINDINGS
 
 Updated: 2026-10-26
-Status: active UX findings from live child/DM playtest plus UX5A automated/browser verification. Physical target-device judgement remains open.
+Status: active UX findings from live child/DM playtest. UX5A physical device retest remains open. Narrative Graph V1 is now the next architecture package after UX5A green.
 
 ## 1. Encounters are too ambiguous for the DM
 Observed:
@@ -11,26 +11,21 @@ Observed:
 - A DM may want to know important later dependencies, clues and scenario keys before improvising away something useful.
 - A novice DM may meet a named figure and still not understand whether it is friendly, hostile or why a die roll is relevant.
 
-Implemented and verified before UX5A:
-- `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
-  - Encounter and climax consequences are narrator suggestions, not fixed outcomes.
-  - `FRITT KAST` supports uncertain actions the child invents.
-  - Inventory `BRUK` no longer removes an item.
-  - `BRUK OPP / LEGG FRA` is explicit removal.
-- `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
-  - VENN/PERSON/MONSTER roles are explained more clearly.
-  - Narrator panel contains a beginner guide for when not to roll.
-  - Six visual D6 faces record the exact physical result.
+Implemented before UX5A:
+- `FRITT KAST` for uncertain free-form actions,
+- `BRUK` no longer consumes normal inventory items,
+- beginner narrator guidance,
+- six physical D6 faces record actual die input.
 
 Still open:
-- narrator mode should derive actual map-supported non-combat solutions and useful cross-room resources for important encounters. This is UX5B after the physical UX5A gate.
+- narrator mode eventually needs actual graph/map-supported solution context. This is deferred until Narrative Graph V1 is proven.
 
 ## 2. Map navigation is not child-intuitive enough
 Observed:
 - Arrow controls are not the first thing a child tries.
 - The immediate instinct is to tap directly on the map where the next room should be.
 
-Implemented in `patches/v0.12.3_playtest_map_navigation.patch`:
+Implemented:
 - map is primary navigation,
 - reachable unexplored exits show tappable `?`,
 - locked exits show lock state,
@@ -38,10 +33,7 @@ Implemented in `patches/v0.12.3_playtest_map_navigation.patch`:
 - arrows remain fallback.
 
 ## 3. Dice input should look like a physical die
-Observed:
-- abstract outcome buttons do not feel like recording a physical roll.
-
-Implemented in `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`:
+Implemented:
 - six D6 faces with pips,
 - exact die face stored,
 - internal low/mid/high compatibility retained,
@@ -54,94 +46,147 @@ Observed in UX3:
 
 Implemented in UX4:
 - every current blueprint has a hard structural progression gate,
-- finale side is unreachable before its prerequisite,
-- prerequisites stay on the reachable side,
-- hidden shortcuts/secret doors cannot bypass the gate,
-- narrator mode shows what is missing,
-- high rolls cannot skip an unmet story gate.
+- finale side is unreachable before prerequisite,
+- prerequisites stay on reachable side,
+- hidden shortcuts/secret doors cannot bypass gate,
+- high rolls cannot skip unmet story gate.
 
-Manual question still open: do prerequisites feel narratively meaningful enough, or should some become fuller NPC quests/puzzles?
+This fixed structural progression, but later playtest shows that a valid prerequisite can still be narratively weak. See finding 8.
 
 ## 5. Secret doors need discovery play
 Implemented in UX4:
-- hidden connection is invisible until discovered,
-- child gets an in-fiction clue and chooses how to investigate,
-- uncertain search uses physical D6 input,
-- low result gives a stronger clue but keeps the door hidden,
-- successful result reveals the door,
+- hidden connection invisible until discovered,
+- in-fiction clue + optional investigation,
+- uncertain search uses physical D6,
+- low result strengthens clue without revealing,
+- successful result reveals connection,
 - secret doors are optional and cannot bypass story progression.
 
-Target-device question remains: is the search flow fun and obvious on iPad/mobile?
-
 ## 6. Rooms need a reason to be investigated without becoming loot detectors
-UX5 finding:
-- entering a room should sometimes reward curiosity beyond the visible event,
-- useful items should be discoverable through play, not dumped into inventory,
-- UI must not tell the child in advance which room contains something,
-- searching must not create hidden mandatory keys.
-
 UX5A implementation:
-- every room gets the same initial `UNDERSØK ROMMET / SE DEG RUNDT` affordance,
-- investigation happens before the UI reveals whether a hidden find exists,
-- KORT/VANLIG/STORT target 1/2/3 deterministic curated optional finds,
-- find placement excludes start/finale, story-critical rooms and rooms already containing ambient treasure,
-- empty rooms record investigation without forcing a die roll,
-- hidden-find rooms reveal only that something may be hidden after investigation,
-- uncertain search uses six physical D6 faces,
-- first 1-2 gives a stronger clue; repeated low search fail-forwards and cannot permanently hide the optional find,
-- full backpack leaves the revealed find in place.
+- every room gets the same initial `SE DEG RUNDT` affordance,
+- UI does not reveal hidden-find rooms in advance,
+- KORT/VANLIG/STORT target 1/2/3 deterministic optional finds,
+- hidden finds exclude story-critical rooms,
+- empty rooms do not force meaningless dice,
+- first low hidden-search roll strengthens clue,
+- repeated low fails forward,
+- full backpack preserves revealed find.
 
-Automated/browser evidence:
-- UX5A QA verifies deterministic placement, state persistence, fail-forward and full inventory invariants,
-- Chromium verified empty-room search, no item-name leak, six die faces, first low hint, second low reveal and full-backpack preservation through actual app controls.
-
-Manual questions still open:
-- does `SE DEG RUNDT` feel inviting or like a button that must be pressed in every room?
-- should obvious child-described searches bypass the die more often?
-- are 1/2/3 optional finds the right density for KORT/VANLIG/STORT?
+Critical rule retained: generic room finds are optional affordances and may never become hidden mandatory scenario keys.
 
 ## 7. Encounters need durable state, not one-roll victories
-UX5 finding:
-- monster hearts were too small/underdeveloped,
-- non-combat approaches had prose but little durable state,
-- a single lucky result could feel as if it ended a whole encounter.
-
 UX5A implementation:
 - normal fresh monsters: 3 hearts,
 - `SPENNING`: 4 hearts,
-- generated non-treasure encounters: 3 progress steps, or 4 in `SPENNING`,
-- physical die result only records die face + consequence suggestion,
-- narrator explicitly marks `+ FREMGANG` when an action genuinely changes the situation,
-- filling the progress track resolves the encounter,
-- monster hearts appear only after the child chooses combat; final explicit heart removal resolves combat,
-- `LØST MED GOD IDÉ` is the explicit narrator action for a genuinely decisive free-form solution,
-- an active legacy fight retains its remaining hearts during migration instead of being healed.
+- generated non-treasure encounters: 3 progress steps, 4 in `SPENNING`,
+- physical die input never mutates hearts/progress automatically,
+- narrator marks `+ FREMGANG` after meaningful fictional change,
+- full progress resolves encounter,
+- monster hearts appear only after child chooses combat,
+- `LØST MED GOD IDÉ` supports genuinely decisive free-form solutions.
 
-Automated/browser evidence:
-- physical 6 was recorded in Chromium without changing HP or progress,
-- full explicit progress resolved the encounter,
-- `LØST MED GOD IDÉ` resolved through its own path,
-- a `SPENNING` monster rendered 4 hearts and combat ended on the final explicit heart,
-- a manually added normal monster in a `PUSTEROM` generated/rendered 3 hearts.
+Manual question remains whether 3-4 steps feel satisfying rather than bookkeeping.
 
-Manual questions still open:
-- do 3-4 steps create satisfying escalation, or too much bookkeeping for young children?
-- should some encounter families later get bespoke progress beats rather than a generic track?
-- is `LØST MED GOD IDÉ` clear enough to invite creativity without becoming a generic skip button?
+## 8. Critical prerequisites are structurally valid but narratively disconnected
+Observed during live playtest of one random `CRYSTAL_MACHINE` adventure:
+- the adventure required three crystals to open progression,
+- the narrator had not been clearly told this requirement in fiction before it mattered,
+- the gate did not provide a concrete visual clue such as three colored empty sockets,
+- the three crystals felt like required objects rather than three small connected story beats,
+- desired play would have been something like: one hidden through exploration, one earned through an NPC favor, one controlled by a guardian/monster.
 
-## Verification now
-UX5A reconstructed runtime:
-- UX5A search/encounter QA: **2216 / 0**.
-- Adventure Code: **405 / 0**.
-- UX4 progression/secret-door QA: **1797 / 0**.
-- durable combined content regression: **5960 / 0**.
-- 11 inline JavaScript blocks: **0 syntax errors**.
+### Root cause confirmed in current runtime
+`planCollect()`:
+- chooses three reachable pre-gate rooms,
+- places one `DEL` event in each,
+- requires all three through the story gate.
+
+World pacing marks those rooms story-critical and skips them when adding normal ambient encounters. This protects prerequisites from random overwrites, but also means the generator has no controlled mechanism to turn those critical part rooms into an NPC quest, guardian scene or signalled hidden search.
+
+This is therefore an architecture limitation, not a missing-hint-only bug.
+
+### Decision
+Do not solve this by allowing random ambient encounters into critical rooms.
+
+Instead introduce Narrative Graph V1 + curated Storylet Matrix:
+- critical story has explicit causal nodes and resource dependencies,
+- human-authored storylets define setup/signal/action/payoff and compatible combinations,
+- generator chooses only compatible storylets,
+- critical graph is validated before ambient content,
+- truth and player knowledge are separate.
+
+### CRYSTAL_MACHINE reference quality bar
+First experiment should support:
+- visible story reveal of three colored missing sockets,
+- one signalled hidden crystal with fail-forward,
+- one NPC-favor crystal with a real reachable dependency,
+- one guardian crystal with motivation and non-combat possibilities,
+- return to machine,
+- deliberate insertion/activation,
+- gate/climax only after assembly.
+
+A three-part collect scenario should default to three different play families, not three equivalent pickups.
+
+### Human-curation boundary
+Automated structure cannot guarantee good prose or meaningful motivations. Humans must curate storylet premises, motives, clues, payoff and compatibility rules. The generator may safely vary compatible selection/placement.
+
+If 10-20 manual generated Crystal Machine adventures still require frequent narrator invention to repair logic after this system exists, prefer a more hand-authored scenario bank rather than forcing procedural generation.
+
+Canonical specs are on `narrative/story-graph-v1-prep`:
+- `docs/NARRATIVE_GRAPH_V1.md`
+- `docs/STORYLET_MATRIX_V1.md`
+- `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
+- `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+
+## 9. Physical device finding: ready story gate felt cosmetic
+Observed:
+- hero already had `GLASSNØKKEL`,
+- one tap both unlocked and traversed the gate,
+- key remained visible in inventory.
+
+Hotfix:
+- first tap opens only,
+- key is removed with fiction log that it remains in lock,
+- second tap traverses.
+
+Targeted Node: 19/0. Targeted Chromium: 15/0. Physical retest pending.
+
+## 10. Physical device finding: puzzle can be logical but fictionally unclear
+Observed example:
+- `DEN HVISKENDE VEGGEN` encounter,
+- unrelated-looking `STEINTRINNENE` sequence puzzle,
+- narrator could infer answer `4` but not why puzzle belonged to current mystery or what solving it should do.
+
+Hotfix:
+- puzzle framed as clue from current mystery,
+- collapsed `FORTELLERHJELP`,
+- explicit read-aloud/no-die guidance,
+- hint and narrator-only answer,
+- `PUZZLET ER LØST` gives exactly +1 progress.
+
+Physical retest pending.
+
+## Verification evidence
+Broad reconstructed UX5A before latest device hotfix:
+- search/encounter QA: **2216 / 0**,
+- Adventure Code: **405 / 0**,
+- UX4 progression: **1797 / 0**,
+- combined content regression: **5960 / 0**,
+- 11 inline JavaScript blocks: **0 syntax errors**,
 - Chromium UX5A smoke: **23 / 0**.
 
-Reconstructed runtime SHA-256:
-`289e8c4194217b723ee8595635e147647a5853e8bc990f2037716f566b2659ca`
+Targeted device hotfix:
+- Node: **19 / 0**,
+- Chromium: **15 / 0**.
 
-The behavioral reconstruction reproduces historical UX4 test evidence exactly. Byte-identical V0.12.3 baseline provenance and complete assets remain a repository-health issue.
+Byte-identical V0.12.3 baseline provenance and complete assets remain a repository-health issue.
 
-## Priority
-Physical iPad/mobile UX5A smoke is now the immediate gate. If it is green, merge UX5A and begin UX5B map-aware solution graph. Do not add more blueprints yet. Continue repository-health repair in parallel.
+## Priority now
+1. Finish physical UX5A hotfix/device smoke.
+2. If green, merge UX5A to `main`.
+3. Create real `narrative/story-graph-v1` branch from merged main.
+4. Implement `WP-NG1` graph model + validator.
+5. Convert only `CRYSTAL_MACHINE` through the work package.
+6. Do not start old UX5B until Narrative Graph V1 has passed structural, Chromium and manual editorial gates.
+7. Do not add more blueprints yet.
