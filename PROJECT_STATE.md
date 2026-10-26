@@ -1,8 +1,8 @@
 # MONSTERHULEN - PROJECT STATE
 
-Updated: 2026-10-23
+Updated: 2026-10-26
 Current baseline: **V0.12.3 Lasting Thing Identity Pass**
-Current work item: **Repository health repair, then V0.12.4 remaining narrator/start equipment + scenario keys (7 assets)**
+Current work item: **Active playtest UX pass while repository-health repair remains open**
 
 ## What works
 - Product name is Monsterhulen.
@@ -12,11 +12,42 @@ Current work item: **Repository health repair, then V0.12.4 remaining narrator/s
 - 13 selectable start items, 10 active heroes and all 20 active monster families have runtime art in the V0.12.3 release baseline.
 
 ## Repository reality right now
-- `main` currently contains project/status manifests but **does not yet contain the full V0.12.3 runtime source and assets**.
-- This contradicts older status text that called the repo complete. Treat that older claim as superseded.
-- The repository repair is therefore the current blocking work package before further implementation.
+- `main` contains durable project memory, playtest findings and reconstructable patch files for the active UX changes.
+- `main` still does **not** contain the complete V0.12.3 runtime/source/assets snapshot as ordinary directly usable project files.
+- Repository-health repair therefore remains an open technical gate, but it no longer blocks manual UX playtesting because every code delta is preserved as a GitHub patch against the canonical V0.12.3 baseline.
 
-## Incomplete after repository repair
+## Active playtest implementation
+Patch order against canonical V0.12.3:
+1. `patches/v0.12.3_playtest_map_navigation.patch`
+2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
+
+Implemented for manual test:
+- map is primary navigation surface,
+- reachable unexplored exit shows tappable `?`,
+- locked exit shows lock state,
+- revealed adjacent room is tappable,
+- old direction arrows remain fallback,
+- FRITT KAST exists in narrator panel for arbitrary child actions,
+- generated encounter/climax consequences are explicitly suggestions, not fixed outcomes,
+- `BRUK` no longer consumes/removes ordinary bag items,
+- `BRUK OPP / LEGG FRA` is the explicit removal action,
+- scenario-critical items remain protected.
+
+## Verification status for active UX patches
+- 11 inline JS blocks: 0 syntax errors.
+- targeted map navigation logic: 3/3 PASS.
+- existing `move()` function is byte-identical to V0.12.3.
+- FRITT KAST uses existing physical dice bands and no digital RNG.
+- inventory handler inspection confirms only explicit drop/consume removes an item.
+- real browser/mobile interaction is **not automated/certified** in the current execution environment and requires manual playtest.
+
+## Still open from playtest
+- determine whether the new map interaction is intuitive enough for a five-year-old,
+- determine whether FRITT KAST and consequence wording make narrator freedom clear,
+- expand DM adventure plan/spoiler overview,
+- design a versioned deterministic adventure code/seed contract for a second DM device.
+
+## Incomplete content after UX/repo gates
 Asset Batch 9 has 7 remaining item entities:
 - `ITEM_WITCH_BROOM`
 - `ITEM_SHOVEL`
@@ -28,16 +59,9 @@ Asset Batch 9 has 7 remaining item entities:
 
 Later roadmap batches remain: collection-part families + abilities, traps + mysteries, scenario goals/altars/finale, plus pending character art for NPC/friend/pet/rescue groups.
 
-## Known bugs / blockers
-- Current blocker: GitHub `main` must be made self-contained before code/art work continues.
-- Full current browser/mobile interaction QA has not been rerun for V0.12.3.
-- No known gameplay blocker is documented for V0.12.4.
-
-## Verification status
-- Historical V0.12.3 automated results exist in the release test report and must be imported with the source baseline.
-- Current GitHub tree verification on 2026-10-23 showed only the small project/status set, not full runtime.
-- Browser/mobile interaction: not rerun for V0.12.3.
-- Physical device testing: not certified for V0.12.3.
+## Known blockers
+- Repository-health baseline is not yet fully closed.
+- Browser/mobile interaction QA must be performed manually for the active UX build.
 
 ## Do not regress
 - Child proposes actions; the app must not become a closed action menu.
@@ -48,4 +72,4 @@ Later roadmap batches remain: collection-part families + abilities, traps + myst
 - Do not rename internal Eventyr*/HulerCharacterSystem APIs merely for product naming cleanup.
 
 ## Exact next action
-Complete the repository health baseline by importing the canonical V0.12.3 runtime/source/spec/test snapshot into GitHub and verifying that a new chat can reconstruct it. Then start V0.12.4 by auditing and producing the seven pending item/key assets.
+Manual-playtest the UX1 build. Record concrete child/DM findings in `PLAYTEST_FINDINGS.md`. If the map/free-roll/inventory model holds up, implement the expanded DM plan plus a versioned adventure-code design before locking V0.12.4 content. Continue repository-health repair in parallel and close it before the next release checkpoint.
