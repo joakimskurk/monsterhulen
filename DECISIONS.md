@@ -2,6 +2,15 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-26 - Encounter subject and narrative role are separate
+A memorable fictional subject is not permanently tied to one encounter function. The **subject** answers “what is this?”; the **Storylet role** answers “what does it do in this adventure?”.
+
+`BOKA SOM SKRIVER TILBAKE` is the reference example. In different authored Storylets it may be an optional narrator-improvisation mystery, an NPC-like conversational figure, a tracked clue source, the carrier of a puzzle that opens a gate, or the wrapper around an item/reward. Compatible magical subjects such as a talking doll, living portrait, enchanted mirror or whispering statue may use the same pattern.
+
+This is controlled variation, not random role assignment. Subject/role combinations must pass compatibility and story-purpose checks. Critical roles remain authored and tracked; an ambient subject cannot be promoted accidentally into critical logic. If a subject carries a clue, puzzle, gate or item, the payload and payoff are explicit. Subject identity and Storylet identity remain separate/stable so saves and causal state do not depend on presentation skin.
+
+The generator should avoid repeating the same subject within one adventure/recent play when another compatible subject is available. Story quality and causal coherence still outrank combinatorial volume.
+
 ## 2026-10-26 - Intentional narrator improvisation is an explicit authored mode
 Improvisation is allowed and useful, but it must be declared rather than inferred from missing content.
 
