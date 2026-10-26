@@ -6,22 +6,22 @@ STATUS: V0.12.3 BASELINE + UX5A PATCH 14 AUTOMATED GREEN + FRESH BROWSER/PHYSICA
 ## LÅSTE PRINSIPPER
 - Fortellingskvalitet slår kombinasjonsmengde.
 - Barnet foreslår handlinger; appen støtter og presenterer affordances, men velger ikke løsningen automatisk.
-- Å eie riktig nøkkel betyr ikke at et trykk på en låst dør automatisk bruker nøkkelen.
-- Ett fysisk sted har ett synlig kanonisk navn. Zone/biome-metadata kan være intern.
-- Et encounter får mekanikk først når det har tydelig `purpose`, `stakes`, `resolvedWhen` og `payoff`.
-- Generiske 3/4-ruters fremgangsspor uten skrevne steg er ikke tillatt.
-- En hindring som påstås å sperre veien må faktisk påvirke ferdsel, og løsning må faktisk endre verden.
-- Puzzles må ha en skrevet rolle i scenen; de skal ikke kobles tilfeldig på et `MYSTISK` encounter.
-- Forteller-improvisasjon er tillatt, men må være eksplisitt merket/scopet i narrator view når appen med vilje ikke har en skjult fasit.
-- Improvisasjon kan ikke skape nye obligatoriske story prerequisites eller motsi tracked state.
-- Kritiske historier bygges fra kuraterte Adventure Blueprints og etter UX5A fra eksplisitt Narrative Graph + kuraterte Storylets.
+- Ett fysisk sted har ett synlig kanonisk navn.
+- Encounter-mekanikk krever `purpose`, `stakes`, `resolvedWhen` og `payoff`.
+- Generiske fremgangsruter uten skrevne fiction-steg er ikke tillatt.
+- Hindringer må faktisk påvirke verden; løsning må faktisk endre world state.
+- Puzzles må ha en skrevet rolle i scenen; de kobles ikke tilfeldig på et `MYSTISK` encounter.
+- Forteller-improvisasjon er tillatt, men må være eksplisitt merket/scopet når appen med vilje ikke har en skjult fasit.
+- Kritisk story-state kan aldri være avhengig av untracked improvisasjon.
+- **Subjekt, narrativ rolle og utfall er separate lag.** En kjent figur/ting kan brukes i flere forhåndsskrevne kompatible Storylets uten at alle kombinasjoner er lov.
+- Kritiske historier bygges fra Adventure Blueprints + Narrative Graph + kuraterte Storylets.
 - Hvert kritisk mål må ha `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
 - Sannhet og spillerkunnskap er separate state.
-- Kritiske beats har dramatisk timing; obsolete komplikasjoner må utløpe eller transformeres.
+- Kritiske beats har timing/expiry.
 - Finaler må opptjenes gjennom eksplisitte story prerequisites.
 - Hemmelige dører kan aldri omgå story-gates.
-- Fysisk 1D6/2D6 brukes ved reell usikkerhet; appen genererer aldri terningresultat.
-- Et terningresultat alene løser aldri et helt encounter eller erstatter et story prerequisite.
+- Fysisk 1D6/2D6 brukes ved reell usikkerhet; appen ruller aldri digitalt.
+- Et terningresultat alene løser aldri et helt encounter eller erstatter et unmet prerequisite.
 - Ting, venner og kjæledyr er affordances, ikke tallbonuser.
 - Generiske UX5A-romfunn er valgfrie og kan aldri bli story-critical requirements.
 - GitHub-repoet er permanent source of truth.
@@ -40,145 +40,202 @@ STATUS: V0.12.3 BASELINE + UX5A PATCH 14 AUTOMATED GREEN + FRESH BROWSER/PHYSICA
 
 ## PLAYTEST- OG ARKITEKTURREKKEFØLGE
 1. Kartnavigasjon via tappbare `?` / lås / kjente nabrom.
-2. FRITT KAST, tydelig narrator-frihet og ikke-forbrukende `BRUK`.
+2. FRITT KAST, narrator freedom og item-use semantics.
 3. Nybegynner-DM-guide + seks faktiske D6-flater.
 4. Adventure Code V1 + kuraterte blueprint-eventyr.
-5. **UX4:** hard finale-progresjon + oppdagelse av hemmelige dører.
-6. **UX5A:** romundersøkelse + encounter-/world-state + fysiske UX-funn.
-7. **Narrative Graph V1:** sammenhengende kritisk story + Storylet Matrix. Neste arkitekturpakke etter grønn UX5A-device gate. Start kun med `CRYSTAL_MACHINE`.
+5. **UX4:** hard finale-progresjon + hemmelige dører.
+6. **UX5A:** romundersøkelse + encounter/world-state + fysiske UX-funn.
+7. **Narrative Graph V1:** causal/timed critical story + Storylet Matrix. Start kun med `CRYSTAL_MACHINE` etter grønn UX5A-device gate.
 8. **UX5B:** kartbevisst løsningsgraf. Utsatt til Narrative Graph V1 er bevist.
-9. **MULTISCREEN / SHARED SESSION V1:** DM-hostet sesjon med detached spillerflate, lokal Wi-Fi-sync og DM undo. Planlegges etter at story/state-modellen er stabil nok; ikke trekkes foran UX5A/Narrative Graph.
+9. **DM CONTROL SURFACE V1:** samlet DM-styring for scene-state, alternative løsninger, valgfri kamp, outcomes, action history og senere multiscreen-kontroll. Deler av kontrollmodellen må allerede materialiseres i NG4 for å kunne playteste Narrative Graph ordentlig.
+10. **MULTISCREEN / SHARED SESSION V1:** DM-hostet sesjon med detached spillerflate, lokal Wi-Fi-sync og DM undo. Bygges på stabil story/world-state og DM action model.
+
+## NY ARKITEKTURREGEL - SUBJECT -> ROLE -> REQUIREMENTS -> OUTCOME
+Den redaksjonelle gjennomgangen av Pannekakezombien, Den bortkomne zombien, Skjelettdanseren, Skjelettvakten, Sumptrollet og Brotrollet gir en konkret modell for hele encounter-systemet.
+
+### 1. Subject
+`subjectId` er den gjenkjennelige figuren/tingen: f.eks. `PANNEKAKEZOMBIEN`, `SUMPTROLLET`, `BOKA_SOM_SKRIVER_TILBAKE`.
+
+Subject bestemmer identitet, tone og hvilke rollefamilier som er fictionally plausible. Subject bestemmer **ikke** alene hva scenen gjør i eventyret.
+
+### 2. Storylet role
+Samme subject kan ha flere kuraterte roller, f.eks.:
+- `BLOCK_PATH`
+- `NPC_FAVOR`
+- `TRADE`
+- `GUARDIAN`
+- `CLUE_SOURCE`
+- `PUZZLE_CARRIER`
+- `ITEM_HOLDER`
+- `OPTIONAL_IMPROV`
+- `RESCUE`
+- `PAYOFF_CHARACTER`
+
+Generatoren velger bare en forhåndsgodkjent subject/role-kombinasjon. Dette er kontrollert variasjon, ikke fri tilfeldig miksing.
+
+### 3. Requirements / dependency contract
+En Storylet som krever noe må deklarere det som faktisk dependency i grafen.
+
+Eksempel `SUMPTROLLET`:
+- hvis valgt Storylet er «finn mat til meg, så slipper jeg deg forbi», må Storylet kreve `FOOD` eller en eksplisitt kompatibel matressurs,
+- Narrative Graph/Storylet Matrix må da plassere minst én gyldig provider **før** trollscenen og på en rute som kan nås uten å passere troll-gaten,
+- validator må avvise generering der nødvendig mat bare finnes etter trollscenen eller bak gaten trollscenen selv kontrollerer.
+
+Eksempel `BROTROLLET`:
+- ønsket objekt kan variere mellom forhåndsskrevne kompatible requests,
+- valgt request bestemmer `requires[]`,
+- nødvendig objekt/provider må materialiseres tidligere/reachable,
+- randomisering kan velge mellom gyldige dependencies, men kan ikke velge en request først og håpe at DM finner opp objektet senere.
+
+Dette generaliserer til NPC-favors, handel, guardians, reparasjoner, riddles og story-items.
+
+### 4. Outcomes
+En løst Storylet kan ha ett eksplisitt skrevet outcome eller velge mellom et lite sett kuraterte outcomes som passer rollen. Eksempler:
+- `UNBLOCK_PATH`
+- `GRANT_OPTIONAL_ITEM`
+- `GRANT_CRITICAL_RESOURCE`
+- `REVEAL_CLUE`
+- `REVEAL_PUZZLE_ANSWER_OR_RULE`
+- `REVEAL_LOCATION`
+- `BECOME_FRIEND`
+- `OPEN_GATE`
+- `SET_RELATIONSHIP_STATE`
+
+Pannekakezombien kan derfor i forskjellige Storylets:
+- blokkere en dør til den blir fornøyd,
+- gi et valgfritt item,
+- gi en nødvendig story-resource,
+- fortelle et konkret spor,
+- kjenne løsningen/reglen til en gåte et annet sted.
+
+Den bortkomne zombien og Skjelettdanseren kan følge samme system med andre kompatible role/outcome-sett.
+
+Kritiske outcomes må være tracked state og må ha setup/payoff. Ambient outcomes kan være valgfrie, men skal fortsatt være tydelige for DM.
+
+### 5. Alternative child solutions + DM resolution
+Authored approach er aldri en lukket fasitliste.
+
+- Barnet kan foreslå en annen plausibel løsning enn Storylettens forventede affordances.
+- DM må kunne godta løsningen gjennom en tydelig scene-action i DM UI, f.eks. `OPPGAVEN ER LØST` / `GODTA LØSNING`.
+- Fysisk terning brukes bare når utfallet av den konkrete handlingen faktisk er usikkert; ikke som obligatorisk seremoni for alle alternative løsninger.
+- Når DM markerer løsningen, brukes Storylettens samme eksplisitte outcome/worldEffects slik at graph state fortsatt er konsistent.
+- DM skal ikke måtte håndredigere flags, inventory eller kart for å representere en legitim improvisert løsning.
+
+## VALGFRI KAMP SOM DM-STARTET MODUL
+`SKJELETTVAKTEN` synliggjør behovet for en egen kampmodul som kan aktiveres for kompatible encounters.
+
+Regler:
+- kamp er **ikke** automatisk fordi subject er et monster, vakt eller guardian,
+- barnet kan foreslå å slåss, men **DM velger eksplisitt `START KAMP`** når det passer scenen,
+- bare Storylets/subjects merket `combatAllowed` kan starte kamp,
+- kritiske guardians må fortsatt ha minst én skrevet non-combat route med mindre blueprint uttrykkelig sier noe annet,
+- kampmodulen bruker den etablerte fysiske-terning-modellen og eksplisitt encounter/combat-state,
+- kampens språk/visuelle uttrykk skal være barnevennlig, lite skummelt og unngå grafisk skade,
+- `SLÅSS` skal ikke presenteres som default eller «riktig svar» bare fordi muligheten finnes,
+- DM kan avslutte kamp gjennom fictionally valid resolution (gir seg, blir venn, flykter, blir distrahert osv.) uten å måtte «drepe» noe.
+
+Kamp er dermed en løsningsmodul som kan kobles på kompatible Storylets, ikke en egen monster-identitet.
+
+## DM CONTROL SURFACE V1
+Den nye modellen forsterker behovet for et ordentlig DM-UI. DM skal forstå og styre state gjennom story-semantikk, ikke internkode.
+
+Minimumsmål:
+- tydelig **HVA ER GREIA? / HVA KREVES? / HVA KAN SKJE? / NÅR ER DET LØST? / HVA ENDRES DA?**,
+- vise hvilke dependencies som er authored/tracked og hvilke detaljer som er fri improvisasjon,
+- `GODTA LØSNING` / `OPPGAVEN ER LØST` for plausibel alternativ child action,
+- `START KAMP` bare når Storylet tillater det,
+- kampmodul med barnevennlige controls,
+- tydelig valg av eventuelle authored outcomes når Storylet faktisk tillater flere,
+- grant/reveal/open actions skal følge Storylet worldEffects, ikke frie debug-knapper,
+- preview av player-visible state,
+- action history og senere `ANGRE SISTE HANDLING`,
+- DM skal kunne følge hele causal chain uten å måtte huske hva generatoren «mente».
+
+NG4 (`room materialization + narrator knowledge`) må derfor også materialisere nødvendig narrator/DM metadata og state transitions, selv om full DM Control Surface ferdigstilles senere.
 
 ## FREMTIDIG PLATTFORMPAKKE - MULTISCREEN / SHARED SESSION V1
-Mål: ett eventyr kan kjøres fra DM-ens browser med en separat spillerflate på ekstern skjerm eller barnets egen enhet, uten at det oppstår to konkurrerende sannheter om state.
+Mål: ett eventyr kjøres fra DM-ens browser med separat spillerflate uten to konkurrerende sannheter om state.
 
-### 1. Detached spillerflate
-- `SPILLERDEL` skal kunne løsnes fra DM-panelet og vises på en annen skjerm.
-- Ekstern skjerm kan være:
-  - **TOUCH CLIENT** - barnet kan trykke på tillatte spillerhandlinger,
-  - **DISPLAY ONLY** - TV/projektor/non-touch-skjerm viser spillerflaten, mens DM/barn bruker annen input.
-- Spillerflaten skal aldri vise narrator-only informasjon, skjulte svar, skjulte rom, improvisasjonsgrenser eller annen DM-state.
-- DM-panelet skal kunne vise en liten preview/status av hva spillerflaten ser akkurat nå.
+### Detached player view
+- `SPILLERDEL` kan løsnes til annen skjerm/enhet.
+- **TOUCH CLIENT** for barnets iPad/annen touch-enhet.
+- **DISPLAY ONLY** for TV/projektor/non-touch.
+- Player view får bare player-visible state; narrator-only info, løsninger, skjult kart/story-state og improv-guidance må aldri lekke.
+- DM-panelet viser preview/status av hva spilleren ser.
 
-### 2. DM Host / Player Client over lokal Wi-Fi
+### DM Host / Player Client
 - DM starter alltid eventyret/sesjonen.
-- DM-enheten er **autoritativ host** for live story/world state.
-- Barnets iPad/annen enhet kan `JOIN`e en eksisterende DM-sesjon; klienten starter ikke en parallell autoritativ kopi.
-- Primær målarkitektur er lokal-nettverk/LAN-first slik at samme Wi-Fi er nok og internett ikke er et krav for selve spilløkten.
-- Join-flow bør være enkel for barn/familie, f.eks. kort kode og/eller QR.
-- Klienten mottar kun spiller-synlig state og sender tillatte spillerhandlinger tilbake til host for validering.
-- Host validerer handlingen, oppdaterer state og broadcaster den nye autoritative state til alle tilkoblede flater.
-- Reconnect må returnere klienten til korrekt nåværende state uten å starte eventyret på nytt.
-- Tap av spillerklient skal ikke ødelegge eller stoppe DM-sesjonen; DM skal kunne fortsette og klienten kan koble til igjen.
+- DM-enheten er autoritativ host.
+- Barnets klient joiner eksisterende sesjon over lokal Wi-Fi.
+- LAN-first/offline-friendly: samme Wi-Fi skal være nok for live-spill.
+- Join bør være enkel via kort kode og/eller QR.
+- Player client sender forespurte handlinger; host validerer og broadcaster ny autoritativ state.
+- Reconnect/refresh henter nåværende state uten dobbel handling eller restart.
+- Tapt player-client ødelegger ikke DM-sesjonen.
 
-### 3. Sync-kontrakt
-- Én autoritativ session-state, ingen last-write-wins mellom DM og spiller.
-- Alle viktige handlinger får stabil action/event-ID slik at dobbelttrykk/reconnect ikke utfører samme handling to ganger.
-- UI må skille mellom `forespurt handling`, `godkjent/applied state` og eventuelle avviste/stale handlinger.
-- Save compatibility og stabile content/story IDs beholdes; multiplayer/session-laget skal ligge over den samme kanoniske eventyrstaten, ikke lage en ny konkurrerende save-modell.
-- Adventure Code forblir nyttig for rekonstruksjon/offline deling, men er ikke i seg selv live-sync-protokollen.
+### Sync invariants
+- Én autoritativ state; ingen last-write-wins mellom DM og spiller.
+- Handlinger har stabile action/event-ID-er for idempotency.
+- Save compatibility og stabile content/story IDs beholdes.
+- Shared-session layer ligger over kanonisk adventure state.
+- Adventure Code er offline reconstruction/sharing, ikke live-sync-protokoll.
 
-### 4. DM angre / action history
-- DM-panelet skal ha tydelig **ANGRE SISTE HANDLING** eller tilsvarende.
-- Angre skal baseres på en reversibel action/event-logg eller state snapshot-kontrakt, ikke håndredigering av tilfeldige felter.
-- Angre må kunne brukes på typiske feiltrykk: feil romflytting, feil `LØST`, feil item-bruk, feil registrert terningresultat, feil encounter-state osv.
-- Angre skal ikke skape dupliserte items, dobbelt-payoff eller inkonsistent Narrative Graph-state.
-- Når DM angrer, synkes korrigert state umiddelbart til spillerflaten.
-- Før implementasjon må vi definere hvilke handlinger som er trygt reversible og om enkelte irreversible/migrerende handlinger trenger bekreftelse i stedet.
+### DM undo
+- `ANGRE SISTE HANDLING` bygger på reversible events/state snapshots.
+- Typiske feil: feil romflytting, resolve, item-use, die face, combat/encounter transition.
+- Undo må rulle tilbake world/story/resource state uten dupliserte rewards/payoffs.
+- Korrigert state broadcastes umiddelbart til player client/display.
 
-### 5. Acceptance senere
-Når denne pakken blir aktiv skal den minst testes for:
-- touch spillerklient på iPad,
+### Senere acceptance
+- iPad touch client,
 - display-only ekstern skjerm,
-- DM + spiller på samme Wi-Fi,
-- join/rejoin etter refresh eller kort nettverksbrudd,
-- samtidige/doble trykk uten duplisert effekt,
-- DM ser korrekt player-view-status,
-- narrator-only informasjon lekker aldri til spillerflate,
-- undo synkes korrekt på begge skjermer,
+- join/rejoin på samme Wi-Fi,
+- reconnect etter refresh/kort nettverksbrudd,
+- dobbelttrykk uten dobbel effekt,
+- DM preview av player view,
+- null narrator-only data leakage,
+- undo synket på alle flater,
 - save/reload midt i delt sesjon,
-- fysisk familie-playtest der DM ikke må administrere nettverket under spill.
+- fysisk familie-playtest uten nettverksadministrasjon under spill.
 
-Dette er en framtidig pakke. Den skal ikke implementeres før den underliggende story/world-state-modellen er stabil nok til at sync og undo kan bygges på eksplisitte state transitions.
-
-## UX5A acceptance og gate
-Fysiske/UX-funn så langt:
-1. ready key gate kunne unlock + traverse i ett trykk,
-2. mystery puzzle kunne være fictionally disconnected/DM-uklar,
-3. patch-10 brukte fortsatt nøkkelen automatisk og tok dermed barnets løsningsvalg,
-4. romnavn + områdenavn ga ett fysisk sted to identiteter,
-5. `REGNBUENETTET` viste at generiske fire fremgangsruter kunne ha null narrativ mening og null payoff,
-6. `BOKA SOM SKRIVER TILBAKE` så ut til å ha en skjult app-fasit/larger plan selv om den manglende beskjeden egentlig var ment som Forteller-improvisasjon.
-
-Patch 11: eksplisitt key use.
-
-Patch 12: én synlig location identity.
-
-Patch 13: encounter purpose contract:
-- purpose/stakes/resolution/payoff,
-- ingen generisk `ANNEN LØSNING`-track,
-- progress bare for skrevne `progressStages`,
-- traps blokkerer faktisk ferdsel fremover mens aktive og tillater retrett,
-- løsning frigjør veien,
-- ambient random mystery puzzles er ikke automatisk påkoblet.
-
-Patch 14: explicit narrator improvisation:
-- intentionally open ambient mysteries får et per-scene improv prompt,
-- narrator view sier `FORTELLER-IMPROVISASJON` og `INGEN SKJULT FASIT`,
-- det står eksplisitt at ingen større forhåndsbestemt plan finnes for den manglende detaljen,
-- Forteller får ramme for hva som kan finnes på,
-- improvisasjon kan gi stemning/optional hint/side discovery, men ikke ny mandatory story-state.
+## UX5A GATE
+Patch 11: explicit story-key use.
+Patch 12: one visible location identity.
+Patch 13: encounter-purpose contract, authored-progress-only, real trap world effect, no random ambient puzzle attachment.
+Patch 14: explicit narrator improvisation with `INGEN SKJULT FASIT` and bounded prompts.
 
 Automated after patch 14:
-- explicit-improv QA: **20/0**,
-- encounter-purpose QA: **4337/0**,
-- authored-mysteries-only QA: **3075/0**,
-- single-location QA: **19/0**,
-- targeted device QA: **27/0**,
-- searchable-room/encounter: **2328/0**,
-- Adventure Code: **405/0**,
-- UX4 progression: **1797/0**,
-- combined content: **5830/0**,
+- explicit-improv **20/0**,
+- encounter-purpose **4337/0**,
+- authored-mysteries-only **3075/0**,
+- single-location **19/0**,
+- targeted device **27/0**,
+- search/encounter **2328/0**,
+- Adventure Code **405/0**,
+- UX4 **1797/0**,
+- content **5830/0**,
 - 11 scripts: **0 syntax errors**.
 
-Historiske Chromium-resultater (23/0 broad, 15/0 patch-10 focused) kan ikke sertifisere dagens kandidat. Fresh current browser QA er pending.
+Fresh current browser QA og fysisk retest er fortsatt pending. UX5A merges ikke før fysisk gate er grønn.
 
-Før UX5A kan merges:
-- `BOKA SOM SKRIVER TILBAKE` må gjøre narrator responsibility umiddelbart forståelig: authored fiction vs intentional improv,
-- improvisasjonsrammen må hjelpe uten å bli en lukket fasit,
-- `REGNBUENETTET`/trap-flow må fortsatt føles logisk fysisk,
-- single-location + explicit-key må fortsatt føles riktig,
-- ambient mystery må ikke produsere meningsløse tilfeldige puzzles,
-- resten av device smoke må være grønn,
-- nye funn må fikses eller eksplisitt klassifiseres.
+## NARRATIVE GRAPH V1
+Funnene fra `CRYSTAL_MACHINE`, `SKYGGEHEKSA`, `REGNBUENETTET`, `BOKA SOM SKRIVER TILBAKE` og nå zombie/skjelett/troll-gjennomgangen peker på samme arkitektur:
+- Storylet må ha subject + role + purpose + stakes + completion + outcomes + world effects,
+- Storylets kan kreve resources/knowledge/state,
+- alle critical dependencies må ha reachable providers tidligere i grafen,
+- valgt variant/request må bindes før map materialization slik at nødvendige providers kan plasseres korrekt,
+- alternative child solutions kan godtas av DM uten å bryte canonical state,
+- combat er optional authored capability, ikke default monster-flow,
+- DM UI må materialisere graph semantics i menneskelig språk.
 
-## Narrative Graph V1 - hvorfor før UX5B
-`CRYSTAL_MACHINE` viste strukturelt sikre men potensielt isolerte critical pickups. `SKYGGEHEKSA` viste dramatisk timing-feil. `REGNBUENETTET` viste at små encounters må ha funksjon/payoff. `BOKA SOM SKRIVER TILBAKE` viste at bevisst åpen improvisasjon må deklareres som sådan i stedet for å ligne manglende logikk.
-
-Target architecture:
-- Adventure Blueprint = overordnet premiss/struktur,
-- Narrative Graph = beats, resources, prerequisites, knowledge-state, phases og payoff,
-- Storylet Matrix = hard compatibility mellom kuraterte moduler,
-- interactive Storylet/node uttrykker purpose/stakes/resolvedWhen/payoff,
-- progress er authored semantics, aldri default tall,
-- Storylets kan ha bounded narrator-improvisation, men critical causal state kan ikke være avhengig av en untracked improvised fact,
-- map generator plasserer kun validert critical story,
-- ambient/optional content legges på etterpå.
-
-Reference `CRYSTAL_MACHINE`:
-- tre synlige fargede tomme fester,
-- `SEARCH_SECRET` med clue + fail-forward,
-- `NPC_FAVOR` med faktisk reachable dependency,
-- `GUARDIAN` med motive + non-combat route,
-- retur + bevisst assembly,
-- gate/climax først etter assembly.
+Reference `CRYSTAL_MACHINE` forblir første og eneste blueprint som konverteres før NG8.
 
 Work packages:
-- NG0 architecture/spec freeze - complete on prep branch; patch-13/14 lessons must remain folded into specs before runtime implementation,
+- NG0 architecture/spec freeze - docs/prep,
 - NG1 graph data model + validator,
-- NG2 Storylet Matrix engine,
+- NG2 Storylet Matrix engine, inkludert subject/role/requirements/outcome compatibility,
 - NG3 Crystal Machine graph planner,
-- NG4 room materialization + narrator knowledge,
+- NG4 room materialization + narrator/DM knowledge/actions,
 - NG5 >=1000 structural generated QA cases,
 - NG6 real browser interaction QA,
 - NG7 10-20 manual editorial playtests,
@@ -190,14 +247,15 @@ Do not convert another blueprint before NG8.
 Kun fire aktive: `GLASS_HEART`, `WITCH_CAT`, `CRYSTAL_MACHINE`, `ZOMBIE_DELIVERY`. Ikke utvid banken nå.
 
 ## REPOSITORY HEALTH GATE
-Repo-health er fortsatt åpen. Behavioral reconstruction fungerer, men original V0.12.3 baseline er ikke byte-reprodusert fra Library-representasjonen og komplett runtime asset-tree mangler som ordinære repo-filer.
+Behavioral reconstruction fungerer, men original V0.12.3 baseline er ikke byte-reprodusert fra Library-representasjonen og komplett runtime asset-tree mangler som ordinære repo-filer.
 
 ## EXACT NEXT
 Mens fysisk UX5A-test er åpen:
 - patch kun UX5A-defekter på `ux5/searchable-rooms-encounter-tracks`,
 - fysisk test patch-14-kandidaten,
+- fortsett redaksjonell subject/role/outcome-gjennomgang,
 - hold Narrative Graph runtime blokkert,
-- ikke start UX5B.
+- ikke implementer DM Control Surface, UX5B eller Multiscreen ennå.
 
 Når UX5A er fysisk GREEN:
 1. dokumenter fysisk evidens,
