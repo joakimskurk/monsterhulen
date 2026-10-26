@@ -25,23 +25,29 @@ This is historical release evidence. It is not a claim that the current GitHub `
 The current manual-test build is V0.12.3 plus these sequential patches:
 1. `patches/v0.12.3_playtest_map_navigation.patch`
 2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
+3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
 
 Verified in the working build:
 - 11 inline JavaScript blocks, 0 syntax errors.
+- Existing Thing, Treasure, Puzzle, NPC, Friend, Pet and Rescue runtime QA still pass with no new failures.
 - Map navigation targeted logic: 3/3 PASS.
   - open unexplored exit renders `?` and routes to the correct existing move direction,
   - locked exit renders lock state and routes through the same existing move direction,
   - revealed adjacent room is directly tappable and routes through the same existing move direction.
-- Existing `move()` function is byte-identical to V0.12.3.
-- FRITT KAST uses the existing physical result bands `1-2`, `3-4`, `5-6` and contains no digital RNG.
+- Existing `move()` function is unchanged from V0.12.3.
+- FRITT KAST contains no digital RNG.
 - Inventory `BRUK` does not remove the item.
 - Only the explicit `BRUK OPP / LEGG FRA` handler removes an ordinary bag item.
 - Encounter/climax consequences are labelled as suggestions, not narrator mandates.
+- Dice input presents six visual D6 faces with pips.
+- Exact `diceValue` is recorded; the existing compatibility mapping remains 1-2 -> low, 3-4 -> mid, 5-6 -> high.
+- The die animation is only visual feedback after the user selects the physical result; the app does not generate a result.
+- VENN/PERSON/MONSTER narrator guidance is present, including explicit beginner instructions for when a roll is unnecessary.
 
 Not verified yet:
 - automated real-browser interaction, because this execution environment blocks Chromium navigation to both localhost and `file://`,
-- manual mobile/tablet layout of the new map hit targets,
-- live child/DM comprehension of `?`, lock state, FRITT KAST and the revised inventory buttons.
+- manual mobile/tablet layout of the six die faces and new narrator guide,
+- live child/DM comprehension of `?`, lock state, FRITT KAST, revised inventory buttons, narrator guide and die-face input.
 
 ## Repository verification
 For the repaired baseline, the repository must verify at minimum:
