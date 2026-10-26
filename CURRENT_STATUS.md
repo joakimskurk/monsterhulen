@@ -1,9 +1,9 @@
 # MONSTERHULEN - CURRENT STATUS
 
 DATO: 2026-10-26
-STATUS: UX5A DEVICE HOTFIX RETEST PENDING + NARRATIVE GRAPH V1 PREPARED + REPOSITORY HEALTH ÅPEN
+STATUS: UX5A PATCH 11 AUTOMATED GREEN + FRESH BROWSER/PHYSICAL RETEST PENDING + NARRATIVE GRAPH V1 PREPARED + REPOSITORY HEALTH ÅPEN
 
-> `PROJECT_STATE.md` er kanonisk handoff. `START_HERE.md` på prep-branchen peker til riktig leserekkefølge.
+> `PROJECT_STATE.md` er kanonisk handoff. `START_HERE.md` peker til riktig leserekkefølge.
 
 ## BASELINE
 - Produkt: Monsterhulen
@@ -14,67 +14,44 @@ STATUS: UX5A DEVICE HOTFIX RETEST PENDING + NARRATIVE GRAPH V1 PREPARED + REPOSI
 - Prep-branch: `narrative/story-graph-v1-prep`
 - UX5A er ikke merget til `main`.
 
-## UX5A STATUS
-Broad automated/browser verification before latest physical hotfix:
-- UX5A search/encounter QA: **2216 / 0**
+## LATEST UX5A CONTRACT
+Patch 11 on runtime branch changes keyed story doors:
+- door tap only establishes `DØREN ER LÅST`,
+- correct key is not auto-used,
+- scenario key is protected but exposes explicit `BRUK`,
+- child/narrator deliberately chooses key use,
+- successful key use opens and removes/archives key but does not traverse,
+- later tap traverses,
+- narrator may optionally hint `KANSKJE DU HAR NOE I SEKKEN?`.
+
+Durable principle: **having a solution available is not the same as choosing the action**. The app should expose problems and affordances without silently deciding for the child.
+
+## VERIFICATION AFTER PATCH 11
+- targeted device QA: **27 / 0**
+- UX5A search/encounter: **2216 / 0**
 - Adventure Code: **405 / 0**
-- UX4 progression/secret-door: **1797 / 0**
-- content regression: **5960 / 0**
+- UX4 progression: **1797 / 0**
+- combined content regression: **5960 / 0**
 - 11 inline scripts: **0 syntax errors**
-- Chromium UX5A smoke: **23 / 0**
 
-Physical playtest found two concrete issues:
-1. ready story gate unlocked + traversed in one tap and key looked unused,
-2. embedded puzzle could be logical but fictionally disconnected/unclear for narrator.
+Fresh behavioral reconstruction SHA-256:
+`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
 
-Hotfix automated/browser verification:
-- targeted Node: **19 / 0**
-- targeted Chromium: **15 / 0**
-
-Physical retest remains required before merge.
-
-## NEW ARCHITECTURE FINDING
-Live `CRYSTAL_MACHINE` playtest exposed that the current collect planner is narratively too loose:
-- three required parts are placed as three critical `DEL` events,
-- those critical rooms are deliberately skipped by ambient encounter generation,
-- therefore the system cannot reliably create one hidden part, one NPC-favor part and one guardian part with coherent dependencies.
-
-This is now treated as an architecture limitation, not a text polish issue.
+Patch 10 had Chromium 15/0, but its key expectation is superseded. Patch 11 needs fresh browser interaction QA and physical iPad/mobile retest.
 
 ## NEXT ARCHITECTURE
-After UX5A physical green and merge to `main`, begin **Narrative Graph V1** before UX5B.
+After physical UX5A green + merge to `main`: **Narrative Graph V1** before UX5B.
 
-Reference first experiment: `CRYSTAL_MACHINE` only.
+Reference only `CRYSTAL_MACHINE` first: visible requirement reveal, `SEARCH_SECRET`, `NPC_FAVOR`, `GUARDIAN`, deliberate return/assembly, gate only after assembly, explicit dramatic phases/expiry.
 
-Target:
-- visible reveal of three missing colored sockets,
-- one `SEARCH_SECRET` crystal with clue + fail-forward,
-- one `NPC_FAVOR` crystal with real reachable dependency,
-- one `GUARDIAN` crystal with motive + non-combat route,
-- return + deliberate assembly,
-- gate/climax only after assembly.
-
-Canonical prep docs:
-- `docs/NARRATIVE_GRAPH_V1.md`
-- `docs/STORYLET_MATRIX_V1.md`
-- `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
-- `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
-
-Old UX5B is deferred until this architecture is proven and should then consume the explicit story graph.
+The new agency rule also applies here: resource possession must not silently complete an action beat. Owning all crystals is not equivalent to choosing to assemble them.
 
 ## GITHUB / REPOSITORY HEALTH
-`joakimskurk/monsterhulen` remains permanent source of truth. Complete runtime/source/assets baseline is still not directly reconstructable byte-identically from ordinary repo files, so repository-health remains open before a future release checkpoint can be called locked.
+GitHub is permanent source of truth. Complete byte-identical runtime/source/assets baseline remains unresolved, so repository-health is open.
 
 ## EXACT NEXT
-While physical playtest continues:
-- fix only UX5A runtime defects on `ux5/searchable-rooms-encounter-tracks`,
-- keep Narrative Graph prep documentation-only.
-
-When UX5A is physically green:
-1. record pass and rerun relevant regressions if needed,
-2. merge UX5A to `main`,
-3. verify `main`,
-4. create `narrative/story-graph-v1` from merged `main`,
-5. bring approved prep docs over,
-6. start `WP-NG1` graph data model + validator,
-7. do not start UX5B first.
+1. browser-test patch 11 when real-browser harness is available,
+2. physically test explicit key flow + puzzle flow + rest of UX5A smoke,
+3. classify new findings as UX/story-coherence/architecture before patching,
+4. if physical GREEN: document evidence, regress, merge UX5A, verify `main`, create `narrative/story-graph-v1`, carry approved prep docs, start `WP-NG1`,
+5. do not start UX5B first.
