@@ -13,6 +13,13 @@ The active runtime branch is still:
 
 UX5A remains unmerged because physical iPad/mobile playtest is not green yet.
 
+Latest UX5A runtime follow-up is patch 11:
+`patches/v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
+
+It implements a new durable child-agency rule: a locked obstacle must present the problem before the app applies a possessed solution. For a keyed story door, tapping the door only establishes that it is locked. The child must deliberately choose an action such as `BRUK` on the matching key. The narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` if needed.
+
+Patch 11 is automated-runtime green but still needs fresh browser interaction QA and physical device retest.
+
 ## Read in this order
 1. `PROJECT_STATE.md`
 2. `ROADMAP.md`
@@ -31,13 +38,16 @@ Repository is source of truth. Do not reconstruct architecture from old chat con
 ## Why the next plan changed
 Live playtest of `CRYSTAL_MACHINE` showed that the current collect planner is structurally safe but narratively weak. It places three required parts into three reachable critical rooms. Critical rooms are excluded from ambient encounters, so the three parts become isolated pickups rather than connected mini-stories.
 
-A later playtest exposed the temporal version of the same problem: `SKYGGEHEKSA`, whose dramatic purpose was to make an active objective harder, could still first appear after that objective had already been completed. Content can therefore be individually valid while still being dramatically obsolete.
+A later playtest exposed the temporal version of the same problem: `SKYGGEHEKSA`, whose dramatic purpose was to make an active objective harder, could still first appear after that objective had already been completed. Content can therefore be individually valid while still be dramatically obsolete.
 
-The intended replacement is a hybrid Narrative Graph + curated Storylet Matrix:
+Continued UX5A review exposed a related interaction principle: even when the system knows the obvious solution, the app should not take the child's decision away. A locked door with the correct key already owned must still invite the child to decide what to try.
+
+The intended critical-story replacement remains a hybrid Narrative Graph + curated Storylet Matrix:
 - humans curate strong small narrative modules and compatibility rules,
 - the generator chooses only compatible modules and places them on a procedural map,
 - critical story causality is validated before ambient content is added,
-- story beats also have explicit dramatic timing and may expire when their purpose is gone.
+- story beats have explicit dramatic timing and may expire when their purpose is gone,
+- UI/interaction presents constraints and affordances without silently choosing the child's solution.
 
 ## Reference target
 `CRYSTAL_MACHINE` is the first and only blueprint to convert initially.
@@ -58,12 +68,7 @@ Narrative Graph V1 uses explicit dramatic phases:
 
 Story-critical nodes/storylets may define `validPhases`, activation dependencies and expiry conditions.
 
-Example:
-- a complication whose purpose is to hinder crystal collection may be valid during `QUEST_ACTIVE`,
-- it must expire when the crystal objective is completed/assembled,
-- if the same antagonist appears later, that later appearance must be a separately authored `CLIMAX` or `AFTERMATH` beat with a new dramatic purpose.
-
-The validator must reject stale critical complications that first activate after the objective they exist to obstruct is already resolved.
+A complication whose purpose is to hinder crystal collection may be valid during `QUEST_ACTIVE`; it must expire when that objective is resolved. A later appearance requires a separately authored `CLIMAX` or `AFTERMATH` role with new dramatic purpose.
 
 ## Exact sequencing from here
 ### While UX5A physical test is still open
@@ -73,6 +78,14 @@ The validator must reject stale critical complications that first activate after
 - do not merge UX5A,
 - do not start UX5B,
 - do not implement Narrative Graph runtime.
+
+Current device retest must include:
+- keyed door tap remains locked and does not auto-use the key,
+- scenario key exposes explicit protected `BRUK`,
+- explicit key use opens but does not traverse,
+- later tap traverses,
+- puzzle narrator flow remains clear,
+- rest of UX5A device smoke remains green.
 
 ### When user reports UX5A physical GREEN
 1. record physical evidence in repo,
@@ -86,8 +99,9 @@ The validator must reject stale critical complications that first activate after
 ### If physical UX5A is YELLOW/RED
 Stay on UX5A. Fix, regress, and physically retest. Narrative Graph implementation remains blocked.
 
-## Critical architecture decisions
+## Critical architecture/product decisions
 - Story quality beats combinatorial volume.
+- Child proposes actions; app does not silently apply a possessed solution.
 - A smaller bank of coherent adventures with controlled variation is preferred to many disconnected combinations.
 - Critical nodes use `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
 - Critical beats have valid dramatic time windows; obsolete complications expire.
