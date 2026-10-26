@@ -1,90 +1,89 @@
 # UX5A physical device findings - 2026-10-26
 
-Status: **YELLOW - FOLLOW-UP PATCH IMPLEMENTED, BROWSER + PHYSICAL RETEST REQUIRED**
+Status: **YELLOW - PATCH 13 IMPLEMENTED, BROWSER + PHYSICAL RETEST REQUIRED**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 
 Do not merge UX5A to `main` yet.
 
 ## Finding 1 - ready locked door was effectively skipped
-Observed during live playtest:
-- a locked story door was shown,
-- hero already had `GLASSNØKKEL`,
-- tapping forward both unlocked and moved through it,
-- key still appeared unused afterwards.
+Original playtest showed `GLASSNØKKEL` gate could unlock + traverse in one tap. Patch 10 split opening/traversal; continued review showed automatic key use still removed child choice.
 
-Patch 10 initially changed this to open-first/traverse-second and consumed/archived the key. That fixed the one-tap bypass, but continued review exposed a deeper interaction problem; see finding 3.
+## Finding 2 - random mystery puzzle was not fictionally connected
+`DEN HVISKENDE VEGGEN` + unrelated `STEINTRINNENE` showed a generic `MYSTISK` encounter should not receive a random puzzle simply because a puzzle bank exists.
 
-## Finding 2 - mystery puzzle was not fictionally connected or DM-clear
-Observed example:
-- encounter `DEN HVISKENDE VEGGEN`,
-- puzzle `STEINTRINNENE`,
-- narrator could infer the answer but not why the puzzle belonged to the mystery or what solving it should do.
+Patch 13 now makes ambient puzzle attachment opt-in/contextual. Legacy/authored puzzles still use narrator help, but puzzle solving does not automatically feed generic progress.
 
-Patch 10:
-- frames puzzle as a clue produced by the current mystery,
-- adds collapsed `FORTELLERHJELP`,
-- says to let child think without a die roll,
-- provides hint and narrator-only answer,
-- `PUZZLET ER LØST` gives exactly +1 progress,
-- free-form solutions and `LØST MED GOD IDÉ` remain valid.
+## Finding 3 - app should present lock, not auto-apply solution
+Patch 11:
+- keyed door tap only says locked,
+- no auto key use/unlock/traversal,
+- protected scenario key has explicit `BRUK`,
+- matching key use opens/removes key but does not traverse,
+- later tap traverses,
+- narrator may give open backpack hint.
 
-## Finding 3 - app should present the lock, not auto-apply the solution
-Continued physical-review judgement:
-- even patch-10 two-step behavior still used the correct key automatically when the child tapped the locked door,
-- this removes an important child decision,
-- desired play is to notice the locked door, think of a solution and deliberately choose an item/action,
-- if child is stuck, narrator may give an open hint such as `KANSKJE DU HAR NOE I SEKKEN?` without naming the answer.
+## Finding 4 - one physical place appeared to have two names
+Patch 12 makes room name the single visible location identity while keeping zone metadata internal.
 
-This is a product-principle issue: **the app should expose the problem and preserve room for the child's idea before applying a known solution.**
+## Finding 5 - `ANNEN LØSNING` four-box track had no meaning/payoff
+Observed with `REGNBUENETTET`:
+- four boxes had no authored four-step sequence,
+- Forteller could reasonably think four separate actions had to be invented,
+- net did not actually block travel,
+- completing progress changed nothing,
+- therefore scene had no clear functional payoff.
 
-### Follow-up fix - patch 11
-Runtime patch:
-`patches/v0.12.3_playtest_explicit_story_key_use_ux5a.patch`
+Patch 13 `v0.12.3_playtest_encounter_purpose_contract_ux5a.patch` replaces generic duration with a purpose contract:
+- generated non-treasure encounters declare `purpose`, `stakes`, `resolvedWhen`, `payoff`,
+- generic 3/4-box progress removed,
+- progress only for authored `progressStages`,
+- narrator explicitly gets `HVA ER GREIA?`, `NÅR ER DET LØST?`, `HVA ENDRES DA?`,
+- traps block onward travel while active but allow retreat,
+- resolution actually frees onward travel,
+- random ambient mystery puzzles are no longer automatic.
 
-Behavior:
-- tapping a locked keyed door only reports `DØREN ER LÅST`,
-- tap does not unlock, traverse or consume key,
-- first discovery logs only that a locked door was found,
-- current scenario key remains protected from `BRUK OPP / LEGG FRA`,
-- scenario key has explicit `BRUK`,
-- `BRUK` performs special key action only when hero is beside matching locked story door,
-- successful use removes key, explains it remains in lock and opens door,
-- successful key use does not traverse,
-- later door/map tap traverses,
-- Forteller may suggest `KANSKJE DU HAR NOE I SEKKEN?` if help is needed but should not immediately give the solution.
+### `REGNBUENETTET` expected physical behavior
+1. Enter from a previous room.
+2. Net is a concrete obstacle.
+3. Onward travel is blocked while active.
+4. Retreat remains possible.
+5. Child proposes how to get through/free themselves/make trap safe.
+6. Physical die only if that particular attempt is uncertain.
+7. One genuinely sufficient plan may solve it; no four filler tasks.
+8. Press `HINDRINGEN ER LØST` only once fiction satisfies displayed solve condition.
+9. Net resolves and onward travel becomes available.
 
-Non-key progression gates retain existing open-first/traverse-later behavior when their authored prerequisite is explicitly satisfied.
+## Automated verification after patch 13
+Runtime SHA-256:
+`e00ba3c6f3ff1511be32e04e1de7f46ffc0404aa012e2b2600c05ace50fd3db8`
 
-## Verification after patch 11
-Patch 11 SHA-256:
-`276711322f02586f481214011a85a236476d22a524c98c7e96a82c9d1533decf`
-
-Fresh text reconstruction through patch 11:
-`038cee162e33290019b332957b15e42e1a79bdae8fe109010cc60deda5429710`
-
-The runtime hash is a behavioral reconstruction artifact, not a byte-identical release-baseline claim.
+Patch SHA-256:
+`74499137374e50bbf0f9d6385e23073bd7e51e7744b3488f5ade085860f27437`
 
 Automated evidence:
-- targeted device QA: **27 PASS / 0 FAIL**,
-- searchable-room/encounter QA: **2216 PASS / 0 FAIL**,
-- Adventure Code: **405 PASS / 0 FAIL**,
-- UX4 progression: **1797 PASS / 0 FAIL**,
-- combined content regression: **5960 PASS / 0 FAIL**,
-- 11 inline JavaScript blocks: **0 syntax errors**.
+- encounter-purpose **4337/0**,
+- single-location **19/0**,
+- targeted device **27/0**,
+- search/encounter **2295/0**,
+- Adventure Code **405/0**,
+- UX4 progression **1797/0**,
+- combined content **5809/0**,
+- 11 scripts **0 syntax errors**.
 
-Patch-10 focused Chromium was **15 PASS / 0 FAIL**, but the key-door expectation is superseded. Patch 11 therefore needs fresh browser interaction smoke; old 15/0 is not proof of the new key flow.
+Encounter-purpose QA executes real runtime `move()` in a three-room harness and proves active trap blocks forward, retreat works, resolved/absent trap allows forward.
+
+Historical Chromium results do not certify patches 11-13. Fresh current browser QA remains pending due browser/localStorage harness problem. Physical retest required.
 
 ## Exact next physical action
-On patch-11 build, test `GLASS_HEART`:
-1. obtain `GLASSNØKKEL`,
-2. approach matching locked story door,
-3. tap door: it must stay locked and only communicate that it is locked,
-4. give child time to suggest a solution,
-5. if genuinely stuck, narrator may say something open like `KANSKJE DU HAR NOE I SEKKEN?`,
-6. open backpack and verify `GLASSNØKKEL` is important but has `BRUK`,
-7. press `BRUK`: door opens, key leaves backpack with fiction feedback, hero remains in same room,
-8. tap now-open door: only now may hero traverse.
+Use patch-13 build:
+1. test a trap, preferably `REGNBUENETTET`,
+2. verify no generic four-box progress,
+3. judge whether purpose/solve/payoff guidance is immediately clear,
+4. verify forward blocked before solve and retreat works,
+5. let child invent plan; roll only if uncertain,
+6. resolve when fiction genuinely supports it,
+7. verify onward path now works.
 
-Also retest a `MYSTISK` puzzle encounter: narrator should understand what to read, what child is trying to solve, where hint/fasit are, and that solving gives one progress step.
+Continue checking single-location identity, explicit key use, room search, backpack behavior, combat and Adventure Code.
 
-If these and the rest of UX5A smoke are green, follow the exact merge transition in `START_HERE.md`. Otherwise keep patching UX5A; Narrative Graph runtime remains blocked.
+If physical gate is green, follow merge transition in `START_HERE.md`. Otherwise keep patching UX5A; Narrative Graph runtime remains blocked.
