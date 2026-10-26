@@ -11,7 +11,9 @@ Monsterhulen prioritizes a small number of coherent, memorable adventures over c
 1. `patches/v0.12.3_playtest_map_navigation.patch`
 2. `patches/v0.12.3_playtest_dm_free_roll_inventory.patch`
 3. `patches/v0.12.3_playtest_dm_guide_dice_faces.patch`
-4. `patches/v0.12.3_playtest_adventure_code_v1.patch`
+4. `patches/v0.12.3_playtest_adventure_code_v1.patch.gz.b64`
+
+`patches/README.md` documents how the compressed Adventure Code patch reconstructs to a normal unified diff.
 
 ## UX implemented for playtest
 - map is primary navigation with tappable unknown exits, locks and known adjacent rooms,
@@ -34,7 +36,7 @@ Only four are active:
 Do not expand this bank until all four have been manually played and judged narratively strong.
 
 ## Automated verification for UX3
-- Adventure Code V1: 405 / 0.
+- `tests/QA_ADVENTURE_CODE_V1.js`: Adventure Code V1 405 / 0.
 - Thing: 67 / 0.
 - Treasure: 121 / 0.
 - Puzzle: 4665 / 0.
