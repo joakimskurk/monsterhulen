@@ -1,0 +1,23 @@
+{
+  "assets/v3/map/border/corner_inner_ne_01.png": "a06a61d9730a7984cc76cd9e0c7a51324eb5e68ebebdb6299f4efb212c3ea16a",
+  "assets/v3/map/border/corner_inner_nw_01.png": "28051cf7648949034b21d3fc2d51682229e4e6464f27086e96293d024ffe944e",
+  "assets/v3/map/border/corner_inner_se_01.png": "344a6d7e20eb277d4bde5885c06270d230c87359a478618046b5a126c1e1b632",
+  "assets/v3/map/border/corner_inner_sw_01.png": "f635e02eb2e315849c36338a4d109bc6f217ed102bfa5c54784a9e5e33bdec0d",
+  "assets/v3/map/border/corner_outer_ne_01.png": "7d0378f52699577c6d384474f9b4d28c618f319d2ff5058c80dba04062246396",
+  "assets/v3/map/border/corner_outer_nw_01.png": "707c6656f1014c46e87c8e894ca77793c8fcc91129a32ae0b7774e14650f30d5",
+  "assets/v3/map/border/corner_outer_se_01.png": "52aa4c84f51572708ac50367c1aa0f349316e220ad65c38f3ca654a82041a5b8",
+  "assets/v3/map/border/corner_outer_sw_01.png": "363fd9aba7b40b1b70331a748aed2787506f0e35425652957a72cd25d4d00b9e",
+  "assets/v3/map/border/wall_e_01.png": "deaf21c73399a8596e7af2040a40b62d83741c34e547df40fa7595ee037c4aeb",
+  "assets/v3/map/border/wall_n_01.png": "567de147835e3e340f5dce68411ae0e33e8efef8600515480477a0a9d56ae80a",
+  "assets/v3/map/border/wall_s_01.png": "504a16a405d68ee63dd25a2fa953cb34c20568fbf24ec01e7bf1595c6dd3096a",
+  "assets/v3/map/border/wall_w_01.png": "9ec4c7240072f5d493ccad8e32d125f8e70f48e9004b3cd2231fa6a63e1feb8d",
+  "assets/v3/map/floor/stone_01.png": "991b1f03f5a94a7faab9874db4e4e7b98377e30808c2425acdf396430b746979",
+  "assets/v3/map/floor/stone_02.png": "e3d3d81eb9a0c558fd49efd60c37f871a006e489d0b259d969582e70485c1ef0",
+  "assets/v3/map/floor/stone_03.png": "cdf541a1f49e0c563eeaba31fee03fb768b430808da04316ab2e65d3fcc7b743",
+  "assets/v3/map/floor/stone_04.png": "daab89e99bfde0496eccafa338f036bb5078964411c875dff10e1d5de4fa8235",
+  "assets/v3/map/floor/stone_05.png": "4bc5959926422b0db7dd409e7863becbe27266c7f149b21a810e4310ff51f799",
+  "assets/v3/map/floor/stone_06.png": "ace4f45e66fdca72bd8a507e0e74b59f413bd9e734c059783a108f4d248df229",
+  "assets/v3/map/floor/stone_07.png": "eb8205b2773c15d33d6ff3983f137ffc61d70ff4ab21d1f2f7c3e1a7f0ba9627",
+  "assets/v3/map/floor/stone_08.png": "0700186ec8ba5eea97715479e4729637981d5cffe09c3c71376a322d07acc373",
+  "assets/v3/map/floor/stone_09.png": "0cab72289a17914281ff3e66a220922a87d9153a440eeb7eee6b22995ec61443"
+}
