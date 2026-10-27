@@ -1,205 +1,199 @@
-# Monsterhulen - Content Review Handoff 2026-10-26
+# Monsterhulen - Content Review Handoff
 
 Updated: 2026-10-27
-Status: editorial planning only.
+Status: **EXISTING CONTENT-BANK EDITORIAL REVIEW COMPLETE; PREP ONLY**
 
-Purpose: preserve exactly where the subject/role review reached and what rules were inferred, so a new chat can continue without reconstructing recent conversation.
+Purpose: preserve the editorial checkpoint and the user-driven rules inferred during subject/role review, so a new chat does not restart the list or expand the bank prematurely.
 
 ## General review frame
-For each subject, review:
+Each subject was reviewed for:
 1. identity/personality,
 2. allowed Storylet roles,
 3. incompatible roles,
 4. plausible requirements,
 5. valid provider families,
-6. possible outcomes/world effects,
+6. outcomes/world effects,
 7. combat capability yes/no,
 8. interaction-shell needs,
 9. critical-safe vs ambient-only,
 10. repetition limits.
 
-Do not add combinations merely for volume. Story quality and thematic fit first.
+Story quality and thematic fit outrank combinatorial volume.
 
-## Reviewed subjects / explicit user input
+## Earlier explicit user-driven reference findings
 
 ### Pannekakezombien
-Current fiction works.
+Stable subject identity may support several authored roles:
+- block a door,
+- give optional/critical item,
+- reveal clue/rule,
+- social/trade/favor variants.
 
-User direction:
-- in one adventure it may block a door,
-- in another it may give an item,
-- item may be optional or progression-critical,
-- it may reveal an answer/rule/clue needed somewhere else.
-
-System consequence:
-- subject identity is stable,
-- Storylet role/outcome varies among authored compatible variants,
-- critical reward/clue is tracked and causally connected,
-- if it blocks path, world state actually blocks/unblocks path.
+Critical reward/clue remains tracked and causally connected. Blocking actually changes route state.
 
 ### Den bortkomne zombien
-User direction: same general flexibility as Pannekakezombien, with fiction appropriate to its identity.
-
-Potential roles:
-- NPC help/favor,
-- follow-clue,
-- route blocker,
-- clue source,
-- item/reward source,
-- `ZOMBIE_DELIVERY`-style story participant.
+Compatible directions include help/favor, follow-clue, route blocker, clue source, item/reward source and `ZOMBIE_DELIVERY`-style participant.
 
 ### Skjelettdanseren
-Current behavior is acceptable.
-
-User direction: remember that NPC-like figures can have different authored outcomes.
-
-Possible outcomes:
-- moves aside,
-- teaches/reveals a rhythm,
-- gives clue,
-- becomes friendly/recurring,
-- enables later music interaction.
+Can move aside, teach/reveal rhythm, give clue, become friendly/recurring or enable later music interaction.
 
 ### Skjelettvakten
-User direction:
-- this is first strong example where child may choose to fight,
-- combat should be its own module/popup,
-- DM explicitly chooses/starts that module,
-- presentation must stay child-friendly/not scary.
-
-System consequence:
-- combat is `combatAllowed` capability, not default monster state,
+Reference optional-combat subject:
 - child may propose fight,
-- DM triggers `START KAMP`,
-- non-combat route normally remains for critical guardian,
+- DM explicitly starts combat,
+- critical guardian retains non-combat route,
 - resolution need not mean death/kill.
 
 ### Sumptrollet
-User direction:
-- archetypal “find me food and I let you pass”,
-- if that Storylet is selected, food must exist before the troll,
-- child may also make troll happy another plausible way,
-- DM needs good control UI to mark task solved / trigger uncertainty.
-
-Later clarification:
-- food may be a thematically plausible random/semi-random room find,
-- or offered by a seller,
-- seller may accept valuables found on route,
-- child may try to talk their way to food/item,
-- DM triggers physical die interaction if negotiation is genuinely uncertain.
-
-System consequence:
-- `requires FOOD` is separate from provider plan,
-- critical food needs at least one guaranteed reachable route,
-- route may be `ROOM_FIND`, `MERCHANT_PURCHASE`, `TRADE`, `SOCIAL_BARGAIN`, `NPC_REWARD`, etc.,
-- critical progression cannot depend on one persuasion roll,
-- alternate free-form solution can resolve same authored outcome.
+Reference `requires FOOD` blocker:
+- food/provider must exist before troll,
+- resource route may be room find, seller, trade, social bargain, NPC reward, etc.,
+- child may solve another plausible way,
+- no critical single-roll persuasion softlock.
 
 ### Brotrollet
-User direction:
-- same system principle as Sumptrollet,
-- but request is different objects rather than food,
-- exact wanted object can vary with randomization,
-- selected object must be spawned/provided earlier in map.
-
-System consequence:
-- choose among pre-authored request variants,
-- selected request fixes `requires[]`,
-- provider plan is validated before map placement,
-- no arbitrary noun generation.
-
-## Monster-category checkpoint - 2026-10-27
-The remainder of the existing `MONSTERS` bank has now been editorially reviewed, from **DEN LEVENDE RUSTNINGEN** through **REGNGARGOILEN**.
-
-Canonical detailed review:
-`docs/MONSTER_SUBJECT_REVIEW_V1.md`
-
-This completes the existing monster category without adding subjects or blueprints.
-
-Important cross-bank findings captured there:
-- similar solution mechanics need anti-repetition scoring/constraints,
-- `KRYSTALLSLIMET` must not become a CRYSTAL_MACHINE provider by noun/theme matching alone,
-- critical password/mystery subjects need real authored truth and clue chains,
-- `BYTTEKRABBEN` is a strong concrete `TRADE` / merchant-style critical provider subject,
-- monster category does not imply combat; combat capability should remain sparse,
-- critical blockers must create concrete world-state effects, not merely a “completed encounter” flag.
-
-The monster review established compatibility directions only. It does **not** approve arbitrary subject-role combinations.
-
-## Earlier subject/role finding that remains binding
+Wanted object may vary among authored variants, but chosen requirement/provider plan is fixed and validated before map placement. No arbitrary noun generation.
 
 ### Boka som skriver tilbake
-Can have different compatible authored variants:
-- open Forteller-improv with explicit `INGEN SKJULT FASIT`,
-- NPC-like conversation,
-- tracked clue source,
-- riddle/puzzle opening gate,
-- puzzle releasing item,
-- lore/history source,
+Subject may support separate curated variants:
+- open `INGEN SKJULT FASIT` improv,
+- NPC-like dialogue,
+- tracked clue,
+- contextual puzzle/gate,
+- item/reward wrapper,
+- lore/history,
 - one-use helper.
 
-Do not use frequently.
+Current ambient improv instance remains non-critical; a critical variant needs separate authored truth.
 
 ### Candidate sibling subjects
-User suggested same functional pattern may work for:
-- Den snakkende dukken,
-- Det levende bildet.
+`DEN SNAKKENDE DUKKEN` and `DET LEVENDE BILDET` remain candidates only. They were **not** added.
 
-These are candidates, not active-bank additions yet.
+## Existing content categories - COMPLETE
+Detailed review docs:
+- `docs/MONSTER_SUBJECT_REVIEW_V1.md`
+- `docs/PEOPLE_SUBJECT_REVIEW_V1.md`
+- `docs/FRIEND_SUBJECT_REVIEW_V1.md`
+- `docs/TRAP_SUBJECT_REVIEW_V1.md`
+- `docs/MYSTERY_SUBJECT_REVIEW_V1.md`
+- `docs/TREASURE_AFFORDANCE_REVIEW_V1.md`
 
-## Provider principles established during review
-- optional items may be genuinely random when thematically sensible,
-- critical items may appear natural/random to player but at least one route is reserved and proven reachable,
-- sellers can use concrete valuables/trades/favors rather than requiring a big numerical currency system,
-- social bargaining is child-led; app does not show a universal “persuade” answer button,
-- DM determines whether an attempt is uncertain before requesting physical die,
-- low social result fails forward,
-- no critical single-roll softlock.
+This covers the existing source categories:
+- MONSTERS,
+- PEOPLE,
+- FRIENDS,
+- TRAPS,
+- MYSTERIES,
+- TREASURES.
 
-Additional monster-review provider constraints:
-- provider truth comes from the graph, never noun matching,
-- a trade subject cannot consume a unique resource that is still required elsewhere,
-- a critical fetch/favor subject must bind its requested resource/provider before map placement,
-- environmental critical blockers need at least one reachable environmental/provider affordance but should still accept plausible free child solutions.
+No subject was added. No Adventure Blueprint was added.
 
-## DM UI direction established during review
-DM needs semantic controls rather than raw state editing:
+## Cross-bank rules now binding
+Integrated into `docs/STORYLET_MATRIX_V1.md` and `DECISIONS.md`:
+
+### Provider semantics
+- critical provider truth comes from graph/provider binding, never noun/theme matching,
+- optional/incidental loot is not automatically a planned critical provider,
+- critical trade cannot consume the only still-required unique critical resource,
+- critical fetch/favor requests bind provider before map placement,
+- critical environmental blockers expose a scene affordance or have a validated resource provider.
+
+Examples:
+- Krystallslimet/Glasskule are not CRYSTAL_MACHINE providers by similarity,
+- Trollmynt/Messingknapp are not universal permission tokens,
+- optional Honningkjeks does not become the only FOOD route unless explicitly provider-bound.
+
+### Truth / knowledge / topology
+- critical puzzle/mystery needs authored truth/rule/cause,
+- `truthMode=IMPROV` cannot supply critical requirements/completion/world effects,
+- knowledge reveal cannot invent graph topology,
+- `REVEAL_LOCATION` reveals existing authored state,
+- `OPEN_GATE` changes an existing authored gate/edge,
+- phase/expiry applies to friendly clue/delivery content too.
+
+### Repetition
+Selection must consider:
+- subject repetition,
+- role repetition,
+- mechanic-family repetition,
+- solution-family repetition,
+- repeated use of the same versatile prop/affordance.
+
+Important overlap families include light redirection, permission/proof, food/hunger, trade/collector, quiet/sleep, route/map reveal, precise repair and pattern observation.
+
+### Combat
+`MONSTER` category does not imply combat.
+
+`combatAllowed` is Storylet-specific and should remain sparse. Many monster subjects are editorially better with combat disabled.
+
+### Items
+Items/friends/pets remain affordances, not generic bonuses.
+
+Possession never performs trade, feeding, placement, repair, gate opening or assembly. Transfer/use/consumption/placement is an explicit typed action.
+
+## Provider principles
+Initial families remain:
+- `ROOM_FIND`
+- `MERCHANT_PURCHASE`
+- `TRADE`
+- `SOCIAL_BARGAIN`
+- `NPC_REWARD`
+- `PUZZLE_REWARD`
+- `SEARCH_SECRET`
+- explicitly allowed starting/owned resource.
+
+Child speaks/acts first. DM requests physical die only when genuinely uncertain. Low social result fails forward.
+
+## DM UI direction
+DM needs semantic controls instead of raw state editing:
 - what is this scene,
 - what does it need,
 - where can it be acquired,
 - what can happen,
 - what counts as resolved,
-- what changes after resolution,
-- what is authored vs improvisable,
+- what changes,
+- authored vs improvisable,
 - `GODTA LØSNING`,
 - `FORHANDLE / USIKKERT FORSØK`,
 - `START KAMP` when allowed,
 - authored outcome application,
 - later action history/undo.
 
-## Interaction popup direction added at checkpoint
-Some interactions need tangible player-facing shells.
+## Interaction-shell direction
+Focused shells present actions but do not own story logic.
 
-Reference: a gate/machine requiring three colored stones.
-- tapping target opens three visible boxes/sockets only after reveal,
-- child explicitly places items,
-- owning items does not auto-place,
-- partial placement persists,
-- wrong item is not consumed,
-- full slots may enable separate activation if authored,
-- undo must restore inventory + target state atomically.
+Reference machine flow:
+- reveal slots first,
+- explicit child placement,
+- possession does not auto-fill,
+- wrong resource not silently consumed,
+- partial state persists,
+- authored activation/world effect,
+- later atomic undo.
 
 See `docs/INTERACTION_SHELLS_V1.md`.
 
+## CRYSTAL_MACHINE candidate-bank checkpoint
+The only pre-NG8 blueprint target remains `CRYSTAL_MACHINE`.
+
+Nine initial Storylets were audited and revised:
+- `docs/CRYSTAL_STORYLET_AUDIT_2026-10-27.md`
+- canonical revised `docs/CRYSTAL_STORYLET_BANK_V1.md`
+
+Controlled first manual baseline after runtime is eventually unblocked:
+- `CRYSTAL_SEARCH_CHIME`
+- `CRYSTAL_NPC_OWL_PAGE`
+- `CRYSTAL_GUARDIAN_LIGHT_SLIME`
+
+This is not a new blueprint.
+
 ## Exact editorial continuation point
-The existing **MONSTER** category is complete.
+**There is no next subject in the existing list. The review is complete.**
 
-Next category: `PEOPLE`.
+Do not continue by inventing more subjects or expanding Adventure Blueprints.
 
-Next original-list subject to review:
-
-**LANTERNEVAKTEN**
-
-Then continue through the existing PEOPLE list in source order before moving to FRIENDS, TRAPS, MYSTERIES and TREASURES.
-
-Do not expand Adventure Blueprint bank during this review.
+Next content work after Narrative Graph runtime is unblocked:
+1. use the small audited Crystal Storylet bank,
+2. build/test only CRYSTAL_MACHINE through NG1-NG8,
+3. manually judge story quality,
+4. only after NG8 acceptance consider another blueprint or bank expansion.
