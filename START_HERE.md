@@ -1,145 +1,90 @@
-# START HERE - MONSTERHULEN
+# START HERE - MONSTERHULEN VISUAL PREP
 
 Updated: 2026-10-27
-Active branch: `ux5/searchable-rooms-encounter-tracks`
+Branch: `visual/visual-system-v1-prep`
+Status: **VISUAL PREP ONLY — NOT ACTIVE RUNTIME**
 
-## Read this first in a new chat
-Repository is permanent source of truth. Do not reconstruct current state from old chat if repo differs.
+Repository `joakimskurk/monsterhulen` remains source of truth.
 
-Read in this order on this branch:
+## Important branch boundary
+This branch was created from UX5A runtime HEAD `b84ebe410679773e6833bf06fcd75bca449a5b89` only to prepare visual design while the physical iPad/mobile gate is unavailable.
+
+Active runtime remains:
+`ux5/searchable-rooms-encounter-tracks`
+
+UX5A patch 15 is still not physically green and must not be merged to `main` yet.
+
+Do not implement Narrative Graph runtime, UX5B, Multiscreen, new blueprints or content-bank expansion from this branch.
+
+## Read in this order
 1. `PROJECT_STATE.md`
-2. `ROADMAP.md`
-3. `DECISIONS.md`
-4. `TESTING.md`
-5. `PLAYTEST_FINDINGS.md`
-6. `patches/README.md`
-7. `docs/UX5A_GATE_REVIEW_2026-10-27.md`
-8. `docs/UX5A_BROWSER_QA_2026-10-27.md`
+2. runtime branch `ux5/searchable-rooms-encounter-tracks` -> `START_HERE.md`
+3. runtime branch -> `PROJECT_STATE.md`, `ROADMAP.md`, `DECISIONS.md`, `TESTING.md`, `PLAYTEST_FINDINGS.md`
+4. `visual/VISUAL_SYSTEM_V1.md`
+5. `visual/ASSET_CONTRACT_VISUAL_V1.md`
+6. `visual/RESPONSIVE_LAYOUT_V1.md`
+7. `visual/VISUAL_ROADMAP_V1.md`
+8. `visual/INTEGRATION_PLAN_V1.md`
+9. `visual/VISUAL_QA_2026-10-27.md`
+10. `prototypes/visual-system-v1/index.html`
+11. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
 
-Then read architecture prep on branch `narrative/story-graph-v1-prep`:
-1. `START_HERE.md`
-2. `docs/ENCOUNTER_STORY_SYSTEM_PLAN_V1.md`
-3. `docs/NARRATIVE_GRAPH_V1.md`
-4. `docs/STORYLET_MATRIX_V1.md`
-5. `docs/INTERACTION_SHELLS_V1.md`
-6. `docs/CONTENT_REVIEW_HANDOFF_2026-10-26.md`
-7. category review docs listed by prep `START_HERE.md`
-8. `docs/CRYSTAL_STORYLET_BANK_V1.md`
-9. `docs/CRYSTAL_STORYLET_AUDIT_2026-10-27.md`
-10. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+## Current visual checkpoint
+Implemented as prep:
+- reusable visual tokens,
+- CSS-only skin that targets the exact current UX5A DOM,
+- interactive node-map vertical-slice prototype,
+- extension rules for existing runtime Asset Contract `2.4.0`,
+- responsive tablet/mobile contract,
+- staged integration plan.
 
-## Current active work
-UX5A patch 15 physical iPad/mobile retest before merge.
+Verification:
+- `tests/QA_VISUAL_SYSTEM_V1.js`: **14/0**,
+- Chromium node-map prototype: **10/0**,
+- exact patch-15 DOM + visual skin: **13/0**.
 
-Latest runtime patches:
-- patch 11 explicit story-key use,
-- patch 12 one visible location identity,
-- patch 13 encounter purpose/world-effect contract,
-- patch 14 explicit narrator-improvisation guidance,
-- patch 15 removes remaining player-visible zone-name leak from `room.desc`.
+The runtime-skin test used the exact reconstructed patch-15 candidate SHA-256:
+`f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
 
-## Patch 15 checkpoint
-The current patch-15 candidate has been reconstructed from indexed current source and machine-tested.
+Known browser-harness caveat remains: injected CDP document uses in-memory localStorage, so native persistence/clipboard are not certified.
 
-Automated evidence:
-- single location **21/0**
-- explicit improv **20/0**
-- authored mysteries only **5136/0**
-- encounter purpose **4337/0**
-- device findings **27/0**
-- search/encounter **2328/0**
-- Adventure Code **405/0**
-- UX4 progression **1797/0**
-- content regression **5830/0**
-- focused patch-15 runtime gate **6844/0**
-- 11 inline scripts **0 syntax errors**
+## Visual principles now binding for this prep
+- concept art is reference, not flattened UI,
+- text/buttons/state remain real DOM,
+- no UI text baked into room art,
+- stable entity IDs from Asset Contract 2.4.0 remain authoritative,
+- room art is presentation, not story truth,
+- decorative art may not invent exits, keys, NPCs, clues, gates or resources,
+- one visible room identity remains binding,
+- child action remains explicit; owned resources do not auto-apply,
+- hidden graph information may not leak through art,
+- primary touch target >=48 CSS px,
+- player surface stays simpler than narrator surface.
 
-Fresh headless Chromium interaction smoke on exact patch-15 HTML: **22/0**.
+## Safe next visual work while UX5A is still open
+Allowed:
+- refine visual docs/prototype,
+- prepare presentation-only asset specifications,
+- produce room/character/item art against stable IDs,
+- browser-test prep artifacts,
+- provenance/repo-health work that does not alter gameplay.
 
-Harness caveat: browser smoke uses an in-memory localStorage shim because container Chromium denies native localStorage for the injected page.
+Blocked:
+- integrating the skin into active UX5A runtime,
+- replacing the production map renderer,
+- Narrative Graph runtime,
+- UX5B,
+- Multiscreen,
+- content/blueprint expansion.
 
-**Remaining merge gate is physical iPad/mobile testing of the same patch-15 candidate, including native persistence and Adventure Code clipboard/paste.**
-
-Do not merge UX5A until physical gate is green.
-
-Do not implement Narrative Graph runtime, full DM Control Surface, UX5B or Multiscreen while this gate remains open.
-
-## Architecture direction captured in prep
-Target chain:
-
-`SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
-
-Supporting layers:
-- knowledge/reveal,
-- phases/expiry,
-- interaction shell/popup,
-- typed state transitions,
-- later action history/undo/shared-session sync.
-
-Important consequences:
-- same recognizable subject may have several curated roles/outcomes,
-- critical resource needs at least one guaranteed reachable provider route,
-- optional room finds may be genuinely random when thematic,
-- merchant/trade/social bargain are provider families,
-- child speaks/acts first; DM triggers dice only if uncertain,
-- no critical single-roll persuasion softlock,
-- combat is optional Storylet-specific capability, not MONSTER default,
-- planned popups make actions tangible but never auto-use owned solutions.
-
-## Editorial-prep checkpoint
-The complete existing content bank has now been editorially reviewed on `narrative/story-graph-v1-prep`:
-- MONSTERS,
-- PEOPLE,
-- FRIENDS,
-- TRAPS,
-- MYSTERIES,
-- TREASURES.
-
-The Storylet Matrix and durable decisions were updated with findings including:
-- mechanic/solution-family anti-repetition,
-- provider truth cannot come from noun/theme matching,
-- incidental loot != planned critical provider,
-- knowledge reveal cannot invent topology,
-- ambient improv cannot carry critical state,
-- phase/expiry for friendly clues/deliveries,
-- sparse Storylet-specific combat,
-- explicit resource transfer/use/placement.
-
-The nine Crystal Machine Storylet candidates were audited and revised in-place. No subjects or blueprints were added.
-
-**There is no next subject to review. Do not expand the bank.**
-
-## Planned popup reference
-For a gate/machine requiring three colored resources:
-- story reveals sockets first,
-- child taps target,
-- popup shows slots,
-- inventory possession does not auto-fill,
-- child explicitly places items,
-- wrong item is not consumed,
-- partial placement persists,
-- full placement resolves or enables authored activation,
-- world effect opens/activates target,
-- later undo restores target + inventory atomically.
-
-Detailed spec lives on prep branch in `docs/INTERACTION_SHELLS_V1.md`.
-
-## Open-source survey result
-No dependency adopted. Study-only: boardgame.io, Colyseus, rot.js, Epoch Mapper.
-
-## Exact sequencing
-While UX5A physical test is open:
-- physical-test patch 15 on iPad/mobile,
-- patch UX5A defects only on this branch,
-- repo-health/provenance work may continue if it does not change gameplay,
-- architecture/content prep remains documentation-only,
-- do not expand content bank.
-
-When user reports physical UX5A GREEN:
+## When physical UX5A becomes GREEN
+Follow the runtime branch transition sequence exactly:
 1. record physical evidence,
-2. confirm final relevant automated/browser evidence,
+2. confirm final automated/browser evidence,
 3. merge UX5A to `main`,
 4. verify `main`,
 5. create `narrative/story-graph-v1` from merged main,
-6. carry approved prep docs,
-7. start WP-NG1.
+6. carry approved architecture prep docs,
+7. start NG1.
+
+Visual V1 integration is then a separate controlled change: apply the safe skin first, verify parity, and only later evaluate the node-map renderer.
