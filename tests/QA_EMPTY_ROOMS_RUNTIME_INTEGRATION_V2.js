@@ -1,0 +1,20 @@
+const fs=require('fs');
+const css=fs.readFileSync('visual/empty-rooms-runtime-v2.css','utf8');
+const js=fs.readFileSync('visual/empty-rooms-runtime-v2.js','utf8');
+let pass=0,fail=0;
+function ok(c,n){if(c){pass++;console.log('PASS',n)}else{fail++;console.log('FAIL',n)}}
+ok(css.includes('32px!important;height:32px!important'),'tile box is locked to 32x32');
+ok(css.includes('image-rendering:pixelated'),'pixelated rendering is explicit');
+ok(css.includes('.mhRoomFloor')&&css.includes('.mhRoomStruct'),'floor and structural layers are separate');
+ok(js.includes('floor/stone_')&&js.includes('border/wall_'),'integration references floor and border assets');
+ok(!js.includes('/connection/')&&!js.includes('/marker/'),'no door/marker asset layer introduced');
+ok(!js.includes('/item/')&&!js.includes('/hero/')&&!js.includes('/monster/'),'no content asset categories introduced');
+ok(js.includes("classList.contains('joinN')")&&js.includes("classList.contains('joinE')")&&js.includes("classList.contains('joinS')")&&js.includes("classList.contains('joinW')"),'room geometry comes from canonical join classes');
+ok(js.includes('corner_outer_')&&js.includes('corner_inner_'),'outer and inner corners are applied');
+ok(js.includes('MutationObserver'),'layer reapplies after canonical map rerender');
+ok(!/\bmove\s*\(/.test(js),'integration does not call gameplay move()');
+ok(!/state\s*\[[^\]]+\]\s*=|state\.[A-Za-z_$][\w$]*\s*=/.test(js),'integration does not mutate runtime state');
+ok(js.includes("map.style.setProperty('width'")&&js.includes('32px'),'map display size derives from 32px cells');
+ok(js.includes("dataset.emptyRoomsV2='applied'"),'runtime proof exposes integration marker');
+ok(css.includes('.mapWrap{overflow:auto'),'small surfaces pan/scroll rather than fractionally scale tiles');
+console.log(`RESULT ${pass} PASS / ${fail} FAIL`); if(fail)process.exit(1);
