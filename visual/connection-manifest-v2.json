@@ -1,0 +1,24 @@
+{
+  "contract": "Monsterhulen Tileset Contract V2",
+  "batch": "connections-v2",
+  "tileSize": 32,
+  "openingSpan": 20,
+  "assets": [
+    {"id":"MAP_PASSAGE_OPEN_N_01","file":"assets/v3/map/connection/passage_open_n_01.png","kind":"connection","state":"passage_open","orientation":"N","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":0,"row":2}},
+    {"id":"MAP_PASSAGE_OPEN_E_01","file":"assets/v3/map/connection/passage_open_e_01.png","kind":"connection","state":"passage_open","orientation":"E","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":1,"row":2}},
+    {"id":"MAP_PASSAGE_OPEN_S_01","file":"assets/v3/map/connection/passage_open_s_01.png","kind":"connection","state":"passage_open","orientation":"S","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":2,"row":2}},
+    {"id":"MAP_PASSAGE_OPEN_W_01","file":"assets/v3/map/connection/passage_open_w_01.png","kind":"connection","state":"passage_open","orientation":"W","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":3,"row":2}},
+    {"id":"MAP_DOOR_OPEN_N_01","file":"assets/v3/map/connection/door_open_n_01.png","kind":"connection","state":"door_open","orientation":"N","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":4,"row":2}},
+    {"id":"MAP_DOOR_OPEN_E_01","file":"assets/v3/map/connection/door_open_e_01.png","kind":"connection","state":"door_open","orientation":"E","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":5,"row":2}},
+    {"id":"MAP_DOOR_OPEN_S_01","file":"assets/v3/map/connection/door_open_s_01.png","kind":"connection","state":"door_open","orientation":"S","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":6,"row":2}},
+    {"id":"MAP_DOOR_OPEN_W_01","file":"assets/v3/map/connection/door_open_w_01.png","kind":"connection","state":"door_open","orientation":"W","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":7,"row":2}},
+    {"id":"MAP_DOOR_LOCKED_N_01","file":"assets/v3/map/connection/door_locked_n_01.png","kind":"connection","state":"door_locked","orientation":"N","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":8,"row":2}},
+    {"id":"MAP_DOOR_LOCKED_E_01","file":"assets/v3/map/connection/door_locked_e_01.png","kind":"connection","state":"door_locked","orientation":"E","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":9,"row":2}},
+    {"id":"MAP_DOOR_LOCKED_S_01","file":"assets/v3/map/connection/door_locked_s_01.png","kind":"connection","state":"door_locked","orientation":"S","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":10,"row":2}},
+    {"id":"MAP_DOOR_LOCKED_W_01","file":"assets/v3/map/connection/door_locked_w_01.png","kind":"connection","state":"door_locked","orientation":"W","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":11,"row":2}},
+    {"id":"MAP_ROUTE_BLOCKED_N_01","file":"assets/v3/map/connection/route_blocked_n_01.png","kind":"connection","state":"route_blocked","orientation":"N","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":12,"row":2}},
+    {"id":"MAP_ROUTE_BLOCKED_E_01","file":"assets/v3/map/connection/route_blocked_e_01.png","kind":"connection","state":"route_blocked","orientation":"E","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":13,"row":2}},
+    {"id":"MAP_ROUTE_BLOCKED_S_01","file":"assets/v3/map/connection/route_blocked_s_01.png","kind":"connection","state":"route_blocked","orientation":"S","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":14,"row":2}},
+    {"id":"MAP_ROUTE_BLOCKED_W_01","file":"assets/v3/map/connection/route_blocked_w_01.png","kind":"connection","state":"route_blocked","orientation":"W","width":32,"height":32,"rotationSafe":false,"semantic":true,"atlas":{"col":15,"row":2}}
+  ]
+}
