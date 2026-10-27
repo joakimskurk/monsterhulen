@@ -176,8 +176,30 @@ Narrative Graph runtime remains blocked until UX5A is physically green and merge
 
 No second blueprint before NG8.
 
-## Content review continuation
-Reviewed through `BROTROLLET`. Next: **DEN LEVENDE RUSTNINGEN**. Do not expand Adventure Blueprint bank.
+## Editorial-prep checkpoint - EXISTING BANK COMPLETE
+The complete existing content bank has now been editorially reviewed on `narrative/story-graph-v1-prep`:
+- MONSTERS,
+- PEOPLE,
+- FRIENDS,
+- TRAPS,
+- MYSTERIES,
+- TREASURES.
+
+The prep Storylet Matrix now includes cross-bank constraints for:
+- mechanic/solution-family anti-repetition,
+- explicit provider binding rather than noun/theme matching,
+- incidental loot vs planned critical provider,
+- critical-safe trade/resource transfer,
+- truth/knowledge/topology separation,
+- authored critical puzzle truth,
+- ambient improv vs critical state,
+- phase/expiry for clue/delivery content,
+- sparse Storylet-specific combat,
+- explicit typed resource use/placement/consumption.
+
+The nine `CRYSTAL_MACHINE` Storylet candidates were audited and revised in place. No new subjects or blueprints were added.
+
+**There is no next subject to review. Do not expand the bank while UX5A/NG gates are open.**
 
 Active blueprint bank remains:
 - `GLASS_HEART`
@@ -185,11 +207,17 @@ Active blueprint bank remains:
 - `CRYSTAL_MACHINE`
 - `ZOMBIE_DELIVERY`
 
-## Repository health
-Still open. Complete runtime/source/assets are not yet byte-reconstructable from ordinary repo files alone.
+## Repository health - OPEN
+Direct GitHub verification on 2026-10-27 confirms the runtime branch still has no ordinary repository `index.html` and no `assets/` directory. The exact tested patch-15 HTML therefore remains dependent on the reconstructed Project/Library candidate rather than being byte-reconstructable from ordinary repo files alone.
+
+A binary snapshot attempt through the GitHub connector was hash-checked before acceptance and found unsafe because the large encoded payload was truncated/corrupted in transport. That snapshot commit was immediately removed from the runtime branch with force-with-lease. **No snapshot artifact from that failed attempt is valid or referenced.**
+
+Do not claim repository provenance is closed. A later repo-health package should add the exact runtime/source/assets through a byte-safe upload path and verify hashes from the repository copy itself.
 
 ## Exact next action
 **Physical-test this exact patch-15 candidate on iPad/mobile using the 14-point gate.**
+
+If physical playtest is temporarily unavailable, allowed work is limited to repo-health/provenance and documentation/spec refinement that does not implement later runtime packages or expand content.
 
 If anything fails, patch UX5A only and rerun affected machine/browser tests.
 
