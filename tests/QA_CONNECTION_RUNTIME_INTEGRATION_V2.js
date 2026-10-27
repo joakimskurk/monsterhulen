@@ -1,0 +1,22 @@
+const fs=require('fs');
+const js=fs.readFileSync(process.argv[2]||'visual/tileset-connections-v2.js','utf8');
+const css=fs.readFileSync(process.argv[3]||'visual/tileset-connections-v2.css','utf8');
+let pass=0,fail=0;function t(name,ok){console.log(`${ok?'PASS':'FAIL'} ${name}`);ok?pass++:fail++;}
+t('relative asset root',js.includes("const ROOT='assets/v3/map/'"));
+t('uses canonical door DOM sensors',js.includes("querySelector(`:scope > i.door${d}`)"));
+t('reads canonical blocked × from movement controls',js.includes("document.querySelectorAll('[data-move]')")&&js.includes('/^×/'));
+t('does not read hidden state binding',!js.includes('state.previousRoomId')&&!js.includes('state.currentRoomId'));
+t('does not call gameplay move()',!/(^|[^A-Za-z])move\s*\(/.test(js));
+t('does not mutate runtime state',!js.includes('state.')&&!js.includes('unlocked=')&&!js.includes('revealed='));
+t('locked precedence',js.indexOf("classList.contains('locked')")<js.indexOf('blocked.has(dir)'));
+t('shortcut/secret maps to passage',js.includes("classList.contains('shortcut')||el.classList.contains('secret')"));
+t('default maps to door_open',js.includes("return 'door_open'"));
+t('generic walls suppressed on connection edges',js.includes('!j.N&&!doors.N')&&js.includes('!j.E&&!doors.E')&&js.includes('!j.S&&!doors.S')&&js.includes('!j.W&&!doors.W'));
+t('connection layer class emitted',js.includes('mhConnection mhConnection-${kind}'));
+t('mutation observer reapplies',js.includes('new MutationObserver(queue)'));
+t('map dataset proof marker',js.includes("map.dataset.connectionsV2='applied'"));
+t('tiles fixed 32px',css.includes('width:32px!important;height:32px!important'));
+t('connection sprites fixed 32px',css.includes('#map .mhRoomFloor,#map .mhRoomStruct,#map .mhConnection'));
+t('old door lines hidden but DOM retained',css.includes('opacity:0!important')&&css.includes('i.doorN'));
+t('no stretched connection backgrounds',!css.includes('background-size:100% 100%'));
+console.log(`RESULT ${pass} PASS / ${fail} FAIL`);if(fail)process.exit(1);
