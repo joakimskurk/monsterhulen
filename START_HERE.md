@@ -15,135 +15,100 @@ Visual work on this branch may not change gameplay/state semantics and must not 
 ## Read in this order
 1. `PROJECT_STATE.md`
 2. runtime branch `START_HERE.md` + runtime gate/status files
-3. `visual/ASSET_SIZE_STANDARD_V2.md` — **binding size source of truth for all new asset production**
-4. `visual/asset-size-standard-v2.json` — machine-readable mirror
+3. `visual/ASSET_SIZE_STANDARD_V2.md` — binding production sizes
+4. `visual/asset-size-standard-v2.json`
 5. `visual/TILESET_CONTRACT_V2.md`
 6. `visual/EMPTY_ROOMS_ASSET_BATCH_V2.md`
-7. `visual/tileset-manifest-v2.json`
-8. `visual/empty-rooms-assets-v2.sha256.json`
-9. `tools/generate_empty_rooms_v2.py`
-10. `tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`
-11. `tools/validate_tileset_v2.py`
-12. `tools/pack_tileset_v2.py`
-13. `visual/VISUAL_DIRECTION_V1_2.md`
-14. V1.x docs only as historical context for mistakes to avoid
-15. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
+7. `visual/EMPTY_ROOMS_RUNTIME_PROOF_V2.md`
+8. `visual/tileset-manifest-v2.json`
+9. `visual/empty-rooms-assets-v2.sha256.json`
+10. `tools/generate_empty_rooms_v2.py`
+11. `visual/empty-rooms-runtime-v2.css`
+12. `visual/empty-rooms-runtime-v2.js`
+13. `tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`
+14. `tests/QA_EMPTY_ROOMS_RUNTIME_INTEGRATION_V2.js`
+15. V1.x docs only as historical mistakes/lessons.
 
-## Current checkpoint — Empty Rooms Asset Batch V2
-The sheet-first production method is abandoned.
+## Current checkpoint — Empty Rooms V2 implemented in exact patch-15 DOM
+The structural kit is now both generated and applied to the real Monsterhulen map.
 
 Canonical pipeline:
 
-**runtime grid -> exact source box -> isolated structural sprite -> validation -> deterministic atlas**
+**runtime grid -> exact source box -> deterministic structural asset -> validation -> runtime composition**
 
-Verified runtime facts:
-- map grid is 13 x 13 cells,
-- rooms may span multiple joined cells,
-- logical V2 art cell is 32 x 32 px,
-- full map at 1x is 416 x 416 CSS px,
-- map should pan/clip/focus rather than fractionally stretch the tile grid.
-
-The first structural room kit is now produced and validated.
-
-Produced:
-- 9 neutral 32x32 floor stone variants,
-- 4 straight 32x32 wall overlays,
-- 4 outer/convex 32x32 corner overlays,
-- 4 inner/concave 32x32 corner overlays.
+Current structural bank:
+- 9 neutral 32x32 floor tiles,
+- 4 straight 32x32 transparent walls,
+- 4 outer/convex 32x32 transparent corners,
+- 4 inner/concave 32x32 transparent corners.
 
 Total: **21 structural assets**.
 
-Nothing else is included:
-- no doors/connections,
-- no items,
-- no heroes,
-- no NPCs/monsters,
-- no furniture/treasure/traps,
-- no room-content art,
-- no current/selected/fog art.
+Explicitly excluded:
+- doors/connections,
+- items,
+- heroes,
+- NPCs/monsters,
+- furniture/traps/treasure,
+- room-content art.
 
-## Binding size rules
-`visual/ASSET_SIZE_STANDARD_V2.md` and `visual/asset-size-standard-v2.json` define all canonical production boxes.
+## Binding geometry
+- runtime grid: 13 x 13,
+- logical cell: 32 x 32 px,
+- structural wall depth: 6 px,
+- full map at 1x: 416 x 416 px,
+- runtime atlas: 512 x 512, 16 x 16 slots,
+- nearest-neighbour / integer scaling only.
 
-Current structural rules:
-- floor / wall / corner / connection canvas: **32 x 32 px**,
-- structural wall depth: **6 px**,
-- future door/opening span: **20 px** centred in a 32 px cell,
-- runtime atlas: **512 x 512**, 16 x 16 slots of 32 px,
-- nearest-neighbour rendering,
-- no fractional tile scaling.
+Do not invent new production sizes. Extend `ASSET_SIZE_STANDARD_V2` + JSON + regression test first if a genuinely new visual role needs another box.
 
-Do not invent a new asset size during production. If a genuinely new visual role needs a different box, update the size standard + JSON + regression test first.
+## Runtime proof implementation
+`visual/empty-rooms-runtime-v2.js` reads only canonical rendered map geometry:
+- `.tile`,
+- `.joinN/.joinE/.joinS/.joinW`,
+- `.fog`.
 
-## Empty-room batch provenance
-The PNGs are deterministically reproducible from repo text source:
+It does not change the dungeon generator or story state.
 
-`tools/generate_empty_rooms_v2.py`
+For each visible cell it:
+1. assigns one deterministic neutral floor variant + legal rotation,
+2. adds wall overlays where the same physical room stops,
+3. adds convex corners on exterior edge intersections,
+4. adds concave corners using cardinal + diagonal join geometry,
+5. leaves existing runtime controls/markers above the structural layers.
 
-A separate reproduction run matched **21/21 PNG files byte-for-byte**.
-
-Expected hashes:
-`visual/empty-rooms-assets-v2.sha256.json`
-
-Produced manifest:
-`visual/tileset-manifest-v2.json`
-
-This batch therefore does not depend on unsafe binary transport through the GitHub connector.
+The presentation re-applies through a `MutationObserver` after canonical map rerenders.
 
 ## Verification
-Local binary/geometry production validator:
-- **21 / 21 structural assets PASS**.
+Structural asset batch:
+- binary/geometry: **21 / 21 PASS**,
+- repo contract: **19 PASS / 0 FAIL**,
+- clean regeneration: **21 / 21 PNGs byte-identical**.
 
-Repo contract regression:
-- `node tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`
-- **19 PASS / 0 FAIL**.
+Runtime integration:
+- `QA_EMPTY_ROOMS_RUNTIME_INTEGRATION_V2.js`: **14 PASS / 0 FAIL**,
+- fresh Chromium exact patch-15 + V2: **15 PASS / 0 FAIL**.
 
-Manual nearest-neighbour visual review performed on:
-- 9 x 4 floor rotation matrix,
-- transparent wall/corner sheet,
-- 1x1 room,
-- 4x3 room,
-- L-shaped room,
-- irregular room,
-- synthetic 13x13 empty-room map.
+Browser proof confirms actual PNGs load at natural 32x32, tiles render at exact 32 CSS px, multi-cell join geometry is used, normal `?` exploration still works, and the layer survives canonical rerenders on tablet/mobile without page-level horizontal overflow.
 
-The initial floor attempt was rejected by validation for excessive edge variance and replaced before this checkpoint. Do not restore the rejected brick-strip floor variant.
+CDP still uses an in-memory localStorage shim; native persistence/clipboard and physical touch remain outside this visual proof.
 
-## Layer model
-1. fog/background = CSS/runtime state
-2. floor tile
-3. wall/corner overlay
-4. connection/door overlay
-5. hero/marker/content sprite
-6. current/selected/reachable/focus = CSS/runtime state
+## Important implementation lessons
+Two intermediate failures were caught and rejected:
+- relative PNG paths do not work in the standalone `setDocumentContent` harness; the inspection HTML must embed its binary assets,
+- retaining the old responsive map box creates dead black space even when cells are 32px; the V2 proof sizes the map box from actual columns/rows x 32.
 
-This supports 1x1, rectangular, L-shaped and irregular multi-cell rooms from one reusable structural asset bank.
-
-## Hard rules
-- no checkerboard/matte background baked into sprites,
-- no manual production crop coordinates,
-- no stretched sheet bitmap as UI chrome,
-- no environment/story meaning inferred from tone,
-- no current/selected state baked into art,
-- no characters/items/furniture in structural room tiles,
-- no content-bank expansion,
-- no changes to runtime gameplay/state.
-
-## Historical visual attempts
-V1.3/V1.4 are retained as lessons only. Do not continue their sheet-extraction workflow.
-
-Retained lessons:
-- structural/browser QA does not prove visual quality,
-- multi-cell rooms must read as one room,
-- art cannot invent topology/content/state,
-- generated sheets are not reliable production crop sources,
-- stretched bitmap chrome fails.
+Do not use those failed intermediate screenshots as evidence.
 
 ## Exact next safe visual action
-Editorially inspect the empty-room structural kit.
+Editorially inspect the **actual patch-15 room-only implementation**.
 
-If accepted, the next asset package may add **connections/openings/doors only** using the already locked 32x32 canvas and centred 20px opening contract.
+If accepted, next asset scope is only:
+- passage/opening overlays,
+- door overlays,
+- locked/blocked connection variants,
+all using the already locked 32x32 / centred 20px opening contract.
 
-Do not create items, heroes, NPCs, monsters or room contents yet.
+Do not produce items, heroes, NPCs, monsters or room contents yet.
 
 When physical UX5A becomes GREEN, return to runtime branch sequencing first. Visual integration remains a separate controlled package after runtime merge.
