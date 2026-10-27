@@ -25,13 +25,14 @@ Do not implement Narrative Graph runtime, UX5B, Multiscreen, new blueprints or c
 6. `visual/COMPONENT_STATE_MATRIX_V1_1.md`
 7. `visual/ASSET_CONTRACT_VISUAL_V1.md`
 8. `visual/ART_PRODUCTION_SPEC_V1_1.md`
-9. `visual/RESPONSIVE_LAYOUT_V1.md`
-10. `visual/VISUAL_ROADMAP_V1.md`
-11. `visual/INTEGRATION_PLAN_V1.md`
-12. `visual/VISUAL_QA_2026-10-27.md`
-13. `visual/VISUAL_QA_V1_1_2026-10-27.md`
-14. `prototypes/visual-system-v1_1/index.html`
-15. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
+9. `visual/UI_SYMBOLS_V1_1.md`
+10. `visual/RESPONSIVE_LAYOUT_V1.md`
+11. `visual/VISUAL_ROADMAP_V1.md`
+12. `visual/INTEGRATION_PLAN_V1.md`
+13. `visual/VISUAL_QA_2026-10-27.md`
+14. `visual/VISUAL_QA_V1_1_2026-10-27.md`
+15. `prototypes/visual-system-v1_1/index.html`
+16. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
 
 ## Current visual checkpoint — V1.1
 Implemented as prep:
@@ -49,6 +50,7 @@ Implemented as prep:
 - conditional combat presentation,
 - component-state matrix,
 - production art specification,
+- 14-symbol functional SVG sprite,
 - extension rules for existing runtime Asset Contract `2.4.0`,
 - responsive tablet/mobile contract,
 - staged integration plan.
@@ -59,7 +61,8 @@ Verification:
 - exact patch-15 DOM + V1 skin: **13/0**,
 - `tests/QA_VISUAL_DETAILS_V1_1.js`: **32/0**,
 - V1.1 Chromium node-map/detail prototype: **20/0**,
-- exact patch-15 DOM + V1 skin + V1.1 detail layer: **13/0**.
+- exact patch-15 DOM + V1 skin + V1.1 detail layer: **13/0**,
+- `tests/QA_VISUAL_SYMBOLS_V1_1.js`: **8/0**.
 
 The runtime tests use the exact reconstructed patch-15 candidate SHA-256:
 `f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
@@ -100,7 +103,7 @@ Allowed:
 Do not mass-produce the full art bank yet. Start with generic cave + START + BRIDGE + MUSHROOM + UNDERGROUND_LAKE, one representative subject portrait and a few inventory objects; revise the contract after actual browser inspection.
 
 Blocked:
-- integrating the skin/detail layer into active UX5A runtime,
+- integrating the skin into active UX5A runtime,
 - replacing the production map renderer,
 - Narrative Graph runtime,
 - UX5B,
