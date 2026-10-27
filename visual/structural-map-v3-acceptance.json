@@ -1,0 +1,66 @@
+{
+  "contract": "Structural Map V3",
+  "status": "binding",
+  "source": {
+    "logicalCellPx": 32,
+    "mapGrid": {"width": 13, "height": 13},
+    "format": "PNG RGBA",
+    "integerScalingOnly": true
+  },
+  "presentation": {
+    "preferredDisplayScale": 2,
+    "logicalCellCssPxAtPreferredScale": 64,
+    "minMapViewportCssPx": {"width": 320, "height": 320},
+    "fitAllShrinkBelow2x": false,
+    "exploredBoundsViewportOccupancyTargetPct": {"min": 55, "max": 85}
+  },
+  "floor": {
+    "canvas": {"width": 32, "height": 32},
+    "quietEdgeZonePx": 4,
+    "detailRegion": {"xMin": 4, "xMax": 27, "yMin": 4, "yMax": 27},
+    "semantic": false,
+    "edgeFrameForbidden": true,
+    "fullEdgeLineForbidden": true
+  },
+  "wall": {
+    "canvas": {"width": 32, "height": 32},
+    "targetDepthPx": 8,
+    "maxInnerEdgeIrregularityPx": 2,
+    "sameRoomJoinWallAllowed": false,
+    "hardStructuralAlpha": true
+  },
+  "connection": {
+    "canvas": {"width": 32, "height": 32},
+    "anchor": "shared-boundary-midpoint",
+    "aperturePx": 18,
+    "maxSpillIntoEachSidePx": 16,
+    "detachedLockSignalAllowed": false,
+    "blockedSignalPlacement": "threshold"
+  },
+  "syntheticRequired": [
+    "room_1x1",
+    "room_4x3",
+    "room_1x5",
+    "room_L",
+    "room_concave",
+    "two_rooms_open_passage",
+    "two_rooms_open_door",
+    "two_rooms_locked_door",
+    "blocked_threshold"
+  ],
+  "productionGates": ["A_single_room_proof", "B_full_perimeter", "C_one_connection", "D_connection_family", "E_runtime_screenshots"],
+  "manualAcceptanceAllMustPass": [
+    "room_reads_before_grid",
+    "tile_seams_not_obvious",
+    "continuous_room_outline",
+    "same_room_joins_invisible",
+    "connections_on_shared_boundary",
+    "open_door_reads_as_architecture",
+    "passage_reads_as_opening",
+    "lock_attached_to_door",
+    "blocked_state_spans_threshold",
+    "map_has_visual_authority",
+    "dead_space_subordinate",
+    "mobile_uses_focus_pan_not_fit_all"
+  ]
+}
