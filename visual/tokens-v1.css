@@ -1,0 +1,35 @@
+:root{
+  --mh-ink:#100b08;
+  --mh-night:#10182b;
+  --mh-cave:#17243a;
+  --mh-cave-mid:#243b56;
+  --mh-cave-blue:#356b86;
+  --mh-parchment:#f3dcae;
+  --mh-parchment-light:#fff0cd;
+  --mh-parchment-dark:#b47d48;
+  --mh-wood:#5c321d;
+  --mh-wood-dark:#2f1a13;
+  --mh-gold:#f4b83e;
+  --mh-gold-bright:#ffd76a;
+  --mh-orange:#d97325;
+  --mh-green:#4e9c35;
+  --mh-green-bright:#75c544;
+  --mh-blue:#347cb2;
+  --mh-purple:#6b48a8;
+  --mh-red:#d94b43;
+  --mh-moss:#52794a;
+  --mh-cyan:#5bc9db;
+  --mh-crystal-red:#ec4b55;
+  --mh-crystal-blue:#3c91ff;
+  --mh-crystal-yellow:#ffbf2e;
+  --mh-crystal-purple:#9b55e8;
+  --mh-radius-s:10px;
+  --mh-radius-m:16px;
+  --mh-radius-l:24px;
+  --mh-border:rgba(43,25,14,.88);
+  --mh-shadow:0 8px 18px rgba(2,6,13,.34), inset 0 1px rgba(255,255,255,.24);
+  --mh-shadow-pressed:0 3px 8px rgba(2,6,13,.34), inset 0 2px 5px rgba(0,0,0,.25);
+  --mh-font-display:Georgia,"Times New Roman",serif;
+  --mh-font-ui:Trebuchet MS,Arial,sans-serif;
+  --mh-touch:48px;
+}
