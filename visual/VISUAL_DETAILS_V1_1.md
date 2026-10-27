@@ -149,7 +149,21 @@ V1.1 includes:
 - `prefers-reduced-motion` handling,
 - no reliance on color alone for locked/current/unknown distinctions.
 
-## 12. What V1.1 deliberately does not do
+## 12. Modular prototype structure
+The detailed prototype is split into ordinary text assets so each part can be byte-verified in Git:
+- `prototypes/visual-system-v1_1/index.html`
+- `prototypes/visual-system-v1_1/style-map.css`
+- `prototypes/visual-system-v1_1/style-ui.css`
+- `prototypes/visual-system-v1_1/prototype.js`
+
+Verified Git blob IDs for the browser-tested modules:
+- index: `356a1d1fb20f092ae7110d9e7beb7e16b5f3494b`
+- map/chrome CSS: `047b238d0504892f7fb8c17067da445e0302ef62`
+- room/HUD/overlay CSS: `e7fdbc0d6788b1040a50e5f658d5978d5258ec5a`
+- interaction JS: `6ce3264a3f867f4bcff5a2ea45cc81475186dbce`
+- runtime detail CSS: `099c874a52a813435fdc49dd8d5bb473ffa0cc16`
+
+## 13. What V1.1 deliberately does not do
 - no Narrative Graph runtime,
 - no production map replacement,
 - no save-schema change,
@@ -161,7 +175,7 @@ V1.1 includes:
 
 ## Verification checkpoint
 Machine/static:
-- `QA_VISUAL_DETAILS_V1_1.js`: **30 PASS / 0 FAIL**.
+- `QA_VISUAL_DETAILS_V1_1.js`: **32 PASS / 0 FAIL**.
 
 Chromium node-map/detail prototype:
 - **20 PASS / 0 FAIL**.
