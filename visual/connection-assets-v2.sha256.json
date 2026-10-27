@@ -1,0 +1,18 @@
+{
+  "MAP_DOOR_LOCKED_E_01": {"bytes":259,"file":"assets/v3/map/connection/door_locked_e_01.png","sha256":"547b29df597d0654dc25529f5093fffeb884b6e618d41edd80a7fb453a5eef58"},
+  "MAP_DOOR_LOCKED_N_01": {"bytes":244,"file":"assets/v3/map/connection/door_locked_n_01.png","sha256":"6282b67e4730a055bcced1a7f5102478a5894f0b106fe2e5f12add056f10297c"},
+  "MAP_DOOR_LOCKED_S_01": {"bytes":272,"file":"assets/v3/map/connection/door_locked_s_01.png","sha256":"5428f75d5d38a43b7ccc539244f68fb1294e0590c5723c614b101b1469d29c19"},
+  "MAP_DOOR_LOCKED_W_01": {"bytes":289,"file":"assets/v3/map/connection/door_locked_w_01.png","sha256":"f719aca0da040e55d2bf0a7823a45ffd4f950fe960d0be0c061ef1f34065959e"},
+  "MAP_DOOR_OPEN_E_01": {"bytes":226,"file":"assets/v3/map/connection/door_open_e_01.png","sha256":"d2e0096ec8413209825590f6177133b3a9ece7027dfb03a81fb0eaff0b0e8dde"},
+  "MAP_DOOR_OPEN_N_01": {"bytes":258,"file":"assets/v3/map/connection/door_open_n_01.png","sha256":"e4278d58a975341ab44ad7cec320270a87d711ae2735871427a4cdff1fcc5bbf"},
+  "MAP_DOOR_OPEN_S_01": {"bytes":243,"file":"assets/v3/map/connection/door_open_s_01.png","sha256":"4aac663c92180315c85c29e9313b15f3dda4e701d8525a983472565573e8983c"},
+  "MAP_DOOR_OPEN_W_01": {"bytes":240,"file":"assets/v3/map/connection/door_open_w_01.png","sha256":"5026978c9691a4f4174e5b9d6f444f2f07476761e4f15f2709676c29ba09e0b6"},
+  "MAP_PASSAGE_OPEN_E_01": {"bytes":189,"file":"assets/v3/map/connection/passage_open_e_01.png","sha256":"88132813e8d3d450db3b494f0ba02ef7d3e2217cdebe4921cb8abe9c8ccf45c4"},
+  "MAP_PASSAGE_OPEN_N_01": {"bytes":193,"file":"assets/v3/map/connection/passage_open_n_01.png","sha256":"e419bc12f21f6760a6003a3b69241be09a37363b8f75944e16e1aed74a8de332"},
+  "MAP_PASSAGE_OPEN_S_01": {"bytes":187,"file":"assets/v3/map/connection/passage_open_s_01.png","sha256":"8d99d4db79d1a85c3c2f8c62791af3aa295b546a63ec2b97f32ede70f53e1326"},
+  "MAP_PASSAGE_OPEN_W_01": {"bytes":190,"file":"assets/v3/map/connection/passage_open_w_01.png","sha256":"e4fa15fecce8062f73d4e74c59b5b1cad5b166622e88a190a14b87330c3ff91a"},
+  "MAP_ROUTE_BLOCKED_E_01": {"bytes":274,"file":"assets/v3/map/connection/route_blocked_e_01.png","sha256":"c3cb695139a8b01b3e8ac555fa4b2bdd5536043a6349def42f3500be24ac6671"},
+  "MAP_ROUTE_BLOCKED_N_01": {"bytes":251,"file":"assets/v3/map/connection/route_blocked_n_01.png","sha256":"a34eefe9cd4e57bc091d061a586a18fdd8630cd161ccb2fe803570653268bdc7"},
+  "MAP_ROUTE_BLOCKED_S_01": {"bytes":241,"file":"assets/v3/map/connection/route_blocked_s_01.png","sha256":"1cf06d51aaecda61d0c54cdff194e9938ce99b5bc351cd01592742e7ee5d2f4e"},
+  "MAP_ROUTE_BLOCKED_W_01": {"bytes":283,"file":"assets/v3/map/connection/route_blocked_w_01.png","sha256":"40df1b483970b6793771f8f4266b1c5b5bd5f825f952e78790fb2806150327e5"}
+}
