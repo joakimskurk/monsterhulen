@@ -1,0 +1,140 @@
+{
+  "version": "2.0.0",
+  "updated": "2026-10-27",
+  "runtimeGrid": {
+    "columns": 13,
+    "rows": 13,
+    "logicalCellPx": 32,
+    "mapWidthPx1x": 416,
+    "mapHeightPx1x": 416,
+    "allowedIntegerScales": [1, 2, 3, 4],
+    "fractionalScalingAllowed": false,
+    "imageRendering": "pixelated"
+  },
+  "atlas": {
+    "width": 512,
+    "height": 512,
+    "slotWidth": 32,
+    "slotHeight": 32,
+    "columns": 16,
+    "rows": 16,
+    "gutter": 0,
+    "format": "PNG_RGBA8"
+  },
+  "generationWorkingMaster": {
+    "preferredSquareCanvas": [1024, 1024],
+    "runtimeSourceIsNormalizedOutput": true,
+    "manualAtlasCroppingAllowed": false
+  },
+  "classes": {
+    "mapFloor": {
+      "canvas": [32, 32],
+      "visibleMax": [32, 32],
+      "rgba": true,
+      "mayBeOpaque": true,
+      "rotationSafeByDefault": true
+    },
+    "mapWall": {
+      "canvas": [32, 32],
+      "wallDepthPx": 6,
+      "rgba": true,
+      "requiresTransparency": true,
+      "rotationSafeByDefault": false,
+      "anchors": {
+        "N": {"x": [0, 31], "y": [0, 5]},
+        "E": {"x": [26, 31], "y": [0, 31]},
+        "S": {"x": [0, 31], "y": [26, 31]},
+        "W": {"x": [0, 5], "y": [0, 31]}
+      }
+    },
+    "mapCornerOuter": {
+      "canvas": [32, 32],
+      "edgeDepthPx": 6,
+      "rgba": true,
+      "requiresTransparency": true,
+      "rotationSafeByDefault": false
+    },
+    "mapCornerInner": {
+      "canvas": [32, 32],
+      "edgeDepthPx": 6,
+      "rgba": true,
+      "requiresTransparency": true,
+      "rotationSafeByDefault": false
+    },
+    "mapConnection": {
+      "canvas": [32, 32],
+      "rgba": true,
+      "requiresTransparency": true,
+      "openingSpanPx": 20,
+      "openingInsetPx": 6,
+      "rotationSafeByDefault": false
+    },
+    "mapActor": {
+      "canvas": [32, 32],
+      "visibleMax": [24, 28],
+      "safeBox": {"x": [4, 27], "y": [2, 29]},
+      "baselineY": 30,
+      "rgba": true,
+      "requiresTransparency": true,
+      "rotationSafeByDefault": false
+    },
+    "mapMarker": {
+      "canvas": [32, 32],
+      "visibleMax": [24, 24],
+      "alignment": "center",
+      "rgba": true,
+      "requiresTransparency": true
+    },
+    "mapItem": {
+      "canvas": [32, 32],
+      "visibleMax": [22, 22],
+      "alignment": "center",
+      "rgba": true,
+      "requiresTransparency": true
+    },
+    "mapEffect": {
+      "canvas": [32, 32],
+      "visibleMax": [32, 32],
+      "rgba": true,
+      "requiresTransparency": true,
+      "intentionalSemiTransparencyAllowed": true
+    },
+    "uiIcon": {
+      "canvas": [24, 24],
+      "visibleMax": [20, 20],
+      "alignment": "center",
+      "standardCssDisplay": [24, 24],
+      "largeCssDisplay": [32, 32],
+      "rgbaOrSvg": true
+    },
+    "uiOrnamentCorner": {
+      "canvas": [16, 16],
+      "repeatable": true,
+      "stretchAllowed": false
+    },
+    "uiOrnamentEdge": {
+      "canvas": [16, 16],
+      "repeatable": true,
+      "stretchAllowed": false
+    }
+  },
+  "assetContract24Compatibility": {
+    "character": {"thumbnail": [64, 64], "large": [128, 128]},
+    "item": {"thumbnail": [32, 32], "large": [64, 64]},
+    "scene": {"thumbnail": [64, 48], "large": [192, 128]},
+    "symbolic": {"thumbnail": [32, 32], "large": [64, 64]}
+  },
+  "runtimeStateNotBakedIntoArt": [
+    "current",
+    "selected",
+    "reachable",
+    "focus",
+    "fog"
+  ],
+  "deferred": {
+    "roomContentIllustration": true,
+    "newSceneplateSize": "not defined; use Asset Contract 2.4.0 scene sizes until explicitly superseded",
+    "bitmapButtonBackgrounds": false,
+    "fullPanelBitmaps": false
+  }
+}
