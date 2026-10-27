@@ -6,7 +6,7 @@ Status: **PARALLEL VISUAL PREP ONLY**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Runtime baseline used to create this branch: `b84ebe410679773e6833bf06fcd75bca449a5b89`
 Architecture prep branch: `narrative/story-graph-v1-prep`
-Current visual work item: **Asset Batch 01 V1.2 integrated proof — browser green, editorial acceptance pending**
+Current visual work item: **Visual V1.3 asset-sheet implementation — static/browser green, physical/editorial integration review pending**
 
 ## Runtime gate is unchanged
 UX5A patch 15 is still waiting for physical iPad/mobile certification.
@@ -17,10 +17,10 @@ Exact tested patch-15 candidate SHA-256:
 Do not merge visual work into active runtime or `main` before that gate is green.
 Do not implement Narrative Graph runtime, UX5B or Multiscreen from this branch.
 
-## Direction correction — V1.2
-User review on 2026-10-27 identified a real art-direction problem: V1/V1.1 had begun using generated concept images too literally as layout templates.
+## Canonical visual direction — V1.2
+User review identified that V1/V1.1 had begun using generated concept images too literally as layout templates.
 
-Canonical V1.2 correction:
+Binding correction:
 
 **Concept images are mood/material references, not composition references.**
 
@@ -38,147 +38,156 @@ Do not copy:
 - parchment as default gameplay panel material,
 - concept-image header/navigation/bottom-HUD composition,
 - ornamental banner structure,
-- Crystal Machine imagery as generic product identity,
 - art-defined topology or hidden story facts.
 
-Canonical direction doc:
-`visual/VISUAL_DIRECTION_V1_2.md`
+## Visual V1.3 — IMPLEMENTED ASSET-SHEET LAYER
+V1.3 is the first checkpoint where the generated pixel-art sheets are split into reusable assets and actually applied to the exact patch-15 web interface.
 
-## V1.2 runtime-first proof
-Artifacts:
-- `visual/runtime-skin-v1_2.css`
-- `visual/VISUAL_DIRECTION_V1_2.md`
-- `visual/VISUAL_QA_V1_2_2026-10-27.md`
-- `visual/INTEGRATION_PLAN_V1_2.md`
-- `visual/ASSET_BATCH_01_V1_2.md`
-- `visual/ASSET_BATCH_01_RESULTS_2026-10-27.md`
-- `tests/QA_VISUAL_DIRECTION_V1_2.js`
+This is not a layout mockup.
 
-Verification:
-- static direction contract **16 PASS / 0 FAIL**,
-- exact patch-15 + V1.2 Chromium **14 PASS / 0 FAIL**.
+Repo implementation files:
+- `visual/runtime-assets-v1_3.css`
+- `visual/runtime-assets-v1_3.js`
+- `visual/asset-manifest-v1_3.json`
+- `visual/VISUAL_IMPLEMENTATION_V1_3_2026-10-27.md`
+- `tests/QA_VISUAL_ASSET_IMPLEMENTATION_V1_3.js`
 
-Browser verification confirms:
-- adventure still starts,
-- canonical generated map remains present,
-- current-room highlight remains,
-- one canonical room badge remains,
-- search and Forteller controls remain,
-- default gameplay cards use dark cave/stone surfaces rather than parchment,
-- tablet/mobile have no horizontal overflow,
-- mobile tabs remain,
-- Forteller target remains >=48 CSS px.
+### Implemented UI shell
+- pixel-art frame asset applied via `border-image`,
+- square/pixel geometry,
+- atlas-derived green/blue/orange/purple control backgrounds,
+- browser/DOM still owns action text, focus, disabled and press state.
 
-Harness caveat remains: CDP runtime uses in-memory localStorage, so native persistence/clipboard and physical touch remain UX5A physical-gate items.
+### Canonical generated map
+The real runtime map remains authoritative.
 
-## Asset Batch 01 V1.2 — GENERATED + INTEGRATED PROOF
-The small proof batch has now been produced and wired into a standalone patch-15 visual product.
+V1.3 presentation now adds:
+- atlas stone textures to existing room cells by current tone,
+- canonical current-room highlight,
+- atlas `?` sprite for unknown/reachable map probe,
+- atlas lock sprite for known locked probe,
+- transparent room hit-targets so button chrome cannot cover the map.
 
-Generated proof assets:
-- `CAVE_GENERIC` current-room sceneplate,
-- `MUSHROOM` current-room sceneplate,
-- `UNDERGROUND_LAKE` current-room sceneplate,
-- `NPC_OWL_LIBRARIAN` portrait (large + thumb),
-- key icon,
-- rope icon,
-- lantern icon,
-- generic non-story crystal icon.
+No authored/static dungeon map replaces runtime topology.
 
-Placement remains runtime-first:
-- sceneplate inside the current-room surface,
-- portrait inside entity/encounter presentation,
-- icons inside existing backpack slots,
-- no illustrated map nodes.
+### Current-room scene art
+Presentation-only sceneplate is inserted into the existing room surface.
 
-The integrated standalone proof also reduces rounded UI treatment to square/pixel corners without changing gameplay/state semantics.
+Current proof families:
+- generic cave,
+- mushroom cave,
+- underground water/lake.
 
-Asset integration browser QA: **12 PASS / 0 FAIL**.
+Selection reads only visible current-room name/description. It does not inspect hidden topology, rewards, future subjects or prerequisites.
+
+### Hero sprites
+Sheet sprites are mapped only where a recognizable match exists for stable Asset Contract IDs:
+- `CHAR_HERO_14` human,
+- `CHAR_HERO_15` panda,
+- `CHAR_HERO_19` cat,
+- `CHAR_HERO_01` witch,
+- `CHAR_HERO_06` wizard,
+- `CHAR_HERO_09` elf,
+- `CHAR_HERO_20` forest elf,
+- `CHAR_HERO_11` dwarf.
+
+Unmatched heroes retain the existing runtime fallback. Do not falsely substitute identities.
+
+### Inventory sprites
+Current visual mappings:
+- key,
+- rope,
+- lantern,
+- generic crystal/rune/stone family.
+
+These only replace presentation inside the existing inventory slot. No item is auto-used, consumed or applied.
+
+## V1.3 split asset package
+The exact local test package contains **29 PNG assets** under `assets/v13/`.
+
+Hash/size provenance is recorded in:
+`visual/asset-manifest-v1_3.json`
+
+The package includes:
+- four semantic button backgrounds,
+- eight matching hero sprites,
+- four inventory sprites,
+- four map-state sprites,
+- three room sceneplates,
+- five map tile textures,
+- one pixel UI-frame asset.
+
+## V1.3 verification — GREEN WITH EXISTING HARNESS CAVEAT
+Static asset/state contract:
+- **15 PASS / 0 FAIL**.
+
+Chromium exact patch-15 + V1.3:
+- **17 PASS / 0 FAIL**.
 
 Verified:
-- patch-15 starts,
-- sceneplate renders from embedded asset data,
-- generated map remains intact,
-- square/pixel card treatment is active,
-- desktop/mobile no-overflow,
-- four inventory art mappings render in proof slots,
-- mushroom family switching works,
-- owl portrait hook works,
-- mobile sceneplate remains readable.
+- adventure starts,
+- canonical generated map remains,
+- current room remains highlighted,
+- one canonical room identity remains,
+- room sceneplate renders,
+- atlas panel/frame is active,
+- semantic atlas button skins are active,
+- search and Forteller controls remain functional,
+- narrator overlay opens,
+- square/pixel geometry is active,
+- tablet has no horizontal overflow,
+- mobile tabs remain,
+- mobile has no horizontal overflow,
+- sceneplate remains in mobile viewport,
+- narrator target remains >=48 CSS px.
 
-Canonical results doc:
-`visual/ASSET_BATCH_01_RESULTS_2026-10-27.md`
+Static contract additionally proves:
+- no gameplay `move()` call introduced,
+- no direct runtime state mutation introduced,
+- scene art reads only visible current-room text,
+- all manifest entries have SHA-256 provenance.
+
+Harness caveat: CDP-injected runtime still uses in-memory localStorage. Native persistence/clipboard and physical touch remain outside this certification.
+
+## Tested V1.3 local deliverables
+Standalone asset-integrated HTML SHA-256:
+`fe270477f4030ebcd76339c7c95d4e489085aa6630b93fa1658af8a2fcc373f4`
+
+Split-asset package ZIP SHA-256:
+`183bfcce70e9b3af315e09a2c7318fbbffe3f455f8caca97bd2c2dac7d6797da`
+
+Tablet capture SHA-256:
+`a7e9c13811eb7058f00dabb8b72b55dc2d887ab3d996e4b2fb02a3712b25fb77`
+
+Mobile capture SHA-256:
+`99ce259116fd72906eb672daa4121c40fd00a1739945294a70826415f4c87fdb`
+
+Local asset manifest SHA-256:
+`bcb0e49f603635b497d1456bf29398639a3c7f8f4e37f06863b8e0830abb6723`
 
 ## Binary provenance limitation
-The tested binary asset package exists as local deliverables, but binary assets are **not committed to GitHub yet**.
+CSS/JS/spec/tests/manifest are committed to GitHub.
 
-Reason: the repository connector previously proved unsafe for large binary/base64 transport. Do not claim repo byte-provenance is closed until a byte-safe upload path exists and repository copies are hash-verified.
+The exact PNG binaries are not committed through the GitHub connector because earlier large binary/base64 transport was proven non-byte-safe. The local split-package ZIP is therefore the exact tested binary source for this checkpoint.
 
-Recorded standalone artifact hashes:
-- integrated product HTML `23f7437fd05e7fc21220876697c98beeadd62949e0a7031122235c45992bbe61`
-- asset package ZIP `2775a23c8edbd679b1dd84769efe93f33c60280a22e4eae96cf8d8e07a9f9ad3`
+Do not claim repository byte-provenance is closed until a byte-safe binary upload path exists and repository copies are hash-verified.
 
-## V1.1 retained as interaction research, not target composition
-V1.1 remains useful for:
+## V1.1 retained only as interaction research
+Useful decisions remain:
 - selected != current,
 - map inspection != movement,
-- explicit travel/action,
-- locked/blocked/unknown state language,
+- explicit action remains separate,
 - hidden-state protection,
 - inventory affordance != auto-use,
 - narrator authored/improv/state separation,
 - conditional combat presentation,
 - multi-cell room warning,
-- component-state matrix,
-- SVG functional symbols.
+- component-state matrix and functional symbols.
 
 The V1.1 node-map/diorama composition is **not production direction**.
 
-## Material hierarchy V1.2
-### Default gameplay
-Dark blue/charcoal cave stone with restrained texture and warm local edge-light.
-
-### Accents
-Wood/bronze used sparingly for room identity, selected state and tactile controls.
-
-### Parchment
-Reserved for setup/resume/story inserts or fictionally appropriate letters/books/clues. Not the default gameplay shell.
-
-## Map direction
-The current generated map stays authoritative.
-
-Near-term refinement:
-- current-room area glow,
-- calmer visited treatment,
-- clearer fog/unknown state,
-- lock/block connection treatment derived from canonical state,
-- subtle cave-depth/material styling.
-
-Do not turn all rooms into pre-authored illustrated nodes.
-
-## Art placement V1.2
-Art is layered into existing runtime surfaces instead of defining layout.
-
-Priority:
-1. existing entity/encounter portraits,
-2. existing inventory slots,
-3. optional current-room sceneplate when canonical state can choose a safe family,
-4. small decorative ambience that cannot be mistaken for state.
-
-## Integration sequence after UX5A merge
-Canonical V1.2 integration plan:
-`visual/INTEGRATION_PLAN_V1_2.md`
-
-Order:
-1. safe tokens + cave/stone shell + accessibility/touch refinements,
-2. existing entity/item art surfaces,
-3. optional current-room sceneplates,
-4. map renderer refinement only if manual testing shows a real need,
-5. story-specific interaction shells only after Narrative Graph provides canonical state.
-
-Do not merge the visual branch wholesale.
-
 ## Stable IDs / asset contract
-Existing runtime Asset Contract 2.4.0 remains authoritative. No parallel IDs.
+Existing runtime Asset Contract 2.4.0 remains authoritative. No parallel entity IDs.
 
 Examples preserved:
 - `CHAR_HERO_14`
@@ -191,23 +200,28 @@ Examples preserved:
 
 ## Binding visual constraints
 - concept art = art direction, not UI bitmap/layout,
-- runtime interaction model stays recognizable,
+- runtime interaction model remains recognizable,
+- generated map/topology remains canonical,
 - browser owns text and interactive controls,
-- no baked-in UI text in world art,
-- one visible room identity per room,
+- one visible place identity per room,
 - art cannot invent exits, locks, keys, NPCs, clues, resources or rewards,
-- icons supplement labels,
 - no hidden-knowledge leak,
 - no auto-use of possessed resources,
 - primary touch target >=48 CSS px,
-- physical/editorial review remains necessary even with green browser QA.
+- physical/editorial review remains necessary even when browser QA is green.
 
-## Repository health
-Still open: exact release/runtime/assets are not yet byte-reconstructable from ordinary repo files alone.
+## Existing architecture/content state
+The existing content bank is already editorially reviewed on `narrative/story-graph-v1-prep`, and the nine `CRYSTAL_MACHINE` candidates are audited/revised. Do not expand the content bank while current gates are open.
 
-## Exact next safe visual action
-Editorially inspect the integrated Asset Batch 01 product. If accepted, expand the art bank in controlled batches using the same runtime-first placement and state-safety rules.
+Narrative Graph runtime remains blocked until UX5A is physically green and merged.
 
-Do **not** return to the old node-map composition and do not mass-produce map-room dioramas.
+## Exact next safe visual work
+Continue from V1.3 implementation, not from new UI mockups:
+1. inspect/refine weak sheet crops and sprite matches,
+2. expand assets in controlled batches against existing runtime surfaces,
+3. add only correct stable-ID entity/hero/item mappings,
+4. keep map topology/state generated by runtime,
+5. rerun V1.3 static and browser QA after each batch,
+6. keep runtime/main untouched until UX5A physical gate is green.
 
-When physical UX5A becomes GREEN, return to the runtime transition sequence first. Visual integration remains a separate later package.
+When physical UX5A becomes GREEN, return to the runtime transition sequence first. Visual integration remains a separate controlled package and must be carried selectively, not merged wholesale.
