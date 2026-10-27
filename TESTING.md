@@ -2,6 +2,8 @@
 
 Updated: 2026-10-27
 
+> V2 note (2026-10-27): the primary future structural test is the playthrough automaton over >=1000 seeds (`docs/v2/SYSTEM_DESIGN_V2.md` §4). Results below were produced outside the repository and are not reproducible from repo bytes until `index.html` is committed (M0).
+
 ## Verification levels
 Never conflate:
 - implemented,

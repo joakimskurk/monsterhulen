@@ -90,4 +90,4 @@ Physical iPad/mobile retesting must confirm:
 Repository-health remains a parallel release blocker because the complete source/assets baseline is not yet directly reconstructable from ordinary repo files with byte-identical V0.12.3 provenance.
 
 ## Exact next action
-Retest the two corrected interactions on physical iPad/mobile, then continue the rest of the UX5A device smoke. If green, merge UX5A to `main` and begin UX5B. Do not expand the blueprint bank yet.
+Superseded: see `PROJECT_STATE.md` and `ROADMAP.md` (M1). UX5B is no longer planned; V2 replaces it.

@@ -1,142 +1,82 @@
 # MONSTERHULEN - ROADMAP
 
 DATO: 2026-10-27
-STATUS: **GAMEPLAY/RUNTIME ACTIVE + UX5A PATCH 15 MACHINE/BROWSER GREEN + PHYSICAL IPAD/MOBILE GATE OPEN + VISUAL WORK PARKED**
+STATUS: **V2-RETNING BESLUTTET (systemisk roguelike for barn) · UX5A PATCH 15 MASKIN/BROWSER GRØNN, FYSISK GATE ÅPEN · RUNTIME-KILDE IKKE I REPO · VISUAL PARKERT**
+
+Kanonisk design: `docs/v2/SYSTEM_DESIGN_V2.md`. Innhold: `docs/v2/CONTENT_MATRIX_V2.md`. Beslutninger: `DECISIONS.md` (2026-10-27).
 
 ## LÅSTE PRODUKTPRINSIPPER
-- Fortellingskvalitet slår kombinasjonsmengde.
-- Barnet foreslår handlinger; appen støtter og tolker, men velger ikke løsningen automatisk.
-- Ett fysisk sted har ett synlig kanonisk navn.
-- Encounter-mekanikk krever `purpose`, `stakes`, `resolvedWhen`, `payoff` og reelle world effects.
-- Ingen generiske fremgangsruter uten skrevne meningsfulle steg.
-- Puzzles må ha skrevet funksjon i scenen.
-- Forteller-improvisasjon er eksplisitt og scopet; critical story-state kan ikke avhenge av untracked improv.
-- Subject, Storylet-role, requirements, provider routes, outcomes og interaction shell er separate lag.
-- Kritisk historie bruker `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
-- Sannhet og spillerkunnskap er separate state.
-- Story-critical beats har timing/expiry.
-- Fysisk terning brukes ved reell usikkerhet; appen ruller aldri digitalt.
-- Terningresultat erstatter aldri unmet prerequisite.
-- Ting/venner/kjæledyr er affordances, ikke tallbonuser.
-- Stable IDs/save compatibility beholdes.
-- GitHub er permanent source of truth.
+- Fysisk terning. Appen ruller aldri. Terning bare ved usikkerhet.
+- Barnet foreslår. Appen viser muligheter, ikke fasit.
+- Å ha noe er ikke å bruke det.
+- Fail-forward.
+- Ett synlig navn per rom.
+- Ting og venner er muligheter, ikke tallbonuser.
+- Alt kobles gjennom merker (vil ha / svakhet / gir).
+- Hvert løp er bevist løsbart ved automatisk gjennomspilling.
+- Forteller kan alltid løse. Appen registrerer hva som ble sant.
+- To enheter: Forteller-enhet + barnets iPad.
+- Stabile ID-er og lagringskompatibilitet.
+- GitHub er permanent source of truth, inkludert runtime-kilden.
 
-## CURRENT ACTIVE GATE — UX5A
-Active branch: `ux5/searchable-rooms-encounter-tracks`.
+## MILEPÆLER
+Hver milepæl har en **spillbar exit**: noe som kan spilles og vurderes ved bordet, ikke bare grønne tester. Arbeidet innenfor en milepæl deles i små pakker.
 
-Patch chain ends at patch 15:
-- patch 11 — explicit story-key use
-- patch 12 — one visible location identity
-- patch 13 — encounter purpose/world-effect contract
-- patch 14 — explicit narrator improvisation
-- patch 15 — remove remaining zone-name leak from player-visible `room.desc`
+### M0 - Kjørbart repo
+- `index.html` + runtime-assets inn som vanlige filer. Hash verifisert mot patch-15-kandidat `f8e9998f…`.
+- GitHub Pages: spillbar URL.
+- Én kommando kjører alle tester fra repoet.
+- Én statusfil (`PROJECT_STATE.md`). Andre statusfiler peker dit.
+- **Exit:** hvem som helst kan åpne appen fra repoet og kjøre testene.
 
-Exact reconstructed patch-15 candidate SHA-256:
-`f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
+### M1 - Lukk UX5A
+- **G-tech** (voksen, ca. 15 min): lagring/reload, Adventure Code kopier/lim inn, touch.
+- **G-play** (én familieøkt): de 14 punktene i `docs/UX5A_GATE_REVIEW_2026-10-27.md`, sortert i *blokkerer* og *noteres*.
+- Sjekk først kjent mistanke: story-nøkkel ved full sekk (`addQuestItem` avviser ved 6 ting, dør krever BRUK fra sekken). Se `docs/reviews/2026-10-27_claude_repo_audit.md` F3.
+- Merge til `main`.
+- **Exit:** UX5A merget, `main` er kanonisk runtime.
 
-Current evidence:
-- focused patch-15 automated gate: **6844/0**
-- fresh Chromium interaction smoke: **22/0**
-- target-device physical gate: **OPEN**
+### M2 - Runtime-kjerne
+- Én state + `apply(state, action)` + seks effekttyper for alle eksisterende handlinger, med uendret oppførsel.
+- Gjennomspillingstester (skriptede løp) erstatter strengsøk-testene.
+- DM-overstyring: LØS, GI LIKEVEL, ANGRE.
+- **Exit:** dagens spill oppfører seg som før, og angre virker.
 
-Canonical physical checklist:
-`docs/UX5A_GATE_REVIEW_2026-10-27.md`
+### M3 - Generator V2: matrise + kjede + gjennomspilling
+- Kortformat (figur, hinder, ting, kilde, oppskrift, oppdrag) + vokabular.
+- Eksisterende innhold konvertert (utkast i `CONTENT_MATRIX_V2.md`).
+- Kjedegenerator baklengs fra mål, soner, plassering, butikklager.
+- Gjennomspillingsautomat + snarvei-sjekk over ≥1000 seeds per oppdragstype.
+- Forteller-kort og løpsoversikt fra kjeden.
+- Minimum nytt innhold for svakheter og kilder (vann, lys, musikk, beholdere).
+- **Exit:** 5 løp spilt ved bordet uten rekkefølgefeil og uten at Forteller måtte reparere logikk.
 
-Do not merge UX5A until physical iPad/mobile gate is green.
+### M4 - To enheter
+- Spillervisning (iPad fullskjerm) + Forteller som vert + relé (Firebase Realtime Database).
+- Filtrert spiller-payload, `actionId`, gjenoppkobling, enhet alene uten nett.
+- **Exit:** en hel økt spilt med Forteller-enhet + iPad.
 
-## CURRENT WORKSTREAM PRIORITY
-The project has returned to **gameplay/runtime**.
+### M5 - Løp og Helteboka
+- Oppdragskort (FINN, REDD, LEVER, SAMLE, KOM UT; dagens 4 eventyr som temakort).
+- Tilbaketrekking i stedet for tap, venner som blir med, oppsummering etter løpet, opplåsing.
+- **Exit:** barnet vil spille et nytt løp, og Helteboka viser hva hun har gjort.
 
-Visual work on `visual/visual-system-v1-prep` is **PARKED**. Do not continue Structural Map V3 or asset production unless the user explicitly reopens that workstream.
+### M6 - Mer innhold
+- Ting (mål +25–30), figurer med svakhet, vennlige figurer med evner, figurer som vil konkurrere, kjæledyr.
+- Hver ny kortbatch spilles før neste.
 
-Gameplay-return handoff:
-`docs/GAMEPLAY_RETURN_HANDOFF_2026-10-27.md`
+## IKKE NÅ
+- Narrative Graph V1 runtime (erstattet, se `DECISIONS.md` 2026-10-27).
+- Visual production (parkert; restart fra Structural Map V3 Gate A hvis gjenåpnet).
+- Generell undo-historikk utover ANGRE siste handling.
+- Flere enn én spillerenhet.
 
-## HARD SEQUENCING BOUNDARY
-While UX5A physical gate is open:
-- patch only confirmed UX5A defects on the UX5A branch,
-- preserve stable IDs/save compatibility,
-- repo-health/provenance and QA/harness improvements are allowed if gameplay semantics remain unchanged,
-- do not implement Narrative Graph runtime,
-- do not implement full DM Control Surface,
-- do not implement UX5B,
-- do not implement Multiscreen/Shared Session,
-- do not expand the blueprint/content bank,
-- do not integrate visual-prep work into runtime/main.
+## AVHENGIGHETER
+M0 → M1 → M2 → (M3 og M4 kan gå parallelt, M3 først anbefalt) → M5 → M6.
 
-If physical playtest is unavailable, do not skip ahead to a later runtime package.
-
-## EXACT TRANSITION AFTER UX5A PHYSICAL GREEN
-1. Record physical evidence.
-2. Confirm final relevant automated/browser evidence.
-3. Merge `ux5/searchable-rooms-encounter-tracks` to `main`.
-4. Verify `main`.
-5. Create fresh `narrative/story-graph-v1` from merged `main`.
-6. Carry only approved prep docs/specs from `narrative/story-graph-v1-prep`.
-7. Start WP-NG1.
-
-## CANONICAL NEXT ARCHITECTURE
-Narrative Graph prep lives on `narrative/story-graph-v1-prep`.
-
-Target model:
-
-`SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
-
-Supporting layers:
-- knowledge/reveal
-- dramatic phase/expiry
-- interaction shell/popup
-- typed canonical state transition
-- later action history/undo/shared-session sync
-
-## NARRATIVE GRAPH V1 WORK PACKAGES
-- NG0 specs/docs — complete/updated on prep
-- NG1 graph + provider + typed transition model/validator
-- NG2 Storylet Matrix/provider engine
-- NG3 Crystal Machine planner
-- NG4 runtime materialization + narrator knowledge + minimal DM controls + required shells
-- NG5 >=1000 automated graph/state cases
-- NG6 real browser/touch QA
-- NG7 10–20 manual editorial/family playtests
-- NG8 accept/revise/abandon
-
-No second blueprint before NG8.
-
-## CONTENT / EDITORIAL PREP — COMPLETE FOR CURRENT BANK
-The full existing bank is reviewed:
-- MONSTERS
-- PEOPLE
-- FRIENDS
-- TRAPS
-- MYSTERIES
-- TREASURES
-
-The nine current `CRYSTAL_MACHINE` Storylet candidates were audited/revised and the Storylet Matrix/provider constraints were consolidated.
-
-**There is no next subject review. Do not expand the bank.**
-
-Current blueprint bank remains only:
-- `GLASS_HEART`
-- `WITCH_CAT`
-- `CRYSTAL_MACHINE`
-- `ZOMBIE_DELIVERY`
-
-## VISUAL TRACK — PARKED
-The V2 structural art direction was manually rejected despite green technical QA. Structural Map V3 introduced a better perceptual contract but V3 production has not started and is paused.
-
-If visual work is reopened later, restart from V3 Gate A only:
-- `visual/STRUCTURAL_MAP_V3_PRODUCTION_CONTRACT.md`
-- `visual/structural-map-v3-acceptance.json`
-- `visual/TILESET_V2_VISUAL_REVIEW_2026-10-27.md`
-
-Do not resume from V1/V2 mass asset production.
-
-## REPOSITORY HEALTH
-Still open. Full active runtime/source/assets are not yet byte-reconstructable from ordinary repo files alone.
+M2 er forutsetning for både M3 og M4 fordi gjennomspillingsautomaten, overstyring og synkronisering alle bruker samme `apply`.
 
 ## EXACT NEXT
-**Physical-test the exact patch-15 candidate on iPad/mobile.**
-
-If it fails, patch UX5A only and rerun affected tests.
-
-If it is green, follow the exact 7-step transition above and only then start Narrative Graph V1 runtime work.
+1. Eier legger `index.html` + assets i repoet (M0). Claude kan hjelpe med hash-sjekk og commit når filene ligger lokalt.
+2. Eier henter ønsker fra den opprinnelige ChatGPT-samtalen inn i repoet (`docs/v2/OWNER_WISHES.md`), så de kan vurderes mot V2.
+3. Eier justerer vokabularet og innholdsutkastet i `docs/v2/CONTENT_MATRIX_V2.md`.

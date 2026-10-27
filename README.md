@@ -12,7 +12,8 @@ Monsterhulen er en norsk, barnevennlig eventyrmotor for fri rollelek mellom barn
 - Kanonisk storage key: `monsterhulen_v120`
 - Legacy migration: `eventyrkryper_v100` og eldre nøkler leses automatisk
 - Asset Contract: **2.4.0**
-- Fysiske D6 brukes på bordet; appen registrerer bare `1-2`, `3-4`, `5-6`.
+- Fysiske D6 brukes på bordet; Forteller taster inn terningflaten.
+- Retning V2: systemisk roguelike for barn. Se `START_HERE.md` og `docs/v2/SYSTEM_DESIGN_V2.md`.
 
 ## GitHub-status
 

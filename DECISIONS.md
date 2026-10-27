@@ -2,7 +2,49 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
+
+## 2026-10-27 - Direction: Monsterhulen is a systemic kids' roguelike, not an authored-story engine
+Monsterhulen V2 generates each run from a bank of figures, obstacles, items, sources and companions that connect through a shared tag vocabulary. Variety comes from combining good building blocks; coherence comes from the connections being meaningful (water cools lava, food satisfies hunger) and from every run being proven solvable.
+
+Narrative Graph V1 (`narrative/story-graph-v1-prep`) is **superseded as runtime architecture**. Its editorial subject reviews remain valuable source material for V2 cards. The four Adventure Blueprints become themed mission cards.
+
+Rationale: all four V1 blueprints compiled to the same structure (place N things in spread rooms -> `FOUND_ALL` gate), and the Narrative Graph plan improved the inside of each fetch while growing a large rule set (30 invariants, matrix rules A–L) for one blueprint. Owner direction 2026-10-27: a dungeon-crawler/roguelike for children with a large compatible matrix, where the DM narrates and improvises.
+
+## 2026-10-27 - The matrix is a shared tag vocabulary, not a pair table
+Every card describes itself: figures have `wants`, `weakness` (with a perceivable sign), `gives` and optional companion abilities; items carry tags; room sources give tags (often requiring a container); a few recipes combine tags. Cards connect when tags match. Explicit pair rules exist only for exceptions (forbidden combinations, special reactions).
+
+Monsters, people, friends and pets are one figure bank with a `disposition` field (friendly/neutral/hostile).
+
+Acquisition source types are the main gameplay variation axis: lying, hidden, trade, reward, companion ability, environment+container, recipe. A chain should not repeat the same source type.
+
+## 2026-10-27 - Generation order: chain first, zones second, automated playthrough decides
+Runs are generated as: mission -> dependency chain backwards from goal -> map with obstacle cut-edges forming zones -> placement so everything needed to open zone N lies in zone < N -> merchant stock from chain needs -> optional alternatives and ambient content -> **automated playthrough** using only guaranteed sources -> bypass check with all secrets/shortcuts open and obstacles closed. A run that fails is regenerated.
+
+The playthrough automaton is the primary structural test (>=1000 seeds per mission type). It replaces placement-by-spread-rooms and most V1 structural validators. It must use the same `apply(state, action)` as runtime.
+
+Rationale: V1 placed content without knowing its dependencies, so an NPC could end up behind the door it was meant to help open.
+
+## 2026-10-27 - The DM can always resolve; the app records what became true
+LØS, GI LIKEVEL, KORT NED, LEGG TIL and ANGRE are always available. Any figure, obstacle or mission requirement can be resolved by the DM with an improvised reason. These are recorded as normal typed actions so state stays true.
+
+This revises "critical state never depends on untracked improv": improvisation decides *how*; the app records *what*. The generator still guarantees one solvable route so the DM never *has* to rescue a run.
+
+## 2026-10-27 - Two devices are a core requirement
+Play uses a DM device (authoritative state, DM cards, dice entry, overrides) and the child's iPad in a fullscreen browser (map, room, search/take, give/use, choices). The child surface never receives DM-only data; its payload is built by an explicit filter.
+
+Transport: internet relay is acceptable (owner: internet is always available). Recommended: Firebase Realtime Database with anonymous auth, per-session code, 24 h expiry; requests carry unique `actionId` for idempotency. Supabase Realtime is the alternative. Without network the DM device continues in single-device mode.
+
+This moves the 2026-10-26 "Shared sessions are DM-hosted" decision from a late platform package to the core roadmap. The host/client model in that decision stands.
+
+## 2026-10-27 - One runtime state and typed actions before new mechanics
+All state changes go through `apply(state, action) -> {state, effects}` with six effect types (REVEAL, OPEN/CLOSE edge, TRANSFER item, DISPOSITION, MOVE figure, RESOLVE). Two devices, undo, DM overrides and the playthrough automaton all depend on it. Existing click handlers that mutate state directly are refactored first, with unchanged behaviour.
+
+## 2026-10-27 - Runtime source lives in the repository as ordinary files
+`index.html` and runtime assets must be committed as normal files and verified by hash from repository bytes. New work is ordinary commits, not patch files against an unavailable baseline. Until then repository health remains open and tests cannot be run from the repo.
+
 ## 2026-10-26 - Required resources use explicit provider routes, not hopeful random spawning
+> **REFINED 2026-10-27:** still valid for the one guaranteed route. In V2 any item/companion/source with a matching tag may also solve the need; the generator guarantees one route and the playthrough automaton proves it. See V2 decisions above.
 A Storylet requirement and the way that requirement can be obtained are separate graph concepts.
 
 Initial provider families include:
@@ -35,6 +77,7 @@ Combat is an optional resolution module, not the default meaning of a monster/gu
 This DM action model is also the basis for later action history/undo and shared-session synchronization.
 
 ## 2026-10-26 - Shared sessions are DM-hosted with one authoritative state
+> **TIMING SUPERSEDED 2026-10-27:** the host/client model stands, but two devices are now a core requirement, not a late platform package. See "Two devices are a core requirement".
 Future multiscreen/live play uses a **DM Host / Player Client** model.
 
 - DM always starts the adventure/session.
@@ -74,6 +117,7 @@ Rules:
 This separation is intended to create more variety from a curated bank without multiplying shallow content. Story quality and causal coherence still outrank combinatorial volume.
 
 ## 2026-10-26 - Intentional narrator improvisation must be explicit
+> **REVISED 2026-10-27:** explicit improv labelling stands. The rule that critical state may never depend on improvisation is replaced by "The DM can always resolve; the app records what became true".
 Improvisation is allowed and can be desirable, but it must be an authored mode rather than an accidental gap in the content.
 
 If a scene intentionally leaves a detail for Forteller to invent, narrator mode must:
@@ -124,6 +168,7 @@ For a keyed story door:
 This is a child-agency rule. The app presents constraints, clues and affordances; the child chooses what to try. Authored solutions are not a closed answer list. A hard story gate still cannot be bypassed by a lucky die roll or accidental navigation, but a genuinely plausible free-form solution may be accepted explicitly by the narrator when the fiction supports it.
 
 ## 2026-10-26 - Critical stories use Narrative Graph + curated Storylets
+> **SUPERSEDED 2026-10-27** by "Direction: Monsterhulen is a systemic kids' roguelike". The playtest findings it records (causal disconnect, timing, availability is not action) remain valid and are addressed by tag connections, zone ordering and the playthrough automaton.
 Live playtest of `CRYSTAL_MACHINE` showed that structurally valid placement is not enough. Three required parts placed safely in three rooms can still feel like unrelated pickups with no causal story.
 
 Critical story generation will therefore move to a hybrid model:
@@ -166,6 +211,7 @@ The gate may be a scenario key, completed NPC task, solved puzzle, collected par
 A secret door is hidden until discovered. The child may investigate a clue in the fiction. If discovery is uncertain, use the normal physical D6 rule and record the actual die face. A low result gives a stronger clue but does not reveal the door; a successful discovery reveals the connection. Secret doors and shortcuts must never bypass a story-critical progression gate.
 
 ## 2026-10-26 - Story quality beats combinatorial volume
+> **REVISED 2026-10-27:** coherence still beats volume, but coherence is now achieved through meaningful tag connections and proven solvability rather than few hand-authored blueprints.
 Monsterhulen optimizes for coherent, memorable adventures, not for the largest possible number of procedural combinations. A few curated adventures that work very well are preferable to thousands of merely valid combinations.
 
 Critical story elements must therefore be bundled in curated Adventure Blueprints. Seed variation is allowed only where it cannot break critical premise, clues, dependencies, world route or payoff. New blueprints are added only after the existing bank has been manually playtested.
