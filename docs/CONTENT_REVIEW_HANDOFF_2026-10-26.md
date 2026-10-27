@@ -1,5 +1,6 @@
 # Monsterhulen - Content Review Handoff 2026-10-26
 
+Updated: 2026-10-27
 Status: editorial planning only.
 
 Purpose: preserve exactly where the subject/role review reached and what rules were inferred, so a new chat can continue without reconstructing recent conversation.
@@ -107,6 +108,24 @@ System consequence:
 - provider plan is validated before map placement,
 - no arbitrary noun generation.
 
+## Monster-category checkpoint - 2026-10-27
+The remainder of the existing `MONSTERS` bank has now been editorially reviewed, from **DEN LEVENDE RUSTNINGEN** through **REGNGARGOILEN**.
+
+Canonical detailed review:
+`docs/MONSTER_SUBJECT_REVIEW_V1.md`
+
+This completes the existing monster category without adding subjects or blueprints.
+
+Important cross-bank findings captured there:
+- similar solution mechanics need anti-repetition scoring/constraints,
+- `KRYSTALLSLIMET` must not become a CRYSTAL_MACHINE provider by noun/theme matching alone,
+- critical password/mystery subjects need real authored truth and clue chains,
+- `BYTTEKRABBEN` is a strong concrete `TRADE` / merchant-style critical provider subject,
+- monster category does not imply combat; combat capability should remain sparse,
+- critical blockers must create concrete world-state effects, not merely a “completed encounter” flag.
+
+The monster review established compatibility directions only. It does **not** approve arbitrary subject-role combinations.
+
 ## Earlier subject/role finding that remains binding
 
 ### Boka som skriver tilbake
@@ -137,6 +156,12 @@ These are candidates, not active-bank additions yet.
 - low social result fails forward,
 - no critical single-roll softlock.
 
+Additional monster-review provider constraints:
+- provider truth comes from the graph, never noun matching,
+- a trade subject cannot consume a unique resource that is still required elsewhere,
+- a critical fetch/favor subject must bind its requested resource/provider before map placement,
+- environmental critical blockers need at least one reachable environmental/provider affordance but should still accept plausible free child solutions.
+
 ## DM UI direction established during review
 DM needs semantic controls rather than raw state editing:
 - what is this scene,
@@ -158,7 +183,7 @@ Some interactions need tangible player-facing shells.
 Reference: a gate/machine requiring three colored stones.
 - tapping target opens three visible boxes/sockets only after reveal,
 - child explicitly places items,
-- owning items does not auto-place them,
+- owning items does not auto-place,
 - partial placement persists,
 - wrong item is not consumed,
 - full slots may enable separate activation if authored,
@@ -167,12 +192,14 @@ Reference: a gate/machine requiring three colored stones.
 See `docs/INTERACTION_SHELLS_V1.md`.
 
 ## Exact editorial continuation point
-The review stopped after **BROTROLLET**.
+The existing **MONSTER** category is complete.
 
-Next original-list subject to review in a fresh chat:
+Next category: `PEOPLE`.
 
-**DEN LEVENDE RUSTNINGEN**
+Next original-list subject to review:
 
-Then continue through the existing subject list, category by category, using the review frame above.
+**LANTERNEVAKTEN**
+
+Then continue through the existing PEOPLE list in source order before moving to FRIENDS, TRAPS, MYSTERIES and TREASURES.
 
 Do not expand Adventure Blueprint bank during this review.
