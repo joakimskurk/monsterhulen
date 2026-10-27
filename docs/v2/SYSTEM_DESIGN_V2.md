@@ -185,6 +185,7 @@ Mulige kjeder:
 3. **Kjededybde etter alder og lengde** (1–4 ledd).
 4. **Hvert hinder i kjeden har et tegn.** Ingen løsning uten at barnet kan ane den.
 5. **Maks én oppskrift per kjede** for 5–7 år (oppskrifter er vanskeligst å forstå).
+6. **Et merke kan ikke trengs inne i sin egen kjede** (funnet av prototypen).
 
 Unntak skrives som korte par-regler, bare når de trengs:
 - **forbud:** «ikke mat spøkelser»,
@@ -233,6 +234,15 @@ GODKJENT  ⇔  oppdraget er fullført
 Automaten bruker **bare garanterte kilder**: ingen alternative, ingen ambient, ingen DM-overstyring, ingen flaks. Derfor er løpet alltid mulig uten at Forteller må redde det, og alt annet gjør det bare lettere.
 
 Den samme automaten kjøres i testene over minst 1000 seeds per oppdragstype. Dette er V2s viktigste test. Den erstatter de fleste strukturtestene fra V1.
+
+### 4.2b Prototype og funn (2026-10-28)
+
+Prototypen ligger i `tools/runsim/` (se README der). Den har gitt fire endringer i designet:
+
+1. **Plasseringsregelen er «foran hinderet øverst i kjeden»,** ikke «foran figuren den hjelper». En kilde kan ligge dypere enn figuren den hjelper og gir da en naturlig returtur.
+2. **Et merke kan ikke trengs i sin egen kjede** («for å få vind trenger du vind»). Ny variasjonsregel 6.
+3. **Venners evner gir reserve.** De løser ofte mer enn det de var plassert for. Forteller-malen bør vise det.
+4. **Selvtesten må sabotere bare eneste kilde, sjekket oppover hele kjeden.** Ellers rapporterer den falske feil.
 
 ### 4.3 Hva automaten fanger
 

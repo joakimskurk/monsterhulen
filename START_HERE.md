@@ -15,6 +15,7 @@ A kids' roguelike for a DM and a child. Each run is assembled from figures, obst
 4. `DECISIONS.md` - newest first (2026-10-27 = V2).
 5. `docs/v2/CONTENT_MATRIX_V2.md` - content draft and gaps.
 6. `TESTING.md` - verification levels and current evidence.
+6b. `content/README.md` and `tools/runsim/README.md` - V2 card data and the generator prototype. Run `npm run check`.
 7. Only if working on UX5A: `docs/UX5A_GATE_REVIEW_2026-10-27.md`, `patches/README.md`.
 
 Background (history, not instructions): `docs/reviews/`.

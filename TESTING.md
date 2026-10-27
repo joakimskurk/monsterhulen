@@ -4,6 +4,13 @@ Updated: 2026-10-27
 
 > V2 note (2026-10-27): the primary future structural test is the playthrough automaton over >=1000 seeds (`docs/v2/SYSTEM_DESIGN_V2.md` §4). Results below were produced outside the repository and are not reproducible from repo bytes until `index.html` is committed (M0).
 
+## V2 prototype evidence (2026-10-28, run from repository bytes)
+| Check | Command | Result | Proves | Does not prove |
+|---|---|---|---|---|
+| Content format | `npm run validate:content` | OK | ids, tag references, role consistency, signs on weaknesses, every needed tag has a provider | that the classification is right |
+| Playthrough batch | `npm run sim:batch` | 15 000 / 15 000 accepted | chain-first generation yields solvable runs in correct order on the abstract map | fun, comprehension, real map geometry |
+| Sabotage selftest | `npm run sim:selftest` | 4 258 sabotages, 0 missed | the automaton rejects runs with a misplaced or missing sole provider, and cross-zone secret doors | robustness to sabotage types not tested |
+
 ## Verification levels
 Never conflate:
 - implemented,

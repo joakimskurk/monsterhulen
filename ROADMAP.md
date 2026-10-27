@@ -43,6 +43,7 @@ Hver milepæl har en **spillbar exit**: noe som kan spilles og vurderes ved bord
 - **Exit:** dagens spill oppfører seg som før, og angre virker.
 
 ### M3 - Generator V2: matrise + kjede + gjennomspilling
+> Startet tidlig som frittstående prototype (2026-10-28): `content/` + `tools/runsim/`. Gjenstår: kobling til appens kart og runtime (etter M2), Forteller-kort i appen, innhold.
 - Kortformat (figur, hinder, ting, kilde, oppskrift, oppdrag) + vokabular.
 - Eksisterende innhold konvertert (utkast i `CONTENT_MATRIX_V2.md`).
 - Kjedegenerator baklengs fra mål, soner, plassering, butikklager.
