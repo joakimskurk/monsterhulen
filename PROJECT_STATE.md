@@ -5,7 +5,7 @@ Current branch: `visual/visual-system-v1-prep`
 Status: **PARALLEL VISUAL PREP ONLY**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Architecture prep branch: `narrative/story-graph-v1-prep`
-Current visual work item: **Visual V1.4 corrected asset integration — automated/browser green, manual screenshot reviewed, editorial refinement still open**
+Current visual work item: **Tileset Contract V2 — grid-first structural asset rebuild**
 
 ## Runtime gate is unchanged
 UX5A patch 15 is still waiting for physical iPad/mobile certification.
@@ -15,104 +15,129 @@ Exact tested patch-15 candidate SHA-256:
 
 Do not merge visual work into active runtime or `main` before that gate is green. Do not implement Narrative Graph runtime, UX5B or Multiscreen from this branch.
 
-## Canonical visual direction
-Concept art is mood/material reference only. The actual Monsterhulen runtime/grid/interaction model is the design substrate.
+## Why visual work restarted from scratch
+V1.3 and V1.4 proved useful interaction/integration lessons, but the asset-production method was still too imprecise. Large generated sheets were visually appealing but did not provide reliable production crops, exact grid alignment or predictable reusable segments.
 
-## V1.3 is visually rejected
-V1.3 was a useful technical proof but failed manual product review despite green structural/browser checks.
+The current production direction is therefore V2:
 
-Failures observed in its screenshots:
-- tiny dungeon cluster inside oversized dead map surface,
-- current highlight repeated per cell,
-- stretched sheet crops used as button/panel chrome,
-- generic scene art invented room contents,
-- tone metadata incorrectly implied environment art,
-- weak mobile composition and overlay risk.
+**grid first -> isolated transparent source sprites -> normalization -> validation -> deterministic atlas build**
 
-Do not use V1.3 as the current visual implementation target.
+Large generated presentation sheets are not production sources.
 
-## Visual V1.4 — current implementation
-Repo files:
-- `visual/runtime-assets-v1_4.css`
-- `visual/runtime-assets-v1_4.js`
-- `visual/asset-manifest-v1_4.json`
-- `visual/VISUAL_IMPLEMENTATION_V1_4_2026-10-27.md`
-- `tests/QA_VISUAL_ASSET_IMPLEMENTATION_V1_4.js`
+## Verified runtime geometry
+Current patch-15 runtime uses:
+- `MAP_W=13`,
+- `MAP_H=13`,
+- multi-cell rooms joined by directional adjacency,
+- responsive `.map` columns in the current UI.
 
-### Integration rule
-Sheet art is used as discrete sprites and repeatable textures. Panels/buttons/layout/state are CSS/DOM components.
+V2 visual contract decouples source art from fractional responsive scaling:
+- logical tile: **32 x 32 px**,
+- full 13 x 13 map at 1x: **416 x 416 CSS px**,
+- fixed logical tile grid inside a focus/pan viewport,
+- nearest-neighbour / pixelated rendering,
+- integer zoom only if zoom is later required.
 
-### Map
-- canonical generated topology remains unchanged,
-- focused scrollable viewport follows current room,
-- centering reads actual CSS padding,
-- physical multi-cell room gets one exterior current outline,
-- fog is quiet/dark,
-- neutral stone textures only for tone styling,
-- `?`, lock and already-visible encounter markers use split sprites,
-- no static/diorama dungeon replaces runtime grid.
+## Canonical V2 docs/tools
+- `visual/TILESET_CONTRACT_V2.md`
+- `visual/tileset-manifest-v2.template.json`
+- `tools/validate_tileset_v2.py`
+- `tools/pack_tileset_v2.py`
 
-### Room art
-Generic scene art is disabled. Scene art may appear only when visible current-room name/description safely selects an explicit family such as mushroom or water.
+## Layer architecture
+Map presentation is composed in layers:
+1. fog/background — runtime/CSS state,
+2. floor — 32x32 base tile,
+3. room border — transparent edge/corner overlay,
+4. connection — optional door/open/locked/block overlay,
+5. marker — hero/NPC/encounter/item sprite,
+6. interaction state — current/selected/reachable/focus from runtime/CSS.
 
-### Hero/items
-Stable hero IDs are mapped only to recognizable matching sprites. Inventory assets are visual replacements inside existing slots and never auto-use/consume items.
+Current/selected/fog are never baked into structural art.
 
-### Mobile
-Explicit surfaces:
-- KART
-- ROM
-- SEKK
-- FORTELLER
+## First production batch
+Content inside rooms is intentionally postponed.
 
-Navigation stays in document flow and does not cover canonical controls.
+### Floor
+Nine neutral stone variants:
+- `MAP_FLOOR_STONE_01` ... `MAP_FLOOR_STONE_09`
 
-## V1.4 asset package
-Current tested package contains **31 PNG assets** under local `assets/v14/`.
+Rules:
+- 32x32,
+- full-cell base art,
+- semantic-neutral,
+- no moss/water/lava/runes/blood/items/footprints/clue-like cracks,
+- rotation-safe.
 
-Hash/size list committed as:
-`visual/asset-manifest-v1_4.json`
+Nine variants x 4 rotations can yield up to 36 visual combinations while preserving identical meaning.
 
-Binary PNGs are not committed through the GitHub connector because earlier binary transport was proven non-byte-safe. The tested local ZIP remains binary source for this checkpoint.
+### Borders
+Transparent 32x32 overlays:
+- four straight wall orientations,
+- four outer/convex corners,
+- four inner/concave corners.
 
-## Verification
-Static V1.4 contract:
-- **20 PASS / 0 FAIL**.
+Target structural wall thickness: about 6 logical pixels from the relevant cell edge.
 
-Chromium exact patch-15 + V1.4:
-- **24 PASS / 0 FAIL**.
+Directional wall art is authored per orientation to avoid rotating lighting/shading unnaturally.
 
-Manual tablet/mobile screenshot review was performed after final map-centering, scene-safety and mobile-navigation corrections.
+## Geometry rule
+For every cell in one physical room:
+- draw an edge only where that cardinal neighbour is not the same room,
+- draw convex corners where two exterior edges meet,
+- draw concave corners where cardinal neighbours exist but the shared diagonal does not.
 
-This means V1.4 fixes the identified V1.3 defects. It does **not** mean the final visual product is editorially complete; visual quality still requires human judgement.
+This supports irregular/L-shaped rooms without bespoke room images.
 
-Harness caveat: CDP runtime uses in-memory localStorage. Native persistence/clipboard and physical touch remain outside this visual certification.
+## Source/atlas boundary
+Individual normalized PNG files are canonical source assets.
 
-## Tested local deliverables
-Standalone corrected HTML SHA-256:
-`80d411f80bc199d488766dd54329757c2e18204dde63b1fa0ea4d017c2559b82`
+Runtime atlas is deterministic build output:
+- 512 x 512 RGBA,
+- 16 x 16 slots,
+- 32 x 32 per slot,
+- stable manifest coordinates,
+- transparent unused slots,
+- no grid guides or text in production atlas.
 
-Corrected split-asset ZIP SHA-256:
-`78a695421189b3c07ef689c3d14343f6ee500c9d7fe07bacab0b049044d4e48b`
+## Transparency
+Required true RGBA transparency:
+- walls/corners,
+- connections,
+- characters,
+- markers,
+- items,
+- UI icons,
+- effects.
 
-Tablet capture SHA-256:
-`4f01a08117f88d1ef6bac96f714e60afc47574f758b3616e1ff050b479b03e07`
+Floor PNGs remain RGBA but intentionally fill the complete cell and may be fully opaque.
 
-Mobile capture SHA-256:
-`dc6d0bd87a57c1e666690b8e82afa672af52fc814c1b869c1c6716d3ee6ce9e8`
+## Generation rule
+Do not ask image generation for a final perfectly sliced atlas.
 
-V1.4 manifest SHA-256:
-`a0f23ca68cafa104e550fd0d2f7445708a73e1e9e86ca0da0cdc9c7c074cf34a`
+For each production asset:
+1. generate one isolated sprite/segment,
+2. use true transparent background when applicable,
+3. no label/frame/neighbour assets,
+4. normalize to its exact box,
+5. pixel-quantize/clean alpha,
+6. validate at 1x/2x/4x nearest-neighbour,
+7. reject/regenerate weak assets rather than compensating with manual crop hacks.
 
-## Stable IDs / state constraints
-Existing Asset Contract 2.4.0 remains authoritative. No parallel IDs. No visual hook may move the hero, mutate story state, reveal hidden topology, auto-use inventory or invent story facts.
+## Historical V1.x status
+V1.3/V1.4 remain historical/research context only.
 
-## Exact next safe visual work
-Continue only from V1.4:
-1. manual/editorial review of corrected build,
-2. refine weak crops/sprites rather than adding broad new visual systems,
-3. expand art in controlled batches against real runtime surfaces,
-4. rerun static + browser + screenshot review each batch,
-5. keep runtime/main untouched until UX5A physical gate is green.
+Retain lessons:
+- manual screenshot review is mandatory,
+- multi-cell rooms must read as one room,
+- art cannot invent state/topology,
+- sheet crops cannot be stretched as panel/button chrome,
+- generic environment art cannot be inferred from abstract tone,
+- mobile navigation must not cover controls.
 
-When physical UX5A becomes GREEN, return to runtime sequencing first. Visual integration remains a later selective package, not a wholesale branch merge.
+Do not continue the old sheet-first asset extraction workflow.
+
+## Exact next safe action
+Generate and normalize the nine neutral floor tiles only. Validate seamless mixing/rotation and render synthetic room shapes from them. Proceed to wall/corner segments only after the floor batch is visually accepted.
+
+When physical UX5A becomes GREEN, return to runtime sequencing first. Visual integration remains a separate selective package after runtime merge.
