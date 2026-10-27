@@ -2,6 +2,24 @@
 
 Only durable decisions that would be costly or confusing to lose belong here.
 
+## 2026-10-27 - Full-bank editorial review adds binding Storylet selection constraints
+The complete existing MONSTERS, PEOPLE, FRIENDS, TRAPS, MYSTERIES and TREASURES banks have been reviewed without adding subjects or blueprints.
+
+Durable consequences:
+- **Provider truth comes from explicit graph/provider binding, never noun/theme matching.** Krystallslimet/Glasskule do not become CRYSTAL_MACHINE providers by similarity; Trollmynt/Messingknapp do not become universal permission tokens.
+- **Incidental optional loot is not automatically a planned critical provider.** A critical resource needs a reserved reachable provider route even when an incidental item of the same canonical type may exist.
+- **Trade/transfer may not consume the only still-required unique critical resource** unless a replacement/alternate route is explicit.
+- **Mechanic family and solution family are repetition dimensions separate from subject and role.** Different subjects that all reduce to “move light”, “bring food”, “show permission”, “trade a shiny thing”, etc. must be penalized/rejected when repetition weakens the adventure.
+- **Knowledge reveal cannot invent graph topology or truth.** Map/friend/NPC subjects may reveal existing authored locations/routes; opening a route changes an existing gate/edge rather than creating a new passage by narration.
+- **Current ambient mystery instances are explicitly improvisational/non-critical.** A subject may also have a separate authored critical Storylet, but `truthMode=IMPROV` cannot supply mandatory requirements, critical clues, completion or world effects.
+- **Critical puzzle/mystery content needs authored truth/cause/rule, not merely a schema-valid puzzle template.**
+- **Phase/expiry applies to friendly clue/delivery content too.** A clue that has lost its dramatic function must expire or receive a newly authored role.
+- **MONSTER category never implies combat.** `combatAllowed` is Storylet-specific and should remain sparse; many monster subjects are explicitly better with combat disabled.
+- **Item transfer/use/consumption/placement is an explicit typed action**, never a side effect of possession.
+- **Critical environmental blockers normally expose at least one scene/environment affordance** unless an exact required item has a validated provider route.
+
+Canonical details live in `docs/STORYLET_MATRIX_V1.md` and the category review docs.
+
 ## 2026-10-26 - Interaction shells present explicit actions; they do not own story logic
 Some story actions should use focused player-facing popups/overlays (“interaction shells”), but the shell is presentation + action submission, not a source of hidden requirements or completion rules.
 
