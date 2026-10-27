@@ -1,6 +1,6 @@
 # START HERE - MONSTERHULEN
 
-Updated: 2026-10-26
+Updated: 2026-10-27
 Branch: `narrative/story-graph-v1-prep`
 
 ## IMPORTANT: PREP BRANCH ONLY
@@ -11,9 +11,13 @@ This branch documents the next architecture while UX5A physical playtest remains
 Active runtime branch:
 `ux5/searchable-rooms-encounter-tracks`
 
-UX5A is still unmerged because physical iPad/mobile verification is not green yet.
+Current runtime candidate: **UX5A patch 15**.
+
+UX5A is machine/browser green but still unmerged because physical iPad/mobile verification, native persistence and real clipboard/paste are not green yet.
 
 `main` must remain untouched until UX5A gate is complete.
+
+Repository is source of truth. Do not reconstruct current state from old chat if repo differs.
 
 ## Read in this order
 1. `PROJECT_STATE.md`
@@ -21,54 +25,71 @@ UX5A is still unmerged because physical iPad/mobile verification is not green ye
 3. `DECISIONS.md`
 4. `TESTING.md`
 5. `PLAYTEST_FINDINGS.md`
-6. `docs/ENCOUNTER_STORY_SYSTEM_PLAN_V1.md` **<- consolidated latest plan**
+6. `docs/ENCOUNTER_STORY_SYSTEM_PLAN_V1.md`
 7. `docs/NARRATIVE_GRAPH_V1.md`
 8. `docs/STORYLET_MATRIX_V1.md`
 9. `docs/INTERACTION_SHELLS_V1.md`
 10. `docs/CONTENT_REVIEW_HANDOFF_2026-10-26.md`
-11. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
-12. `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
-13. `docs/CRYSTAL_STORYLET_BANK_V1.md`
-14. `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
-15. `docs/UX5A_DEVICE_FINDINGS_2026-10-26.md`
-
-Repository is source of truth. Do not reconstruct project state from old chat if repo differs.
+11. `docs/MONSTER_SUBJECT_REVIEW_V1.md`
+12. `docs/PEOPLE_SUBJECT_REVIEW_V1.md`
+13. `docs/FRIEND_SUBJECT_REVIEW_V1.md`
+14. `docs/TRAP_SUBJECT_REVIEW_V1.md`
+15. `docs/MYSTERY_SUBJECT_REVIEW_V1.md`
+16. `docs/TREASURE_AFFORDANCE_REVIEW_V1.md`
+17. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
+18. `docs/CRYSTAL_MACHINE_REFERENCE_V1.md`
+19. `docs/CRYSTAL_STORYLET_BANK_V1.md`
+20. `docs/CRYSTAL_STORYLET_AUDIT_2026-10-27.md`
+21. `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
+22. runtime branch `docs/UX5A_GATE_REVIEW_2026-10-27.md`
+23. runtime branch `docs/UX5A_BROWSER_QA_2026-10-27.md`
 
 ## Current runtime gate
-Latest UX5A runtime follow-ups:
-- patch 11: explicit story-key use,
-- patch 12: one visible location identity,
-- patch 13: encounter purpose/world-effect contract,
-- patch 14: explicit narrator-improvisation guidance.
+Latest UX5A runtime layers:
+- patch 11 explicit story-key use,
+- patch 12 one visible location identity,
+- patch 13 encounter purpose/world-effect contract,
+- patch 14 explicit narrator-improvisation guidance,
+- patch 15 removes remaining visible zone-name leak from room description.
 
-Patch 14 automated runtime is green; fresh current browser certification and physical target-device retest remain open.
+Patch-15 machine evidence on runtime branch:
+- 21/0 single-location,
+- 20/0 improv,
+- 5136/0 authored mysteries,
+- 4337/0 encounter purpose,
+- 27/0 device findings,
+- 2328/0 search/encounter,
+- 405/0 Adventure Code,
+- 1797/0 UX4,
+- 5830/0 content regression,
+- 6844/0 focused patch-15 gate,
+- 0 syntax errors across 11 inline scripts.
 
-Do not merge UX5A until physical gate is green.
+Fresh Chromium interaction smoke: **22/0**, with in-memory localStorage harness caveat.
 
-## Latest architecture model
-Recent content/editorial review established:
+Remaining merge gate:
+- real iPad/mobile touch/usability/comprehension,
+- native save/reload/resume,
+- real Adventure Code copy/paste.
+
+**Do not merge UX5A until physical gate is green.**
+
+## Current architecture model
 
 `SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
 
 Supporting layers:
-- player knowledge/reveal state,
-- dramatic phases/expiry,
-- interaction shell/popup,
-- typed canonical state transitions,
+- player knowledge/reveal,
+- phases/expiry,
+- interaction shell,
+- typed validated state transitions,
 - later action history/undo/shared-session sync.
 
 ### Subject != role
-A recognizable subject can have several curated compatible roles.
+A recognizable subject may support several curated authored roles. No unrestricted random role assignment.
 
-Examples:
-- Pannekakezombien may block route, give item, reveal clue, trade, etc.,
-- Boka som skriver tilbake may be open improv, NPC-like, clue source, puzzle/gate or item wrapper,
-- candidate sibling subjects include Den snakkende dukken / Det levende bildet, but they are **not active-bank additions yet**.
-
-No unrestricted random role assignment.
-
-### Requirements need providers
-A required item/state is separate from the way it can be obtained.
+### Requirement != provider
+Critical resource needs at least one reserved reachable validator-proven provider route before it is required.
 
 Initial provider families:
 - `ROOM_FIND`
@@ -80,105 +101,93 @@ Initial provider families:
 - `SEARCH_SECRET`
 - explicit allowed starting/owned resource.
 
-Optional resources can be truly variable when thematic.
+### Full-bank editorial constraints now locked
+The complete existing MONSTERS/PEOPLE/FRIENDS/TRAPS/MYSTERIES/TREASURES banks are reviewed.
 
-Critical resource needs at least one **reserved, reachable, validator-proven** route before it is required. It may still feel random/natural to player.
+Key consequences now in `STORYLET_MATRIX_V1.md` and `DECISIONS.md`:
+- provider truth is explicit graph binding, never noun/theme matching,
+- incidental optional loot != planned critical provider,
+- trade cannot consume the only still-required unique critical resource,
+- knowledge reveal cannot create topology/truth,
+- critical puzzles/mysteries need authored truth/rule/cause,
+- ambient improv cannot carry critical state,
+- phase/expiry applies to friendly clue/delivery content,
+- MONSTER category does not imply combat,
+- mechanic/solution family repetition is tracked separately from subject/role,
+- repeated use of the same versatile prop is also repetition,
+- item use/transfer/consumption/placement is explicit action.
 
-Critical progression cannot depend on one persuasion roll.
+Do **not** expand the content bank now.
 
-### Merchant/social play
-Merchant is a Storylet/provider, not automatically a numerical economy.
+## CRYSTAL_MACHINE remains the only pre-NG8 blueprint target
+The nine initial Crystal Storylets have been audited and revised in-place.
 
-Prefer concrete valuables/trades/favors.
+Canonical bank:
+`docs/CRYSTAL_STORYLET_BANK_V1.md`
 
-Child speaks/acts first. DM triggers `FORHANDLE / USIKKERT FORSØK` only if outcome is genuinely uncertain, using physical dice. Low social results fail forward.
+Audit:
+`docs/CRYSTAL_STORYLET_AUDIT_2026-10-27.md`
 
-### DM control direction
-DM needs semantic controls:
-- `HVA ER GREIA?`
-- `HVA KREVES?`
-- `HVOR KAN DET SKAFFES?`
-- `HVA KAN SKJE?`
-- `NÅR ER DET LØST?`
-- `HVA ENDRES DA?`
-- authored vs improv boundary,
-- `GODTA LØSNING`,
-- negotiation uncertainty,
-- optional `START KAMP`,
-- authored outcome application,
-- later action history/undo.
+Important constraints:
+- main three-color requirement is revealed before acquisition branches,
+- three branches remain reachable in any order,
+- generic UX5A loot cannot satisfy machine crystals accidentally,
+- secondary favor dependencies are real graph nodes/features,
+- Search Reflection + Light Slime is rejected in initial V1 due mechanic overlap,
+- Search Light Crack + Light Slime gets strong repetition penalty,
+- Light Slime and Trader Crab initial candidates use `combatAllowed=false`,
+- Golem may allow optional DM-started combat but noncombat remains primary.
 
-### Optional combat
-Combat is a Storylet capability, not default monster behavior.
+Controlled first manual baseline when runtime eventually reaches this stage:
+- `CRYSTAL_SEARCH_CHIME`
+- `CRYSTAL_NPC_OWL_PAGE`
+- `CRYSTAL_GUARDIAN_LIGHT_SLIME`
 
-Child may propose fighting; DM explicitly starts combat only if `combatAllowed=true`. Critical guardians normally have non-combat route. Child-friendly/non-graphic; surrender/retreat/friendship etc. are valid endings.
+This is not a new blueprint.
 
-## Planned interaction shells/popups
-Some actions should be tangible player interactions without becoming auto-solvers.
-
-Reference: three colored stones/crystals in a gate/machine.
-
-Flow:
-1. story reveals sockets,
-2. child taps target,
-3. popup shows slots,
-4. owned items do not auto-fill,
-5. child places items explicitly,
-6. wrong item is not consumed,
-7. partial placement persists,
-8. all slots either complete or enable separate activation according to authored rule,
-9. world effect opens/activates target,
-10. later undo restores inventory + target atomically.
-
+## Interaction-shell direction
 Canonical spec: `docs/INTERACTION_SHELLS_V1.md`.
 
-## Canonical action direction
-Narrative Graph, DM controls, undo and future shared session should converge on typed validated state transitions with stable action IDs.
+For machine slots:
+1. story reveals sockets,
+2. child taps target,
+3. slots become visible,
+4. owned crystals do not auto-fill,
+5. child explicitly places,
+6. wrong resource not consumed,
+7. partial placement persists,
+8. full placement either completes or enables authored activation,
+9. world effect occurs,
+10. later undo restores inventory + target atomically.
 
-No raw UI field mutation.
+## Optional combat
+Combat is Storylet-specific, never inferred from MONSTER category.
 
-This is why full multiscreen must wait until story/world action model is stable.
+Child proposes; DM explicitly starts only when `combatAllowed=true`. Critical guardians retain non-combat route.
 
-## Future multiscreen / shared session
-Recorded, not active:
-- DM always hosts authoritative state,
-- player view detachable to touch client or display-only screen,
-- same-Wi-Fi/LAN-first join via simple code/QR,
-- client requests action; host validates/broadcasts,
-- reconnect/idempotency,
-- narrator-only info never leaks,
-- DM player-view preview,
-- undo/action history syncs corrected state.
+## Future multiscreen
+Recorded only, not active. DM-hosted authoritative state; LAN-first player/display clients; typed actions; reconnect/idempotency; no narrator leakage; action history/undo foundation.
 
-Adventure Code remains offline reconstruction/sharing, not live sync.
+Adventure Code remains offline reconstruction, not live sync.
 
-## Open-source survey result
-No dependency adopted now.
-
-Study-only candidates:
-- `boardgame.io`: reducer/log/undo/state patterns,
-- `Colyseus`: authoritative sync/reconnect patterns,
-- `rot.js`: roguelike algorithms,
-- `Epoch Mapper`: structured dungeon events/quests/interaction/standalone patterns.
-
-See `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`.
-
-Do not pull in a generic dungeon engine while current story/state architecture is unsettled.
-
-## Updated implementation sequence
+## Implementation sequence
 ### While UX5A is open
-- patch UX5A defects only on runtime branch,
-- physical retest patch-14 candidate,
-- editorial content review may continue as docs,
-- prep branch remains docs/spec only,
-- no Narrative Graph runtime,
-- no DM Control Surface runtime,
-- no UX5B,
-- no Multiscreen implementation.
+Allowed:
+- patch UX5A defects on runtime branch,
+- physical test patch 15,
+- repo-health/provenance improvements that do not change gameplay,
+- docs/spec refinement only.
+
+Blocked:
+- Narrative Graph runtime,
+- full DM Control Surface runtime,
+- UX5B,
+- Multiscreen,
+- new subjects/blueprints.
 
 ### When UX5A is physically GREEN
 1. record physical evidence,
-2. confirm relevant automated + browser regressions,
+2. confirm final regressions,
 3. merge UX5A to `main`,
 4. verify `main`,
 5. create `narrative/story-graph-v1`,
@@ -186,52 +195,23 @@ Do not pull in a generic dungeon engine while current story/state architecture i
 7. start WP-NG1.
 
 ### Narrative Graph packages
-- NG1 graph + provider + transition model/validator,
-- NG2 Storylet Matrix/provider engine,
+- NG1 graph + provider + typed transition model/validator,
+- NG2 small audited Storylet Matrix/provider engine,
 - NG3 Crystal Machine planner,
-- NG4 materialization + minimal semantic DM controls + required interaction shells,
-- NG5 >=1000 automated structural/state cases,
-- NG6 browser/touch interaction QA,
+- NG4 materialization + minimal semantic DM controls + required shells,
+- NG5 >=1000 automated graph/state cases,
+- NG6 browser/touch QA,
 - NG7 10-20 manual editorial/family playtests,
 - NG8 accept/revise/abandon.
 
-Do not convert another blueprint before NG8.
+Do not convert a second blueprint before NG8.
 
-### After NG8 if accepted
-Current preferred order:
-1. **DM Control Surface V1** polish + action history/undo foundation,
-2. **UX5B** map-aware dependency/solution UI,
-3. convert blueprints one at a time,
-4. **Multiscreen / Shared Session V1** when action/state model is stable.
+## Content review status
+**Existing content-bank review is complete.**
 
-## Content review continuation
-Review has progressed through:
-- Pannekakezombien,
-- Den bortkomne zombien,
-- Skjelettdanseren,
-- Skjelettvakten,
-- Sumptrollet,
-- Brotrollet.
+There is no “next subject” now.
 
-Exact next subject in a new chat:
-
-**DEN LEVENDE RUSTNINGEN**
-
-Use `docs/CONTENT_REVIEW_HANDOFF_2026-10-26.md`.
-
-Do not expand Adventure Blueprint bank during review.
-
-## Reference target remains CRYSTAL_MACHINE
-First/only blueprint converted before NG8:
-
-`SETUP -> QUEST_REVEAL -> 3 parallel acquisitions -> RETURN -> ASSEMBLE -> GATE -> CLIMAX`
-
-Preferred initial acquisition mix:
-- `SEARCH_SECRET`
-- `NPC_FAVOR`
-- `GUARDIAN`
-
-The machine reveals three colored missing sockets before player UI assumes knowledge. Child deliberately places/activates crystals. Ownership alone never assembles machine.
+Do not expand the bank. Next content work after Narrative Graph is unblocked is to use the small audited Crystal bank and manually judge story quality.
 
 ## Stop condition
 If procedural architecture needs growing special-case rules or frequent narrator repair, prefer more hand-authored scenario skeletons.
