@@ -1,0 +1,17 @@
+{
+  "status": "draft-1",
+  "updated": "2026-10-28",
+  "sources": [
+    { "id": "BRONN",        "name": "Gammel brønn",    "gives": "VANN",  "requires": "BEHOLDER", "zones": ["TÅKESUMPEN", "MÅNESKOGEN", "LANTERNEHAGEN", "GRAVPLASSEN"], "intro": "En brønn med kaldt, klart vann." },
+    { "id": "BEKK",         "name": "Liten bekk",      "gives": "VANN",  "requires": "BEHOLDER", "zones": ["REGNBUEDALEN", "SOPPSKOGEN", "TÅKESUMPEN"], "intro": "En bekk klukker over steinene." },
+    { "id": "DRYPPSTEIN",   "name": "Dryppstein",      "gives": "VANN",  "requires": "BEHOLDER", "zones": ["KRYSTALLGROTTEN", "SKYGGEGANGENE", "BEINKATAKOMBENE"], "intro": "Det drypper jevnt fra taket ned i en liten skål." },
+    { "id": "ILDSTED",      "name": "Ildsted",         "gives": "ILD",   "requires": "BEHOLDER", "zones": ["HEKSETÅRNET", "ZOMBIESLOTTET", "KLOKKETÅRNET"], "intro": "Glør ulmer i et gammelt ildsted." },
+    { "id": "VARM_STEIN",   "name": "Varm steinhelle", "gives": "VARME", "requires": null,       "zones": ["HEKSETÅRNET", "KRYSTALLGROTTEN", "ZOMBIESLOTTET"], "intro": "En flat stein er god og varm å ta på." },
+    { "id": "ISVEGG",       "name": "Iskald vegg",     "gives": "KULDE", "requires": "BEHOLDER", "zones": ["KRYSTALLGROTTEN", "SKYGGEGANGENE", "BEINKATAKOMBENE"], "intro": "Veggen er dekket av rim og blå is." },
+    { "id": "BLOMSTERENG",  "name": "Blomstereng",     "gives": "DUFT",  "requires": null,       "zones": ["SOPPSKOGEN", "LANTERNEHAGEN", "REGNBUEDALEN", "MÅNESKOGEN"], "intro": "Blomster i alle farger lukter søtt." },
+    { "id": "FRUKTBUSK",    "name": "Fruktbusk",       "gives": "MAT",   "requires": null,       "zones": ["SOPPSKOGEN", "MÅNESKOGEN", "LANTERNEHAGEN"], "intro": "En busk full av saftige bær." },
+    { "id": "LYSSOPP",      "name": "Lysende sopp",    "gives": "LYS",   "requires": "BEHOLDER", "zones": ["SOPPSKOGEN", "SKYGGEGANGENE", "MÅNESKOGEN"], "intro": "Små sopper lyser blått i mørket." },
+    { "id": "VINDSPREKK",   "name": "Vindsprekk",      "gives": "LUFT",  "requires": "GRAVE",    "zones": ["KLOKKETÅRNET", "MÅNESKOGEN", "HEKSETÅRNET"], "intro": "Det suser bak en sprekk som er full av grus." },
+    { "id": "MOSEJORD",     "name": "Mosejord",        "gives": "JORD",  "requires": null,       "zones": ["GRAVPLASSEN", "SOPPSKOGEN", "TÅKESUMPEN"], "intro": "Myk, mørk jord under mosen." }
+  ]
+}

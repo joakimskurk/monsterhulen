@@ -1,0 +1,12 @@
+{
+  "status": "draft-1",
+  "updated": "2026-10-28",
+  "recipes": [
+    { "id": "DUFTSPRAY",  "inputs": ["TOM_FLASKE", "DUFTBLOMST"], "output": { "name": "Duftspray", "tags": ["DUFT"], "consumable": true },
+      "hint": "En tom flaske og en blomst … kanskje de kan bli noe sammen?" },
+    { "id": "FJAERVIFTE", "inputs": ["ROD_FJAER", "GULLTRAD"],    "output": { "name": "Fjærvifte", "tags": ["LUFT"], "consumable": false },
+      "hint": "Fjæra blafrer så fint. Hvis man festet den til noe …" },
+    { "id": "VARM_FAKKEL","inputs": ["LYSSTAV", "VARMESTEIN"],    "output": { "name": "Glødestav", "tags": ["LYS", "VARME"], "consumable": true },
+      "hint": "Lysstaven blir varm når den ligger inntil steinen." }
+  ]
+}

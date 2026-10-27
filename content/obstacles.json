@@ -1,0 +1,33 @@
+{
+  "status": "draft-1",
+  "updated": "2026-10-28",
+  "obstacles": [
+    { "id": "KILENDE_GULVET", "name": "Det kilende gulvet", "origin": "trap-review",
+      "solvedBy": [ { "tag": "MYK", "sign": "Der noen har lagt en pute, kiler det ikke." }, { "tag": "LATTER", "sign": "Gulvet roer seg når noen ler tilbake." } ],
+      "intro": "Gulvet kiler under føttene så man ler seg overende." },
+    { "id": "BEINFELLEN", "name": "Beinfellen", "origin": "trap-review",
+      "solvedBy": [ { "tag": "HOYDE", "sign": "Ett bein holder alt det andre oppe." }, { "tag": "REPARASJON", "sign": "Støtten vakler, men kan festes." } ],
+      "intro": "En haug med bein balanserer over døråpningen." },
+    { "id": "BOBLEPORTEN", "name": "Bobleporten", "origin": "trap-review",
+      "solvedBy": [ { "tag": "STILLHET", "sign": "Boblene stopper når ingen rører seg." } ],
+      "intro": "Døråpningen er full av strikkete bobler som spretter tilbake." },
+    { "id": "SKYGGEGULVET", "name": "Skyggegulvet", "origin": "trap-review",
+      "solvedBy": [ { "tag": "LYS", "sign": "Skyggene trekker seg fra lykta." } ],
+      "intro": "Skygger kryper over gulvet og griper etter anklene." },
+    { "id": "SOVENDE_TRAPPA", "name": "Den sovende trappa", "origin": "trap-review",
+      "solvedBy": [ { "tag": "STILLHET", "sign": "Trinnene snorker i takt." }, { "tag": "MUSIKK", "sign": "Trappa våkner og retter seg ut når noen nynner." } ],
+      "intro": "En levende trapp sover, og trinnene sover på forskjellig høyde." },
+    { "id": "REGNBUENETTET", "name": "Regnbuenettet", "origin": "trap-review",
+      "solvedBy": [ { "tag": "LYS", "sign": "Trådene blir gjennomsiktige i farget lys." } ],
+      "intro": "Et klissete nett i alle regnbuens farger sperrer døråpningen." },
+    { "id": "STINKGASSEN", "name": "Stinkgassen", "origin": "new",
+      "solvedBy": [ { "tag": "DUFT", "sign": "Rundt blomstene i hjørnet lukter det godt." }, { "tag": "LUFT", "sign": "Gassen bølger når det trekker." } ],
+      "intro": "En grønn sky henger i gangen og lukter forferdelig." },
+    { "id": "LAVAELVA", "name": "Lavaelva", "origin": "new",
+      "solvedBy": [ { "tag": "VANN", "sign": "Der det drypper, blir lavaen svart og hard." }, { "tag": "KULDE", "sign": "Kanten stivner ved den kalde veggen." } ],
+      "intro": "En bekk av glødende lava renner tvers over gangen." },
+    { "id": "MORKE_KLOFTA", "name": "Den mørke kløfta", "origin": "new",
+      "solvedBy": [ { "tag": "LYS", "sign": "Med lys ser man smale steiner å trå på." }, { "tag": "HOYDE", "sign": "Det henger en krok i taket over kløfta." } ],
+      "intro": "En kløft så mørk at man ikke ser bunnen eller den andre siden." }
+  ]
+}
