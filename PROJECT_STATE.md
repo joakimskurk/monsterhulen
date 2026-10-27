@@ -49,22 +49,22 @@ New V1.1 artifacts:
 - `visual/VISUAL_DETAILS_V1_1.md`
 - `visual/COMPONENT_STATE_MATRIX_V1_1.md`
 - `visual/ART_PRODUCTION_SPEC_V1_1.md`
+- `visual/UI_SYMBOLS_V1_1.md`
+- `visual/ui-symbols-v1_1.svg`
 - `visual/runtime-detail-v1_1.css`
 - `visual/VISUAL_QA_V1_1_2026-10-27.md`
 - `tests/QA_VISUAL_DETAILS_V1_1.js`
+- `tests/QA_VISUAL_SYMBOLS_V1_1.js`
 - `prototypes/visual-system-v1_1/index.html`
 - `prototypes/visual-system-v1_1/style-map.css`
 - `prototypes/visual-system-v1_1/style-ui.css`
 - `prototypes/visual-system-v1_1/prototype.js`
 
-V1.1 static contract QA:
-- **32 PASS / 0 FAIL**.
-
-V1.1 Chromium node-map/detail prototype:
-- **20 PASS / 0 FAIL**.
-
-Exact patch-15 DOM + V1 skin + V1.1 detail CSS:
-- **13 PASS / 0 FAIL**.
+V1.1 verification:
+- static detail contract **32 PASS / 0 FAIL**,
+- Chromium node-map/detail prototype **20 PASS / 0 FAIL**,
+- exact patch-15 DOM + V1 skin + V1.1 detail CSS **13 PASS / 0 FAIL**,
+- SVG symbol contract **8 PASS / 0 FAIL**.
 
 Verified browser-tested V1.1 Git blobs:
 - prototype index `356a1d1fb20f092ae7110d9e7beb7e16b5f3494b`
@@ -72,6 +72,7 @@ Verified browser-tested V1.1 Git blobs:
 - room/HUD/overlay CSS `e7fdbc0d6788b1040a50e5f658d5978d5258ec5a`
 - prototype interaction JS `6ce3264a3f867f4bcff5a2ea45cc81475186dbce`
 - runtime detail CSS `099c874a52a813435fdc49dd8d5bb473ffa0cc16`
+- SVG symbol sprite `037fe96a3be8047bea9556db3c33659d6b7a9b33`
 
 Harness caveat: CDP-injected runtime uses an in-memory localStorage shim. Native persistence and clipboard are still physical-gate items.
 
@@ -175,6 +176,25 @@ Do not mass-produce the full art bank yet. First safe asset batch:
 Browser-test crop, readability, performance and hidden-state safety before expanding.
 
 Crystal Machine visual phase variants wait until canonical story/state can drive them.
+
+## Functional SVG symbols
+`visual/ui-symbols-v1_1.svg` contains 14 text-free functional symbols using `currentColor`:
+- map,
+- inspect/eye,
+- backpack,
+- narrator,
+- lock,
+- blocked,
+- current,
+- visited,
+- travel,
+- clue,
+- trade,
+- friend,
+- guardian,
+- reward.
+
+These are UI affordances, not story content. Icons supplement labels and may not leak hidden state.
 
 ## Visual layout direction
 Tablet landscape remains primary shared-tabletop presentation:
