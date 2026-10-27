@@ -1,7 +1,7 @@
 # Storylet Matrix V1
 
 Status: **DESIGN LOCK CANDIDATE - prep only**
-Updated: 2026-10-26
+Updated: 2026-10-27
 
 ## Purpose
 The Storylet Matrix defines which curated narrative modules may satisfy which story functions. It prevents individually valid content from combining into incoherent critical story.
@@ -77,6 +77,11 @@ maxAgeBand
 consumesResource
 openHint
 strongerHint
+mechanicFamilies[]
+solutionFamilies[]
+truthMode
+validPhases[]
+expiresAfter
 ```
 
 `subjectId` is stable presentation identity. `id` is Storylet logic/role identity.
@@ -94,6 +99,10 @@ strongerHint
 `progressStages[]` is allowed only for named meaningful fictional state changes; no generic 3/4 duration.
 
 `narratorImprov` explicitly declares open narrator-owned detail. Critical requirements/completion/outcomes/world effects cannot depend on untracked improv.
+
+`mechanicFamilies[]` and `solutionFamilies[]` support anti-repetition scoring across different subjects that would otherwise produce the same play beat.
+
+`truthMode` distinguishes at minimum authored critical truth from intentionally open narrator-improv. An ambient improv instance cannot silently become critical merely because its subject also supports an authored critical variant elsewhere.
 
 ## Subject / role compatibility
 Subjects are reusable fictional wrappers, not fixed mechanics.
@@ -283,6 +292,106 @@ If a Storylet intentionally leaves detail open:
 
 For critical Storylets, tracked payload wins. Narrator may improvise wording around a known critical clue, not invent required destination/state.
 
+## Full-bank editorial constraints - 2026-10-27
+The existing MONSTERS, PEOPLE, FRIENDS, TRAPS, MYSTERIES and TREASURES banks have now been reviewed. Detailed source-of-truth prep docs:
+- `docs/MONSTER_SUBJECT_REVIEW_V1.md`
+- `docs/PEOPLE_SUBJECT_REVIEW_V1.md`
+- `docs/FRIEND_SUBJECT_REVIEW_V1.md`
+- `docs/TRAP_SUBJECT_REVIEW_V1.md`
+- `docs/MYSTERY_SUBJECT_REVIEW_V1.md`
+- `docs/TREASURE_AFFORDANCE_REVIEW_V1.md`
+
+The following constraints are now part of Storylet selection/validation design.
+
+### A. Mechanic-family anti-repetition
+Different subjects can still create the same play beat. Selection must therefore track mechanic/solution family in addition to subject and role.
+
+Important existing overlap families include:
+- `LIGHT_REDIRECT`: Krystallslimet / Solslukeren / Lysslukeren / Glimtmøllen / Skyggegulvet,
+- `PERMISSION_PROOF`: Skjelettvakten / Den levende rustningen / Steingolemen,
+- `FOOD_HUNGER`: Sumptrollet / Den sultne krokodillen / Den kjøttetende planten,
+- `TRADE_COLLECTOR`: Brotrollet / Kjempeedderkoppen / Byttekrabben / Revehandleren / Samlerkrabben,
+- `QUIET_SLEEP`: Tåkespøkelset / Den søvnige kista / Sovesoppen / Gjespesoppen / Den sovende trappa,
+- `MAP_ROUTE_REVEAL`: Alvekartografen / Sneglebudet / Soppprinsen,
+- `REPAIR_PRECISE`: Dvergsmeden / Skjelettmusikeren / Den tomme rustningen,
+- `PATTERN_OBSERVE`: Den gamle heksa / Kråkeforskeren / Sporsoppen / authored Bokbillen variants.
+
+This is normally a scoring/rejection constraint based on adjacency and adventure length, not a reason to delete subjects.
+
+### B. Provider truth is graph truth, never noun/theme matching
+Examples that must **not** happen automatically:
+- Krystallslimet does not provide a CRYSTAL_MACHINE crystal because it is crystal-themed,
+- Glasskule does not count as a machine crystal because it is glass/crystal-like,
+- Trollmynt does not grant permission to every troll/guard merely because it carries a troll symbol,
+- Messingknapp does not act as a universal pass because some guards may recognize one authored emblem,
+- optional Honningkjeks room loot does not become the sole critical FOOD provider unless a provider plan binds it.
+
+Resource compatibility may help authoring/scoring, but only provider plan/Storylet identity establishes critical semantics.
+
+### C. Incidental resource instance != planned critical provider instance
+Optional search loot remains genuinely optional.
+
+If a resource type is critical, the graph binds at least one planned provider instance/route. An incidental resource of the same canonical type may optionally satisfy the requirement only when the Storylet/resource contract explicitly permits interchangeable instances.
+
+This avoids accidental softlocks and accidental “lucky spawn solved the story” logic.
+
+### D. Trade cannot consume a still-required unique critical resource
+Before `TRADE_ITEM`, `BUY_ITEM` or another transfer is accepted, preconditions must reject an exchange that would destroy the only remaining required resource route unless the graph explicitly contains a replacement/alternate route.
+
+This is especially important for collector/trader subjects.
+
+### E. Knowledge provider cannot create topology or truth
+Subjects such as Alvekartografen, Soppprinsen, Den svarte katten, Sneglebudet and Muldvarpgraveren may reveal existing authored routes/locations.
+
+They cannot create a secret door, passage, destination or objective by narrator invention.
+
+`REVEAL_LOCATION` changes knowledge. `OPEN_GATE` changes an existing authored gate/edge. Neither action invents graph topology.
+
+### F. Critical puzzle/mystery requires authored truth
+Subjects such as:
+- Steingolemen,
+- Takgargoilen,
+- Den gamle heksa,
+- Kråkeforskeren,
+- Sporsoppen,
+- Bokbillen,
+- authored variants of current ambient mysteries
+may carry critical puzzle/clue roles only when the answer/cause/rule exists in Storylet/graph truth.
+
+A schema-valid puzzle template or narrator improvisation is not enough.
+
+### G. Ambient improv instance cannot be promoted to critical
+The current six MYSTERIES are intentionally ambient/improvisational in their current form.
+
+A subject may later have a separate authored critical Storylet, but `truthMode=IMPROV` content cannot provide required graph state, mandatory resource, required destination or critical world effect.
+
+### H. Phase/expiry applies to friendly/clue content too
+Delivery/reveal Storylets such as Sneglebudet, Papirfuglen, Den flyvende skoen and other clue carriers need valid phases. If the dramatic purpose has expired, the Storylet must not materialize later unless a new authored role explicitly recontextualizes it.
+
+### I. MONSTER category does not imply combat
+`combatAllowed` defaults from Storylet compatibility, not subject category.
+
+Many monster subjects are editorially stronger with `combatAllowed=false`. Sparse optional-combat examples include selected guardian variants such as Skjelettvakten, Den levende rustningen, Den sultne krokodillen, Kjempeedderkoppen, Kistemonsteret and Steingolemen.
+
+Critical guardians still require a credible non-combat route.
+
+### J. Item use/consumption/placement is explicit state transition
+Resource possession never performs:
+- trade,
+- placement,
+- feeding,
+- repair,
+- gate opening,
+- assembly.
+
+If a resource is transferred/consumed/target-bound, that happens through a typed validated action. This keeps future undo/sync atomic.
+
+### K. Environmental critical blocker must expose an affordance
+For traps/environmental blockers, a critical solution cannot depend on an exact hidden carried item unless that item has a provider plan. The scene/environment itself should normally expose at least one readable approach family.
+
+### L. Repeating the same prop is also repetition
+Versatile items such as Rød fjær, Glasskule, Gulltråd and Messingknapp can fit many Storylets. Scoring should penalize repeated use of the same item/affordance as the “answer” across one adventure.
+
 ## Hard rejection examples
 Reject before map materialization if:
 - subject/role pairing incompatible,
@@ -307,7 +416,16 @@ Reject before map materialization if:
 - interaction shell reveals knowledge before reveal,
 - interaction shell can mutate critical state through an action type not declared by Storylet,
 - critical slot/resource placement is auto-filled from inventory,
-- partial/undo semantics would duplicate or destroy a critical resource.
+- partial/undo semantics would duplicate or destroy a critical resource,
+- critical provider is inferred only from matching subject/item name/theme,
+- optional ambient loot is the only critical route without a reserved provider binding,
+- trade/transfer consumes the only still-required unique critical resource without replacement route,
+- knowledge reveal or narrator improv invents new graph topology,
+- `truthMode=IMPROV` content supplies critical requirement/completion/world effect,
+- critical clue/puzzle lacks authored truth/rule/cause,
+- Storylet materializes outside `validPhases` or after `expiresAfter` without an explicitly authored new role,
+- `MONSTER` category alone is used to infer `combatAllowed=true`,
+- critical environmental blocker requires an unavailable exact item despite no provider/environmental affordance.
 
 ## Matrix scoring
 After hard filtering, score valid choices by:
@@ -319,7 +437,11 @@ After hard filtering, score valid choices by:
 6. age-band fit,
 7. interaction variety without gimmick overload,
 8. recent role repetition penalty,
-9. recent subject repetition penalty.
+9. recent subject repetition penalty,
+10. mechanic-family repetition penalty,
+11. solution-family repetition penalty,
+12. repeated critical prop/affordance penalty,
+13. tonal/dynamic contrast across adjacent beats.
 
 Invalid combinations are rejected, never scored into validity.
 
@@ -339,6 +461,12 @@ All crystals owned makes `ASSEMBLE` available, not complete.
 `ASSEMBLE` uses explicit slot/assembly interaction. Child deliberately places/activates crystals, producing tracked `MACHINE_ASSEMBLED` before gate/climax.
 
 Each branch must have explicit provider reachability, purpose, solve condition, payoff and world effect.
+
+Editorial constraints from the full-bank review apply here immediately:
+- Krystallslimet/Glasskule do not become crystal providers by thematic similarity,
+- `NPC_FAVOR` provider can use reviewed people/friend subjects only through approved authored variants,
+- guardian choice must not duplicate the search/favor branch mechanic,
+- provider route may not consume another branch’s unique critical resource.
 
 ## DM materialization requirements
 NG4/narrator layer must expose enough metadata for novice DM to understand:
@@ -371,5 +499,8 @@ A critical Storylet is not accepted because schema validates. It must answer:
 - Is narrator-owned improv explicitly scoped?
 - Is subject compatible with role?
 - Does UI leave room for unlisted plausible child solution?
+- Is this Storylet mechanically distinct enough from adjacent beats?
+- Is any critical truth/provider/route explicit rather than inferred from theme/name?
+- Is the Storylet still dramatically valid in the phase where it can materialize?
 
 If answers are weak, Storylet remains editorially unapproved even if structural tests are green.
