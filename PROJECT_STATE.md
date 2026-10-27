@@ -5,7 +5,7 @@ Current branch: `visual/visual-system-v1-prep`
 Status: **PARALLEL VISUAL PREP ONLY**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Architecture prep branch: `narrative/story-graph-v1-prep`
-Current visual work item: **Empty Rooms Asset Batch V2 — generated, structurally validated, editorial acceptance pending**
+Current visual work item: **Empty Rooms V2 — implemented in exact patch-15 map DOM, static/browser green, editorial review pending**
 
 ## Runtime gate is unchanged
 UX5A patch 15 is still waiting for physical iPad/mobile certification.
@@ -15,152 +15,136 @@ Exact tested patch-15 candidate SHA-256:
 
 Do not merge visual work into active runtime or `main` before that gate is green. Do not implement Narrative Graph runtime, UX5B or Multiscreen from this branch.
 
-## Visual production direction
-V1.x sheet-first extraction is no longer the production method.
+## Canonical visual production method
+The old sheet-first extraction path is abandoned.
 
-Canonical V2 pipeline:
+Current V2 pipeline:
 
-**grid first -> exact isolated source sprite -> normalization -> validation -> deterministic atlas**
+**grid first -> exact isolated source asset -> normalization/validation -> deterministic source bank -> runtime composition**
 
-Large generated presentation sheets are not production sources.
+Large generated sheets are not production sources.
 
-## Verified geometry and locked sizes
-Current runtime:
-- `MAP_W=13`,
-- `MAP_H=13`,
-- multi-cell physical rooms.
-
-Binding V2 sizes:
-- logical tile: **32 x 32 px**,
-- full map at 1x: **416 x 416 CSS px**,
-- floor: 32x32 full-cell RGBA,
-- wall: 32x32 transparent overlay, exact 6px structural depth,
-- outer corner: 32x32 transparent overlay, 6px participating edges,
-- inner corner: 32x32 transparent overlay, 6px participating edges,
-- future connection/door: 32x32 transparent overlay, centred 20px opening,
-- runtime atlas: **512 x 512**, 16x16 slots of 32 px,
-- nearest-neighbour / integer scaling only.
-
+## Binding size/geometry contract
 Canonical sources:
 - `visual/ASSET_SIZE_STANDARD_V2.md`
 - `visual/asset-size-standard-v2.json`
 - `visual/TILESET_CONTRACT_V2.md`
 
-Do not improvise new asset dimensions. Extend the size standard + JSON + regression test first if a new visual role is genuinely needed.
+Locked values:
+- map grid: 13 x 13,
+- logical map cell: 32 x 32 px,
+- full map at 1x: 416 x 416 px,
+- structural wall depth: 6 px,
+- future connection opening: 20 px centred inside a 32 px cell,
+- atlas: 512 x 512, 16 x 16 slots of 32 px,
+- nearest-neighbour / integer scaling only.
 
-## Empty Rooms Asset Batch V2 — current output
-The structural empty-room kit now contains exactly **21 assets**:
+New production sizes may not be improvised. Extend the size standard + JSON + regression test first.
+
+## Empty Rooms structural bank
+Exactly **21 room-only assets**:
 
 ### Floor — 9
 `MAP_FLOOR_STONE_01` ... `MAP_FLOOR_STONE_09`
 
-- 32x32,
+- 32 x 32,
 - fully opaque RGBA,
-- cool neutral dungeon stone,
+- neutral dungeon stone,
 - semantic-neutral,
 - rotation-safe.
 
 ### Straight walls — 4
-- `MAP_WALL_N_01`
-- `MAP_WALL_E_01`
-- `MAP_WALL_S_01`
-- `MAP_WALL_W_01`
+- N / E / S / W,
+- 32 x 32 transparent overlays,
+- exact 6 px structural edge band.
 
-### Outer/convex corners — 4
-- NW / NE / SE / SW
+### Outer corners — 4
+- NW / NE / SE / SW,
+- 32 x 32 transparent overlays.
 
-### Inner/concave corners — 4
-- NW / NE / SE / SW
+### Inner corners — 4
+- NW / NE / SE / SW,
+- 32 x 32 transparent overlays.
 
-Walls/corners:
-- true transparent RGBA,
-- hard alpha 0/255,
-- exact geometry-aligned overlays,
-- directional assets are not rotation-safe.
-
-## Deliberately not produced yet
-- doors/openings/connections,
-- items,
-- heroes,
-- NPCs,
-- monsters,
-- encounters,
-- traps,
-- furniture,
-- treasure,
-- room-content illustrations,
-- current/selected/reachable/fog sprites.
-
-Current/selected/reachable/fog remain runtime/CSS state.
+No doors, actors, items, furniture, traps, treasure or room-content art exist in this V2 structural bank.
 
 ## Deterministic provenance
-Generator committed:
-`tools/generate_empty_rooms_v2.py`
-
-Produced manifest:
-`visual/tileset-manifest-v2.json`
-
-Expected PNG SHA-256 values:
-`visual/empty-rooms-assets-v2.sha256.json`
-
-A separate clean generation reproduced all **21/21 PNG files byte-for-byte**.
-
-For this structural batch, GitHub text source can therefore reproduce the binary assets without relying on connector binary upload.
-
-## Verification
-### Local binary/geometry validation
-Result: **21 / 21 PASS**.
-
-Checks include:
-- exact 32x32 dimensions,
-- floor opacity,
-- overlay transparency,
-- hard structural alpha,
-- exact 6px straight-wall bands,
-- inner-corner footprint bounds,
-- unique IDs,
-- unique atlas slots,
-- deterministic 512x512 atlas assembly.
-
-The first attempted floor pattern was rejected because a boundary differed too much. The accepted batch uses a rotation-safe square-stone construction instead.
-
-### Repo regression
-`node tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`
-
-Result: **19 PASS / 0 FAIL**.
-
-### Manual structural visual review
-Reviewed at nearest-neighbour scale:
-- all 9 floors in 0/90/180/270 rotation matrix,
-- wall/corner transparency contact sheet,
-- 1x1 room,
-- 4x3 rectangle,
-- L-shaped room,
-- irregular joined room,
-- synthetic 13x13 map with multiple empty room shapes.
-
-This proves structural composition, not final artistic polish. Palette/detail refinement may happen later only if stable IDs, dimensions, anchors and geometry remain intact.
-
-## Layer architecture
-1. fog/background — runtime/CSS,
-2. floor — V2 source tile,
-3. wall/corner — V2 transparent overlay,
-4. connection — later V2 overlay,
-5. content marker — later,
-6. interaction state — runtime/CSS.
-
-## Canonical batch documentation
-- `visual/EMPTY_ROOMS_ASSET_BATCH_V2.md`
+Text source in repo can reproduce the exact PNG bank:
+- `tools/generate_empty_rooms_v2.py`
 - `visual/tileset-manifest-v2.json`
 - `visual/empty-rooms-assets-v2.sha256.json`
-- `tools/generate_empty_rooms_v2.py`
-- `tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`
+
+Clean regeneration reproduced **21 / 21 PNGs byte-identically**.
+
+Structural QA:
+- local binary/geometry: **21 / 21 PASS**,
+- `tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`: **19 PASS / 0 FAIL**.
+
+## Runtime integration proof
+Implementation files:
+- `visual/empty-rooms-runtime-v2.css`
+- `visual/empty-rooms-runtime-v2.js`
+- `tests/QA_EMPTY_ROOMS_RUNTIME_INTEGRATION_V2.js`
+- `visual/EMPTY_ROOMS_RUNTIME_PROOF_V2.md`
+
+The integration reads canonical patch-15 DOM geometry only:
+- `.tile`,
+- `.joinN/.joinE/.joinS/.joinW`,
+- `.fog`.
+
+It does not call gameplay `move()`, directly mutate state, or replace the dungeon generator.
+
+For each visible room cell it composes:
+1. one deterministic floor tile,
+2. straight exterior walls,
+3. convex corners,
+4. concave corners derived from cardinal + diagonal joins.
+
+Existing runtime controls/markers remain above this room-only structural layer.
+
+The layer re-applies after normal map rerenders using a `MutationObserver`.
+
+## Runtime proof verification
+Static integration contract:
+- **14 PASS / 0 FAIL**.
+
+Fresh Chromium exact patch-15 + V2:
+- **15 PASS / 0 FAIL**.
+
+Verified:
+- exact 32px PNGs load (`naturalWidth=32`),
+- exact 32 CSS px tile boxes,
+- real multi-cell join geometry,
+- wall/corner overlays present,
+- normal `?` exploration still functions,
+- room assets reapply after canonical map rerenders,
+- tablet and mobile have no document-level horizontal overflow.
+
+Representative screenshots used only legal map exploration to reveal several rooms; no debug state mutation created fake geometry.
+
+Harness caveat: CDP uses an in-memory localStorage shim. Native persistence/clipboard and physical touch are not certified by this visual proof.
+
+## Rejected intermediate integration states
+Two issues were found and fixed before acceptance:
+1. relative asset URLs inside a `setDocumentContent` standalone harness produced unloaded PNGs (`naturalWidth=0`),
+2. keeping the old responsive map box produced dead black space despite 32px cells.
+
+Accepted standalone inspection build embeds the 21 PNGs; the split package uses ordinary relative paths. The map box is sized from actual columns/rows x 32 and scrolls/pans on small surfaces rather than fractionally scaling tiles.
+
+## Current boundary
+This checkpoint proves **room-only structural composition** inside the actual Monsterhulen map.
+
+It does not prove final art-direction approval and it does not change active UX5A runtime or `main`.
 
 ## Exact next safe action
-Editorially inspect the empty-room structural kit.
+User/editorial review of the exact V2 room-only patch-15 implementation.
 
-If accepted, produce **connection/opening/door overlays only** using the locked 32x32 canvas + 20px opening specification.
+If accepted, produce only connection assets next:
+- open passage,
+- door,
+- locked/blocked connection variants,
+using the already locked 32 x 32 canvas and 20 px centred opening contract.
 
-Do not produce items, heroes, NPCs, monsters or room contents yet.
+Do not create items, heroes, NPCs, monsters or room-content art yet.
 
 When physical UX5A becomes GREEN, return to runtime sequencing first. Visual integration remains a separate selective package after runtime merge.
