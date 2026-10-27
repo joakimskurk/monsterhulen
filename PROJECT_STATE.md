@@ -6,7 +6,7 @@ Status: **PARALLEL VISUAL PREP ONLY**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Runtime baseline used to create this branch: `b84ebe410679773e6833bf06fcd75bca449a5b89`
 Architecture prep branch: `narrative/story-graph-v1-prep`
-Current visual work item: **Visual Direction V1.2 — fit concept-art feel to actual Monsterhulen runtime**
+Current visual work item: **Asset Batch 01 V1.2 integrated proof — browser green, editorial acceptance pending**
 
 ## Runtime gate is unchanged
 UX5A patch 15 is still waiting for physical iPad/mobile certification.
@@ -45,12 +45,13 @@ Canonical direction doc:
 `visual/VISUAL_DIRECTION_V1_2.md`
 
 ## V1.2 runtime-first proof
-New artifacts:
+Artifacts:
 - `visual/runtime-skin-v1_2.css`
 - `visual/VISUAL_DIRECTION_V1_2.md`
 - `visual/VISUAL_QA_V1_2_2026-10-27.md`
 - `visual/INTEGRATION_PLAN_V1_2.md`
 - `visual/ASSET_BATCH_01_V1_2.md`
+- `visual/ASSET_BATCH_01_RESULTS_2026-10-27.md`
 - `tests/QA_VISUAL_DIRECTION_V1_2.js`
 
 Verification:
@@ -69,6 +70,52 @@ Browser verification confirms:
 - Forteller target remains >=48 CSS px.
 
 Harness caveat remains: CDP runtime uses in-memory localStorage, so native persistence/clipboard and physical touch remain UX5A physical-gate items.
+
+## Asset Batch 01 V1.2 — GENERATED + INTEGRATED PROOF
+The small proof batch has now been produced and wired into a standalone patch-15 visual product.
+
+Generated proof assets:
+- `CAVE_GENERIC` current-room sceneplate,
+- `MUSHROOM` current-room sceneplate,
+- `UNDERGROUND_LAKE` current-room sceneplate,
+- `NPC_OWL_LIBRARIAN` portrait (large + thumb),
+- key icon,
+- rope icon,
+- lantern icon,
+- generic non-story crystal icon.
+
+Placement remains runtime-first:
+- sceneplate inside the current-room surface,
+- portrait inside entity/encounter presentation,
+- icons inside existing backpack slots,
+- no illustrated map nodes.
+
+The integrated standalone proof also reduces rounded UI treatment to square/pixel corners without changing gameplay/state semantics.
+
+Asset integration browser QA: **12 PASS / 0 FAIL**.
+
+Verified:
+- patch-15 starts,
+- sceneplate renders from embedded asset data,
+- generated map remains intact,
+- square/pixel card treatment is active,
+- desktop/mobile no-overflow,
+- four inventory art mappings render in proof slots,
+- mushroom family switching works,
+- owl portrait hook works,
+- mobile sceneplate remains readable.
+
+Canonical results doc:
+`visual/ASSET_BATCH_01_RESULTS_2026-10-27.md`
+
+## Binary provenance limitation
+The tested binary asset package exists as local deliverables, but binary assets are **not committed to GitHub yet**.
+
+Reason: the repository connector previously proved unsafe for large binary/base64 transport. Do not claim repo byte-provenance is closed until a byte-safe upload path exists and repository copies are hash-verified.
+
+Recorded standalone artifact hashes:
+- integrated product HTML `23f7437fd05e7fc21220876697c98beeadd62949e0a7031122235c45992bbe61`
+- asset package ZIP `2775a23c8edbd679b1dd84769efe93f33c60280a22e4eae96cf8d8e07a9f9ad3`
 
 ## V1.1 retained as interaction research, not target composition
 V1.1 remains useful for:
@@ -117,19 +164,6 @@ Priority:
 3. optional current-room sceneplate when canonical state can choose a safe family,
 4. small decorative ambience that cannot be mistaken for state.
 
-New first-batch spec:
-`visual/ASSET_BATCH_01_V1_2.md`
-
-Batch 01 now excludes map-room dioramas.
-Proof assets:
-- `CAVE_GENERIC` current-room sceneplate,
-- `MUSHROOM` current-room sceneplate,
-- `UNDERGROUND_LAKE` current-room sceneplate,
-- `NPC_OWL_LIBRARIAN` portrait,
-- key, rope, lantern and generic non-story crystal inventory icons.
-
-No full bank before this proof batch is manually/browser accepted.
-
 ## Integration sequence after UX5A merge
 Canonical V1.2 integration plan:
 `visual/INTEGRATION_PLAN_V1_2.md`
@@ -172,8 +206,8 @@ Examples preserved:
 Still open: exact release/runtime/assets are not yet byte-reconstructable from ordinary repo files alone.
 
 ## Exact next safe visual action
-Do **not** return to the old node-map composition.
+Editorially inspect the integrated Asset Batch 01 product. If accepted, expand the art bank in controlled batches using the same runtime-first placement and state-safety rules.
 
-Next safe visual work is to create and test the small `ASSET_BATCH_01_V1_2` against the real runtime-style surfaces, then revise before any larger art production.
+Do **not** return to the old node-map composition and do not mass-produce map-room dioramas.
 
 When physical UX5A becomes GREEN, return to the runtime transition sequence first. Visual integration remains a separate later package.
