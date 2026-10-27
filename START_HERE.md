@@ -23,8 +23,10 @@ Then read architecture prep on branch `narrative/story-graph-v1-prep`:
 4. `docs/STORYLET_MATRIX_V1.md`
 5. `docs/INTERACTION_SHELLS_V1.md`
 6. `docs/CONTENT_REVIEW_HANDOFF_2026-10-26.md`
-7. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
-8. `docs/OPEN_SOURCE_SURVEY_2026-10-26.md`
+7. category review docs listed by prep `START_HERE.md`
+8. `docs/CRYSTAL_STORYLET_BANK_V1.md`
+9. `docs/CRYSTAL_STORYLET_AUDIT_2026-10-27.md`
+10. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
 
 ## Current active work
 UX5A patch 15 physical iPad/mobile retest before merge.
@@ -34,16 +36,12 @@ Latest runtime patches:
 - patch 12 one visible location identity,
 - patch 13 encounter purpose/world-effect contract,
 - patch 14 explicit narrator-improvisation guidance,
-- patch 15 removes the remaining player-visible zone-name leak from `room.desc`.
+- patch 15 removes remaining player-visible zone-name leak from `room.desc`.
 
 ## Patch 15 checkpoint
-The 2026-10-27 full gate review found that patch 12 had removed the separate area badge but the player room description still exposed `${zone.name}. ${room.name}.`.
+The current patch-15 candidate has been reconstructed from indexed current source and machine-tested.
 
-Patch 15 changes the visible description to `${room.name}.` while keeping `zoneName` internal for deterministic generation/tone.
-
-The current patch-15 candidate has now been reconstructed from the indexed current source and machine-tested.
-
-Automated evidence on patch 15:
+Automated evidence:
 - single location **21/0**
 - explicit improv **20/0**
 - authored mysteries only **5136/0**
@@ -56,18 +54,17 @@ Automated evidence on patch 15:
 - focused patch-15 runtime gate **6844/0**
 - 11 inline scripts **0 syntax errors**
 
-Patch-15 reconstructed candidate SHA-256:
-`f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
+Fresh headless Chromium interaction smoke on exact patch-15 HTML: **22/0**.
 
-A fresh headless Chromium interaction smoke is also green **22/0** using the exact patch-15 HTML. Because this container denies native localStorage for the injected `about:blank` harness, the smoke used an in-memory localStorage shim. Therefore browser DOM/click/mobile-view interactions are fresh-current, but native persistence and real clipboard behavior are still not certified.
+Harness caveat: browser smoke uses an in-memory localStorage shim because container Chromium denies native localStorage for the injected page.
 
-**Remaining merge gate is physical iPad/mobile testing of the same patch-15 candidate, plus native persistence/clipboard behavior on real target browser.**
+**Remaining merge gate is physical iPad/mobile testing of the same patch-15 candidate, including native persistence and Adventure Code clipboard/paste.**
 
-Do not merge UX5A until the physical gate is green.
+Do not merge UX5A until physical gate is green.
 
 Do not implement Narrative Graph runtime, full DM Control Surface, UX5B or Multiscreen while this gate remains open.
 
-## Latest architecture direction captured in prep
+## Architecture direction captured in prep
 Target chain:
 
 `SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
@@ -86,15 +83,37 @@ Important consequences:
 - merchant/trade/social bargain are provider families,
 - child speaks/acts first; DM triggers dice only if uncertain,
 - no critical single-roll persuasion softlock,
-- combat is optional DM-started capability (`combatAllowed`), not monster default,
-- DM needs semantic controls instead of raw state editing,
-- planned popups/interaction shells make actions tangible but never auto-use owned solutions.
+- combat is optional Storylet-specific capability, not MONSTER default,
+- planned popups make actions tangible but never auto-use owned solutions.
+
+## Editorial-prep checkpoint
+The complete existing content bank has now been editorially reviewed on `narrative/story-graph-v1-prep`:
+- MONSTERS,
+- PEOPLE,
+- FRIENDS,
+- TRAPS,
+- MYSTERIES,
+- TREASURES.
+
+The Storylet Matrix and durable decisions were updated with findings including:
+- mechanic/solution-family anti-repetition,
+- provider truth cannot come from noun/theme matching,
+- incidental loot != planned critical provider,
+- knowledge reveal cannot invent topology,
+- ambient improv cannot carry critical state,
+- phase/expiry for friendly clues/deliveries,
+- sparse Storylet-specific combat,
+- explicit resource transfer/use/placement.
+
+The nine Crystal Machine Storylet candidates were audited and revised in-place. No subjects or blueprints were added.
+
+**There is no next subject to review. Do not expand the bank.**
 
 ## Planned popup reference
-For a gate/machine requiring three colored stones:
-- story reveals the three sockets first,
+For a gate/machine requiring three colored resources:
+- story reveals sockets first,
 - child taps target,
-- popup shows three slots,
+- popup shows slots,
 - inventory possession does not auto-fill,
 - child explicitly places items,
 - wrong item is not consumed,
@@ -108,19 +127,13 @@ Detailed spec lives on prep branch in `docs/INTERACTION_SHELLS_V1.md`.
 ## Open-source survey result
 No dependency adopted. Study-only: boardgame.io, Colyseus, rot.js, Epoch Mapper.
 
-## Content editorial continuation
-Reviewed through `BROTROLLET`.
-
-Next subject if continuing review: **DEN LEVENDE RUSTNINGEN**.
-
-Do not expand Adventure Blueprint bank.
-
 ## Exact sequencing
 While UX5A physical test is open:
 - physical-test patch 15 on iPad/mobile,
 - patch UX5A defects only on this branch,
-- content review may continue as documentation,
-- architecture prep remains documentation-only.
+- repo-health/provenance work may continue if it does not change gameplay,
+- architecture/content prep remains documentation-only,
+- do not expand content bank.
 
 When user reports physical UX5A GREEN:
 1. record physical evidence,
