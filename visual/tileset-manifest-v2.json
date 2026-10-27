@@ -1,29 +1,290 @@
 {
   "contract": "Monsterhulen Tileset Contract V2",
   "tileSize": 32,
-  "mapGrid": {"width": 13, "height": 13},
-  "atlas": {"width": 512, "height": 512, "cell": 32, "columns": 16, "rows": 16},
+  "mapGrid": {
+    "width": 13,
+    "height": 13
+  },
+  "atlas": {
+    "width": 512,
+    "height": 512,
+    "cell": 32,
+    "columns": 16,
+    "rows": 16
+  },
   "assets": [
-    {"id":"MAP_FLOOR_STONE_01","file":"assets/v3/map/floor/stone_01.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":0,"row":0}},
-    {"id":"MAP_FLOOR_STONE_02","file":"assets/v3/map/floor/stone_02.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":1,"row":0}},
-    {"id":"MAP_FLOOR_STONE_03","file":"assets/v3/map/floor/stone_03.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":2,"row":0}},
-    {"id":"MAP_FLOOR_STONE_04","file":"assets/v3/map/floor/stone_04.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":3,"row":0}},
-    {"id":"MAP_FLOOR_STONE_05","file":"assets/v3/map/floor/stone_05.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":4,"row":0}},
-    {"id":"MAP_FLOOR_STONE_06","file":"assets/v3/map/floor/stone_06.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":5,"row":0}},
-    {"id":"MAP_FLOOR_STONE_07","file":"assets/v3/map/floor/stone_07.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":6,"row":0}},
-    {"id":"MAP_FLOOR_STONE_08","file":"assets/v3/map/floor/stone_08.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":7,"row":0}},
-    {"id":"MAP_FLOOR_STONE_09","file":"assets/v3/map/floor/stone_09.png","kind":"floor","width":32,"height":32,"rotationSafe":true,"semantic":false,"atlas":{"col":8,"row":0}},
-    {"id":"MAP_WALL_N_01","file":"assets/v3/map/border/wall_n_01.png","kind":"border","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":0,"row":1}},
-    {"id":"MAP_WALL_E_01","file":"assets/v3/map/border/wall_e_01.png","kind":"border","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":1,"row":1}},
-    {"id":"MAP_WALL_S_01","file":"assets/v3/map/border/wall_s_01.png","kind":"border","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":2,"row":1}},
-    {"id":"MAP_WALL_W_01","file":"assets/v3/map/border/wall_w_01.png","kind":"border","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":3,"row":1}},
-    {"id":"MAP_CORNER_OUTER_NW_01","file":"assets/v3/map/border/corner_outer_nw_01.png","kind":"corner_outer","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":4,"row":1}},
-    {"id":"MAP_CORNER_OUTER_NE_01","file":"assets/v3/map/border/corner_outer_ne_01.png","kind":"corner_outer","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":5,"row":1}},
-    {"id":"MAP_CORNER_OUTER_SE_01","file":"assets/v3/map/border/corner_outer_se_01.png","kind":"corner_outer","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":6,"row":1}},
-    {"id":"MAP_CORNER_OUTER_SW_01","file":"assets/v3/map/border/corner_outer_sw_01.png","kind":"corner_outer","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":7,"row":1}},
-    {"id":"MAP_CORNER_INNER_NW_01","file":"assets/v3/map/border/corner_inner_nw_01.png","kind":"corner_inner","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":8,"row":1}},
-    {"id":"MAP_CORNER_INNER_NE_01","file":"assets/v3/map/border/corner_inner_ne_01.png","kind":"corner_inner","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":9,"row":1}},
-    {"id":"MAP_CORNER_INNER_SE_01","file":"assets/v3/map/border/corner_inner_se_01.png","kind":"corner_inner","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":10,"row":1}},
-    {"id":"MAP_CORNER_INNER_SW_01","file":"assets/v3/map/border/corner_inner_sw_01.png","kind":"corner_inner","width":32,"height":32,"rotationSafe":false,"semantic":false,"atlas":{"col":11,"row":1}}
+    {
+      "id": "MAP_FLOOR_STONE_01",
+      "file": "assets/v3/map/floor/stone_01.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 0,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_02",
+      "file": "assets/v3/map/floor/stone_02.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 1,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_03",
+      "file": "assets/v3/map/floor/stone_03.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 2,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_04",
+      "file": "assets/v3/map/floor/stone_04.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 3,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_05",
+      "file": "assets/v3/map/floor/stone_05.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 4,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_06",
+      "file": "assets/v3/map/floor/stone_06.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 5,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_07",
+      "file": "assets/v3/map/floor/stone_07.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 6,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_08",
+      "file": "assets/v3/map/floor/stone_08.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 7,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_FLOOR_STONE_09",
+      "file": "assets/v3/map/floor/stone_09.png",
+      "kind": "floor",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": true,
+      "semantic": false,
+      "atlas": {
+        "col": 8,
+        "row": 0
+      }
+    },
+    {
+      "id": "MAP_WALL_N_01",
+      "file": "assets/v3/map/border/wall_n_01.png",
+      "kind": "border",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 0,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_WALL_E_01",
+      "file": "assets/v3/map/border/wall_e_01.png",
+      "kind": "border",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 1,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_WALL_S_01",
+      "file": "assets/v3/map/border/wall_s_01.png",
+      "kind": "border",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 2,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_WALL_W_01",
+      "file": "assets/v3/map/border/wall_w_01.png",
+      "kind": "border",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 3,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_OUTER_NW_01",
+      "file": "assets/v3/map/border/corner_outer_nw_01.png",
+      "kind": "corner_outer",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 4,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_OUTER_NE_01",
+      "file": "assets/v3/map/border/corner_outer_ne_01.png",
+      "kind": "corner_outer",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 5,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_OUTER_SE_01",
+      "file": "assets/v3/map/border/corner_outer_se_01.png",
+      "kind": "corner_outer",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 6,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_OUTER_SW_01",
+      "file": "assets/v3/map/border/corner_outer_sw_01.png",
+      "kind": "corner_outer",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 7,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_INNER_NW_01",
+      "file": "assets/v3/map/border/corner_inner_nw_01.png",
+      "kind": "corner_inner",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 8,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_INNER_NE_01",
+      "file": "assets/v3/map/border/corner_inner_ne_01.png",
+      "kind": "corner_inner",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 9,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_INNER_SE_01",
+      "file": "assets/v3/map/border/corner_inner_se_01.png",
+      "kind": "corner_inner",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 10,
+        "row": 1
+      }
+    },
+    {
+      "id": "MAP_CORNER_INNER_SW_01",
+      "file": "assets/v3/map/border/corner_inner_sw_01.png",
+      "kind": "corner_inner",
+      "width": 32,
+      "height": 32,
+      "rotationSafe": false,
+      "semantic": false,
+      "atlas": {
+        "col": 11,
+        "row": 1
+      }
+    }
   ]
 }
