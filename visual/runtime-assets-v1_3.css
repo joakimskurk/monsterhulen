@@ -1,0 +1,119 @@
+@import url('./runtime-skin-v1_2.css');
+
+/* Visual V1.3 — asset-sheet implementation. Real DOM/state, pixel-art presentation. */
+:root{
+  --v13-frame:url("assets/v13/ui_panel_dark.png");
+  --v13-green:url("assets/v13/button_green.png");
+  --v13-blue:url("assets/v13/button_blue.png");
+  --v13-orange:url("assets/v13/button_orange.png");
+  --v13-purple:url("assets/v13/button_purple.png");
+  --v13-current:url("assets/v13/map_current.png");
+  --v13-unknown:url("assets/v13/map_unknown.png");
+  --v13-lock:url("assets/v13/map_lock.png");
+}
+*{image-rendering:pixelated;image-rendering:crisp-edges}
+body{font-family:"Courier New",ui-monospace,monospace!important;background:#060c14!important}
+.app{max-width:1460px!important}
+.topbar{
+  border-radius:0!important;border:8px solid transparent!important;border-image:var(--v13-frame) 18 fill stretch!important;
+  background:#0c1522!important;box-shadow:0 8px 0 #03070c!important;padding:6px 10px!important;
+}
+.brand{
+  font-family:Georgia,"Times New Roman",serif!important;font-weight:900!important;font-size:clamp(24px,3vw,38px)!important;
+  color:#ffc34b!important;letter-spacing:.04em!important;text-shadow:3px 3px 0 #4c260b,0 0 10px #e3851a55!important;
+}
+.status .pill{border-radius:0!important;border:2px solid #445467!important;background:#09111c!important}
+button{
+  border-radius:0!important;border:0!important;background-color:#1a2a3b!important;background-size:100% 100%!important;background-repeat:no-repeat!important;
+  box-shadow:none!important;text-shadow:2px 2px 0 #000!important;padding:10px 14px!important;letter-spacing:.04em!important;
+  min-height:50px!important;
+}
+button:not(.danger):not(.ghost){background-image:var(--v13-blue)!important}
+button.primary,#interactBtn{background-image:var(--v13-green)!important}
+#bagBtn,[data-tab="bag"]{background-image:var(--v13-orange)!important}
+#dmBtn,#closeDm,#dmOverlay button.primary{background-image:var(--v13-purple)!important}
+button.danger{background:#6d2728!important;border:2px solid #ad4d42!important}
+button:disabled{filter:grayscale(1) brightness(.55)!important;opacity:.9!important}
+button:hover:not(:disabled){filter:brightness(1.14)!important}
+button:active:not(:disabled){transform:translateY(2px)!important;filter:brightness(.9)!important}
+
+.card,.dmPanel,.modalBox{
+  border-radius:0!important;border:10px solid transparent!important;border-image:var(--v13-frame) 18 fill stretch!important;
+  background:#0b1523!important;color:#f6f0df!important;box-shadow:0 7px 0 #02060b!important;
+}
+.mapWrap{background:#08111c!important}
+.card h2,.card h3,.dmPanel h2,.dmPanel h3{font-family:"Courier New",monospace!important;text-transform:uppercase!important;color:#f2c66e!important;text-shadow:2px 2px 0 #000!important}
+.badge{border-radius:0!important;border:2px solid #3d5164!important;background:#08121e!important;font-family:"Courier New",monospace!important}
+#roomNameBadge{border-color:#a9702f!important;color:#ffcf70!important}
+.map{
+  border-radius:0!important;border:6px solid #26384a!important;background:#030810!important;
+  box-shadow:inset 0 0 0 2px #0e1d2d, inset 0 0 26px #000!important;
+}
+.tile{border-color:#111b27!important}
+.tile.tone-LYS{background:linear-gradient(135deg,#4f5764,#343b49)!important}
+.tile.tone-MØRK{background:linear-gradient(135deg,#232a36,#121821)!important}
+.tile.tone-BLANDET{background:linear-gradient(135deg,#344451,#21303c)!important}
+.tile.tone-RAR{background:linear-gradient(135deg,#47364f,#28243a)!important}
+.tile.visited{box-shadow:inset 0 0 0 1px #687586!important}
+.tile.current{outline:4px solid #ffbd31!important;outline-offset:-4px!important;box-shadow:inset 0 0 0 2px #fff09c,0 0 16px #ff9f18aa!important}
+.tile.current .mark{min-width:42px;min-height:42px;padding:6px;background-image:var(--v13-current);background-size:100% 100%;display:grid;place-items:center}
+.mapExitProbe{
+  width:88%!important;height:88%!important;min-height:0!important;padding:0!important;background-image:var(--v13-unknown)!important;background-size:100% 100%!important;color:transparent!important;text-shadow:none!important;
+}
+.mapExitProbe.locked{background-image:var(--v13-lock)!important}
+.navHint{border-radius:0!important;border:2px solid #2b3f52!important;background:#07111d!important}
+.controls{gap:5px!important}
+.controls button{font-size:11px!important}
+.mobileTabs button{border-radius:0!important}
+button.tab.active{outline:2px solid #ffbd31!important;outline-offset:-3px!important}
+
+.v13Scene{
+  position:relative;margin:6px 0 10px;border:5px solid #26394c;background:#050a10;aspect-ratio:16/7;overflow:hidden;
+  box-shadow:inset 0 0 0 2px #090f18,0 4px 0 #03070c;
+}
+.v13Scene img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:pixelated}
+.v13SceneLabel{position:absolute;left:7px;bottom:7px;padding:3px 6px;background:#050912dd;border:1px solid #627386;color:#f2d08b;font-size:9px;font-weight:900}
+
+#roomDesc{border-radius:0!important;border-left:4px solid #d18832!important;background:#07111d!important}
+.heroBox{border-radius:0!important;border:3px solid #33475a!important;background:#07111d!important}
+.avatar{border-radius:0!important;border:4px solid #8f602c!important;background:#0b1623!important}
+.inventory{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+.slot{
+  border-radius:0!important;border:4px solid #2d4052!important;min-height:104px!important;background:#07111d!important;
+  box-shadow:inset 0 0 0 2px #111f2d!important;
+}
+.slot.filled{border-color:#805e31!important;background:#0b1724!important}
+.slot .ico{min-height:42px;display:grid;place-items:center}
+.v13Item{width:42px;height:42px;object-fit:contain;image-rendering:pixelated;display:block;margin:auto}
+.slot .ico:has(.v13Item) > :not(.v13Item){display:none!important}
+.entityArt{border-radius:0!important;border:3px solid #354a5e!important;background:#08131f!important}
+.searchBox,.encounterTrack,.narratorGuide,.helpBox,.seed,.log{border-radius:0!important}
+.dmPanel{background:#100d1b!important;border-image:var(--v13-frame) 18 fill stretch!important}
+.modalBox{background:#101a26!important;color:#f2ead8!important}
+.toast{border-radius:0!important}
+
+@media(max-width:760px){
+  .topbar,.card,.dmPanel,.modalBox{border-width:7px!important}
+  .v13Scene{aspect-ratio:16/8}
+  .inventory{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+
+.entityArt.v13HeroLoaded{position:relative!important;overflow:hidden!important}
+.entityArt.v13HeroLoaded > :not(.v13HeroSprite){opacity:0!important}
+.v13HeroSprite{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;object-fit:contain!important;display:block!important;image-rendering:pixelated!important}
+.tile.current .mark .entityMapHero{width:30px!important;height:30px!important}
+
+/* V1.3 atlas tile pass: room topology remains canonical; textures are presentation only. */
+.tile.tone-LYS{background-image:url("assets/v13/tile_stone_light.png")!important;background-size:cover!important}
+.tile.tone-MØRK{background-image:url("assets/v13/tile_stone_dark.png")!important;background-size:cover!important}
+.tile.tone-BLANDET{background-image:url("assets/v13/tile_stone_moss.png")!important;background-size:cover!important}
+.tile.tone-RAR{background-image:url("assets/v13/tile_stone_crack.png")!important;background-size:cover!important}
+.tile.fog{background:#03070d!important;background-image:none!important}
+.mapRoomTap{background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;filter:none!important;opacity:0!important}
+.mapExitProbe{background-color:transparent!important;box-shadow:none!important;border:0!important}
+.mapExitProbe:hover:not(:disabled){filter:brightness(1.12)!important}
+
+/* Beat generic button skin inside the canonical map: map probes are state markers, not action chrome. */
+.map button.mapRoomTap{background:none!important;background-image:none!important;border:0!important;box-shadow:none!important;filter:none!important;opacity:0!important}
+.map button.mapExitProbe{background-color:transparent!important;background-image:url("assets/v13/map_unknown.png")!important;background-size:100% 100%!important;background-repeat:no-repeat!important;border:0!important;box-shadow:none!important;color:transparent!important;text-shadow:none!important}
+.map button.mapExitProbe.locked{background-image:url("assets/v13/map_lock.png")!important}
