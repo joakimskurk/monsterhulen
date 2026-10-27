@@ -1,7 +1,11 @@
 const fs=require('fs');
 const path=require('path');
 const root=path.resolve(__dirname,'..');
-const proto=fs.readFileSync(path.join(root,'prototypes/visual-system-v1_1/index.html'),'utf8');
+const protoRoot=path.join(root,'prototypes/visual-system-v1_1');
+const html=fs.readFileSync(path.join(protoRoot,'index.html'),'utf8');
+const css=fs.readFileSync(path.join(protoRoot,'style-map.css'),'utf8')+'\n'+fs.readFileSync(path.join(protoRoot,'style-ui.css'),'utf8');
+const js=fs.readFileSync(path.join(protoRoot,'prototype.js'),'utf8');
+const proto=html+'\n'+css+'\n'+js;
 const detail=fs.readFileSync(path.join(root,'visual/runtime-detail-v1_1.css'),'utf8');
 let pass=0,fail=0;
 function check(name,ok){if(ok){pass++;console.log('PASS',name)}else{fail++;console.log('FAIL',name)}}
@@ -28,6 +32,8 @@ check('focus-visible styling exists',proto.includes(':focus-visible'));
 check('reduced motion supported',proto.includes('prefers-reduced-motion'));
 check('aria-live room panel',proto.includes('aria-live="polite"'));
 check('room art does not encode exits',!proto.includes('data-exit-art'));
+check('split prototype loads both CSS files',html.includes('style-map.css') && html.includes('style-ui.css'));
+check('split prototype loads JS file',html.includes('prototype.js'));
 check('runtime detail calls itself presentation-only',detail.includes('presentation-only detail layer'));
 check('runtime detail adds no script',!/<script/i.test(detail));
 check('runtime detail does not hide core controls',!detail.includes('display:none') || detail.includes('@media'));
