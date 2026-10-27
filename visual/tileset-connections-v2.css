@@ -1,0 +1,31 @@
+/* Monsterhulen Tileset V2 runtime proof — empty rooms + canonical connections only. */
+#map{
+  grid-template-columns:repeat(var(--map-w,9),32px)!important;
+  grid-auto-rows:32px!important;
+  width:max-content!important;height:max-content!important;aspect-ratio:auto!important;
+  gap:0!important;background:#070b10!important;
+  image-rendering:pixelated;image-rendering:crisp-edges;
+}
+.mapWrap{overflow:auto;overscroll-behavior:contain;}
+#map .tile{
+  width:32px!important;height:32px!important;min-width:32px!important;min-height:32px!important;
+  border:0!important;background:transparent!important;overflow:hidden!important;isolation:isolate;
+}
+#map .tile.fog{background:#070b10!important;}
+#map .tile.current{outline:0!important;filter:brightness(1.13);}
+#map .mhRoomFloor,#map .mhRoomStruct,#map .mhConnection{
+  position:absolute;inset:0;width:32px;height:32px;pointer-events:none;
+  image-rendering:pixelated;image-rendering:crisp-edges;
+}
+#map .mhRoomFloor{z-index:0;transform-origin:50% 50%;}
+#map .mhRoomStruct{z-index:1;}
+#map .mhConnection{z-index:2;}
+#map .tile.current::after{
+  content:"";position:absolute;inset:0;pointer-events:none;z-index:1;
+  box-shadow:inset 0 0 0 1px rgba(255,214,74,.22);
+}
+/* Keep canonical door DOM as state sensors, but replace its old yellow 4px line visually. */
+#map .tile > i.doorN,#map .tile > i.doorE,#map .tile > i.doorS,#map .tile > i.doorW{opacity:0!important;pointer-events:none!important;}
+#map .tile > .mark,#map .tile > .assetMark,#map .tile > button{position:relative;z-index:4;}
+#map .tile > i{position:absolute;}
+@media(max-width:680px){.mapWrap{max-width:100%;padding-bottom:4px;}#map{margin:0 auto;}}
