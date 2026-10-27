@@ -1,0 +1,24 @@
+const fs=require('fs');
+const path=require('path');
+const root=process.argv[2]||'.';
+const css=fs.readFileSync(path.join(root,'visual/runtime-skin-v1_2.css'),'utf8');
+const doc=fs.readFileSync(path.join(root,'visual/VISUAL_DIRECTION_V1_2.md'),'utf8');
+let pass=0,fail=0;
+function check(name,cond){if(cond){pass++;console.log('PASS',name)}else{fail++;console.log('FAIL',name)}}
+check('direction says concept is mood not composition',/mood references, not composition references/i.test(doc));
+check('node-map composition explicitly not target',/node-map composition is \*\*not the visual target\*\*/i.test(doc));
+check('runtime-first composition explicit',/current UX5A structure remains primary/i.test(doc));
+check('parchment rare not default',/Parchment — rare narrative insert/i.test(doc));
+check('map topology remains canonical',/Map topology remains generated from canonical room data/i.test(doc));
+check('v12 CSS is presentation-only',/presentation-only override/i.test(css));
+check('v12 keeps map surface',/\.mapWrap\{/.test(css)&&/\.map\{/.test(css));
+check('v12 does not hide runtime map',!/\.map\s*\{[^}]*display\s*:\s*none/is.test(css));
+check('v12 uses stone shell',/--v12-stone/.test(css)&&/background:#0e1a29/.test(css));
+check('v12 reserves parchment for modal',/Parchment is reserved for story\/setup moments/.test(css));
+check('v12 current room has warm highlight',/\.tile\.current/.test(css)&&/--v12-warm-bright/.test(css));
+check('bag accent retained',/#bagBtn/.test(css));
+check('narrator accent retained',/#dmBtn/.test(css));
+check('touch target preserved',/min-height:var\(--mh-touch\)/.test(css));
+check('mobile stays one-column',/@media\(max-width:760px\)[\s\S]*\.main\{display:block!important\}/.test(css));
+check('reduced motion handled',/prefers-reduced-motion/.test(css));
+console.log(`${pass} PASS / ${fail} FAIL`); process.exit(fail?1:0);
