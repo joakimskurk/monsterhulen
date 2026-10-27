@@ -17,86 +17,85 @@ Do not implement Narrative Graph runtime, UX5B, Multiscreen, new blueprints or c
 ## Read in this order
 1. `PROJECT_STATE.md`
 2. runtime `START_HERE.md` + runtime gate/status files
-3. `visual/VISUAL_SYSTEM_V1.md`
-4. `visual/VISUAL_DETAILS_V1_1.md`
-5. `visual/COMPONENT_STATE_MATRIX_V1_1.md`
-6. `visual/ASSET_CONTRACT_VISUAL_V1.md`
-7. `visual/ART_PRODUCTION_SPEC_V1_1.md`
-8. `visual/ASSET_BATCH_01_V1_1.md`
-9. `visual/UI_SYMBOLS_V1_1.md`
-10. `visual/RESPONSIVE_LAYOUT_V1.md`
-11. `visual/VISUAL_ROADMAP_V1.md`
-12. `visual/INTEGRATION_PLAN_V1.md`
-13. `visual/VISUAL_QA_2026-10-27.md`
-14. `visual/VISUAL_QA_V1_1_2026-10-27.md`
-15. `prototypes/visual-system-v1_1/index.html`
-16. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
+3. `visual/VISUAL_DIRECTION_V1_2.md`
+4. `visual/INTEGRATION_PLAN_V1_2.md`
+5. `visual/ASSET_BATCH_01_V1_2.md`
+6. `visual/VISUAL_QA_V1_2_2026-10-27.md`
+7. `visual/VISUAL_SYSTEM_V1.md`
+8. `visual/VISUAL_DETAILS_V1_1.md` — retain interaction/state lessons, not layout target
+9. `visual/COMPONENT_STATE_MATRIX_V1_1.md`
+10. `visual/ASSET_CONTRACT_VISUAL_V1.md`
+11. `visual/ART_PRODUCTION_SPEC_V1_1.md`
+12. `visual/UI_SYMBOLS_V1_1.md`
+13. `visual/RESPONSIVE_LAYOUT_V1.md`
+14. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
 
-## Current checkpoint — Visual V1.1
-Prepared without changing gameplay:
-- V1 visual tokens and CSS skin for the exact UX5A DOM,
-- additive V1.1 runtime detail CSS,
-- modular interactive node-map/detail prototype,
-- current vs selected room semantics,
-- explicit travel separate from map inspection,
-- locked/blocked/unknown map language,
-- room-panel and encounter hierarchy,
-- backpack affordance sheet with no auto-use,
-- Forteller authored/improv/resolve/die hierarchy,
-- conditional combat presentation,
-- component-state matrix,
-- production art specification,
-- controlled Asset Batch 01 brief,
-- 14-symbol functional SVG sprite,
-- Asset Contract 2.4.0 compatibility rules,
-- responsive tablet/mobile contract,
-- staged integration plan.
+## Current checkpoint — Visual V1.2 direction correction
+User review identified that V1/V1.1 had become too literal an interpretation of the generated concept images.
+
+Binding correction:
+
+**Concept images are mood/material references, not composition/layout templates.**
+
+Monsterhulen's actual UX5A runtime remains the design substrate.
+
+Keep from concept art:
+- warm torchlight against cool cave darkness,
+- friendly saturated fantasy accents,
+- tactile depth/material cues,
+- child-safe wonder,
+- richer entity/item/room illustration where canonical state supports it.
+
+Do NOT copy:
+- fixed diorama-node map composition,
+- parchment as the default gameplay shell,
+- concept-image top navigation/bottom HUD composition,
+- ornamental banner/logo structure,
+- crystal-machine imagery as generic product identity,
+- decorative art that invents story facts.
+
+## Current V1.2 implementation proof
+Prepared on this branch only:
+- `visual/runtime-skin-v1_2.css` — runtime-first cave/stone presentation layer,
+- `tests/QA_VISUAL_DIRECTION_V1_2.js`,
+- `visual/VISUAL_QA_V1_2_2026-10-27.md`,
+- `visual/INTEGRATION_PLAN_V1_2.md`,
+- `visual/ASSET_BATCH_01_V1_2.md`.
 
 Verification:
-- V1 static QA **14/0**
-- V1 Chromium prototype **10/0**
-- exact patch-15 + V1 skin **13/0**
-- V1.1 static detail QA **32/0**
-- V1.1 Chromium prototype **20/0**
-- exact patch-15 + V1 + V1.1 detail layer **13/0**
-- SVG symbol QA **8/0**
+- V1.2 static direction QA **16/0**,
+- exact patch-15 + V1.2 Chromium interaction/layout QA **14/0**.
 
-Exact runtime candidate used by runtime browser checks:
+Exact runtime candidate used by browser check:
 `f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
 
 CDP runtime harness still uses in-memory localStorage. Native persistence/clipboard and physical touch remain outside this certification.
 
-## Binding V1.1 rules
-- map selection only inspects; it never moves the hero,
-- explicit `GÅ HIT` is separate and canonical-state-gated,
-- `current` and `selected` are visually distinct,
-- hidden topology/content does not leak through map or art,
-- a physical room gets one room-level current treatment, never repeated per grid cell,
-- story progress appears only after its requirement is player-known,
-- inventory explains possibilities but does not apply solutions,
-- `START KAMP` is conditional, not a generic monster control,
-- Forteller distinguishes authored truth from improv scope,
-- text/buttons/state remain real DOM,
-- no UI text is baked into world art,
-- existing stable entity IDs remain authoritative,
-- room art is presentation, not story truth,
-- primary touch target >=48 CSS px.
+## V1.1 status
+V1.1 is not deleted because it contains useful interaction decisions:
+- selected != current,
+- map inspection != travel,
+- explicit action remains separate,
+- hidden-state protection,
+- inventory affordance != auto-use,
+- narrator authored/improv/state separation,
+- multi-cell room warning,
+- component-state matrix and symbol work.
 
-## Exact next safe visual package
-`visual/ASSET_BATCH_01_V1_1.md`
+However, the V1.1 illustrated node-map composition is **not the target UI**.
 
-Only produce/test this small proof batch before expanding:
-- `CAVE_GENERIC`
-- `START`
-- `BRIDGE`
-- `MUSHROOM`
-- `UNDERGROUND_LAKE`
-- one `NPC_OWL_LIBRARIAN` proof portrait
-- key, rope, lantern and generic non-story crystal art proofs
+## New asset rule
+`visual/ASSET_BATCH_01_V1_2.md` supersedes V1.1 batch placement assumptions.
 
-Integrate those assets into the **visual-prep prototype only**, then browser-test crop, readability, performance, mobile layout and hidden-state safety. Do not mass-produce the full art bank before this proof batch is accepted.
+First art proof is limited to existing runtime surfaces:
+- current-room sceneplate,
+- existing entity/encounter portrait,
+- existing inventory item icons.
+
+No illustrated map nodes in Batch 01.
+The generated runtime map remains canonical and state-driven.
 
 ## When physical UX5A becomes GREEN
 Return to the runtime branch and follow its transition sequence exactly: record evidence -> confirm regressions -> merge UX5A to `main` -> verify `main` -> create `narrative/story-graph-v1` -> carry approved prep -> start NG1.
 
-Visual integration remains a separate controlled package after that: safe CSS layers first, functional parity verification, then node renderer/art only if still justified.
+Visual integration remains a separate controlled package after that. Carry V1.2 changes selectively; do not merge this branch wholesale.
