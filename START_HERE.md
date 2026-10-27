@@ -10,105 +10,106 @@ Repository `joakimskurk/monsterhulen` is source of truth.
 Active runtime remains `ux5/searchable-rooms-encounter-tracks`.
 UX5A patch 15 is still waiting for physical iPad/mobile certification and must not be merged to `main` yet.
 
-Visual work on this branch may not change gameplay/state semantics and must not be merged wholesale into runtime/main. Narrative Graph runtime, UX5B, Multiscreen and content-bank expansion remain blocked.
+Visual work here may not change gameplay/state semantics. Do not merge this branch wholesale into runtime/main. Narrative Graph runtime, UX5B, Multiscreen and content-bank expansion remain blocked.
 
 ## Read in this order
 1. `PROJECT_STATE.md`
 2. runtime branch `START_HERE.md` + runtime gate/status files
-3. `visual/ASSET_SIZE_STANDARD_V2.md` — binding production sizes
+3. `visual/ASSET_SIZE_STANDARD_V2.md`
 4. `visual/asset-size-standard-v2.json`
 5. `visual/TILESET_CONTRACT_V2.md`
 6. `visual/EMPTY_ROOMS_ASSET_BATCH_V2.md`
 7. `visual/EMPTY_ROOMS_RUNTIME_PROOF_V2.md`
-8. `visual/tileset-manifest-v2.json`
-9. `visual/empty-rooms-assets-v2.sha256.json`
-10. `tools/generate_empty_rooms_v2.py`
-11. `visual/empty-rooms-runtime-v2.css`
-12. `visual/empty-rooms-runtime-v2.js`
-13. `tests/QA_EMPTY_ROOMS_ASSET_BATCH_V2.js`
-14. `tests/QA_EMPTY_ROOMS_RUNTIME_INTEGRATION_V2.js`
-15. V1.x docs only as historical mistakes/lessons.
+8. `visual/CONNECTION_ASSET_BATCH_V2.md`
+9. `visual/CONNECTION_RUNTIME_PROOF_V2.md`
+10. `visual/tileset-manifest-v2.json`
+11. `visual/connection-manifest-v2.json`
+12. room + connection hash registries
+13. `tools/generate_empty_rooms_v2.py`
+14. `tools/generate_connections_v2.py`
+15. `tools/build_tileset_manifest_v2.py`
+16. room + connection QA tests
+17. V1.x docs only as historical mistakes/lessons.
 
-## Current checkpoint — Empty Rooms V2 implemented in exact patch-15 DOM
-The structural kit is now both generated and applied to the real Monsterhulen map.
+## Current checkpoint — empty dungeon renderer V2
+The grid-first production pipeline is now proven in the exact patch-15 DOM.
 
 Canonical pipeline:
 
-**runtime grid -> exact source box -> deterministic structural asset -> validation -> runtime composition**
+**runtime grid -> exact isolated source asset -> deterministic validation -> runtime composition**
 
-Current structural bank:
-- 9 neutral 32x32 floor tiles,
-- 4 straight 32x32 transparent walls,
-- 4 outer/convex 32x32 transparent corners,
-- 4 inner/concave 32x32 transparent corners.
+Current V2 map bank:
+- 9 floor tiles,
+- 4 straight room walls,
+- 4 outer corners,
+- 4 inner corners,
+- 4 open passages,
+- 4 open doors,
+- 4 locked doors,
+- 4 blocked-route overlays.
 
-Total: **21 structural assets**.
+Total: **37 structural/map-connection assets**.
 
-Explicitly excluded:
-- doors/connections,
+Still excluded:
 - items,
 - heroes,
 - NPCs/monsters,
-- furniture/traps/treasure,
-- room-content art.
+- furniture/traps/treasure art,
+- room-content illustration.
 
 ## Binding geometry
 - runtime grid: 13 x 13,
 - logical cell: 32 x 32 px,
-- structural wall depth: 6 px,
-- full map at 1x: 416 x 416 px,
-- runtime atlas: 512 x 512, 16 x 16 slots,
+- wall depth: 6 px,
+- connection opening: 20 px centred,
+- map at 1x: 416 x 416 px,
+- atlas: 512 x 512 / 16 x 16 slots,
 - nearest-neighbour / integer scaling only.
 
-Do not invent new production sizes. Extend `ASSET_SIZE_STANDARD_V2` + JSON + regression test first if a genuinely new visual role needs another box.
+Do not invent new sizes. Extend `ASSET_SIZE_STANDARD_V2` + JSON + regression test first.
 
-## Runtime proof implementation
-`visual/empty-rooms-runtime-v2.js` reads only canonical rendered map geometry:
-- `.tile`,
-- `.joinN/.joinE/.joinS/.joinW`,
-- `.fog`.
+## Connection mapping
+Runtime DOM is authoritative:
+- ordinary traversable connection -> open door,
+- known shortcut/secret -> open passage,
+- `.locked` -> locked door,
+- current direction with canonical `×` movement control -> abstract blocked-route X.
 
-It does not change the dungeon generator or story state.
+No separate `closed but unlocked` state is invented because patch 15 does not expose one.
 
-For each visible cell it:
-1. assigns one deterministic neutral floor variant + legal rotation,
-2. adds wall overlays where the same physical room stops,
-3. adds convex corners on exterior edge intersections,
-4. adds concave corners using cardinal + diagonal join geometry,
-5. leaves existing runtime controls/markers above the structural layers.
-
-The presentation re-applies through a `MutationObserver` after canonical map rerenders.
+The integration reads rendered DOM only; it does not call gameplay `move()` or mutate hidden game state.
 
 ## Verification
-Structural asset batch:
-- binary/geometry: **21 / 21 PASS**,
-- repo contract: **19 PASS / 0 FAIL**,
-- clean regeneration: **21 / 21 PNGs byte-identical**.
+Empty-room bank:
+- **21/21 binary PASS**
+- **19/0 repo contract**
+- **14/0 room runtime static**
+- **15/0 room runtime Chromium**
 
-Runtime integration:
-- `QA_EMPTY_ROOMS_RUNTIME_INTEGRATION_V2.js`: **14 PASS / 0 FAIL**,
-- fresh Chromium exact patch-15 + V2: **15 PASS / 0 FAIL**.
+Connection bank:
+- **16/16 binary PASS**
+- **18/0 connection asset contract**
+- **17/0 connection runtime static**
+- **17/0 fresh Chromium**
+- clean generation reproduced **16/16 byte-identically**.
 
-Browser proof confirms actual PNGs load at natural 32x32, tiles render at exact 32 CSS px, multi-cell join geometry is used, normal `?` exploration still works, and the layer survives canonical rerenders on tablet/mobile without page-level horizontal overflow.
+Combined room + connection allocation: **37 unique atlas slots**.
+
+Browser evidence includes legal runtime encounters with both a real locked story connection and a real `blocksForward` route.
 
 CDP still uses an in-memory localStorage shim; native persistence/clipboard and physical touch remain outside this visual proof.
 
-## Important implementation lessons
-Two intermediate failures were caught and rejected:
-- relative PNG paths do not work in the standalone `setDocumentContent` harness; the inspection HTML must embed its binary assets,
-- retaining the old responsive map box creates dead black space even when cells are 32px; the V2 proof sizes the map box from actual columns/rows x 32.
-
-Do not use those failed intermediate screenshots as evidence.
+## Hard rules
+- no manually cropped generated sheets,
+- no fractional tile scaling,
+- no stretched bitmap UI chrome,
+- no art-invented topology or story state,
+- no content assets until structural map is accepted,
+- current/selected/reachable/fog remain runtime/CSS state.
 
 ## Exact next safe visual action
-Editorially inspect the **actual patch-15 room-only implementation**.
+Editorially inspect the combined empty-dungeon renderer: floors, room borders and canonical connections.
 
-If accepted, next asset scope is only:
-- passage/opening overlays,
-- door overlays,
-- locked/blocked connection variants,
-all using the already locked 32x32 / centred 20px opening contract.
+If accepted, refine only the existing map-state presentation (`fog`, `unknown`, `current`, `reachable`) using CSS/runtime state. Do not start items, heroes or monsters yet.
 
-Do not produce items, heroes, NPCs, monsters or room contents yet.
-
-When physical UX5A becomes GREEN, return to runtime branch sequencing first. Visual integration remains a separate controlled package after runtime merge.
+When physical UX5A becomes GREEN, return to runtime branch sequencing first. Visual integration remains a separate selective package after runtime merge.
