@@ -20,18 +20,19 @@ Do not implement Narrative Graph runtime, UX5B, Multiscreen, new blueprints or c
 3. `visual/VISUAL_DIRECTION_V1_2.md`
 4. `visual/INTEGRATION_PLAN_V1_2.md`
 5. `visual/ASSET_BATCH_01_V1_2.md`
-6. `visual/VISUAL_QA_V1_2_2026-10-27.md`
-7. `visual/VISUAL_SYSTEM_V1.md`
-8. `visual/VISUAL_DETAILS_V1_1.md` — retain interaction/state lessons, not layout target
-9. `visual/COMPONENT_STATE_MATRIX_V1_1.md`
-10. `visual/ASSET_CONTRACT_VISUAL_V1.md`
-11. `visual/ART_PRODUCTION_SPEC_V1_1.md`
-12. `visual/UI_SYMBOLS_V1_1.md`
-13. `visual/RESPONSIVE_LAYOUT_V1.md`
-14. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
+6. `visual/ASSET_BATCH_01_RESULTS_2026-10-27.md`
+7. `visual/VISUAL_QA_V1_2_2026-10-27.md`
+8. `visual/VISUAL_SYSTEM_V1.md`
+9. `visual/VISUAL_DETAILS_V1_1.md` — retain interaction/state lessons, not layout target
+10. `visual/COMPONENT_STATE_MATRIX_V1_1.md`
+11. `visual/ASSET_CONTRACT_VISUAL_V1.md`
+12. `visual/ART_PRODUCTION_SPEC_V1_1.md`
+13. `visual/UI_SYMBOLS_V1_1.md`
+14. `visual/RESPONSIVE_LAYOUT_V1.md`
+15. architecture prep on `narrative/story-graph-v1-prep` only when story-system context is needed.
 
-## Current checkpoint — Visual V1.2 direction correction
-User review identified that V1/V1.1 had become too literal an interpretation of the generated concept images.
+## Current checkpoint — Visual V1.2 + Asset Batch 01 proof
+User review identified that V1/V1.1 had become too literal an interpretation of generated concept images.
 
 Binding correction:
 
@@ -54,20 +55,32 @@ Do NOT copy:
 - crystal-machine imagery as generic product identity,
 - decorative art that invents story facts.
 
-## Current V1.2 implementation proof
+## V1.2 implementation proof
 Prepared on this branch only:
 - `visual/runtime-skin-v1_2.css` — runtime-first cave/stone presentation layer,
 - `tests/QA_VISUAL_DIRECTION_V1_2.js`,
 - `visual/VISUAL_QA_V1_2_2026-10-27.md`,
 - `visual/INTEGRATION_PLAN_V1_2.md`,
-- `visual/ASSET_BATCH_01_V1_2.md`.
+- `visual/ASSET_BATCH_01_V1_2.md`,
+- `visual/ASSET_BATCH_01_RESULTS_2026-10-27.md`.
 
 Verification:
 - V1.2 static direction QA **16/0**,
-- exact patch-15 + V1.2 Chromium interaction/layout QA **14/0**.
+- exact patch-15 + V1.2 Chromium interaction/layout QA **14/0**,
+- standalone Asset Batch 01 integration proof **12/0**.
 
-Exact runtime candidate used by browser check:
+Exact runtime candidate used by browser checks:
 `f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
+
+Asset Batch 01 currently proves:
+- `CAVE_GENERIC`, `MUSHROOM`, `UNDERGROUND_LAKE` sceneplates,
+- `NPC_OWL_LIBRARIAN` portrait,
+- key, rope, lantern and generic non-story crystal icons,
+- square/pixel-corner shell over the exact patch-15 visual inspection build,
+- embedded standalone asset loading,
+- mobile/desktop no-overflow.
+
+Binary assets are not committed to GitHub yet because the connector has previously failed byte-safe large binary/base64 transport. The results doc records hashes and QA. Do not claim repository provenance is closed.
 
 CDP runtime harness still uses in-memory localStorage. Native persistence/clipboard and physical touch remain outside this certification.
 
@@ -84,16 +97,19 @@ V1.1 is not deleted because it contains useful interaction decisions:
 
 However, the V1.1 illustrated node-map composition is **not the target UI**.
 
-## New asset rule
+## Asset rule
 `visual/ASSET_BATCH_01_V1_2.md` supersedes V1.1 batch placement assumptions.
 
-First art proof is limited to existing runtime surfaces:
+Art proof is limited to existing runtime surfaces:
 - current-room sceneplate,
 - existing entity/encounter portrait,
 - existing inventory item icons.
 
 No illustrated map nodes in Batch 01.
 The generated runtime map remains canonical and state-driven.
+
+## Exact next safe visual step
+Inspect the integrated Asset Batch 01 product as an actual Monsterhulen interface. If editorially accepted, expand the art bank using the same runtime-first placement rules. Do not mass-produce map-room dioramas or story-state art.
 
 ## When physical UX5A becomes GREEN
 Return to the runtime branch and follow its transition sequence exactly: record evidence -> confirm regressions -> merge UX5A to `main` -> verify `main` -> create `narrative/story-graph-v1` -> carry approved prep -> start NG1.
