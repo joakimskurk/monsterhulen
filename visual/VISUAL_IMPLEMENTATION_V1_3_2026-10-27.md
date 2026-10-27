@@ -125,11 +125,11 @@ Standalone V1.3 HTML:
 V1.3 split-asset ZIP:
 `183bfcce70e9b3af315e09a2c7318fbbffe3f455f8caca97bd2c2dac7d6797da`
 
-Tablet capture:
-`a7e9c13811eb7058f00dabb8b72b55dc2d887ab3d996e4b2fb02a3712b25fb77`
+Latest tablet capture:
+`b557cc3caddeaa256f0e98aeb1b68ede07dbcd6309519ff3eb45f715397c4bd2`
 
-Mobile capture:
-`99ce259116fd72906eb672daa4121c40fd00a1739945294a70826415f4c87fdb`
+Latest mobile capture:
+`ed702e16a20000933897ff647d605a656ea08ad5cf7e7dcf7bdd5201e414d862`
 
 ## Boundary
 This checkpoint does not merge visual changes into `ux5/searchable-rooms-encounter-tracks` or `main`.
