@@ -28,6 +28,8 @@ Then read architecture prep on branch `narrative/story-graph-v1-prep`:
 9. `docs/CRYSTAL_STORYLET_AUDIT_2026-10-27.md`
 10. `docs/NARRATIVE_GRAPH_WORK_PACKAGE.md`
 
+Visual prep now also exists on branch `visual/visual-system-v1-prep`. Read that branch's `START_HERE.md` only when working on presentation/visual-system tasks. It is prep-only and must not be merged wholesale into active runtime/main before UX5A physical green.
+
 ## Current active work
 UX5A patch 15 physical iPad/mobile retest before merge.
 
@@ -109,6 +111,24 @@ The nine Crystal Machine Storylet candidates were audited and revised in-place. 
 
 **There is no next subject to review. Do not expand the bank.**
 
+## Visual-prep checkpoint
+Branch: `visual/visual-system-v1-prep`.
+
+Prepared without changing the exact UX5A candidate:
+- Visual System V1 tokens/rules,
+- Asset Contract 2.4.0 extension rules,
+- responsive tablet/mobile layout contract,
+- CSS-only skin targeting current patch-15 DOM,
+- separate interactive node-map vertical slice,
+- staged integration plan.
+
+Verification on that prep branch:
+- static visual QA **14/0**,
+- Chromium node-map prototype **10/0**,
+- exact patch-15 DOM + visual skin **13/0**.
+
+The visual work does **not** close the UX5A physical gate. Do not merge the visual branch wholesale. After UX5A is green/merged, carry visual changes selectively and verify them as a separate package.
+
 ## Planned popup reference
 For a gate/machine requiring three colored resources:
 - story reveals sockets first,
@@ -133,6 +153,8 @@ While UX5A physical test is open:
 - patch UX5A defects only on this branch,
 - repo-health/provenance work may continue if it does not change gameplay,
 - architecture/content prep remains documentation-only,
+- visual work may continue only on `visual/visual-system-v1-prep` as non-runtime prep,
+- do not integrate the visual skin or node renderer into active UX5A before physical green,
 - do not expand content bank.
 
 When user reports physical UX5A GREEN:
