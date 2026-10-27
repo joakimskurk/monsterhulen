@@ -1,0 +1,24 @@
+const fs=require('fs');
+const path=require('path');
+const root=process.cwd();
+const css=fs.readFileSync(path.join(root,'visual/runtime-assets-v1_3.css'),'utf8');
+const js=fs.readFileSync(path.join(root,'visual/runtime-assets-v1_3.js'),'utf8');
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'visual/asset-manifest-v1_3.json'),'utf8'));
+let pass=0,fail=0;function t(name,ok){if(ok){pass++;console.log('PASS',name)}else{fail++;console.log('FAIL',name)}}
+const assets=Object.keys(manifest);
+t('at least 20 split assets',assets.length>=20);
+t('pixel panel frame',css.includes('ui_panel_dark.png'));
+t('semantic button sprite skins',['button_green.png','button_blue.png','button_orange.png','button_purple.png'].every(x=>css.includes(x)));
+t('map unknown sprite',css.includes('map_unknown.png'));
+t('map lock sprite',css.includes('map_lock.png'));
+t('mapRoomTap remains transparent',/\.map button\.mapRoomTap\{[^}]*background:none!important/.test(css));
+t('canonical tile textures',['tile_stone_light.png','tile_stone_dark.png','tile_stone_moss.png','tile_stone_crack.png'].every(x=>css.includes(x)));
+t('room scene families mapped',['room_cave','room_mushroom','room_lake'].every(x=>js.includes(x)));
+t('item affordance assets mapped',['item_key','item_rope','item_lantern','item_crystal'].every(x=>js.includes(x)));
+t('hero entity mapping uses stable IDs',['CHAR_HERO_14','CHAR_HERO_15','CHAR_HERO_19','CHAR_HERO_01','CHAR_HERO_06','CHAR_HERO_20'].every(x=>js.includes(x)));
+t('no gameplay movement call introduced',!js.includes('move('));
+t('no state mutation assignment introduced',!js.includes('state.')&&!js.includes('state['));
+t('scene art selected from visible room only',js.includes("room?.name")&&js.includes("room?.desc"));
+t('asset paths stay versioned',assets.every(x=>x.startsWith('assets/v13/')));
+t('manifest hashes present',Object.values(manifest).every(v=>/^[0-9a-f]{64}$/.test(v.sha256)));
+console.log(`${pass} PASS / ${fail} FAIL`);process.exit(fail?1:0);
