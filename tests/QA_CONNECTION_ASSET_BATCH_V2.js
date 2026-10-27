@@ -1,0 +1,25 @@
+const fs=require('fs');
+const path=require('path');
+const root=process.argv[2]||process.cwd();
+const manifest=JSON.parse(fs.readFileSync(path.join(root,'visual/connection-manifest-v2.json'),'utf8'));
+const hashes=JSON.parse(fs.readFileSync(path.join(root,'visual/connection-assets-v2.sha256.json'),'utf8'));
+let pass=0,fail=0;function t(name,ok){console.log(`${ok?'PASS':'FAIL'} ${name}`);ok?pass++:fail++;}
+const a=manifest.assets||[];
+t('tileSize 32',manifest.tileSize===32);
+t('opening span 20',manifest.openingSpan===20);
+t('exact 16 assets',a.length===16);
+const kinds=['passage_open','door_open','door_locked','route_blocked'];
+const dirs=['N','E','S','W'];
+for(const k of kinds)t(`${k} has four directions`,dirs.every(d=>a.some(x=>x.state===k&&x.orientation===d)));
+t('all 32x32',a.every(x=>x.width===32&&x.height===32));
+t('all connection kind',a.every(x=>x.kind==='connection'));
+t('no rotations',a.every(x=>x.rotationSafe===false));
+t('connection assets are semantic state carriers',a.every(x=>x.semantic===true));
+t('unique IDs',new Set(a.map(x=>x.id)).size===a.length);
+t('unique atlas slots',new Set(a.map(x=>`${x.atlas.row}:${x.atlas.col}`)).size===a.length);
+t('all placed on atlas row 2',a.every(x=>x.atlas.row===2));
+t('hash registry exact coverage',Object.keys(hashes).length===16&&a.every(x=>hashes[x.id]&&hashes[x.id].file===x.file&&/^[0-9a-f]{64}$/.test(hashes[x.id].sha256)));
+t('no items/heroes/monsters',a.every(x=>!/ITEM|HERO|NPC|MONSTER/.test(x.id)));
+t('locked IDs explicit',dirs.every(d=>a.some(x=>x.id===`MAP_DOOR_LOCKED_${d}_01`)));
+t('blocked IDs explicit',dirs.every(d=>a.some(x=>x.id===`MAP_ROUTE_BLOCKED_${d}_01`)));
+console.log(`RESULT ${pass} PASS / ${fail} FAIL`);if(fail)process.exit(1);
