@@ -91,7 +91,7 @@ def build(root):
     for j,c in enumerate(['NW','NE','SE','SW'],4): assets.append({'id':f'MAP_CORNER_OUTER_{c}_01','file':f'assets/v3/map/border/corner_outer_{c.lower()}_01.png','kind':'corner_outer','width':32,'height':32,'rotationSafe':False,'semantic':False,'atlas':{'col':j,'row':1}})
     for j,c in enumerate(['NW','NE','SE','SW'],8): assets.append({'id':f'MAP_CORNER_INNER_{c}_01','file':f'assets/v3/map/border/corner_inner_{c.lower()}_01.png','kind':'corner_inner','width':32,'height':32,'rotationSafe':False,'semantic':False,'atlas':{'col':j,'row':1}})
     manifest={'contract':'Monsterhulen Tileset Contract V2','tileSize':32,'mapGrid':{'width':13,'height':13},'atlas':{'width':512,'height':512,'cell':32,'columns':16,'rows':16},'assets':assets}
-    (visual/'tileset-manifest-v2.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2),encoding='utf-8')
+    (visual/'tileset-manifest-v2.json').write_text(json.dumps(manifest,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     return assets
 
 if __name__=='__main__':
