@@ -5,7 +5,7 @@ Current branch: `visual/visual-system-v1-prep`
 Status: **PARALLEL VISUAL PREP ONLY**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Architecture prep branch: `narrative/story-graph-v1-prep`
-Current visual work item: **Tileset Contract V2 — grid-first structural asset rebuild**
+Current visual work item: **Tileset Contract V2 — grid-first structural asset rebuild with locked production sizes**
 
 ## Runtime gate is unchanged
 UX5A patch 15 is still waiting for physical iPad/mobile certification.
@@ -39,10 +39,54 @@ V2 visual contract decouples source art from fractional responsive scaling:
 - integer zoom only if zoom is later required.
 
 ## Canonical V2 docs/tools
+Read/use these for all further asset work:
+- `visual/ASSET_SIZE_STANDARD_V2.md` — **binding human-readable size standard**
+- `visual/asset-size-standard-v2.json` — **machine-readable size standard**
 - `visual/TILESET_CONTRACT_V2.md`
 - `visual/tileset-manifest-v2.template.json`
+- `tests/QA_ASSET_SIZE_STANDARD_V2.js`
 - `tools/validate_tileset_v2.py`
 - `tools/pack_tileset_v2.py`
+
+If a new asset role needs a size that is not defined here, do not improvise a dimension. Update the size standard + JSON + regression test first.
+
+## Locked production size matrix
+### Structural map
+- floor tile: **32 x 32**, full-cell art
+- straight wall: **32 x 32** transparent overlay, **6 px** structural depth
+- outer corner: **32 x 32** transparent overlay, **6 px** on both edges
+- inner corner: **32 x 32** transparent overlay, **6 px** on participating interior edges
+- connection/door: **32 x 32** transparent overlay, centred **20 px** opening span / **6 px** inset
+
+### Map actors/markers
+- hero/NPC/monster: **32 x 32 canvas**, visible max **24 x 28**, baseline **y=30**
+- generic question/lock/encounter marker: **32 x 32 canvas**, visible max **24 x 24** centred
+- small item marker: **32 x 32 canvas**, visible max **22 x 22** centred
+- effect frame: **32 x 32 canvas**, visible max **32 x 32**
+
+### UI
+- generic UI icon: **24 x 24 canvas**, visible max **20 x 20**
+- standard icon display: **24 x 24 CSS px**
+- large icon display: **32 x 32 CSS px**
+- optional repeatable UI corner/edge ornament: **16 x 16**, never stretched
+- full button/panel bitmap backgrounds: **not allowed**; use CSS/DOM
+
+### Existing Asset Contract 2.4.0 compatibility
+- character: 64 x 64 thumbnail / 128 x 128 large
+- item: 32 x 32 thumbnail / 64 x 64 large
+- scene: 64 x 48 thumbnail / 192 x 128 large
+- symbolic: 32 x 32 thumbnail / 64 x 64 large
+
+Map sprites and entity portraits are different visual roles tied to the same stable entity ID. The 32x32 tileset does not replace canonical portrait sizes.
+
+## Runtime atlas
+- **512 x 512 RGBA**
+- **16 x 16 slots**
+- **32 x 32 per slot**
+- **0 px runtime gutter**
+- unused slots transparent
+- slot coordinates come from manifest
+- atlas is build output, never a hand-cropped source
 
 ## Layer architecture
 Map presentation is composed in layers:
@@ -77,7 +121,7 @@ Transparent 32x32 overlays:
 - four outer/convex corners,
 - four inner/concave corners.
 
-Target structural wall thickness: about 6 logical pixels from the relevant cell edge.
+Target structural wall thickness is exactly **6 logical pixels** from the relevant cell edge.
 
 Directional wall art is authored per orientation to avoid rotating lighting/shading unnaturally.
 
@@ -92,13 +136,7 @@ This supports irregular/L-shaped rooms without bespoke room images.
 ## Source/atlas boundary
 Individual normalized PNG files are canonical source assets.
 
-Runtime atlas is deterministic build output:
-- 512 x 512 RGBA,
-- 16 x 16 slots,
-- 32 x 32 per slot,
-- stable manifest coordinates,
-- transparent unused slots,
-- no grid guides or text in production atlas.
+Runtime atlas is deterministic build output. Never generate a large art sheet and manually crop production sprites from it.
 
 ## Transparency
 Required true RGBA transparency:
@@ -113,16 +151,17 @@ Required true RGBA transparency:
 Floor PNGs remain RGBA but intentionally fill the complete cell and may be fully opaque.
 
 ## Generation rule
-Do not ask image generation for a final perfectly sliced atlas.
-
 For each production asset:
 1. generate one isolated sprite/segment,
 2. use true transparent background when applicable,
 3. no label/frame/neighbour assets,
-4. normalize to its exact box,
-5. pixel-quantize/clean alpha,
-6. validate at 1x/2x/4x nearest-neighbour,
-7. reject/regenerate weak assets rather than compensating with manual crop hacks.
+4. normalize to the exact box from `ASSET_SIZE_STANDARD_V2`,
+5. enforce safe box/baseline/edge anchor,
+6. pixel-quantize/clean alpha,
+7. validate at 1x/2x/4x nearest-neighbour,
+8. reject/regenerate weak assets rather than compensating with crop hacks.
+
+Preferred image-generation working master for isolated square assets is **1024 x 1024 RGBA**, but this master is not a runtime/source size. The normalized contracted PNG is the canonical source asset.
 
 ## Historical V1.x status
 V1.3/V1.4 remain historical/research context only.
