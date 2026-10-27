@@ -79,6 +79,8 @@ The produced manifest is committed in:
 
 `visual/tileset-manifest-v2.json`
 
+The generator and committed manifest are byte-synchronized; a clean generation writes the same manifest bytes as the repo copy.
+
 This closes the binary-provenance problem for this structural batch: the source PNGs do not need to be transported through the GitHub connector to be reproducible.
 
 ## Validation
@@ -143,7 +145,7 @@ Atlas remains generated output. Individual normalized PNGs remain canonical sour
 
 ## Local tested deliverable hashes
 Asset package ZIP:
-`97e76c5296672a32668b946ba070348774c10937bc3acf12a6ec3689e1496e33`
+`cca6d3f701ed9580263970a7a478a46e0825677346ec534238241d6887b2ed3c`
 
 Runtime atlas:
 `9aba59f16c52cf6fbfdf01e69d127243b1f8fbca923360db1f6e8636e2225dbd`
@@ -155,7 +157,7 @@ Synthetic 13x13 empty-room preview:
 `1db236951abc5d2a11c45c846fb23975a0651a1f9869e8a2429fed7d069d238c`
 
 Generator source:
-`dfb57c3e98da3e140ab11f185fff4120e0eceb9f2211a743dd982737b43ff8bd`
+`c6b2c1516842f60827e2e6a213bfe713ada2fd5004b51b64f8cb04ca157f81c3`
 
 ## Next production boundary
 Do not create content assets yet.
