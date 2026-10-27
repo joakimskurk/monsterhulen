@@ -1,231 +1,146 @@
-# MONSTERHULEN - PROJECT STATE
+# MONSTERHULEN - PROJECT STATE (VISUAL PREP)
 
 Updated: 2026-10-27
-Active runtime branch: `ux5/searchable-rooms-encounter-tracks`
-Current baseline: **V0.12.3 Lasting Thing Identity Pass**
-Current work item: **UX5A patch 15 physical iPad/mobile retest before merge**
-Prep branch: `narrative/story-graph-v1-prep`
-Next architecture after green UX5A: **Narrative Graph V1, starting only with `CRYSTAL_MACHINE`**
+Current branch: `visual/visual-system-v1-prep`
+Status: **PARALLEL VISUAL PREP ONLY**
+Runtime branch: `ux5/searchable-rooms-encounter-tracks`
+Runtime baseline used for this branch: `b84ebe410679773e6833bf06fcd75bca449a5b89`
+Architecture prep branch: `narrative/story-graph-v1-prep`
 
-## Current gate
-UX5A remains open only because the target-device physical gate is not yet green.
+## Runtime gate is unchanged
+UX5A patch 15 is still waiting for physical iPad/mobile certification.
 
-The 2026-10-27 full checklist review found one remaining violation of the existing “one visible location identity” rule: the player-visible room description still began with `${zone.name}. ${room.name}.` even after the separate area badge had been removed.
-
-Patch 15 is committed:
-`patches/v0.12.3_playtest_room_description_location_identity_ux5a.patch`
-
-It changes the player-facing description to start with `${room.name}.` while retaining `zoneName` internally for generation/tone.
-
-`tests/QA_SINGLE_LOCATION_NAME_UX5A.js` now explicitly rejects the old zone-prefixed description and requires the canonical room-name-only prefix.
-
-## Patch-15 machine verification - GREEN
-The exact current indexed patch-14 source was reconstructed by line-segmented Project/Library materialization, patch 15 applied cleanly, and the following tests were run against the resulting candidate:
-
-- single location **21/0**
-- explicit improv **20/0**
-- authored mysteries only **5136/0**
-- encounter purpose **4337/0**
-- device findings **27/0**
-- search/encounter **2328/0**
-- Adventure Code **405/0**
-- UX4 progression **1797/0**
-- content regression **5830/0**
-- focused patch-15 runtime gate **6844/0**
-- 11 inline scripts **0 syntax errors**
-
-Patch-15 reconstructed candidate SHA-256:
+Exact tested patch-15 candidate SHA-256:
 `f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`
 
-Patch-15 patch SHA-256:
-`f8cd1e6c746541961ebf9308e62763d58a27ae705bee42886d56c082ceb620a5`
+Do not merge visual work into active runtime or `main` before that gate is green.
 
-Updated single-location QA source SHA-256:
-`c84bf6b16841c6795e589f49c08cf6287fa403aa08d2a8d77662e679d51d20d1`
+Do not implement Narrative Graph runtime, UX5B or Multiscreen from this branch.
 
-Restored authored-mysteries-only QA source SHA-256:
-`29c48341a73260b0906c8d50db3416fe7a27fcea543f2cc60429ef71e15de255`
+## Why this branch exists
+Physical playtest is temporarily unavailable, so visual work is being prepared without invalidating the exact UX5A candidate that still needs certification.
 
-The previously documented `QA_AUTHORED_MYSTERIES_ONLY_UX5A.js` was missing from the repository tree. It has now been restored with current coverage and passes **5136/0**. The old historical 3075/0 remains historical evidence only.
+The strategy is deliberately split:
+1. safe CSS-only visual skin against current DOM,
+2. separate future-layout prototype for a richer illustrated node map,
+3. staged integration only after UX5A merge.
 
-## Fresh browser interaction QA - GREEN WITH HARNESS CAVEAT
-Fresh headless Chromium interaction smoke on the exact patch-15 HTML: **22/0**.
+## Implemented visual-prep artifacts
+- `visual/tokens-v1.css`
+- `visual/runtime-skin-v1.css`
+- `visual/VISUAL_SYSTEM_V1.md`
+- `visual/ASSET_CONTRACT_VISUAL_V1.md`
+- `visual/RESPONSIVE_LAYOUT_V1.md`
+- `visual/VISUAL_ROADMAP_V1.md`
+- `visual/INTEGRATION_PLAN_V1.md`
+- `visual/VISUAL_QA_2026-10-27.md`
+- `prototypes/visual-system-v1/index.html`
+- `tests/QA_VISUAL_SYSTEM_V1.js`
 
-Covered actual browser DOM/click behavior for:
-- setup/start,
-- patch-15 room identity,
-- room search transition,
-- Adventure Code rendering,
-- DM overlay,
-- trap resolve control,
-- movement,
-- retreat-preserving trap state,
-- explicit combat choice,
-- non-combat resolve,
-- combat hearts/state,
-- 390x844 mobile viewport and mobile tabs.
+## Visual QA
+Static contract QA:
+- **14 PASS / 0 FAIL**.
 
-Container limitation: Chromium could not load the local candidate through localhost or `file://`, and injected `about:blank` denies native localStorage. The exact HTML was injected through DevTools and the harness supplied only an in-memory localStorage shim.
+Chromium future-layout prototype:
+- **10 PASS / 0 FAIL**,
+- 1365x1024 tablet/desktop,
+- 390x844 mobile DPR2,
+- room-node click updates selected room/panel,
+- narrator overlay opens,
+- mobile tabs visible,
+- no horizontal overflow.
 
-Therefore:
-- browser interaction/DOM/mobile-view smoke: **GREEN**,
-- native localStorage persistence/resume: **NOT CERTIFIED BY THIS HARNESS**,
-- real clipboard/prompt copy/paste: **NOT CERTIFIED BY THIS HARNESS**,
-- target-device touch/usability: **PENDING**.
+Chromium exact patch-15 DOM + `runtime-skin-v1.css`:
+- **13 PASS / 0 FAIL**,
+- default setup can start actual eventyr,
+- generated map remains present,
+- canonical room identity remains,
+- Forteller and `SE DEG RUNDT` remain,
+- >=48px Forteller target,
+- mobile tabs remain visible,
+- no 390px horizontal overflow.
 
-See:
-- `docs/UX5A_GATE_REVIEW_2026-10-27.md`
-- `docs/UX5A_BROWSER_QA_2026-10-27.md`
+Harness caveat: CDP-injected runtime uses an in-memory localStorage shim. Native persistence and clipboard are still physical-gate items.
 
-## Runtime patch chain
-Latest layers:
-- patch 11 explicit story-key use,
-- patch 12 one visible location identity,
-- patch 13 encounter purpose/world-effect contract,
-- patch 14 explicit narrator-improvisation guidance,
-- patch 15 room-description location-identity completion.
+## Existing asset contract discovered and preserved
+The exact runtime already contains **Asset Contract 2.4.0** with:
+- `assets/v1` legacy UI registry,
+- `assets/v2/entities` entity registry,
+- stable hero/map/item/reward IDs,
+- stable entity IDs,
+- deterministic thumbnail/large paths,
+- visual kinds `character`, `item`, `scene`, `symbolic`.
 
-## Current source/runtime conclusions
-### Boka som skriver tilbake
-Verified:
-- `FORTELLER-IMPROVISASJON`,
-- `INGEN SKJULT FASIT`,
-- no hidden larger predetermined plan,
-- concrete per-scene prompt,
-- no mandatory story-key invention or tracked-state contradiction.
+Visual V1 therefore does **not** create parallel hero/monster/NPC/item IDs.
 
-Physical/editorial question remains whether this is immediately useful to a real narrator.
+Examples retained:
+- `CHAR_HERO_14`,
+- `NPC_OWL_LIBRARIAN`,
+- `MONSTER_TRADER_CRAB`,
+- `MONSTER_STONE_GOLEM`,
+- `TRAP_RAINBOW_NET`,
+- `MYSTERY_WRITING_BOOK`,
+- `TREASURE_GLASS_MARBLE`.
 
-### Regnbuenettet / trap semantics
-Verified:
-- no generic progress boxes without authored stages,
-- purpose/stakes/resolvedWhen/payoff,
-- `blocksForward=true`,
-- onward block + retreat semantics in real `move()` test,
-- resolution frees route.
+## Room-art direction
+Presentation-only room families may be introduced later, e.g.:
+- START,
+- CAVE_GENERIC,
+- BRIDGE,
+- MUSHROOM,
+- UNDERGROUND_LAKE,
+- MINE,
+- GUARDIAN,
+- TREASURE,
+- PUZZLE,
+- TRAP,
+- FINALE_GATE,
+- CRYSTAL_CAVERN.
 
-### Ambient mysteries
-Verified no random puzzle attachment unless explicitly opted in. Restored dedicated QA covers all six current mystery subjects over deterministic samples.
+These are **not story entities**. A room illustration must never invent a connection, lock, key, character, clue, treasure, crystal socket or required resource absent from canonical state.
 
-### One visible location identity
-Patch 15 fixes remaining room-description zone leak. Automated 21/0 + focused runtime coverage + browser smoke are green.
+Proposed future art root: `assets/v3/rooms/...` after an intentional integration package.
 
-### Explicit story-key flow
-Verified ownership does not unlock/traverse. Explicit key use opens; traversal remains separate.
+## Visual layout direction
+Tablet landscape is primary shared-tabletop presentation:
+- top chrome,
+- map/world surface ~60%,
+- current-room parchment surface ~40%,
+- bottom hero/inventory/actions HUD,
+- Forteller visible but subordinate.
 
-### Room search / full backpack
-Verified first low strengthens clue, repeated low fails forward, and full backpack preserves revealed find. Physical touch feel remains open.
+Mobile keeps one main surface at a time with tabs and >=48px primary touch targets.
 
-### Combat
-Verified normal generated monster = 3 hearts, `SPENNING` = 4; explicit combat start; non-combat route remains; legacy active combat migration does not heal lost hearts.
+## Safe skin vs future renderer
+`visual/runtime-skin-v1.css` is designed to prove that much of the visual upgrade can land without gameplay/state rewrite.
 
-### Adventure Code
-Automated **405/0** and browser code rendering green. Native clipboard/paste on target device remains open.
+The richer node-map prototype is **not** production logic. A future node renderer must consume canonical rooms/connections and preserve fog/reveal/lock/block/secret/movement semantics exactly.
 
-## Required physical-device gate before UX5A merge
-On the exact patch-15 build, actual iPad/mobile must verify:
-1. `BOKA SOM SKRIVER TILBAKE` narrator panel makes intentional improv vs authored content obvious,
-2. improv prompt is useful/bounded and does not create mandatory state,
-3. `REGNBUENETTET` has no generic progress boxes,
-4. narrator understands purpose/solve/payoff,
-5. active trap blocks onward and allows retreat; resolution frees route,
-6. ambient mysteries do not receive disconnected random puzzles,
-7. each room has one clear visible place identity after patch 15,
-8. explicit story-key flow remains child-driven,
-9. `SE DEG RUNDT` feels exploratory rather than compulsory,
-10. hidden-find fail-forward/full-backpack flow works by touch,
-11. 3-heart normal / 4-heart `SPENNING` combat controls remain usable,
-12. final-heart/non-combat resolution controls are understandable,
-13. representative legacy active-combat save if possible,
-14. native save/reload + Adventure Code copy/paste work on target browser/device.
+## Binding visual constraints
+- concept art is art direction, not the UI bitmap,
+- browser owns text and interactive controls,
+- no baked-in UI text in world art,
+- stable IDs remain authoritative,
+- one visible place identity per room,
+- icons supplement text; they do not replace action labels,
+- no hidden-knowledge leak through art,
+- no auto-use of possessed resources,
+- no visual change may silently alter story/world state,
+- physical/editorial review remains necessary even when browser checks are green.
 
-## Binding product direction
-- story quality beats combinatorial volume,
-- child proposes actions; app does not silently apply owned solutions,
-- one physical room has one visible identity,
-- interactive mechanics require purpose/stakes/resolution/payoff/world effects,
-- no generic filler progress,
-- puzzles need authored contextual role,
-- narrator improvisation is explicit/scoped,
-- critical state never depends on untracked improv,
-- physical dice report uncertainty only,
-- stable IDs/save compatibility remain binding,
-- critical story uses `SETUP -> SIGNAL -> ACTION -> PAYOFF`.
-
-## Consolidated next architecture
-Canonical prep plan:
-`docs/ENCOUNTER_STORY_SYSTEM_PLAN_V1.md`
-
-Target chain:
-`SUBJECT -> STORYLET ROLE -> REQUIREMENTS + PROVIDERS -> PLAYER ACTION / DM RESOLUTION -> OUTCOME + WORLD EFFECT`
-
-Supporting layers: knowledge/reveal, phases/expiry, interaction shell, typed transitions, later action history/undo/shared-session sync.
+## Existing architecture/content state
+The complete existing content bank has already been editorially reviewed on `narrative/story-graph-v1-prep`, and the nine `CRYSTAL_MACHINE` candidates have been audited/revised. Do not expand the bank while current gates are open.
 
 Narrative Graph runtime remains blocked until UX5A is physically green and merged.
 
-## Narrative Graph sequence after green UX5A
-- NG0 specs/docs complete on prep.
-- NG1 graph + provider + typed transition model/validator.
-- NG2 Storylet Matrix/provider engine.
-- NG3 Crystal Machine planner.
-- NG4 materialization + narrator knowledge + minimal DM controls + required shells.
-- NG5 >=1000 automated graph/state cases.
-- NG6 real browser/touch QA.
-- NG7 10-20 manual editorial/family playtests.
-- NG8 accept/revise/abandon.
+## Repository health
+Still open: the exact release/runtime/assets are not yet byte-reconstructable from ordinary repo files alone. The failed large binary snapshot attempt was removed and is not valid provenance evidence.
 
-No second blueprint before NG8.
+## Exact next actions
+While physical UX5A test remains unavailable, safe work on this branch is:
+- refine visual prep/prototype,
+- specify and produce presentation-only art against stable IDs,
+- browser-test visual artifacts,
+- repo-health/provenance work that does not change gameplay.
 
-## Editorial-prep checkpoint - EXISTING BANK COMPLETE
-The complete existing content bank has now been editorially reviewed on `narrative/story-graph-v1-prep`:
-- MONSTERS,
-- PEOPLE,
-- FRIENDS,
-- TRAPS,
-- MYSTERIES,
-- TREASURES.
-
-The prep Storylet Matrix now includes cross-bank constraints for:
-- mechanic/solution-family anti-repetition,
-- explicit provider binding rather than noun/theme matching,
-- incidental loot vs planned critical provider,
-- critical-safe trade/resource transfer,
-- truth/knowledge/topology separation,
-- authored critical puzzle truth,
-- ambient improv vs critical state,
-- phase/expiry for clue/delivery content,
-- sparse Storylet-specific combat,
-- explicit typed resource use/placement/consumption.
-
-The nine `CRYSTAL_MACHINE` Storylet candidates were audited and revised in place. No new subjects or blueprints were added.
-
-**There is no next subject to review. Do not expand the bank while UX5A/NG gates are open.**
-
-Active blueprint bank remains:
-- `GLASS_HEART`
-- `WITCH_CAT`
-- `CRYSTAL_MACHINE`
-- `ZOMBIE_DELIVERY`
-
-## Repository health - OPEN
-Direct GitHub verification on 2026-10-27 confirms the runtime branch still has no ordinary repository `index.html` and no `assets/` directory. The exact tested patch-15 HTML therefore remains dependent on the reconstructed Project/Library candidate rather than being byte-reconstructable from ordinary repo files alone.
-
-A binary snapshot attempt through the GitHub connector was hash-checked before acceptance and found unsafe because the large encoded payload was truncated/corrupted in transport. That snapshot commit was immediately removed from the runtime branch with force-with-lease. **No snapshot artifact from that failed attempt is valid or referenced.**
-
-Do not claim repository provenance is closed. A later repo-health package should add the exact runtime/source/assets through a byte-safe upload path and verify hashes from the repository copy itself.
-
-## Exact next action
-**Physical-test this exact patch-15 candidate on iPad/mobile using the 14-point gate.**
-
-If physical playtest is temporarily unavailable, allowed work is limited to repo-health/provenance and documentation/spec refinement that does not implement later runtime packages or expand content.
-
-If anything fails, patch UX5A only and rerun affected machine/browser tests.
-
-When physical UX5A is GREEN:
-1. record physical evidence,
-2. confirm final automated/browser evidence,
-3. merge UX5A to `main`,
-4. verify `main`,
-5. create `narrative/story-graph-v1`,
-6. carry approved prep docs,
-7. start NG1.
+When physical UX5A becomes GREEN, return to the runtime branch transition sequence. Do not merge this visual branch wholesale into runtime/main. Carry visual changes selectively after runtime merge and re-test them as a separate visual package.
