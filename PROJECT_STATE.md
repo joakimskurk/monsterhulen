@@ -5,7 +5,7 @@ Current branch: `visual/visual-system-v1-prep`
 Status: **PARALLEL VISUAL PREP ONLY**
 Runtime branch: `ux5/searchable-rooms-encounter-tracks`
 Architecture prep branch: `narrative/story-graph-v1-prep`
-Current visual work item: **Tileset V2 empty-dungeon renderer — rooms + canonical connections implemented and browser green; editorial review pending**
+Current visual work item: **Structural Map V3 reset — V2 technical contract retained, V2 art direction rejected after manual screenshot review**
 
 ## Runtime gate unchanged
 UX5A patch 15 still waits for physical iPad/mobile certification.
@@ -15,111 +15,90 @@ Exact patch-15 candidate SHA-256:
 
 Do not merge visual work into active runtime or `main` before that gate is green. Do not implement Narrative Graph runtime, UX5B or Multiscreen here.
 
-## Canonical V2 production method
-The old sheet-first extraction path is abandoned.
+## Current editorial verdict
+The V2 engineering model works, but the current structural artwork/presentation is **visually rejected**.
 
-**grid first -> exact source box -> isolated deterministic asset -> validation -> runtime composition**
+Do not continue from the current floor/wall/door art as if it were approved.
 
-Binding sources:
-- `visual/ASSET_SIZE_STANDARD_V2.md`
-- `visual/asset-size-standard-v2.json`
-- `visual/TILESET_CONTRACT_V2.md`
+Canonical review:
+`visual/TILESET_V2_VISUAL_REVIEW_2026-10-27.md`
 
-Locked geometry:
+## What remains canonical
 - 13 x 13 runtime grid,
-- 32 x 32 logical cell,
-- 416 x 416 map at 1x,
-- 6 px structural wall depth,
-- 20 px centred connection opening,
-- 512 x 512 atlas / 16 x 16 slots,
-- nearest-neighbour integer scaling only.
+- 32 x 32 logical source-cell contract,
+- multi-cell room geometry from canonical joins,
+- separate floor / border / connection layers,
+- deterministic source generation and manifests,
+- stable IDs,
+- transparent overlays,
+- nearest-neighbour integer scaling,
+- runtime DOM/state as authority,
+- no visual invention of hidden topology/story state.
 
-## Current structural bank — 37 assets
-### Empty rooms — 21
-- 9 neutral floors,
-- 4 straight walls,
-- 4 outer corners,
-- 4 inner corners.
+32x32 is source resolution. It does not force 32 CSS px presentation.
 
-### Connections — 16
-- 4 `PASSAGE_OPEN`,
-- 4 `DOOR_OPEN`,
-- 4 `DOOR_LOCKED`,
-- 4 `ROUTE_BLOCKED`.
+## Why current V2 visuals failed
+1. Dungeon occupies too little of the map surface and reads like a minimap/debug widget.
+2. Floor art emphasizes cell boundaries, so physical rooms look tiled into compartments.
+3. Wall language reads as a per-cell cage rather than a strong outer room silhouette.
+4. Door/passages are composed as one-cell symbols instead of shared-boundary architecture.
+5. `DOOR_OPEN` reads as loose planks; `PASSAGE_OPEN` is too weak.
+6. Lock presentation can detach from the exact affected doorway.
+7. Blocked X is too small at current scale.
+8. Large `?` markers dominate the tiny structural map.
+9. Mobile remains functional but spatially weak because the dungeon is shrunk rather than presented in a focused/pannable integer-scale viewport.
 
-No items, heroes, NPCs, monsters, furniture, trap illustrations, treasure or room-content art are part of this bank.
+## V2 evidence remains useful engineering history
+Current V2 structural bank:
+- 21 room assets,
+- 16 connection assets,
+- 37 total allocated map assets.
 
-## Connection state contract
-Connection art is driven only by canonical runtime DOM:
-- ordinary traversable door -> `door_open`,
-- known `.shortcut` / `.secret` -> `passage_open`,
-- `.locked` -> `door_locked`,
-- current movement control beginning with `×` -> `route_blocked`.
+Verification already achieved:
+- empty rooms: 21/21 binary, 19/0 static, 14/0 runtime static, 15/0 Chromium,
+- connections: 16/16 binary, 18/0 static, 17/0 runtime static, 17/0 Chromium,
+- clean deterministic reproduction for both batches,
+- real runtime examples reached a locked connection and a blocksForward route.
 
-Locked takes precedence over blocked. `route_blocked` uses an abstract X so the art does not invent the physical cause.
+These results prove technical composition/state mapping only. They do **not** constitute visual approval.
 
-Patch 15 has no separate closed-but-unlocked state, so V2 does not invent one.
+## Current production boundary
+Do not start:
+- heroes,
+- NPCs/monsters,
+- items,
+- furniture,
+- treasure/trap illustration,
+- room-content illustration,
+- decorative scene art.
 
-## Deterministic provenance
-Room generator:
-`tools/generate_empty_rooms_v2.py`
+Do not spend time polishing fog/current/reachable state until the base room silhouette is visually strong.
 
-Connection generator:
-`tools/generate_connections_v2.py`
+## Structural Map V3 goal
+Reuse the technical contract but redesign perception:
 
-Connection validator:
-`tools/validate_connections_v2.py`
+**ROOM FIRST, GRID SECOND.**
 
-Batch manifests/hashes:
-- `visual/tileset-manifest-v2.json`
-- `visual/empty-rooms-assets-v2.sha256.json`
-- `visual/connection-manifest-v2.json`
-- `visual/connection-assets-v2.sha256.json`
+Required direction:
+- quieter floor with no obvious tile seams,
+- stronger outer perimeter that makes multi-cell rooms read as one shape,
+- connections centred on the shared boundary between rooms/cells,
+- one state signal per fact,
+- tablet test at 2x integer display where space permits,
+- mobile focused/pannable 2x viewport rather than fit-all shrinking,
+- rooms + connections only.
 
-`tools/build_tileset_manifest_v2.py` merges batch manifests and rejects duplicate IDs/atlas slots before full packing.
+## Acceptance gate for V3
+V3 does not advance on automated green alone.
 
-Clean reproduction:
-- rooms: 21/21 byte-identical,
-- connections: 16/16 byte-identical.
-
-## Verification
-Room structural bank:
-- 21/21 binary/geometry PASS,
-- 19/0 static batch QA.
-
-Connection structural bank:
-- 16/16 binary/geometry PASS,
-- 18/0 static batch QA.
-
-Runtime static:
-- room-only: 14/0,
-- room + connections: 17/0.
-
-Fresh Chromium exact patch-15 + V2 connections:
-- **17 PASS / 0 FAIL**.
-
-Browser proof covers exact 32px assets, canonical door DOM mapping, legal exploration/rerenders, tablet/mobile overflow and presentation mapping for locked/blocked states. Separate legal UI runs reached a real locked story connection and a real `blocksForward` route.
-
-CDP harness caveat remains: in-memory localStorage, so native persistence/clipboard and physical touch are not certified.
-
-## Runtime implementation files
-- `visual/tileset-connections-v2.css`
-- `visual/tileset-connections-v2.js`
-- `tests/QA_CONNECTION_ASSET_BATCH_V2.js`
-- `tests/QA_CONNECTION_RUNTIME_INTEGRATION_V2.js`
-- `visual/CONNECTION_ASSET_BATCH_V2.md`
-- `visual/CONNECTION_RUNTIME_PROOF_V2.md`
-
-The visual layer does not call gameplay `move()`, does not mutate dungeon state and does not replace the generator.
-
-## Current boundary
-The empty dungeon structural renderer is now complete enough for editorial review:
-
-`floor -> border/corners -> canonical connection -> runtime fog/interaction state`
-
-Do not create content assets yet.
+Required before more asset categories:
+1. structural/source validation,
+2. real runtime Chromium test,
+3. tablet screenshot review,
+4. mobile screenshot review,
+5. explicit manual visual acceptance that rooms read as rooms and connections read as architecture.
 
 ## Exact next safe action
-Review the combined empty-dungeon renderer visually. If accepted, refine only existing map-state presentation (`fog`, `unknown`, `current`, `reachable`) in CSS/runtime state before opening actor/item/monster production.
+Prototype the V3 structural room system only. Do not create content assets.
 
 When physical UX5A becomes GREEN, return to runtime sequencing first. Visual integration remains a selective package after runtime merge.
