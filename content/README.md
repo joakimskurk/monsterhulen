@@ -96,7 +96,18 @@ Merker med `"carry": false` (STILLHET, ROS, MOT, MORKE, SOVN) er handlinger barn
 
 ## Oppdrag
 
-Se `missions.json`. Typene er `FINN`, `REDD`, `SAMLE`, `LEVER` og `KOM_UT`. Dagens fire eventyr er tema på disse.
+Se `missions.json`. Typene er `FINN`, `REDD`, `SAMLE`, `LEVER` og `KOM_UT`, med tre tema hver (15 oppdrag). De fire gamle eventyrene er tema på disse og har `legacyBlueprint`.
+
+| Felt | Betydning |
+|---|---|
+| `route` | valgfri: fire soner (start, bak hinder 1, bak hinder 2, bak hinder 3+). Uten `route` trekkes en rute fra koden. |
+| `goal.name` | det som står i siste rom |
+| `goal.lock` | FINN: `name` (døra) og `key` (nøkkelen) |
+| `goal.calm` | REDD: merker som roer figuren. Ett velges per løp. |
+| `goal.count`, `goal.pool` | SAMLE: så mange ulike merker trekkes fra listen |
+| `goal.item` | LEVER: tingen som hentes i siste rom og bæres tilbake til inngangen |
+
+Et nytt oppdrag trenger bare data. `npm run check` beviser det over 200 seeds per lengde, og `npm run sim:batch` over 1000.
 
 ## Kobling til `index.html`
 

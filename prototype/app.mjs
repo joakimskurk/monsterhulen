@@ -60,13 +60,25 @@ function log(text) { state.log.push(text); }
 
 async function start() {
   content = await loadContent();
-  for (const m of content.missions) $('#mission').append(el('option', { value: m.id }, m.name));
+  const TYPE_NAMES = { FINN: 'Finn skatten', REDD: 'Redd noen', SAMLE: 'Få noe i gang', LEVER: 'Lever noe hjem', KOM_UT: 'Kom deg ut' };
+  for (const [type, title] of Object.entries(TYPE_NAMES)) {
+    const group = el('optgroup', { label: title });
+    for (const m of content.missions.filter((x) => x.type === type)) group.append(el('option', { value: m.id }, m.name));
+    if (group.children.length) $('#mission').append(group);
+  }
   const params = new URLSearchParams(location.hash.slice(1));
   if (params.get('m')) $('#mission').value = params.get('m');
   if (params.get('l')) $('#length').value = params.get('l');
   $('#seed').value = params.get('s') || String(1 + Math.floor(Math.random() * 9999));
   $('#setup').addEventListener('submit', (e) => { e.preventDefault(); generate(); });
   $('#newRun').addEventListener('click', () => { $('#seed').value = String(1 + Math.floor(Math.random() * 9999)); generate(); });
+  // A different mission than the current one, so two surprises in a row never repeat.
+  $('#surprise').addEventListener('click', () => {
+    const others = content.missions.filter((m) => m.id !== $('#mission').value);
+    $('#mission').value = others[Math.floor(Math.random() * others.length)].id;
+    $('#seed').value = String(1 + Math.floor(Math.random() * 9999));
+    generate();
+  });
   $('#reset').addEventListener('click', () => { if (confirm('Starte dette løpet på nytt?')) { state = freshState(current.run); save(); render(); } });
   await connectRelay();
   generate();

@@ -35,7 +35,7 @@ npm run prototype:lan
 Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekkes automatisk av `npm run test:leak`. Trykk **Vis på iPad** ved et tegn for å vise det som en boble på skjermen hennes. Mens en forespørsel venter, er knappene hennes låst, så dobbeltrykk ikke gir dobbel effekt.
 
 ## Slik spiller du
-1. Velg oppdrag og lengde. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
+1. Velg oppdrag (15, gruppert etter type) og lengde, eller trykk **Overrask meg** for et tilfeldig annet oppdrag. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
 2. Trykk på et rom på kartet når barnet går dit. Grå rom ligger bak et hinder som ikke er løst.
 3. Romkortet viser det du leser høyt, hva figuren vil, tegnet og hjelpestigen, og hvor den garanterte løsningen ligger.
 4. Barnet foreslår. Kast terning bare når utfallet er usikkert. Trykk:

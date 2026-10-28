@@ -14,7 +14,6 @@ const ROUTES = [
   ['MÅNESKOGEN', 'KRYSTALLGROTTEN', 'BEINKATAKOMBENE', 'BEINKATAKOMBENE'],
   ['REGNBUEDALEN', 'SKYGGEGANGENE', 'KLOKKETÅRNET', 'KLOKKETÅRNET'],
 ];
-const ROUTE_FOR = { WITCH_CAT: 0, ZOMBIE_DELIVERY: 1, GLASS_HEART: 2, CRYSTAL_MACHINE: 3 };
 
 const BASE_WEIGHT = { LIGGER: 1.6, GJEMT: 1.2, HANDEL: 2.2, BELONNING: 2.2, VENN: 2.2, MILJO: 2.2, OPPSKRIFT: 1.6 };
 
@@ -24,7 +23,8 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   const mission = content.missions.find((m) => m.id === missionId);
   if (!mission) throw new Error(`unknown mission ${missionId}`);
   const map = generateMap(rng, shape);
-  const route = ROUTES[ROUTE_FOR[mission.id] ?? Math.floor(rng() * ROUTES.length)];
+  // A mission may fix its zones (missions.json `route`); otherwise a route is drawn from the seed.
+  const route = mission.route || ROUTES[Math.floor(rng() * ROUTES.length)];
   map.rooms.forEach((r) => { r.zoneName = route[Math.min(r.zone, route.length - 1)]; });
 
   const ctx = {
@@ -130,7 +130,7 @@ function makeGoal(ctx, lastGate) {
   if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}` }, room: map.end, zone: endZone, needs: [] });
   if (mission.type === 'LEVER') {
     const node = addNode(ctx, { kind: 'deliver', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [], deliverTo: map.start });
-    node.item = { specificId: 'DELIVERY', name: 'den mistede tingen zombien skal levere', tags: [], consumable: true };
+    node.item = { specificId: 'DELIVERY', name: mission.goal.item, tags: [], consumable: true };
     return node;
   }
   if (mission.type === 'REDD') {
@@ -253,7 +253,8 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
   }
 
   if (type === 'BELONNING') {
-    const quest = rng.pick(content.figures.filter((f) => isUsableQuest(ctx, f, tag)));
+    const quests = content.figures.filter((f) => isUsableQuest(ctx, f, tag));
+    const quest = quests.length && pickQuest(ctx, quests);
     const room = quest && chooseRoom(ctx, maxZone, nearRoom);
     if (!quest || !room) return null;
     const reward = rng.pick(itemsWithTag(ctx, tag));
@@ -316,7 +317,7 @@ function provideSpecific(ctx, item, consumer, depth, { onlyPlaced = false } = {}
   for (const type of rng.shuffle(options).sort((a, b) => sourceTypeWeight(ctx, b) - sourceTypeWeight(ctx, a))) {
     if (type === 'BELONNING') {
       const quests = content.figures.filter((f) => (f.roles || []).includes('quest') && !ctx.usedFigures.has(f.id));
-      const quest = quests.length && rng.pick(quests);
+      const quest = quests.length && pickQuest(ctx, quests);
       const room = quest && chooseRoom(ctx, consumer.zone, consumer.room);
       if (!quest || !room) continue;
       const snapshot = { nodes: ctx.nodes.length, budget: ctx.budget, occupied: new Set(ctx.occupied), usedFigures: new Set(ctx.usedFigures), usedItems: new Set(ctx.usedItems) };
@@ -340,9 +341,7 @@ function resolveFigureWant(ctx, node, figure, depth) {
   const { content, rng } = ctx;
   const nestedOk = ctx.budget > 0 && depth < 4;
   const wants = rng.shuffle(figure.wants || []);
-  const chainable = wants.filter((w) => (w.type === 'MISTET')
-    || (w.type === 'SORT' && w.tags.some((t) => isCarryTag(content, t)))
-    || (w.type === 'GJORE' && (w.needs || []).some((t) => isCarryTag(content, t))));
+  const chainable = wants.filter((w) => isChainableWant(content, w));
   if (nestedOk) {
     for (const w of chainable) {
       if (w.type === 'MISTET') {
@@ -350,16 +349,26 @@ function resolveFigureWant(ctx, node, figure, depth) {
         if (lost) { node.needs.push({ specific: `LOST:${figure.id}`, name: w.what, via: 'lost', provider: lost.id, sign: w.sign }); return true; }
         continue;
       }
-      const tags = (w.type === 'SORT' ? w.tags : w.needs).filter((t) => isCarryTag(content, t));
+      const tags = wantTags(w).filter((t) => isCarryTag(content, t));
       for (const t of rng.shuffle(tags)) {
         const p = provideTag(ctx, t, node, depth + 1);
-        if (p) { node.needs.push({ tag: t, via: w.type === 'SORT' ? 'wants' : 'task', provider: p.id, task: w.task, sign: w.sign }); return true; }
+        if (p) { node.needs.push({ tag: t, via: { SORT: 'wants', BYTTE: 'trade', GJORE: 'task' }[w.type], provider: p.id, task: w.task, sign: w.sign }); return true; }
       }
     }
   }
   const local = wants.find((w) => !chainable.includes(w));
   if (local) { node.needs.push({ local: true, via: w2via(local), task: local.task || (local.tags || []).map((t) => content.tagById.get(t).label).join(' / '), sign: local.sign }); return true; }
   return false;
+}
+const wantTags = (w) => ({ SORT: w.tags, BYTTE: w.accepts, GJORE: w.needs }[w.type] || []);
+// A want that can be met with something carried, so it can start a sub-chain.
+function isChainableWant(content, w) {
+  return w.type === 'MISTET' || wantTags(w).some((t) => isCarryTag(content, t));
+}
+// Quest figures whose want can become a sub-chain make richer runs; prefer them while budget allows.
+function pickQuest(ctx, quests) {
+  const rich = ctx.budget > 0;
+  return ctx.rng.weighted(quests.map((f) => [f, rich && (f.wants || []).some((w) => isChainableWant(ctx.content, w)) ? 3 : 1]));
 }
 const w2via = (w) => ({ VITE: 'vite', KAMP: 'kamp', GJORE: 'gjore', SORT: 'handling' }[w.type] || 'lokal');
 

@@ -93,6 +93,13 @@ for (const m of c.missions) {
   if (!['FINN', 'REDD', 'SAMLE', 'LEVER', 'KOM_UT'].includes(m.type)) err(at, `bad type ${m.type}`);
   (m.goal?.calm || []).forEach((t) => tagOk(at, t));
   (m.goal?.pool || []).forEach((t) => tagOk(at, t));
+  for (const z of m.route || []) if (!zones.has(z)) err(at, `unknown zone ${z}`);
+  if (m.route && m.route.length !== 4) err(at, 'route needs 4 zones (start, gate 1, gate 2, gate 3+)');
+  if (m.type === 'FINN' && !(m.goal?.lock?.name && m.goal?.lock?.key)) err(at, 'FINN needs goal.lock.name and goal.lock.key');
+  if (m.type === 'REDD' && !(m.goal?.calm || []).length) err(at, 'REDD needs goal.calm');
+  if (m.type === 'SAMLE' && !((m.goal?.pool || []).length >= (m.goal?.count || 0) && m.goal?.count > 0)) err(at, 'SAMLE needs goal.count <= pool size');
+  if (m.type === 'LEVER' && !m.goal?.item) err(at, 'LEVER needs goal.item');
+  if (!m.intro) err(at, 'missing intro');
 }
 
 // Coverage: for each carry tag, count consumers and providers.

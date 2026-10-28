@@ -53,8 +53,8 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 
 ## Resultater 2026-10-28
 
-- **15 000 løp** (5 oppdrag × KORT/VANLIG/STORT × 1000 seeds): alle godkjent, gjennomsnittlig 1,0–2,4 forsøk per løp.
-- **Selvtest:** 4 260 sabotasjer, 0 uoppdaget:
+- **45 000 løp** (15 oppdrag × KORT/VANLIG/STORT × 1000 seeds): alle godkjent, gjennomsnittlig 1,0–3,2 forsøk per løp (SAMLE på KORT trenger flest).
+- **Selvtest:** 12 732 sabotasjer, 0 uoppdaget:
   - en garantert kilde flyttet bak hinderet kjeden er for,
   - en garantert kilde fjernet,
   - en hemmelig dør fra sone 0 inn i siste sone.
@@ -77,3 +77,4 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 4. **Oppskrifter brukes lite** (1–4 %), fordi det fantes bare tre. Med ni oppskrifter og vekt 1,6 er de 5–8 % (2026-10-28), og det er flere kjedeformer.
 5. **Seks figurer ble aldri brukt som garantert løsning.** Årsakene var innholdsfeil (en evne ingen trengte, en figur som ville ha det den selv ga, blokkere uten bærbar løsning). Rettet 2026-10-28, se `docs/v2/CONTENT_MATRIX_V2.md` §7b. Nå brukes alle 66.
 6. **Halvparten av behovene manglet tegn.** Bare svakheter og hinder hadde tegn; ønsker, handel, kilder og oppskrifter hadde ingen. Nå har alle et tegn, og validatoren krever det.
+7. **Korte FINN-løp var tynne.** 39 % var bare «én figur med en gåte gir nøkkelen». Årsak: et bytte-ønske regnes ikke som noe som kunne starte en underkjede. Nå kan det, og figurer med et slikt ønske velges tre ganger så ofte så lenge budsjettet rekker. Andelen falt til 12 %, og antall ulike innholdssett i korte Glassnøkkel-løp steg fra 87 til 118 av 300.

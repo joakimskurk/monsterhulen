@@ -58,7 +58,7 @@ OPPDRAG  →  HULEN  →  ROM FOR ROM  →  MÅLET  →  HJEM  →  HELTEBOKA
 | SAMLE | 3 ting med ulike merker til en maskin eller gryte |
 | KOM UT | finn veien gjennom til den andre utgangen |
 
-Dagens fire eventyr (GLASS_HEART, WITCH_CAT, CRYSTAL_MACHINE, ZOMBIE_DELIVERY) blir oppdragskort med fast tema. Premiss og tekst beholdes.
+Dagens fire eventyr (GLASS_HEART, WITCH_CAT, CRYSTAL_MACHINE, ZOMBIE_DELIVERY) blir oppdragskort med fast tema. Premiss og tekst beholdes. Hver type har nå tre tema (15 oppdrag, `content/missions.json`). Et nytt tema er bare data; kjeden bygges uansett fra matrisen.
 
 **Lengde:** KORT (5–7 rom, kjede 1–2 ledd), VANLIG (9–13 rom, 2–3 ledd), STORT (15–17 rom, 3–4 ledd). Kjedens dybde styres også av barnets alder.
 
