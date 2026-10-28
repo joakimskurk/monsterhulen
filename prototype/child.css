@@ -171,7 +171,6 @@ body.child .found-bag img { width: 90%; height: 90%; object-fit: contain; }
 body.child .found-bag.hot { border-color: #ffd95c; background: rgba(255, 217, 92, .12); }
 body.child .found-name { margin: 0; }
 /* Dropped on the backpack: the thing slides down behind it and gets smaller; the backpack hops. */
-.found-thing.into { transition: transform .6s cubic-bezier(.5, 0, .7, 1), opacity .6s ease-in; opacity: 0; }
 .found-bag.gulp { animation: gulp .45s ease-out; }
 @keyframes gulp { 0% { transform: scale(1); } 40% { transform: scale(1.08, .94); } 100% { transform: scale(1); } }
 body.child .found-thing.dragging { z-index: 3; }

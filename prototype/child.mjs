@@ -162,7 +162,6 @@ function openFound() {
   const thing = $('#foundThing');
   thing.replaceChildren(String(f.icon).startsWith('assets/') ? el('img', { src: `/${f.icon}`, alt: '' }) : el('span', {}, f.icon));
   thing.style.transform = '';
-  thing.classList.remove('into');
   $('#found').hidden = false;
 }
 function closeFound() {
@@ -177,19 +176,33 @@ function closeFound() {
   let start = null;
   thing.addEventListener('pointerdown', (e) => { start = { x: e.clientX, y: e.clientY }; thing.setPointerCapture(e.pointerId); thing.classList.add('dragging'); });
   const overBag = (e) => { const b = bag.getBoundingClientRect(); return e.clientX >= b.left - 20 && e.clientX <= b.right + 20 && e.clientY >= b.top - 20 && e.clientY <= b.bottom + 20; };
-  // Into the backpack: the thing slides to the middle of it and a little down, behind it, getting
-  // smaller as it goes (workshop K3); then the backpack hops and the popup closes.
+  // Into the backpack (owner): the thing goes up in a little arc over the backpack, in front of it,
+  // then drops down into the opening at the top, behind the front of the backpack, getting smaller as
+  // it goes. Then the backpack hops and the popup closes.
   let going = false;
   const intoBag = () => {
     if (going) return;
     going = true;
     const t = thing.getBoundingClientRect(), b = bag.getBoundingClientRect();
-    const now = new DOMMatrix(getComputedStyle(thing).transform === 'none' ? undefined : getComputedStyle(thing).transform);
-    const dx = now.m41 + (b.left + b.width / 2) - (t.left + t.width / 2), dy = now.m42 + (b.top + b.height * 0.62) - (t.top + t.height / 2);
-    thing.classList.add('into');
-    thing.style.transform = `translate(${dx}px, ${dy}px) scale(.35)`;
-    setTimeout(() => { bag.classList.add('gulp'); }, 420);
-    setTimeout(() => { bag.classList.remove('gulp', 'hot'); going = false; closeFound(); }, 900);
+    const css = getComputedStyle(thing).transform;
+    const now = css === 'none' ? new DOMMatrix() : new DOMMatrix(css);
+    // Positions as offsets from where the thing stands without any transform.
+    const ox = t.left + t.width / 2 - now.m41, oy = t.top + t.height / 2 - now.m42;
+    const bx = b.left + b.width / 2 - ox, top = b.top - oy;
+    const peak = { x: bx, y: top - b.height * 0.35 };
+    const mid = { x: (now.m41 + bx) / 2, y: Math.min(now.m42, peak.y) - b.height * 0.2 };
+    const at = (p, s) => `translate(${p.x}px, ${p.y}px) scale(${s})`;
+    thing.style.zIndex = '3'; // in front of the backpack while it flies over
+    const run = thing.animate([
+      { transform: at({ x: now.m41, y: now.m42 }, 1), offset: 0 },
+      { transform: at(mid, 0.8), offset: 0.3 },
+      { transform: at(peak, 0.55), offset: 0.55 },
+      { transform: at({ x: bx, y: top + b.height * 0.32 }, 0.3), opacity: 1, offset: 0.85 },
+      { transform: at({ x: bx, y: top + b.height * 0.45 }, 0.25), opacity: 0, offset: 1 },
+    ], { duration: 950, easing: 'ease-in-out', fill: 'forwards' });
+    setTimeout(() => { thing.style.zIndex = '1'; }, 950 * 0.55); // over the opening: from now on behind the front
+    setTimeout(() => { bag.classList.add('gulp'); }, 950 * 0.8);
+    run.finished.then(() => { bag.classList.remove('gulp', 'hot'); going = false; closeFound(); run.cancel(); thing.style.zIndex = ''; thing.style.transform = ''; });
   };
   thing.addEventListener('pointermove', (e) => { if (start) { thing.style.transform = `translate(${e.clientX - start.x}px, ${e.clientY - start.y}px)`; bag.classList.toggle('hot', overBag(e)); } });
   thing.addEventListener('pointerup', (e) => {
