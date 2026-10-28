@@ -546,6 +546,9 @@ function renderRoom(roomId) {
     roomId !== state.here && reachableNow && !throughOpenDoor(roomId)
       ? el('p', { class: 'hint' }, 'Ikke rett ved siden av der barnet er. ', el('button', { class: 'small ghost', onclick: () => goTo(roomId) }, 'Flytt barnet hit likevel'))
       : null,
+    // The one who gives the quest, at the entrance: read it aloud when the adventure begins.
+    run.giver && run.giver.room === roomId ? el('div', { class: 'card' }, el('div', { class: 'kind' }, 'Gir oppdraget'), el('h3', {}, run.giver.name),
+      el('p', {}, `Les høyt: «${run.giver.says}»`), run.mission.payoff ? el('p', { class: 'hint' }, `Til slutt: «${run.mission.payoff}»`) : null) : null,
     ...nodes.map(nodeCard),
     ...alts.map((a) => {
       const key = `alt:${a.room}`;

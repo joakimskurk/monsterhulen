@@ -15,7 +15,7 @@ import { rejectedFor } from '../../tools/lib/fits.mjs';
 
 const content = loadContent();
 const FIGURES = new Set(['blocker', 'trader', 'quest', 'companion', 'target', 'lock', 'machine', 'goal', 'exit', 'deliver']);
-let runs = 0, wrongGifts = 0, ambientGifts = 0, visible = 0, fills = 0;
+let runs = 0, wrongGifts = 0, ambientGifts = 0, visible = 0, fills = 0, givers = 0;
 for (const missionId of missionIds(content)) {
   for (const length of ['KORT', 'VANLIG', 'STORT']) {
     for (let seed = 1; seed <= 25; seed++) {
@@ -23,6 +23,13 @@ for (const missionId of missionIds(content)) {
       const where = `${missionId}/${length}/${seed} «${run.mission.name}»`;
       runs++;
       for (const tag of run.mission.goal?.tags || []) assert.ok(!run.nodes.some((n) => n.needs.some((x) => x.tag === tag)), `${where}: the cave wants ${tag}, which the treasure is`);
+      // Someone the DM's text says waits at the entrance is on the child's screen there (owner's playtest
+      // «Fløyta som ble borte»: the DM read about a little ghost the child could not see).
+      if (/venter ved inngangen/.test(run.mission.intro) || run.mission.giver) {
+        const at = playerView(run, table.freshState(run)).room.things.find((x) => x.kind === 'giver');
+        assert.ok(at && at.text.length > 10, `${where}: the one waiting at the entrance is not on the child's screen`);
+        givers++;
+      }
       // The matrix review: no planned solution is one the figure rejects (a feather for a toothache).
       for (const n of run.nodes) for (const need of n.needs.filter((x) => x.tag && x.provider)) {
         const p = run.nodes.find((x) => x.id === need.provider);
@@ -75,4 +82,4 @@ for (const missionId of missionIds(content)) {
   }
 }
 assert.ok(wrongGifts > 0 && visible > 0 && fills > 0);
-console.log(`matrix test: ${runs} runs, ${visible} things and figures all on the child's screen, ${fills} sources filled from the iPad, ${wrongGifts} gifts to a wrong figure that fits and ${ambientGifts} to wandering figures; the planned thing always comes back, OK`);
+console.log(`matrix test: ${runs} runs, ${givers} with the quest giver at the entrance, ${visible} things and figures all on the child's screen, ${fills} sources filled from the iPad, ${wrongGifts} gifts to a wrong figure that fits and ${ambientGifts} to wandering figures; the planned thing always comes back, OK`);

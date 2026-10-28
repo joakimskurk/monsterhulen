@@ -14,9 +14,11 @@ const BASE_WEIGHT = { LIGGER: 1.6, GJEMT: 1.2, HANDEL: 2.2, BELONNING: 2.2, VENN
 
 export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   const rng = makeRng(`${missionId}|${length}|${seed}`);
-  const shape = LENGTHS[length];
   const mission = resolveMission(content, missionId, seed);
   if (!mission) throw new Error(`unknown mission ${missionId}`);
+  // «Få noe i gang»: the device in the innermost room is the last challenge (it was the last gate),
+  // so the cave has one gate fewer and the same amount to do.
+  const shape = mission.type === 'SAMLE' ? { ...LENGTHS[length], gates: LENGTHS[length].gates - 1 } : LENGTHS[length];
   const map = generateMap(rng, shape);
   // A mission may fix its zones (`route`); otherwise a route is drawn from the seed.
   const routes = content.themes.routes;
@@ -33,7 +35,9 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
     occupied: new Set([map.start, map.end]),
   };
 
-  const run = { seed, length, mission, map, nodes: ctx.nodes, gates: {}, goal: null, alternatives: [], ambient: [] };
+  const run = { seed, length, mission, map, nodes: ctx.nodes, gates: {}, goal: null, alternatives: [], ambient: [],
+    // Who gives the quest, waiting in the entrance room (not a node: nothing to solve there).
+    giver: mission.giver ? { ...mission.giver, room: map.start } : null };
   const lastGate = shape.gates;
 
   for (let g = 1; g <= lastGate; g++) {
@@ -42,7 +46,6 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
     let gateNode;
     // A chest holds the treasure in the innermost room; it is not a gate, so the last gate is a normal blocker.
     if (g === lastGate && mission.type === 'FINN' && !mission.goal.lock.inGoal) gateNode = makeLock(ctx, room, g);
-    else if (g === lastGate && mission.type === 'SAMLE') gateNode = makeMachine(ctx, room, g);
     else gateNode = makeBlocker(ctx, room, g);
     if (!gateNode) return { ok: false, reason: `no blocker for gate ${g}` };
     run.gates[g] = gateNode.id;
@@ -153,9 +156,10 @@ function addOpenerNeeds(ctx, node, opener) {
   return true;
 }
 
-function makeMachine(ctx, room, gate) {
+// «Få noe i gang»: the device is the goal, in the innermost room; its payoff ends the run.
+function makeMachine(ctx, room, zone) {
   const { rng, mission } = ctx;
-  const node = addNode(ctx, { kind: 'machine', card: { name: mission.goal.name, icon: mission.goal.icon }, room, zone: zoneOf(ctx, room), gate, needs: [] });
+  const node = addNode(ctx, { kind: 'goal', machine: true, payoff: mission.goal.payoff, card: { name: mission.goal.name, icon: mission.goal.icon }, room, zone, needs: [] });
   const part = mission.goal.part;
   if (part && !addThemeNeed(ctx, node, { part: part.name, icon: part.icon, sign: part.sign }, 'part')) return null;
   const tags = rng.shuffle(mission.goal.pool).slice(0, mission.goal.count - (part ? 1 : 0));
@@ -184,7 +188,7 @@ function makeGoal(ctx, lastGate) {
     const node = addNode(ctx, { kind: 'exit', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
     return !mission.goal.need || addThemeNeed(ctx, node, mission.goal.need, 'exit') ? node : null;
   }
-  if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}`, icon: ctx.content.generic('door') }, room: map.end, zone: endZone, needs: [] });
+  if (mission.type === 'SAMLE') return makeMachine(ctx, map.end, endZone);
   if (mission.type === 'LEVER') {
     const node = addNode(ctx, { kind: 'deliver', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [], deliverTo: map.start });
     node.item = { specificId: 'DELIVERY', name: mission.goal.item, icon: mission.goal.itemIcon || ctx.content.generic('lost-thing'), tags: [], consumable: true };

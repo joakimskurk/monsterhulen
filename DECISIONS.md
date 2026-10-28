@@ -4,6 +4,27 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - Every story starts with someone who asks, and ends with their thanks
+
+Two playtests from the owner pointed the same way.
+
+- «Den tomme heksegryta»: the goal was the room *behind* the cauldron, which felt like an anticlimax. There should be a witch at the start who has lost her cauldron and needs help to finish the brew, «så har vi hele veien ett mål».
+- «Fløyta som ble borte»: the DM's text said a little ghost waits in the first room, but the child could not see it.
+
+Decisions, applied to all mission types where the story has someone at the start:
+
+- **The quest giver** (`run.giver`) stands in the entrance room on both screens and says what is wrong in their own words. On the child's map, their picture marks the entrance. On the DM page there is a card to read aloud, with the ending.
+  - Få noe i gang: the one who owns the device (ten givers in `themes.json`).
+  - Lever noe hjem: the owner.
+  - Redd noen: the mother.
+  - Heksekatten: the witch.
+  - Finn skatten and Kom deg ut have no one at the start, so no giver.
+  - Tested: anyone the DM's text says «venter ved inngangen» is on the child's screen.
+- **Få noe i gang:** the device stands in the innermost room and *is* the goal. When it works, its magic happens, for example «Gryta bobler og glitrer …», and the run ends. There is no room behind it. The cave has one gate fewer, because the device is the last challenge, so there is the same amount to do as before.
+- **The ending** is the quest giver's thanks (`mission.payoff`), on the end screen after «Du …!».
+- **Found in the deep round on the way:** a thing planned for one socket (a torch for warmth) took another socket it also fitted (light). The thing planned for that socket then had nowhere to go. A thing now goes to the need it was planned for first.
+- **Packing before the run** has «BEGYNN EVENTYRET», so she can go without bringing anything. The layer had no way out.
+
 ## 2026-10-28 - The matrix: every solution must make sense to a five-year-old
 
 Owner's playtest: the crocodile's toothache was solved with a feather, because both were tagged «noe mykt». The simulated workshop is `docs/v2/workshops/2026-10-28_matrisen.md`.

@@ -55,6 +55,7 @@ export function playerView(run, state, extra = {}) {
     }
   }
   for (const a of run.alternatives) if (a.room === room && !done.has(`alt:${a.room}`)) things.push({ id: `alt:${a.room}`, kind: 'item', name: a.item, icon: iconOf(a.item), text: `Her ligger ${a.item.toLowerCase()}.` });
+  if (run.giver && run.giver.room === room) things.unshift({ id: 'giver', kind: 'giver', name: run.giver.name, icon: run.giver.icon || '🧙', text: `«${run.giver.says}»` });
   for (const a of run.ambient) if (a.room === room && !done.has(`amb:${a.room}`)) things.push({ id: `amb:${a.room}`, kind: 'figure', name: a.figure.name, icon: iconOf(a.figure.name), text: a.figure.intro || '' });
   return things;
   };
@@ -69,9 +70,10 @@ export function playerView(run, state, extra = {}) {
   const marksFor = (room) => {
     const seen = thingsIn(room);
     const marks = [];
-    const figure = seen.find((x) => x.kind === 'figure');
+    // The one who gave the quest also shows, by the entrance, when nobody else needs anything there.
+    const figure = seen.find((x) => x.kind === 'figure') || seen.find((x) => x.kind === 'giver');
     if (figure) marks.push({ kind: 'figure', icon: figure.icon, label: figure.name });
-    if (seen.some((x) => x.kind !== 'figure')) marks.push({ kind: 'thing', icon: ui['room-thing'], label: 'Noe å ta' });
+    if (seen.some((x) => x.kind !== 'figure' && x.kind !== 'giver')) marks.push({ kind: 'thing', icon: ui['room-thing'], label: 'Noe å ta' });
     marks.push(looked.has(room) ? { kind: 'looked', icon: ui['room-looked'], label: 'Du har sett deg rundt her' } : { kind: 'look', icon: ui['room-look'], label: 'Ikke sett deg rundt ennå' });
     return marks;
   };

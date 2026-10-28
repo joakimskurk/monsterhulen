@@ -8,6 +8,8 @@
       "goal": { "name": "Krystallhjertet", "lock": { "name": "Glassdøra", "key": "Glassnøkkelen" } },
       "intro": "Bak en dør av glass ligger et hjerte av krystall. Et sted i hulen finnes nøkkelen." },
     { "id": "WITCH_CAT", "name": "Heksekatten som forsvant", "type": "REDD", "legacyBlueprint": "WITCH_CAT",
+      "giver": { "name": "Heksa", "says": "Katten min har gått seg vill dypt inne i hulen! Kan du finne den og få den trygt hjem?" },
+      "payoff": "Heksa klemmer katten sin, og katten maler så høyt at det ekkoer i hele hulen. Takk!",
       "route": ["SOPPSKOGEN", "GRAVPLASSEN", "HEKSETÅRNET", "HEKSETÅRNET"],
       "goal": { "name": "Heksekatten", "calm": ["MAT", "MYK", "MUSIKK"] },
       "intro": "Heksekatten har gått seg vill dypt inne i hulen. Finn den og få den trygt hjem." },

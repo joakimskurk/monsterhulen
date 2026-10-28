@@ -139,12 +139,14 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
     want(`mission:${m.id}`);
     if (m.goal.lock) { want(`mission:${m.id}:lock`); want(`mission:${m.id}:key`); }
     if (m.type === 'LEVER') want(`mission:${m.id}:item`);
+    if (m.giver) want(`mission:${m.id}:giver`);
   }
   const th = c.themes;
   for (const [kind, list] of Object.entries({ treasure: th.FINN.treasures, lock: th.FINN.locks, key: th.FINN.keys, magic: th.FINN.magic, creature: th.REDD.creatures, device: th.SAMLE.devices, owner: th.LEVER.owners, thing: th.LEVER.things, place: th.LEVER.places, exit: th.KOM_UT.exits })) {
     list.forEach((x) => want(`theme:${kind}:${x.id}`));
   }
   th.SAMLE.devices.filter((d) => d.part).forEach((d) => want(`theme:device-part:${d.id}`));
+  th.SAMLE.devices.forEach((d) => { if (!d.giver?.says || !d.giver?.payoff) err(`theme device ${d.id}`, 'needs a giver who says what is wrong, and a payoff'); want(`theme:giver:${d.id}`); });
   th.KOM_UT.exits.filter((e) => e.need?.part).forEach((e) => want(`theme:exit-part:${e.id}`));
   ['rhyme-line', 'lost-thing', 'part', 'key', 'door', 'unknown'].forEach((g) => want(`generic:${g}`));
   // The iPad's own symbols (workshop 2026-10-28, iPad map and room symbols).

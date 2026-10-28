@@ -23,6 +23,7 @@ function attachPlaceholders(content) {
   }
   for (const r of content.recipes) r.output.icon = ph(`recipe:${r.id}`);
   for (const m of content.missions) {
+    if (m.giver) m.giver.icon = ph(`mission:${m.id}:giver`);
     m.goal.icon = ph(`mission:${m.id}`);
     m.goal.itemIcon = ph(`mission:${m.id}:item`);
     if (m.goal.lock) { m.goal.lock.icon = ph(`mission:${m.id}:lock`); m.goal.lock.keyIcon = ph(`mission:${m.id}:key`); }
@@ -33,6 +34,7 @@ function attachPlaceholders(content) {
     for (const part of list) part.icon = ph(`theme:${kind}:${part.id}`);
   }
   for (const d of t.SAMLE.devices) if (d.part) d.part.icon = ph(`theme:device-part:${d.id}`);
+  for (const d of t.SAMLE.devices) if (d.giver) d.giver.icon = ph(`theme:giver:${d.id}`);
   for (const e of t.KOM_UT.exits) if (e.need?.part) e.need.icon = ph(`theme:exit-part:${e.id}`);
 }
 

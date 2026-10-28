@@ -22,6 +22,7 @@ let view = null;
 let waiting = false; // one request at a time; cleared when the DM sends a new view
 let seenNews = -1;    // the newest news line already shown, so a new one can stand out
 let knownItems = null; // backpack names from the previous view, to mark what is new
+let packSkipped = null; // the run she chose to start without packing (more)
 
 function status(text) { $('#status').textContent = text; }
 
@@ -101,7 +102,8 @@ function render() {
     el('h3', {}, pic(t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
     el('div', { class: 'actions' },
-      t.kind === 'item' || (t.kind === 'source' && !t.fill)
+      t.kind === 'giver' ? null
+      : t.kind === 'item' || (t.kind === 'source' && !t.fill)
         ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, t.kind === 'source' ? 'HENT' : 'TA')
         : t.kind === 'exit'
           ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, 'KOM FRAM 🎉')
@@ -297,13 +299,15 @@ function renderEnd(v) {
 
 // Packing before the run, and the hero book itself (workshop B4).
 function renderBook(v) {
+  // Packing opens on top before the run; she can always go without (BEGYNN EVENTYRET).
   const pack = $('#pack');
-  $('#packLayer').hidden = !v.pack;
+  $('#packLayer').hidden = !v.pack || packSkipped === v.runCode;
   if (v.pack) {
     pack.replaceChildren(el('h2', {}, 'TA MED FRA HELTEBOKA'), el('p', {}, 'Du kan ta med én venn og én ting.'),
       el('div', { class: 'chips' },
         ...v.pack.friends.filter((n) => !v.companions.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'friend', name: n }))),
-        ...v.pack.ting.filter((n) => !v.inventory.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'ting', name: n })))));
+        ...v.pack.ting.filter((n) => !v.inventory.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'ting', name: n })))),
+      el('button', { class: 'big', onclick: () => { packSkipped = v.runCode; $('#packLayer').hidden = true; } }, 'BEGYNN EVENTYRET'));
   }
   // The hero book behind a button at the top, so it never takes room from the game.
   const book = $('#book');

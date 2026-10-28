@@ -21,6 +21,7 @@ export function resolveMission(content, missionId, seed) {
 }
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+const MY = { den: 'min', det: 'mitt', dem: 'mine' };
 const fill = (template, values) => cap(template.replace(/\{(\w+)\}/g, (_, k) => values[k] ?? `{${k}}`));
 
 // Weight ×3 for parts that belong to a zone on the route: a bone key in the catacombs.
@@ -93,7 +94,10 @@ function composeRedd(rng, t, base) {
   return {
     ...base,
     name: `${who} ${problem.text}`,
-    intro: `${who} ${problem.text}, er langt inne i hulen. Finn ${c.pron} og få ${c.pron} trygt hjem.`,
+    intro: `${who} ${problem.text}, er langt inne i hulen. Mammaen venter ved inngangen. Finn ${c.pron} og få ${c.pron} trygt hjem.`,
+    // The one who misses it waits at the entrance and asks for help.
+    giver: { name: `Mammaen til ${c.def}`, icon: c.icon, says: `Hjelp! ${who} min er borte, langt inne i hulen. Kan du finne ${c.pron} og få ${c.pron} trygt hjem?` },
+    payoff: `Mammaen gir ${c.def} en stor klem. Takk for at du hjalp!`,
     // `free`: what gets it loose before it can be calmed (decision A9). Never the same tag as a calm tag.
     goal: { name: who, icon: c.icon, free: problem.free || null, calm: c.calm, calmSigns: Object.fromEntries(c.calm.map((tag) => [tag, t.calmSigns[tag].replace('{who}', who)])) },
     theme: { goal: c.id, opener: problem.text },
@@ -105,9 +109,14 @@ function composeSamle(rng, s, base) {
   return {
     ...base,
     name: rng.pick(d.titles),
-    intro: d.intro,
+    // The one who owns it waits at the entrance and says what is wrong (owner, playtest 2026-10-28:
+    // «Da har vi hele veien ett mål, så starter eventyret»). The device stands deepest in the cave and
+    // is the goal itself; when it works, the payoff is the end (no room behind it).
+    intro: `${d.giver.name} venter ved inngangen: «${d.giver.says}»`,
+    giver: { name: d.giver.name, icon: d.giver.icon, says: d.giver.says },
+    payoff: d.giver.payoff,
     // A missing part replaces one of the three sockets.
-    goal: { name: cap(d.def), icon: d.icon, count: 3, pool: d.pool, socket: d.socket, part: d.part || null },
+    goal: { name: cap(d.def), icon: d.icon, count: 3, pool: d.pool, socket: d.socket, part: d.part || null, payoff: d.giver.payoff },
     theme: { goal: d.id, opener: d.id },
   };
 }
@@ -122,6 +131,9 @@ function composeLever(rng, l, base) {
     ...base,
     name: fill(rng.pick(l.titles), values),
     intro: `${cap(owner.def)} venter ved inngangen. ${cap(owner.gen)} ${thing.base} ligger ${place.where} langt inne i hulen. Hent ${thing.pron} og bring ${thing.pron} hjem.`,
+    // The owner waits at the entrance, on the child's screen too (owner, playtest «Fløyta som ble borte»).
+    giver: { name: cap(owner.def), icon: owner.icon, says: `${cap(thing.def)} ${MY[thing.pron]} er borte! ${cap(thing.pron)} ligger ${place.where}, langt inne i hulen. Kan du hente ${thing.pron} til meg?` },
+    payoff: `${cap(owner.def)} blir så glad for å få ${thing.def} tilbake. Takk for at du hjalp!`,
     goal: { name: cap(place.def), icon: place.icon, itemIcon: thing.icon, item: `${thing.def} til ${owner.def}`, deliver: `${thing.def} til ${owner.def} ved inngangen`, need: place.guard || null },
     theme: { goal: `${owner.id}:${thing.id}`, opener: place.id },
   };

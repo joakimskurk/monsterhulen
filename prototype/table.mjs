@@ -59,7 +59,10 @@ export function needFor(t, node, { given, friend }) {
     if (friend) { const f = t.run.nodes.find((n) => n.kind === 'companion' && n.card.name === friend); return !!(need.tag && f?.ability.includes(need.tag)); }
     return false;
   };
-  return open.find(fits) ?? open[0];
+  // The need it was planned for comes first: a torch planned for warmth must not use up the light
+  // socket, which the light rod was planned for (deep round: the machine could not be finished).
+  const planned = open.find((i) => { const p = node.needs[i].provider && nodeById(t, node.needs[i].provider); return given ? p?.item?.name === given : friend && p?.card?.name === friend; });
+  return planned ?? open.find(fits) ?? open[0];
 }
 
 // `handedOver`: the child already gave the thing from the iPad (acceptThing removed it).
@@ -136,6 +139,7 @@ export function resolve(t, node, { improvised = false } = {}) {
   if (['blocker', 'lock', 'machine'].includes(node.kind)) { state.openGates.push(node.gate); log(t, `${node.card.name} er løst – veien videre er åpen.${note}`); }
   else if (node.kind === 'companion') { state.companions.push(node.card.name); log(t, `${node.card.name} ble med!${note}`); }
   else if (node.kind === 'target') { state.companions.push(node.card.name); state.say = `${node.card.name} følger med deg. Ta den trygt med hjem!`; log(t, `${node.card.name} er rolig og følger med hjem.${note}`); }
+  else if (node.payoff) { state.say = `${node.payoff} 🎉`; log(t, `${node.card.name} virker! 🎉${note}`); }
   else if (node.treasure) { state.say = `Du fant ${node.treasure.name.toLowerCase()}! 🎉`; log(t, `Du fant ${node.treasure.name.toLowerCase()}! 🎉${note}`); }
   else if (['goal', 'exit'].includes(node.kind)) { state.say = `Du klarte det! ${node.card.name}! 🎉`; log(t, `Du kom fram til ${node.card.name.toLowerCase()}! 🎉${note}`); }
   else if (node.kind === 'deliver') { state.inventory.push(node.item.name); log(t, `Du fant ${node.item.name.toLowerCase()}.${note}`); }
@@ -172,19 +176,19 @@ export function isFinished(t) {
 export function summary(t) {
   const { run, state } = t;
   const goal = run.nodes.find((n) => GOAL_KINDS.includes(n.kind));
-  const machine = run.nodes.find((n) => n.kind === 'machine');
   const headline = {
     FINN: `Du fant ${lower(goal.card.name)}!`,
     REDD: `Du reddet ${lower(goal.card.name)}!`,
     LEVER: `Du brakte ${goal.item?.name} hjem!`,
-    SAMLE: `Du fikk ${lower(machine?.card.name || run.mission.goal.name)} i gang!`,
+    SAMLE: `Du fikk ${lower(goal.card.name)} i gang!`,
     KOM_UT: `Du fant veien ut: ${lower(goal.card.name)}!`,
   }[run.mission.type];
   const done = run.nodes.filter((n) => isDone(t, n.id));
+  // The one who gave the quest says thank you at the end (it is the end of the story they started).
   const brought = state.brought || {};
   return {
     title: run.mission.name,
-    headline,
+    headline: run.mission.payoff ? `${headline} ${run.mission.payoff}` : headline,
     helped: done.filter((n) => ['blocker', 'quest', 'trader'].includes(n.kind) && n.cardKind !== 'obstacle').map((n) => n.card.name),
     passed: done.filter((n) => n.cardKind === 'obstacle' || n.kind === 'lock' || n.kind === 'machine').map((n) => n.card.name),
     friends: done.filter((n) => n.kind === 'companion' && n.card.name !== brought.friend?.name).map((n) => ({ name: n.card.name, ability: n.ability })),
