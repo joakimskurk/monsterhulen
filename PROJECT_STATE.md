@@ -25,6 +25,7 @@ M3 work started early as a **standalone prototype** that does not touch the runt
 
 ## Runtime candidate (unchanged since 2026-10-27 morning)
 - Reconstructed patch-15 candidate SHA-256: `f8e9998fc9085741e1032b4347d4a75a3e792c57ebd64552fe93c2ee87ae1466`.
+- **Owner's original V0.12.3 "CONNECTIONS V2" is in the repo as reference** (`docs/reference/original-v0.12.3/`, SHA-256 `3ca61d5c…`, 2026-10-28). It is not the patch-15 candidate (`f8e9998f…`); whether it becomes runtime is the owner's call.
 - **The candidate is not in the repository.** It was reconstructed outside GitHub. All baseline bundles on `repo-*-v0.12.3` branches are incomplete. For example, `repo-baseline-v0.12.3` lists 18 source parts but contains 15, and none of the thumbnail parts.
 - Consequence: tests in `tests/` cannot currently be run from repository bytes.
 

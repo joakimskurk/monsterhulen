@@ -5,7 +5,7 @@ Only durable decisions that would be costly or confusing to lose belong here.
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
 ## 2026-10-28 - The cave map follows the owner's original: rooms of different sizes and doors
-**Owner input from the first table session:** the abstract map (circles and lines) made playtesting hard; rooms of different sizes and doors are the core map mechanic of the original, which the owner shared (`Monsterhulen_CONNECTIONS_V2_IMPLEMENTED.html`, V0.12.3).
+**Owner input from the first table session:** the abstract map (circles and lines) made playtesting hard; rooms of different sizes and doors are the core map mechanic of the original, which the owner shared (`Monsterhulen_CONNECTIONS_V2_IMPLEMENTED.html`, V0.12.3, now in `docs/reference/original-v0.12.3/`).
 - `tools/runsim/map.mjs` lays out the cave as the original's generator does: rectangular rooms (1×1 to 3×2) grown as a tree on a grid, a door on the shared wall, one door per room side. V2 adds the spine from the start to the farthest room, locked doors (gates) on it that split the cave into zones (a larger first zone, as before), and extra doors only inside one zone. Every run is still proven by the playthrough automaton.
 - Room names and mood per zone come from the original (`content/places.json`); the start is STARTPORTEN.
 - Both screens draw rooms and doors (`prototype/map-view.mjs`); the iPad shows only rooms the child knows, with fog over unexplored neighbours.
