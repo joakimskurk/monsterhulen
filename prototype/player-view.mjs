@@ -17,6 +17,20 @@ export function layoutMap(map) {
 }
 
 // `extra`: the end of the run, the hero book and packing, prepared by the DM page (child-facing only).
+// The latest thing that happened, said to the child: «Du fant Sølvskje!» rather than the DM's log line.
+// Walking into a room is not news; the room itself shows that.
+function latestNews(log) {
+  for (let i = log.length - 1; i >= 0; i--) {
+    const line = log[i].replace(' (Forteller bestemte)', '');
+    if (/^(Gikk inn i rom|Eventyret begynner)/.test(line)) continue;
+    const took = line.match(/^Tok (.+)\.$/);
+    const got = line.match(/^Fikk (.+) \((.+)\)\.$/);
+    const text = took ? `Du fant ${took[1].toLowerCase()}!` : got ? `Du fikk ${got[1].toLowerCase()} av ${got[2].toLowerCase()}!` : line;
+    return { id: i, text };
+  }
+  return null;
+}
+
 export function playerView(run, state, extra = {}) {
   const { map } = run;
   const openGates = new Set(state.openGates);
@@ -78,5 +92,6 @@ export function playerView(run, state, extra = {}) {
     book: extra.book || null,
     pack: extra.pack || null,
     log: state.log.slice(-3).map((l) => l.replace(' (Forteller bestemte)', '')),
+    news: latestNews(state.log),
   };
 }

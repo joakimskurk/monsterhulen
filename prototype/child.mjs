@@ -15,6 +15,8 @@ const el = (tag, attrs = {}, ...kids) => {
 let code = new URLSearchParams(location.hash.slice(1)).get('k');
 let view = null;
 let waiting = false; // one request at a time; cleared when the DM sends a new view
+let seenNews = -1;    // the newest news line already shown, so a new one can stand out
+let knownItems = null; // backpack names from the previous view, to mark what is new
 
 function status(text) { $('#status').textContent = text; }
 
@@ -77,6 +79,14 @@ function render() {
   say.hidden = !v.say;
   say.replaceChildren(...[v.say || '', v.say ? speaker(v.say) : null].filter(Boolean));
   $('#roomTitle').textContent = v.room.title.toUpperCase();
+  // What just happened, so a taken or given thing never passes silently.
+  const news = $('#news');
+  news.hidden = !v.news;
+  if (v.news) {
+    news.textContent = v.news.text;
+    news.classList.toggle('fresh', v.news.id > seenNews);
+    seenNews = Math.max(seenNews, v.news.id);
+  }
   $('#place').textContent = v.room.place;
   $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing' },
     // Text first (owner, 2026-10-28); the picture is a small placeholder until assets are generated.
@@ -90,7 +100,13 @@ function render() {
             v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: name, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
           ],
     ))) : [el('p', {}, 'Det ser tomt ut her …')]));
-  $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Tom')]));
+  const fresh = new Set(knownItems ? v.inventory.filter((n) => !knownItems.includes(n)) : []);
+  knownItems = v.inventory.slice();
+  $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => {
+    const c = chip(v, n, voice ? () => speak(n) : null);
+    if (fresh.has(n)) c.classList.add('new');
+    return c;
+  }) : [el('span', { class: 'empty' }, 'Tom')]));
   $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
   renderMap(v);
   renderEnd(v);
