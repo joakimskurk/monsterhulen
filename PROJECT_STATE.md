@@ -13,7 +13,8 @@ M3 work started early as a **standalone prototype** that does not touch the runt
 - `content/`: V2 card data, draft 1 (66 figures, 9 obstacles, 49 items, 11 sources, 3 recipes, 5 missions). `npm run validate:content` is green.
 - `tools/runsim/`: chain-first generator + playthrough automaton + DM template (`tools/runsim/README.md`).
 - Evidence (run from repository bytes): 15 000 runs accepted (5 missions × 3 lengths × 1000 seeds); selftest 4 258 sabotages, 0 missed. `npm run check` reproduces a smaller version.
-- `prototype/`: table prototype page for playing a generated run with physical dice (`npm run prototype`, see `prototype/README.md`). Browser-tested on desktop and phone width; a full GLASS_HEART run was played through.
+- `prototype/`: table prototype for playing a generated run with physical dice, now with **two screens** (DM page + child's iPad page over the home network, `npm run prototype:lan`, see `prototype/README.md`). Browser-tested: a full GLASS_HEART run on one screen, and a full WITCH_CAT run on two screens (move, search, take, trade, solve obstacle, calm target, double taps). Not yet tested on a real iPad.
+- `tests/v2/player-view-leak.test.mjs`: 7 000 child views checked; no signs, solutions, hidden items or DM wording leak.
 - Not proven: fun, child comprehension, card text quality, real map geometry, integration with the app.
 
 ## Runtime candidate (unchanged since 2026-10-27 morning)

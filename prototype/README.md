@@ -6,13 +6,33 @@ En enkel Forteller-side som lar deg spille et løp fra V2-generatoren ved bordet
 
 ## Start
 
+**Én skjerm** (bare Forteller):
+
 ```bash
 npm run prototype
 ```
 
-Åpne deretter <http://127.0.0.1:8765/prototype/> i nettleseren.
+Åpne <http://127.0.0.1:8765/prototype/>.
 
-For å bruke den på iPad på samme nett: start med `python3 -m http.server 8765` (uten `--bind`) og åpne `http://<maskinens-ip>:8765/prototype/`.
+**To skjermer** (Forteller + barnets iPad på samme Wi-Fi):
+
+```bash
+npm run prototype:lan
+```
+
+1. Åpne Forteller-siden på maskinen: <http://127.0.0.1:8765/prototype/>.
+2. Øverst står **Barnets skjerm** med en kode (f.eks. `VJFF`) og en lenke. Åpne lenken i Safari på iPaden. Legg den gjerne til på Hjem-skjermen for fullskjerm.
+3. Barnet trykker. Du får forespørselen i boksen **Fra iPaden** og godtar eller sier «Ikke ennå».
+
+`prototype:lan` gjør prototypen synlig for andre enheter på hjemmenettet. Bruk den bare på et nett du stoler på.
+
+### Hva barnet kan gjøre på iPaden
+- trykke på et rom på kartet for å gå dit (hun ser bare rom hun har vært i og naborommene),
+- **SE DEG RUNDT** (du ser om noe er gjemt og kaster terning ved behov),
+- **TA** en ting som ligger synlig,
+- **GI NOE** til en figur, eller **BE EN VENN HJELPE**.
+
+Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekkes automatisk av `npm run test:leak`. Trykk **Vis på iPad** ved et tegn for å vise det som en boble på skjermen hennes. Mens en forespørsel venter, er knappene hennes låst, så dobbeltrykk ikke gir dobbel effekt.
 
 ## Slik spiller du
 1. Velg oppdrag og lengde. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
@@ -34,5 +54,5 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 
 ## Begrensninger
 - Kartet er abstrakt (rom og streker), ikke appens grafikk.
-- Én skjerm. Ingen barnevisning ennå (det er M4).
+- To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.

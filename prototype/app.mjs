@@ -4,6 +4,7 @@ import { buildContent, CONTENT_FILES } from '../tools/lib/content-core.mjs';
 import { acceptedRun } from '../tools/runsim/accept.mjs';
 import { reachable } from '../tools/runsim/map.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
+import { playerView, layoutMap } from './player-view.mjs';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -20,6 +21,18 @@ const el = (tag, attrs = {}, ...kids) => {
 let content;
 let current;   // { code, run, result }
 let state;     // per-run play state, persisted
+let requests = [];   // from the child's iPad, not persisted
+let relay = false;   // true when served by tools/server.mjs (two screens possible)
+
+// Short code the iPad uses to join. Stable per DM browser so a reload keeps the pairing.
+const SESSION = (() => {
+  const key = 'monsterhulen-bord:session';
+  try { const s = localStorage.getItem(key); if (s) return s; } catch { /* ignore */ }
+  const letters = 'ABCDEFGHJKLMNPRSTUVWXYZ';
+  const code = Array.from({ length: 4 }, () => letters[Math.floor(Math.random() * letters.length)]).join('');
+  try { localStorage.setItem(key, code); } catch { /* ignore */ }
+  return code;
+})();
 
 async function loadContent() {
   const raw = {};
@@ -55,7 +68,103 @@ async function start() {
   $('#setup').addEventListener('submit', (e) => { e.preventDefault(); generate(); });
   $('#newRun').addEventListener('click', () => { $('#seed').value = String(1 + Math.floor(Math.random() * 9999)); generate(); });
   $('#reset').addEventListener('click', () => { if (confirm('Starte dette løpet på nytt?')) { state = freshState(current.run); save(); render(); } });
+  await connectRelay();
   generate();
+}
+
+// ---------- two screens ----------
+
+async function connectRelay() {
+  try {
+    const info = await (await fetch('/api/info')).json();
+    relay = true;
+    const urls = info.urls.map((u) => `${u}/prototype/child.html#k=${SESSION}`);
+    $('#pair').hidden = false;
+    $('#pair').replaceChildren(
+      el('h2', {}, 'Barnets skjerm'),
+      el('p', {}, 'Kode: ', el('b', { class: 'code' }, SESSION)),
+      info.lan
+        ? el('p', { class: 'hint' }, 'Åpne på iPaden (samme Wi-Fi): ', ...urls.map((u) => el('a', { href: u, target: '_blank' }, u)))
+        : el('p', { class: 'hint' }, 'Kjør «npm run prototype:lan» for å koble til en iPad. Test på denne maskinen: ', el('a', { href: urls[0], target: '_blank' }, 'åpne barnets skjerm')),
+      el('button', { class: 'ghost small', onclick: () => { state.say = null; save(); render(); } }, 'Fjern tekst på iPaden'),
+    );
+    const source = new EventSource(`/api/${SESSION}/dm-stream`);
+    source.addEventListener('request', (e) => { const r = JSON.parse(e.data); if (!requests.some((x) => x.actionId === r.actionId)) { requests.push(r); renderRequests(); } });
+    source.addEventListener('ack', (e) => { const { actionId } = JSON.parse(e.data); requests = requests.filter((x) => x.actionId !== actionId); renderRequests(); });
+  } catch {
+    relay = false; // served by a plain static server: one screen only
+  }
+}
+
+function publish() {
+  if (!relay || !current) return;
+  const view = playerView(current.run, { ...state, runCode: current.code });
+  fetch(`/api/${SESSION}/player`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(view) }).catch(() => {});
+}
+
+function ack(r) {
+  requests = requests.filter((x) => x.actionId !== r.actionId);
+  renderRequests();
+  if (relay) fetch(`/api/${SESSION}/ack`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ actionId: r.actionId }) }).catch(() => {});
+}
+
+function consumableByName(name) {
+  const card = content.items.find((i) => i.name === name);
+  return card ? card.consumable !== false : true;
+}
+
+function thingName(id) {
+  if (id.startsWith('alt:')) return current.run.alternatives.find((a) => `alt:${a.room}` === id)?.item;
+  if (id.startsWith('amb:')) return current.run.ambient.find((a) => `amb:${a.room}` === id)?.figure.name;
+  const n = nodeById(id);
+  return n?.kind === 'item' ? n.item.name : n?.card.name;
+}
+
+function acceptThing(id, { given } = {}) {
+  if (isDone(id)) { render(); return; }
+  if (given) {
+    const i = state.inventory.indexOf(given);
+    if (i >= 0 && consumableByName(given)) state.inventory.splice(i, 1);
+  }
+  if (id.startsWith('alt:')) {
+    const a = current.run.alternatives.find((x) => `alt:${x.room}` === id);
+    state.inventory.push(a.item); state.done.push(id); log(`Tok ${a.item}.`); save(); render(); return;
+  }
+  if (id.startsWith('amb:')) { state.done.push(id); log(`${thingName(id)} er fornøyd.`); save(); render(); return; }
+  resolve(nodeById(id));
+}
+
+function renderRequests() {
+  // Requests about something already handled (double taps) are settled silently.
+  for (const r of requests.filter((x) => x.thing && isDone(x.thing))) ack(r);
+  const box = $('#requests');
+  box.hidden = requests.length === 0;
+  box.replaceChildren(el('h2', {}, 'Fra iPaden'), ...requests.map((r) => {
+    const no = el('button', { class: 'ghost', onclick: () => { log(r.type === 'MOVE' ? 'Ikke dit ennå.' : `${r.name || 'Det'}: ikke helt ennå.`); save(); render(); ack(r); } }, 'Ikke ennå');
+    if (r.type === 'MOVE') {
+      const ok = reach().has(r.room);
+      return el('div', { class: 'card' }, el('p', {}, `Hun vil gå til rom ${r.room}.`),
+        el('div', { class: 'actions' }, ok ? el('button', { onclick: () => { goTo(r.room); ack(r); } }, 'Gå dit') : el('p', { class: 'hint' }, 'Bak et hinder.'), no));
+    }
+    if (r.type === 'TAKE') {
+      return el('div', { class: 'card' }, el('p', {}, `Hun vil ta ${r.name}.`),
+        el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing); ack(r); } }, 'Ja'), no));
+    }
+    if (r.type === 'SEARCH') {
+      const hidden = current.run.nodes.filter((n) => n.room === r.room && n.kind === 'item' && n.hidden && !isDone(n.id));
+      return el('div', { class: 'card' }, el('p', {}, `Hun ser seg rundt i rom ${r.room}.`),
+        el('p', { class: 'hint' }, hidden.length ? 'Noe er gjemt her. Kast terning hvis det er usikkert: 1–2 gir et tydeligere spor, prøver hun igjen finner hun det.' : 'Ingenting gjemt her. Beskriv noe fint eller rart hun legger merke til.'),
+        el('div', { class: 'actions' }, ...hidden.map((n) => el('button', { onclick: () => { resolve(n); ack(r); } }, `Fant: ${n.item.name}`)),
+          el('button', { class: 'ghost', onclick: () => { log('Hun så seg rundt.'); save(); render(); ack(r); } }, hidden.length ? 'Ikke ennå' : 'OK')));
+    }
+    if (r.type === 'GIVE' || r.type === 'FRIEND') {
+      const text = r.type === 'GIVE' ? `Hun vil gi ${r.item} til ${r.name}.` : `Hun vil at ${r.friend} skal hjelpe med ${r.name}.`;
+      return el('div', { class: 'card' }, el('p', {}, text),
+        el('p', { class: 'hint' }, 'Passer det med det figuren vil ha eller er svak mot? Kast terning bare hvis det er usikkert.'),
+        el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing, { given: r.type === 'GIVE' ? r.item : null }); ack(r); } }, 'Det virker!'), no));
+    }
+    return el('div', { class: 'card' }, el('p', {}, JSON.stringify(r)), el('div', { class: 'actions' }, no));
+  }));
 }
 
 function generate() {
@@ -107,12 +216,13 @@ function spendFor(node) {
 }
 
 function resolve(node, { improvised = false } = {}) {
+  if (!node || isDone(node.id)) return; // a second tap on the iPad must not give twice
   const note = improvised ? ' (Forteller bestemte)' : '';
   spendFor(node);
   if (['blocker', 'lock', 'machine'].includes(node.kind)) { state.openGates.push(node.gate); log(`${node.card.name} er løst – veien videre er åpen.${note}`); }
   else if (node.kind === 'companion') { state.companions.push(node.card.name); log(`${node.card.name} ble med!${note}`); }
-  else if (node.kind === 'target') log(`${node.card.name} er rolig og følger med hjem.${note}`);
-  else if (['goal', 'exit'].includes(node.kind)) log(`Dere nådde ${node.card.name}! 🎉${note}`);
+  else if (node.kind === 'target') { state.companions.push(node.card.name); state.say = `${node.card.name} følger med deg. Ta den trygt med hjem!`; log(`${node.card.name} er rolig og følger med hjem.${note}`); }
+  else if (['goal', 'exit'].includes(node.kind)) { state.say = `Du klarte det! ${node.card.name}! 🎉`; log(`Dere nådde ${node.card.name}! 🎉${note}`); }
   else if (node.kind === 'deliver') { state.inventory.push(node.item.name); log(`Fant ${node.item.name}.${note}`); }
   else if (node.item) { state.inventory.push(node.item.name); log(`${node.kind === 'item' ? 'Tok' : 'Fikk'} ${node.item.name}${node.kind === 'item' ? '' : ` (${node.card.name})`}.${note}`); }
   state.done.push(node.id);
@@ -141,20 +251,14 @@ function render() {
   renderInventory();
   $('#log').replaceChildren(...state.log.slice().reverse().map((t) => el('li', {}, t)));
   $('#template').textContent = dmTemplate(content, run, current.result);
+  renderRequests();
+  publish();
 }
 
 function renderMap() {
   const { map } = current.run;
   const open = reach();
-  const depth = map.distance[map.start];
-  const columns = new Map();
-  for (const r of map.rooms) { const d = depth[r.id]; if (!columns.has(d)) columns.set(d, []); columns.get(d).push(r.id); }
-  const pos = {};
-  const colW = 92, rowH = 74;
-  let maxRows = 1;
-  for (const [d, ids] of columns) { ids.forEach((id, i) => { pos[id] = { x: 46 + d * colW, y: 40 + i * rowH }; }); maxRows = Math.max(maxRows, ids.length); }
-  const width = 46 * 2 + (Math.max(...columns.keys())) * colW;
-  const height = 40 * 2 + (maxRows - 1) * rowH;
+  const { pos, width, height } = layoutMap(map);
   const ns = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(ns, 'svg');
   svg.setAttribute('width', width); svg.setAttribute('height', height); svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -187,7 +291,7 @@ function needBlock(need) {
   const via = { weakness: ' (svakhet)', trade: ' (som betaling)', fill: ' (å fylle i)', tool: ' (verktøy)' }[need.via] || '';
   return el('div', { class: 'need' },
     el('div', {}, el('b', {}, need.local ? 'Vil: ' : 'Trenger: '), what + via),
-    need.sign ? el('div', {}, el('b', {}, 'Tegn: '), `«${need.sign}»`) : null,
+    need.sign ? el('div', {}, el('b', {}, 'Tegn: '), `«${need.sign}»`, relay ? el('button', { class: 'small ghost', onclick: () => { state.say = need.sign; save(); render(); } }, 'Vis på iPad') : null) : null,
     need.provider ? el('div', { class: 'sure' }, `Garantert: ${providerText(need.provider)}`) : null,
   );
 }

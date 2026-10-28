@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <title>Monsterhulen</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="child.css">
+</head>
+<body class="child">
+  <section id="join" class="panel" hidden>
+    <h1>MONSTERHULEN</h1>
+    <p>Skriv koden Forteller ser på sin skjerm.</p>
+    <form id="joinForm">
+      <input id="code" autocomplete="off" autocapitalize="characters" maxlength="6" placeholder="KODE">
+      <button type="submit">BLI MED</button>
+    </form>
+  </section>
+
+  <main id="game" hidden>
+    <div id="say" class="say" hidden></div>
+    <section class="panel">
+      <h1 id="roomTitle"></h1>
+      <p id="place" class="place"></p>
+      <div id="things"></div>
+      <div class="actions"><button id="search" class="big">SE DEG RUNDT</button></div>
+    </section>
+    <section class="panel">
+      <h2>KARTET</h2>
+      <div id="map"></div>
+    </section>
+    <section class="panel">
+      <h2>SEKKEN</h2>
+      <div id="inventory" class="chips"></div>
+      <h2>VENNER</h2>
+      <div id="companions" class="chips"></div>
+    </section>
+    <p id="status" class="status"></p>
+  </main>
+
+  <dialog id="pick">
+    <h2 id="pickTitle"></h2>
+    <div id="pickList" class="chips"></div>
+    <button id="pickCancel" class="ghost">AVBRYT</button>
+  </dialog>
+
+  <script type="module" src="child.mjs"></script>
+</body>
+</html>

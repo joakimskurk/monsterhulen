@@ -53,6 +53,7 @@ Hver milepæl har en **spillbar exit**: noe som kan spilles og vurderes ved bord
 - **Exit:** 5 løp spilt ved bordet uten rekkefølgefeil og uten at Forteller måtte reparere logikk.
 
 ### M4 - To enheter
+> Protokollen er prøvd i bordprototypen (2026-10-28): lokal relé, filtrert visning, forespørsler, dobbeltrykkvern. Gjenstår: internett-relé (Firebase) og integrasjon i appen.
 - Spillervisning (iPad fullskjerm) + Forteller som vert + relé (Firebase Realtime Database).
 - Filtrert spiller-payload, `actionId`, gjenoppkobling, enhet alene uten nett.
 - **Exit:** en hel økt spilt med Forteller-enhet + iPad.
