@@ -41,6 +41,7 @@ for (const f of c.figures) {
     if (w.type === 'MISTET' && !w.what) err(at, 'MISTET without what');
     if (['GJORE', 'VITE', 'KAMP'].includes(w.type) && !w.task) err(at, `${w.type} without task`);
     (w.needs || []).forEach((t) => tagOk(at, t));
+    if (!w.sign) err(at, `want ${w.type} without sign (hint step 1)`);
   }
   for (const w of f.weakness || []) {
     tagOk(at, w.tag);
@@ -76,7 +77,7 @@ for (const i of c.items) {
 for (const s of c.sources) {
   const at = `source ${s.id}`;
   tagOk(at, s.gives);
-  if (s.requires !== null && s.requires !== undefined) tagOk(at, s.requires);
+  if (s.requires !== null && s.requires !== undefined) { tagOk(at, s.requires); if (!s.sign) err(at, 'requires a tool but has no sign'); }
   for (const z of s.zones || []) if (!zones.has(z)) err(at, `unknown zone ${z}`);
 }
 
@@ -84,6 +85,7 @@ for (const r of c.recipes) {
   const at = `recipe ${r.id}`;
   for (const id of r.inputs || []) if (!c.itemById.has(id)) err(at, `unknown input item ${id}`);
   (r.output?.tags || []).forEach((t) => tagOk(at, t));
+  if (!r.hint) err(at, 'missing hint');
 }
 
 for (const m of c.missions) {

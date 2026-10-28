@@ -38,6 +38,7 @@
     { "id": "SPADE",           "name": "Spade",           "origin": "new", "tags": ["GRAVE"], "consumable": false },
     { "id": "STIGE",           "name": "Kort stige",      "origin": "new", "tags": ["HOYDE"], "consumable": false },
     { "id": "TAU",             "name": "Tau",             "origin": "new", "tags": ["HOYDE"], "consumable": false },
+    { "id": "KROKSTOKK",             "name": "Krokstokk",             "origin": "new", "tags": ["GRIPE"], "consumable": false },
     { "id": "GAMMELT_BREV",    "name": "Gammelt brev",    "origin": "new", "tags": ["HISTORIE"], "consumable": true },
     { "id": "JORDKLUMP",       "name": "Klump med god jord", "origin": "new", "tags": ["JORD"], "consumable": true },
 

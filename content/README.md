@@ -39,7 +39,7 @@ Merker med `"carry": false` (STILLHET, ROS, MOT, MORKE, SOVN) er handlinger barn
   "disposition": "hostile",
   "roles": ["blocker"],
   "combat": "strong",
-  "wants":    [ { "type": "SORT", "tags": ["VARME"] } ],
+  "wants":    [ { "type": "SORT", "tags": ["VARME"], "sign": "Monsteret gløder svakere og svakere og kryper mot alt som er varmt." } ],
   "weakness": [ { "tag": "VANN", "result": "blir til en stein du kan gå over", "sign": "Det freser når det drypper fra taket." } ],
   "gives":    { "opens": true, "rewards": [], "sells": [], "ability": [] },
   "intro": "En glødende klump står i gangen og bobler."
@@ -52,7 +52,7 @@ Merker med `"carry": false` (STILLHET, ROS, MOT, MORKE, SOVN) er handlinger barn
 | `disposition` | `friendly` / `neutral` / `hostile` (i veien, ikke ond) |
 | `roles` | `blocker`, `trader`, `quest`, `companion` |
 | `combat` | `none`, `ok`, `strong` (kan bare vinnes med svakhet), `wants` (vil sloss eller konkurrere) |
-| `wants[]` | `SORT` (`tags`), `BYTTE` (`accepts`), `MISTET` (`what`), `GJORE` (`task`, valgfri `needs`), `VITE` (`task`), `KAMP` (`task`) |
+| `wants[]` | `SORT` (`tags`), `BYTTE` (`accepts`), `MISTET` (`what`), `GJORE` (`task`, valgfri `needs`), `VITE` (`task`), `KAMP` (`task`). Alle har `sign` (påkrevd): det barnet ser som viser hva figuren vil. Det er første trinn i hjelpestigen. |
 | `weakness[]` | `tag`, `result`, `sign` (tegnet barnet kan legge merke til, påkrevd) |
 | `gives.opens` | figuren slipper deg forbi når den er fornøyd |
 | `gives.rewards` | merker figuren kan gi som belønning |
@@ -80,16 +80,19 @@ Merker med `"carry": false` (STILLHET, ROS, MOT, MORKE, SOVN) er handlinger barn
 ## Kilde
 
 ```json
-{ "id": "BRONN", "name": "Brønn", "gives": "VANN", "requires": "BEHOLDER", "zones": ["TÅKESUMPEN"] }
+{ "id": "BRONN", "name": "Brønn", "gives": "VANN", "requires": "BEHOLDER", "sign": "Vannet er langt nede. Det renner rett gjennom fingrene.", "zones": ["TÅKESUMPEN"] }
 ```
 
-`requires: "BEHOLDER"` gir en fylt beholder («Bøtte med vann», merke `VANN`, brukes opp). `requires: null` gir merket direkte. Et annet merke (f.eks. `GRAVE`) må barnet ha for å bruke kilden.
+`requires: "BEHOLDER"` gir en fylt beholder («Bøtte med vann», merke `VANN`, brukes opp). `requires: null` gir merket direkte. Et annet merke (f.eks. `GRAVE`) må barnet ha for å bruke kilden. En kilde med `requires` må ha `sign`: det som viser at hendene ikke er nok.
 
 ## Oppskrift
 
 ```json
-{ "id": "DUFTSPRAY", "inputs": ["TOM_FLASKE", "DUFTBLOMST"], "output": { "name": "Duftspray", "tags": ["DUFT"], "consumable": true } }
+{ "id": "DUFTSPRAY", "inputs": ["TOM_FLASKE", "DUFTBLOMST"], "output": { "name": "Duftspray", "tags": ["DUFT"], "consumable": true },
+  "hint": "En tom flaske og en blomst … kanskje de kan bli noe sammen?" }
 ```
+
+`hint` er påkrevd og brukes som tegn for ingrediensene. Maks én oppskrift per løp.
 
 ## Oppdrag
 

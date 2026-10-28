@@ -16,7 +16,7 @@ const ROUTES = [
 ];
 const ROUTE_FOR = { WITCH_CAT: 0, ZOMBIE_DELIVERY: 1, GLASS_HEART: 2, CRYSTAL_MACHINE: 3 };
 
-const BASE_WEIGHT = { LIGGER: 2, GJEMT: 1.5, HANDEL: 2.2, BELONNING: 2.2, VENN: 2.2, MILJO: 2.2, OPPSKRIFT: 1 };
+const BASE_WEIGHT = { LIGGER: 1.6, GJEMT: 1.2, HANDEL: 2.2, BELONNING: 2.2, VENN: 2.2, MILJO: 2.2, OPPSKRIFT: 1.6 };
 
 export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   const rng = makeRng(`${missionId}|${length}|${seed}`);
@@ -247,7 +247,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
     const payTags = trader.wants.find((w) => w.type === 'BYTTE').accepts.filter((t) => isCarryTag(content, t) && t !== tag);
     for (const payTag of rng.shuffle(payTags)) {
       const pay = provideTag(ctx, payTag, node, depth + 1);
-      if (pay) { node.needs.push({ tag: payTag, via: 'trade', provider: pay.id }); return node; }
+      if (pay) { node.needs.push({ tag: payTag, via: 'trade', provider: pay.id, sign: trader.wants.find((w) => w.type === 'BYTTE').sign }); return node; }
     }
     return null;
   }
@@ -286,7 +286,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
       ctx.budget -= 1;
       const tool = provideTag(ctx, source.requires, node, depth + 1, { containerOnly: source.requires === 'BEHOLDER' });
       if (!tool) return null;
-      node.needs.push({ tag: source.requires, via: source.requires === 'BEHOLDER' ? 'fill' : 'tool', provider: tool.id });
+      node.needs.push({ tag: source.requires, via: source.requires === 'BEHOLDER' ? 'fill' : 'tool', provider: tool.id, sign: source.sign });
     }
     return node;
   }
@@ -301,7 +301,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
       const ingredient = provideSpecific(ctx, { ...itemInstance(item), specificId: id }, node, depth + 1, { onlyPlaced: true });
       if (!ingredient) return null;
       ctx.usedItems.add(id);
-      node.needs.push({ specific: id, name: item.name, via: 'ingredient', provider: ingredient.id });
+      node.needs.push({ specific: id, name: item.name, via: 'ingredient', provider: ingredient.id, sign: recipe.hint });
     }
     return node;
   }
@@ -347,18 +347,18 @@ function resolveFigureWant(ctx, node, figure, depth) {
     for (const w of chainable) {
       if (w.type === 'MISTET') {
         const lost = provideSpecific(ctx, { specificId: `LOST:${figure.id}`, name: w.what, tags: [], consumable: true }, node, depth + 1, { onlyPlaced: true });
-        if (lost) { node.needs.push({ specific: `LOST:${figure.id}`, name: w.what, via: 'lost', provider: lost.id }); return true; }
+        if (lost) { node.needs.push({ specific: `LOST:${figure.id}`, name: w.what, via: 'lost', provider: lost.id, sign: w.sign }); return true; }
         continue;
       }
       const tags = (w.type === 'SORT' ? w.tags : w.needs).filter((t) => isCarryTag(content, t));
       for (const t of rng.shuffle(tags)) {
         const p = provideTag(ctx, t, node, depth + 1);
-        if (p) { node.needs.push({ tag: t, via: w.type === 'SORT' ? 'wants' : 'task', provider: p.id, task: w.task }); return true; }
+        if (p) { node.needs.push({ tag: t, via: w.type === 'SORT' ? 'wants' : 'task', provider: p.id, task: w.task, sign: w.sign }); return true; }
       }
     }
   }
   const local = wants.find((w) => !chainable.includes(w));
-  if (local) { node.needs.push({ local: true, via: w2via(local), task: local.task || (local.tags || []).map((t) => content.tagById.get(t).label).join(' / ') }); return true; }
+  if (local) { node.needs.push({ local: true, via: w2via(local), task: local.task || (local.tags || []).map((t) => content.tagById.get(t).label).join(' / '), sign: local.sign }); return true; }
   return false;
 }
 const w2via = (w) => ({ VITE: 'vite', KAMP: 'kamp', GJORE: 'gjore', SORT: 'handling' }[w.type] || 'lokal');

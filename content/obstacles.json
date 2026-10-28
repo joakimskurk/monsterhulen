@@ -27,7 +27,7 @@
       "solvedBy": [ { "tag": "VANN", "sign": "Der det drypper, blir lavaen svart og hard." }, { "tag": "KULDE", "sign": "Kanten stivner ved den kalde veggen." } ],
       "intro": "En bekk av glødende lava renner tvers over gangen." },
     { "id": "MORKE_KLOFTA", "name": "Den mørke kløfta", "origin": "new",
-      "solvedBy": [ { "tag": "LYS", "sign": "Med lys ser man smale steiner å trå på." }, { "tag": "HOYDE", "sign": "Det henger en krok i taket over kløfta." } ],
+      "solvedBy": [ { "tag": "LYS", "sign": "Med lys ser man smale steiner å trå på." }, { "tag": "HOYDE", "sign": "Det henger en krok i taket over kløfta." }, { "tag": "GRIPE", "sign": "På den andre siden dingler et tau, nesten innen rekkevidde." } ],
       "intro": "En kløft så mørk at man ikke ser bunnen eller den andre siden." }
   ]
 }

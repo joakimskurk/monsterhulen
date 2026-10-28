@@ -10,9 +10,9 @@ Updated: 2026-10-28
 
 ## V2 design spike (2026-10-28) – deliberate deviation from milestone order
 M3 work started early as a **standalone prototype** that does not touch the runtime. Reason: generation order is the owner's main concern and could be proven without `index.html`.
-- `content/`: V2 card data, draft 1 (66 figures, 9 obstacles, 49 items, 11 sources, 3 recipes, 5 missions). `npm run validate:content` is green.
+- `content/`: V2 card data, draft 1 (66 figures, 9 obstacles, 50 items, 11 sources, 9 recipes, 5 missions). `npm run validate:content` is green. Every want, tool-requiring source and recipe has a sign, so hint step 1 is never empty (enforced by the validator). Changes to six never-used figures: `docs/v2/CONTENT_MATRIX_V2.md` §7b.
 - `tools/runsim/`: chain-first generator + playthrough automaton + DM template (`tools/runsim/README.md`).
-- Evidence (run from repository bytes): 15 000 runs accepted (5 missions × 3 lengths × 1000 seeds); selftest 4 258 sabotages, 0 missed. `npm run check` reproduces a smaller version.
+- Evidence (run from repository bytes, rerun 2026-10-28 after the content changes): 15 000 runs accepted (5 missions × 3 lengths × 1000 seeds); selftest 4 260 sabotages, 0 missed; all 66 figures appear as guaranteed solutions. `npm run check` reproduces a smaller version.
 - `prototype/`: table prototype for playing a generated run with physical dice, now with **two screens** (DM page + child's iPad page over the home network, `npm run prototype:lan`, see `prototype/README.md`). Browser-tested: a full GLASS_HEART run on one screen, and a full WITCH_CAT run on two screens (move, search, take, trade, solve obstacle, calm target, double taps). Not yet tested on a real iPad.
 - `tests/v2/player-view-leak.test.mjs`: 7 000 child views checked; no signs, solutions, hidden items or DM wording leak.
 - Not proven: fun, child comprehension, card text quality, real map geometry, integration with the app.

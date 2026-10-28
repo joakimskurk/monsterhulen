@@ -159,8 +159,10 @@ Kolonnene «vil ha» og «svakhet» er et første forslag. Der gjennomgangen ikk
 |---|---|
 | BEHOLDER + kilde | beholder med merket (bøtte med VANN, krukke med LYS) |
 | tom flaske + duftblomst | duftspray (DUFT) |
-| tau + krok/gripeklo | klatresett (HØYDE+GRIPE) |
+| tau + krok/gripeklo | klatresett (HØYDE+GRIPE) (ikke laget) |
 | fjær + tråd | fjærvifte (LUFT) |
+
+I `content/recipes.json` (2026-10-28) finnes 9: duftspray, fjærvifte, glødestav, bærpannekake (MAT+DUFT), vindspill (MUSIKK+LUFT), liten hule (LY+MYK), kjølekrukke (KULDE), sangbrev (HISTORIE+MUSIKK) og blomsterpotte (JORD+DUFT). De gir 5–8 % av kildene i løpene, mot 1–4 % med tre.
 
 ---
 
@@ -187,6 +189,20 @@ Kolonnene «vil ha» og «svakhet» er et første forslag. Der gjennomgangen ikk
 - **Figurer som *vil* sloss eller konkurrere (KA!):** Bryte-troll, Kappløps-hare, Stirre-ugle. Konkurranse kan alltid erstatte kamp.
 - **Kjæledyr:** bekreftes som egen type eller som venner (åpent spørsmål).
 - **Ting:** se tabell §6. Rundt 25–30 nye enkle ting gir god dekning.
+
+## 7b. Justeringer etter generatortest (2026-10-28)
+
+Seks figurer ble aldri brukt som garantert løsning. Endringene under er utkast som eier bør se over:
+
+| Figur | Hvorfor ubrukt | Endring |
+|---|---|---|
+| Den lille vampyren | evnen MØRKE er ikke et bærbart merke | evne **HØYDE** (blir flaggermus og flyr opp) |
+| Bobleprømperen | ville ha LUFT og ga LUFT (merket kan ikke trengs i egen kjede) | vil ha **DUFT** |
+| Beinhunden, Svarte katten | evnen GRIPE trengtes av ingen | Den mørke kløfta løses også med **GRIPE**; Tårnvampyren trenger HØYDE **eller GRIPE**; ny ting **Krokstokk** (GRIPE) |
+| Surmulesoppen | blokkerer, men hadde bare et lokalt ønske (ROS) | svak mot **LATTER** |
+| Takgargoilen | blokkerer, men hadde bare VITE | svak mot **LYS** (blir til stein) |
+
+Alle ønsker har nå et `sign`. Før hadde omtrent halvparten av behovene i et løp ikke noe tegn, så første trinn i hjelpestigen var tomt.
 
 ## 8. Mysterier (6) og puzzles (36)
 

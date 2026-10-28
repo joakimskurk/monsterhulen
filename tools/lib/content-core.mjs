@@ -25,9 +25,9 @@ export const isCarryTag = (content, tag) => content.tagById.get(tag)?.carry === 
 export function figureNeeds(figure) {
   const out = [];
   for (const w of figure.wants || []) {
-    if (w.type === 'SORT') for (const tag of w.tags) out.push({ via: 'wants', tag });
-    if (w.type === 'BYTTE') for (const tag of w.accepts) out.push({ via: 'trade', tag });
-    if (w.type === 'GJORE') for (const tag of w.needs || []) out.push({ via: 'task', tag });
+    if (w.type === 'SORT') for (const tag of w.tags) out.push({ via: 'wants', tag, sign: w.sign });
+    if (w.type === 'BYTTE') for (const tag of w.accepts) out.push({ via: 'trade', tag, sign: w.sign });
+    if (w.type === 'GJORE') for (const tag of w.needs || []) out.push({ via: 'task', tag, sign: w.sign });
   }
   for (const w of figure.weakness || []) out.push({ via: 'weakness', tag: w.tag, sign: w.sign, result: w.result });
   return out;

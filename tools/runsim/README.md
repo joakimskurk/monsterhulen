@@ -54,7 +54,7 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 ## Resultater 2026-10-28
 
 - **15 000 løp** (5 oppdrag × KORT/VANLIG/STORT × 1000 seeds): alle godkjent, gjennomsnittlig 1,0–2,4 forsøk per løp.
-- **Selvtest:** 4 258 sabotasjer, 0 uoppdaget:
+- **Selvtest:** 4 260 sabotasjer, 0 uoppdaget:
   - en garantert kilde flyttet bak hinderet kjeden er for,
   - en garantert kilde fjernet,
   - en hemmelig dør fra sone 0 inn i siste sone.
@@ -73,6 +73,7 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 
 1. **Returturer kommer gratis.** En kilde kan ligge dypere enn figuren den hjelper (men foran hinderet øverst i kjeden). Det gir naturlige «gå inn, hent, gå tilbake»-turer. Generatoren kan gjøre dette med vilje.
 2. **Venner gir reserve.** En venn med en evne løser ofte mer enn den var plassert for. Det gjør løpene robuste og gir barnet frihet. Forteller-malen bør vise det.
-3. **«Ligger åpent / gjemt» er 45–50 % av kildene.** Det er enkelt for små barn, men kan føles som mye henting. Vektene kan justeres når vi ser hvordan det spilles.
-4. **Oppskrifter brukes lite** (1–4 %), fordi det bare finnes tre. Flere oppskrifter gir mer variasjon.
-5. **Seks figurer brukes aldri som garantert løsning:** de som bare vil sloss, eller bare vil vite noe uten belønning. De fungerer som frie møter. Det er greit, men bør være bevisst.
+3. **«Ligger åpent / gjemt» er 45–50 % av kildene.** Det er enkelt for små barn, men kan føles som mye henting. Det er mest strukturelt: hver kjede ender i en ting, og når budsjettet er brukt, er bare enkle kilder igjen. Vektene ble senket litt 2026-10-28 (LIGGER 2 → 1,6, GJEMT 1,5 → 1,2). Videre justering bør vente på spilletest.
+4. **Oppskrifter brukes lite** (1–4 %), fordi det fantes bare tre. Med ni oppskrifter og vekt 1,6 er de 5–8 % (2026-10-28), og det er flere kjedeformer.
+5. **Seks figurer ble aldri brukt som garantert løsning.** Årsakene var innholdsfeil (en evne ingen trengte, en figur som ville ha det den selv ga, blokkere uten bærbar løsning). Rettet 2026-10-28, se `docs/v2/CONTENT_MATRIX_V2.md` §7b. Nå brukes alle 66.
+6. **Halvparten av behovene manglet tegn.** Bare svakheter og hinder hadde tegn; ønsker, handel, kilder og oppskrifter hadde ingen. Nå har alle et tegn, og validatoren krever det.

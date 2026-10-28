@@ -22,7 +22,10 @@ for (const mission of content.missions) {
         const json = JSON.stringify(view);
         views++;
         for (const s of signs) assert.ok(!json.includes(s), `sign leaked in ${mission.id}/${length}/${seed} room ${room.id}: ${s}`);
-        for (const h of hiddenNames) assert.ok(!json.includes(`"${h}"`) && !json.includes(h.toLowerCase()), `hidden item leaked: ${h}`);
+        // Whole words only: "Pannekake" must not match the figure "Pannekakezombien".
+        // The mission title is public (it may name the key), so it is left out of this check.
+        const withoutMission = JSON.stringify({ ...view, mission: null });
+        for (const h of hiddenNames) assert.ok(!new RegExp(`(^|[^\\p{L}])${h}([^\\p{L}]|$)`, 'iu').test(withoutMission), `hidden item leaked: ${h}`);
         for (const k of FORBIDDEN_KEYS) assert.ok(!json.includes(`"${k}"`), `DM key "${k}" leaked`);
         assert.ok(!/Garantert|Forteller bestemte|GI LIKEVEL/.test(json), 'DM wording leaked');
       }
