@@ -11,10 +11,7 @@ body.child button.big { width: 100%; }
 .end .headline { font-size: 24px; font-weight: 700; }
 .sticker { display: inline-block; padding: 8px 12px; border-radius: 999px; background: var(--zone0); }
 .sticker.ting { background: var(--accent); color: #fff; }
-.big-icon { font-size: 56px; line-height: 1.1; }
-.thing .big-icon { float: left; margin: 0 14px 4px 0; }
-.thing { overflow: hidden; }
-.icon { font-size: 28px; vertical-align: middle; }
+.icon { font-size: 22px; vertical-align: middle; opacity: .85; }
 .chipbtn { display: inline-flex; align-items: center; gap: 6px; }
 .speak { min-height: 44px !important; padding: 4px 10px !important; margin-left: 10px; font-size: 22px !important; }
 #pickList button { font-size: 22px; }

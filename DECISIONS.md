@@ -4,12 +4,11 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
-## 2026-10-28 - The child's screen works for a child who does not read yet
-Simulated workshop (`docs/v2/workshops/2026-10-28_ipad_for_ikke-lesere.md`, C1–C2; roles simulated by Claude).
-- Everything the child sees and can tap has a picture: things in the room, in the backpack and in Helteboka, figures, friends and action buttons. Pictures are an `icon` field on each card (emoji now, drawings later). Signs and solutions get no pictures on the iPad.
-- Each card on the iPad has a speaker button that reads its name and text aloud with the device's Norwegian voice. Only when the child taps it, never by itself. No Norwegian voice: no button.
-
-Rationale: the player is five; a text-only iPad would make the child depend on the DM for every tap, defeating the point of a separate screen.
+## 2026-10-28 - The iPad is text first; everything to be generated is in content/assets.json
+**Owner decision** (replaces the simulated workshop's C1, `docs/v2/workshops/2026-10-28_ipad_for_ikke-lesere.md`): the child reads, or the DM helps, and text works better than trying to carry the game with symbols. The DM does the narration.
+- The iPad shows text. Action buttons are words. A small picture before a name is a placeholder.
+- Everything that is to be generated (pictures now, other assets later) has its own file: `content/assets.json`, one entry per card with what to draw (`name`), the placeholder shown until then, its own target `file`, and `status`. Content cards carry no picture fields. The validator requires exactly one asset per card and no orphans.
+- The speaker button (C2) stays for now: it reads a card aloud only when the child taps it. The owner considers it unimportant.
 
 ## 2026-10-28 - End of the run and Helteboka (M5 in the prototype)
 Discussed in a simulated workshop (`docs/v2/workshops/2026-10-28_helteboka.md`, decisions B1–B6; roles simulated by Claude, not real people).

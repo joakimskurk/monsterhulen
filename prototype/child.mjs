@@ -77,15 +77,15 @@ function render() {
   $('#roomTitle').textContent = v.room.title.toUpperCase();
   $('#place').textContent = v.room.place;
   $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing' },
-    el('div', { class: 'big-icon' }, t.icon || '❔'),
-    el('h3', {}, t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
+    // Text first (owner, 2026-10-28); the picture is a small placeholder until assets are generated.
+    el('h3', {}, el('span', { class: 'icon' }, t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
     el('div', { class: 'actions' },
       t.kind === 'item'
-        ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, '✋ TA')
+        ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, 'TA')
         : [
-            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, '🎁 GI NOE'),
-            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, '🤝 BE EN VENN HJELPE') : null,
+            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'GI NOE'),
+            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
           ],
     ))) : [el('p', {}, 'Det ser tomt ut her …')]));
   $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Tom')]));
@@ -107,7 +107,7 @@ function renderEnd(v) {
     line('DU HJALP', pictures(e.helped)), line('NYE VENNER', pictures(e.friends.map((f) => f.name))), line('DU FANT', pictures(e.found)),
     e.chosen ? el('p', { class: 'headline' }, `${e.chosen} er din nå!`)
       : e.offer.length ? el('div', {}, el('h2', {}, 'VELG EN TING TIL HELTEBOKA'),
-        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, el('span', { class: 'big-icon' }, icon(v, o.name)), o.name.toUpperCase())))) : null].filter(Boolean));
+        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, el('span', { class: 'icon' }, icon(v, o.name)), ' ', o.name.toUpperCase())))) : null].filter(Boolean));
 }
 
 // Packing before the run, and the hero book itself (workshop B4).

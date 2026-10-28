@@ -6,7 +6,32 @@ export function buildContent(raw) {
   content.tagById = new Map(raw.vocabulary.tags.map((t) => [t.id, t]));
   content.itemById = new Map(raw.items.map((i) => [i.id, i]));
   content.figureById = new Map(raw.figures.map((f) => [f.id, f]));
+  attachPlaceholders(content);
   return content;
+}
+
+// Pictures live in content/assets.json (everything that is to be generated, one entry each).
+// Until a drawing exists, each card gets the asset's placeholder as `icon` when content is loaded.
+function attachPlaceholders(content) {
+  content.assetByKey = new Map((content.assets || []).map((a) => [a.key, a]));
+  const ph = (key) => content.assetByKey.get(key)?.placeholder;
+  content.generic = (name) => ph(`generic:${name}`);
+  for (const [list, kind] of [[content.items, 'item'], [content.figures, 'figure'], [content.obstacles, 'obstacle'], [content.sources, 'source'], [content.vocabulary.tags, 'tag']]) {
+    for (const card of list) card.icon = ph(`${kind}:${card.id}`);
+  }
+  for (const r of content.recipes) r.output.icon = ph(`recipe:${r.id}`);
+  for (const m of content.missions) {
+    m.goal.icon = ph(`mission:${m.id}`);
+    m.goal.itemIcon = ph(`mission:${m.id}:item`);
+    if (m.goal.lock) { m.goal.lock.icon = ph(`mission:${m.id}:lock`); m.goal.lock.keyIcon = ph(`mission:${m.id}:key`); }
+  }
+  const t = content.themes;
+  if (!t) return;
+  for (const [kind, list] of Object.entries({ treasure: t.FINN.treasures, lock: t.FINN.locks, key: t.FINN.keys, magic: t.FINN.magic, creature: t.REDD.creatures, device: t.SAMLE.devices, owner: t.LEVER.owners, thing: t.LEVER.things, place: t.LEVER.places, exit: t.KOM_UT.exits })) {
+    for (const part of list) part.icon = ph(`theme:${kind}:${part.id}`);
+  }
+  for (const d of t.SAMLE.devices) if (d.part) d.part.icon = ph(`theme:device-part:${d.id}`);
+  for (const e of t.KOM_UT.exits) if (e.need?.part) e.need.icon = ph(`theme:exit-part:${e.id}`);
 }
 
 export const CONTENT_FILES = {
@@ -18,6 +43,7 @@ export const CONTENT_FILES = {
   recipes: ['recipes.json', 'recipes'],
   missions: ['missions.json', 'missions'],
   themes: ['themes.json', null],
+  assets: ['assets.json', 'assets'],
 };
 
 export const isCarryTag = (content, tag) => content.tagById.get(tag)?.carry === true;

@@ -43,6 +43,12 @@
 
 > **Avgjørelse C2:** Hvert kort på iPaden har en høyttalerknapp som leser navn og tekst høyt med enhetens norske stemme. Det skjer bare når barnet trykker, aldri av seg selv. Knappen vises bare når det finnes en norsk stemme.
 
+## Eierens svar (2026-10-28, ikke simulert)
+
+Eieren overstyrte C1: barnet leser, eller Forteller hjelper, og tekst er bedre enn å prøve å få det til med symboler. Forteller står for fortellingen. Bilder skal genereres senere. Plassholdere er greit nå, og alt som skal genereres, skal ha en egen fil. Stemmeknappen (C2) kan bli.
+
+Gjennomført: iPaden er tekst først, med små plassholdere. Alle bilder ligger i `content/assets.json`. Se `DECISIONS.md`.
+
 ## Ikke avgjort (tas med til eieren)
 
 - Når tegninger erstatter emoji: hvem lager dem, og i hvilken stil?

@@ -104,22 +104,44 @@ for (const m of c.missions) {
 
 for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${tag.id}`, 'carry tag needs a phrase for signs');
 
-// Every card the child can see has a picture (workshop C1, docs/v2/workshops/2026-10-28_ipad_for_ikke-lesere.md).
+// Everything that is to be generated lives in content/assets.json, one entry per card (owner, 2026-10-28).
+// Every card has exactly one asset, every asset belongs to a card, and every asset has its own file.
 {
-  const needIcon = (where, card) => { if (!card?.icon) err(where, 'missing icon (picture for the iPad)'); };
-  c.items.forEach((x) => needIcon(`item ${x.id}`, x));
-  c.figures.forEach((x) => needIcon(`figure ${x.id}`, x));
-  c.obstacles.forEach((x) => needIcon(`obstacle ${x.id}`, x));
-  c.sources.forEach((x) => needIcon(`source ${x.id}`, x));
-  c.recipes.forEach((x) => needIcon(`recipe ${x.id}`, x.output));
-  c.vocabulary.tags.forEach((x) => needIcon(`tag ${x.id}`, x));
-  c.missions.forEach((m) => { needIcon(`mission ${m.id}`, m.goal); if (m.goal.lock) needIcon(`mission ${m.id} lock`, m.goal.lock); });
-  const th = c.themes;
-  for (const [kind, list] of Object.entries({ treasure: th.FINN.treasures, lock: th.FINN.locks, key: th.FINN.keys, magic: th.FINN.magic, creature: th.REDD.creatures, device: th.SAMLE.devices, thing: th.LEVER.things, place: th.LEVER.places, exit: th.KOM_UT.exits })) {
-    list.forEach((x) => needIcon(`themes ${kind} ${x.id}`, x));
+  const expected = new Set();
+  const want = (key) => expected.add(key);
+  c.items.forEach((x) => want(`item:${x.id}`));
+  c.figures.forEach((x) => want(`figure:${x.id}`));
+  c.obstacles.forEach((x) => want(`obstacle:${x.id}`));
+  c.sources.forEach((x) => want(`source:${x.id}`));
+  c.recipes.forEach((x) => want(`recipe:${x.id}`));
+  c.vocabulary.tags.forEach((x) => want(`tag:${x.id}`));
+  for (const m of c.missions) {
+    want(`mission:${m.id}`);
+    if (m.goal.lock) { want(`mission:${m.id}:lock`); want(`mission:${m.id}:key`); }
+    if (m.type === 'LEVER') want(`mission:${m.id}:item`);
   }
-  th.SAMLE.devices.filter((d) => d.part).forEach((d) => needIcon(`themes device ${d.id} part`, d.part));
-  th.KOM_UT.exits.filter((e) => e.need?.part).forEach((e) => needIcon(`themes exit ${e.id} need`, e.need));
+  const th = c.themes;
+  for (const [kind, list] of Object.entries({ treasure: th.FINN.treasures, lock: th.FINN.locks, key: th.FINN.keys, magic: th.FINN.magic, creature: th.REDD.creatures, device: th.SAMLE.devices, owner: th.LEVER.owners, thing: th.LEVER.things, place: th.LEVER.places, exit: th.KOM_UT.exits })) {
+    list.forEach((x) => want(`theme:${kind}:${x.id}`));
+  }
+  th.SAMLE.devices.filter((d) => d.part).forEach((d) => want(`theme:device-part:${d.id}`));
+  th.KOM_UT.exits.filter((e) => e.need?.part).forEach((e) => want(`theme:exit-part:${e.id}`));
+  ['rhyme-line', 'lost-thing', 'part', 'key', 'door', 'unknown'].forEach((g) => want(`generic:${g}`));
+
+  const files = new Set();
+  for (const a of c.assets) {
+    const at = `asset ${a.key}`;
+    if (!expected.has(a.key)) err(at, 'belongs to no card (remove it, or fix the key)');
+    if (!a.name) err(at, 'missing name (what to draw)');
+    if (!a.placeholder) err(at, 'missing placeholder');
+    if (!['placeholder', 'generated'].includes(a.status)) err(at, `bad status ${a.status}`);
+    if (!/^assets\/[a-z0-9-]+(\/[A-Za-z0-9_-]+)+\.(png|webp|svg)$/.test(a.file || '')) err(at, `bad file ${a.file}`);
+    if (files.has(a.file)) err(at, `file ${a.file} is used twice`);
+    files.add(a.file);
+  }
+  const have = new Set(c.assets.map((a) => a.key));
+  if (have.size !== c.assets.length) err('assets', 'the same key twice');
+  for (const key of expected) if (!have.has(key)) err(`asset ${key}`, 'missing in content/assets.json');
 }
 
 // Themes for composed missions (content/themes.json, workshop 2026-10-28).
@@ -191,7 +213,7 @@ for (const [tag, n] of coverage) {
   else if (n.need > 0 && n.items + n.sources === 0) warn(`tag ${tag}`, 'only figures provide it (no item or source)');
 }
 
-const counts = `figures ${c.figures.length}, obstacles ${c.obstacles.length}, items ${c.items.length} (${c.items.filter((i) => i.persistent).length} persistent), sources ${c.sources.length}, recipes ${c.recipes.length}, missions ${c.missions.length}`;
+const counts = `assets ${c.assets.length} (${c.assets.filter((a) => a.status === 'placeholder').length} placeholders), figures ${c.figures.length}, obstacles ${c.obstacles.length}, items ${c.items.length} (${c.items.filter((i) => i.persistent).length} persistent), sources ${c.sources.length}, recipes ${c.recipes.length}, missions ${c.missions.length}`;
 console.log(`Content: ${counts}\n`);
 console.log('Tag coverage (need | items sources sells rewards ability recipes):');
 for (const [tag, n] of coverage) console.log(`  ${tag.padEnd(11)} ${String(n.need).padStart(3)} | ${[n.items, n.sources, n.sells, n.rewards, n.ability, n.recipes].map((x) => String(x).padStart(3)).join(' ')}`);

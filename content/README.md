@@ -24,9 +24,17 @@ Sjekk dataene med:
 node tools/validate-content.mjs
 ```
 
-## Bilder
+## Assets (alt som skal genereres)
 
-Alle kort barnet kan se, har et `icon` (emoji nå, tegning senere): ting, figurer, hinder, kilder, oppskrifter (`output.icon`), merker (reserve for ting som lages, som «beholder med vann») og delene i `themes.json`. Validatoren krever det. Bakgrunn: `docs/v2/workshops/2026-10-28_ipad_for_ikke-lesere.md`.
+`assets.json` er den ene filen for alt som skal genereres. Kortene selv har ingen bildefelt. Én linje per asset:
+
+```json
+{ "key": "figure:LAVAMONSTERET", "name": "Lavamonsteret", "placeholder": "🌋", "file": "assets/figure/LAVAMONSTERET.png", "status": "placeholder" }
+```
+
+- `key` peker på kortet: `item:`, `figure:`, `obstacle:`, `source:`, `recipe:`, `tag:` (reserve for ting som lages underveis, som «beholder med vann»), `mission:ID` (og `:lock`, `:key`, `:item`), `theme:<del>:ID` og `generic:` (regle-linje, mistet ting, del, nøkkel, dør, ukjent).
+- `name` er hva som skal tegnes. `placeholder` vises til tegningen finnes. `file` er der den genererte filen skal ligge, én fil per asset. `status` er `placeholder` eller `generated`.
+- Validatoren krever nøyaktig én asset per kort og ingen assets uten kort. Nytt kort = ny linje her.
 
 ## Grunnregel
 

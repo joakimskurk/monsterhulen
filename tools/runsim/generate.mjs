@@ -108,7 +108,7 @@ function makeLock(ctx, room, gate) {
 // Adds what the opener needs to `node` (a door at a gate, or the chest that is the goal). False if it cannot be provided.
 function addOpenerNeeds(ctx, node, opener) {
   if (opener.kind === 'KEY' || opener.kind === 'MAGIC') {
-    const provider = provideSpecific(ctx, { specificId: 'KEY', name: opener.item, icon: opener.icon || '🗝️', tags: [], consumable: true }, node, 0);
+    const provider = provideSpecific(ctx, { specificId: 'KEY', name: opener.item, icon: opener.icon || ctx.content.generic('key'), tags: [], consumable: true }, node, 0);
     if (!provider) return false;
     node.needs.push({ specific: 'KEY', name: opener.item, provider: provider.id, sign: opener.sign });
     return true;
@@ -121,7 +121,7 @@ function addOpenerNeeds(ctx, node, opener) {
       ? `Over ${opener.door} står første linje: ${opener.lines[0]} … Resten er visket bort.`
       : `Over ${opener.door} er det risset tre linjer, men bokstavene er visket bort.`;
     for (let i = shown; i < opener.lines.length; i++) {
-      const line = { specificId: `RHYME:${i + 1}`, name: `Regle-linje ${i + 1}: «${opener.lines[i]}»`, icon: '📜', found: `Noen har risset en linje i veggen: «${opener.lines[i]}»`, tags: [], consumable: true };
+      const line = { specificId: `RHYME:${i + 1}`, name: `Regle-linje ${i + 1}: «${opener.lines[i]}»`, icon: ctx.content.generic('rhyme-line'), found: `Noen har risset en linje i veggen: «${opener.lines[i]}»`, tags: [], consumable: true };
       const provider = provideSpecific(ctx, line, node, 0);
       if (!provider) return false;
       node.needs.push({ specific: line.specificId, name: line.name, via: 'rhyme', provider: provider.id, sign: i === shown ? doorSign : `Linje ${i + 1} mangler i innskriften.` });
@@ -162,10 +162,10 @@ function makeGoal(ctx, lastGate) {
     const node = addNode(ctx, { kind: 'exit', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
     return !mission.goal.need || addThemeNeed(ctx, node, mission.goal.need, 'exit') ? node : null;
   }
-  if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}`, icon: '🚪' }, room: map.end, zone: endZone, needs: [] });
+  if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}`, icon: ctx.content.generic('door') }, room: map.end, zone: endZone, needs: [] });
   if (mission.type === 'LEVER') {
     const node = addNode(ctx, { kind: 'deliver', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [], deliverTo: map.start });
-    node.item = { specificId: 'DELIVERY', name: mission.goal.item, icon: mission.goal.itemIcon || '🎁', tags: [], consumable: true };
+    node.item = { specificId: 'DELIVERY', name: mission.goal.item, icon: mission.goal.itemIcon || ctx.content.generic('lost-thing'), tags: [], consumable: true };
     if (mission.goal.need && !addThemeNeed(ctx, node, mission.goal.need, 'guard')) return null;
     return node;
   }
@@ -189,7 +189,7 @@ const phraseOf = (ctx, tag) => ctx.content.tagById.get(tag).phrase || ctx.conten
 // A need that comes from a theme part (decision A9): a tag ({ tag, sign }) or one specific part ({ part, sign }).
 function addThemeNeed(ctx, node, need, via) {
   if (need.part) {
-    const provider = provideSpecific(ctx, { specificId: 'PART', name: need.part, icon: need.icon || '⚙️', tags: [], consumable: true }, node, 0);
+    const provider = provideSpecific(ctx, { specificId: 'PART', name: need.part, icon: need.icon || ctx.content.generic('part'), tags: [], consumable: true }, node, 0);
     if (!provider) return false;
     node.needs.push({ specific: 'PART', name: need.part, via, provider: provider.id, sign: need.sign });
     return true;
@@ -401,7 +401,7 @@ function resolveFigureWant(ctx, node, figure, depth) {
   if (nestedOk) {
     for (const w of chainable) {
       if (w.type === 'MISTET') {
-        const lost = provideSpecific(ctx, { specificId: `LOST:${figure.id}`, name: w.what, icon: '🎁', tags: [], consumable: true }, node, depth + 1, { onlyPlaced: true });
+        const lost = provideSpecific(ctx, { specificId: `LOST:${figure.id}`, name: w.what, icon: ctx.content.generic('lost-thing'), tags: [], consumable: true }, node, depth + 1, { onlyPlaced: true });
         if (lost) { node.needs.push({ specific: `LOST:${figure.id}`, name: w.what, via: 'lost', provider: lost.id, sign: w.sign }); return true; }
         continue;
       }
