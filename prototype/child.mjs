@@ -101,9 +101,11 @@ function render() {
     el('h3', {}, pic(t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
     el('div', { class: 'actions' },
-      t.kind === 'item'
-        ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, 'TA')
-        : [
+      t.kind === 'item' || (t.kind === 'source' && !t.fill)
+        ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, t.kind === 'source' ? 'HENT' : 'TA')
+        : t.kind === 'source'
+          ? el('button', { onclick: () => pick(`HVA VIL DU FYLLE VED ${t.name.toUpperCase()}?`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'FYLL NOE')
+          : [
             el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'GI NOE'),
             v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: name, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
           ],

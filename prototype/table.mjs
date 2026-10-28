@@ -85,8 +85,10 @@ export function acceptThing(t, id, { given, friend } = {}) {
     const i = t.state.inventory.indexOf(given);
     // Never stranded (owner's playtest, the matrix check): a thing that fits here, but is still
     // planned for someone else, is lent and given back, so the one it was meant for can still get it.
-    if (i >= 0 && consumableByName(t, given) && stillPlanned(t, given, id)) log(t, `${thingName(t, id)} får låne ${given.toLowerCase()} og gir den tilbake.`);
-    else if (i >= 0 && consumableByName(t, given)) t.state.inventory.splice(i, 1);
+    // Filled at a source or made into something: the container or ingredient goes into it.
+    const into = !id.startsWith('alt:') && !id.startsWith('amb:') && ['source', 'recipe'].includes(nodeById(t, id)?.kind);
+    if (i >= 0 && consumableByName(t, given) && !into && stillPlanned(t, given, id)) log(t, `${thingName(t, id)} får låne ${given.toLowerCase()} og gir den tilbake.`);
+    else if (i >= 0 && (consumableByName(t, given) || into)) t.state.inventory.splice(i, 1);
   }
   if (id.startsWith('alt:')) {
     const a = t.run.alternatives.find((x) => `alt:${x.room}` === id);

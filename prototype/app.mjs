@@ -143,7 +143,7 @@ function handleBySelf(r) {
   if (r.type === 'ROLL') { if (state.roll && state.roll.id === r.rollId) { table.rolled(T0, Number(r.value)); save(); render(); } return true; }
   if (r.type === 'MOVE' && bySelf('move') && throughOpenDoor(r.room)) { goTo(r.room); return true; }
   if (r.type === 'TAKE' && bySelf('take') && !r.thing.startsWith('amb:')) { const n = nodeById(r.thing); if (r.thing.startsWith('alt:') || (n?.kind === 'item' && !n.hidden)) { acceptThing(r.thing); return true; }
-    if (n?.treasure && !n.needs.length && state.here === n.room) { resolve(n); return true; } }
+    if ((n?.treasure || n?.kind === 'source') && !n.needs.length && state.here === n.room) { resolve(n); return true; } }
   if ((r.type === 'GIVE' || r.type === 'FRIEND') && bySelf('give') && table.fits(T0, r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend })) {
     acceptThing(r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend });
     return true;
