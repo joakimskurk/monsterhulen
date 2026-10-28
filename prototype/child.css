@@ -193,3 +193,4 @@ body.waiting #game .chipbtn { opacity: 1; pointer-events: auto; }
 /* A task to act out at the table (Ønskebrønnen playtest): shown on the card, with GJORT. */
 body.child .thing .task { grid-area: auto / 1 / auto / -1; margin: 4px 0 0; color: #ffd95c; -webkit-line-clamp: 2; }
 body.child .thing .done-task { background: #ffd95c; color: #271b00; }
+body.child .say.nudge { background: #3a2f12; border: 2px dashed #ffd95c; color: #ffe9a8; font-style: normal; }

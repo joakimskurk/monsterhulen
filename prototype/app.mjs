@@ -5,6 +5,7 @@ import { acceptedRun } from '../tools/runsim/accept.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView } from './player-view.mjs';
+import { stuckHint } from './stuck.mjs';
 import { caveGrid, doorsFor, doorKind, caveBounds } from './map-view.mjs';
 import * as table from './table.mjs';
 import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
@@ -212,6 +213,7 @@ function publish() {
       ...book.friends.map((f) => [f.name, content.figures.find((x) => x.name === f.name)?.icon]),
       ...book.ting.map((x) => [x.name, content.items.find((i) => i.id === x.id)?.icon]),
     ].filter(([, icon]) => icon)),
+    nudge: stuckHint(T())?.child || null,
     // The iPad's own symbols (content/assets.json, ui:*): placeholders until the pictures come.
     ui: Object.fromEntries(['backpack', 'magnifier', 'player', 'room-thing', 'room-look', 'room-looked'].map((k) => [k, content.ui(k)])),
   });
@@ -240,8 +242,11 @@ function renderRequests() {
   // Requests about something already handled (double taps) are settled silently.
   for (const r of requests.filter((x) => x.thing && isDone(x.thing))) ack(r);
   const box = $('#requests');
-  box.hidden = requests.length === 0;
-  box.replaceChildren(el('h2', {}, 'Fra iPaden'), ...requests.map((r) => {
+  const stuck = stuckHint(T());
+  box.hidden = requests.length === 0 && !stuck;
+  box.replaceChildren(el('h2', {}, 'Fra iPaden'),
+    stuck ? el('div', { class: 'card urgent' }, el('p', {}, el('b', {}, '⚠ '), stuck.dm), stuck.child ? el('p', { class: 'hint' }, `iPaden viser: «${stuck.child}»`) : null) : null,
+    ...requests.map((r) => {
     const no = el('button', { class: 'ghost', onclick: () => { log(r.type === 'MOVE' ? 'Ikke dit ennå.' : `${r.name || 'Det'}: ikke helt ennå.`); save(); render(); ack(r); } }, 'Ikke ennå');
     if (r.type === 'MOVE') {
       const ok = reach().has(r.room);

@@ -88,8 +88,10 @@ function render() {
   const v = view;
   $('#mission').textContent = v.mission.name;
   const say = $('#say');
-  say.hidden = !v.say;
-  say.replaceChildren(...[v.say || '', v.say ? speaker(v.say) : null].filter(Boolean));
+  const line = v.say || v.nudge;
+  say.hidden = !line;
+  say.classList.toggle('nudge', !v.say && !!v.nudge);
+  say.replaceChildren(...[line || '', line ? speaker(line) : null].filter(Boolean));
   $('#roomTitle').textContent = v.room.title.toUpperCase();
   // What just happened, so a taken or given thing never passes silently.
   const news = $('#news');

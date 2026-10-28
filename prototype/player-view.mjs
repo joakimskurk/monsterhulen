@@ -133,5 +133,7 @@ export function playerView(run, state, extra = {}) {
     ui: { backpack: '🎒', magnifier: '🔍', player: '★', ...extra.ui },
     log: state.log.slice(-3).map((l) => l.replace(' (Forteller bestemte)', '')),
     news: latestNews(state.log),
+    // When she is stuck (prototype/stuck.mjs): a nudge that says no more than her map already shows.
+    nudge: extra.nudge || null,
   };
 }

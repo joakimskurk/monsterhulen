@@ -4,6 +4,14 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - When she is stuck, the iPad nudges and the DM gets the answer
+
+Owner's run NY_KOM_UT-VANLIG-6747 («Ønskebrønnen»): the chain began with a troll coin hidden in Kjeksgrotta. Sovesoppen wants music, from the friend Skjelettmusikeren. He needs gold thread, traded from Dvergsmeden, who wants the coin. Nothing on the iPad said to look there, so three figures asked for things and the way on looked locked.
+
+- **Stuck** (`prototype/stuck.mjs`): she has been in every room she can reach, and nothing on the iPad can be used. That means nothing to take, no source, nothing in the backpack or a friend that fits anyone, and nothing to make.
+- **When something is hidden,** the iPad shows «Kanskje noe er gjemt et sted? Se deg rundt med lupa i rommene med 🔍». The map already shows which rooms those are, so the nudge gives away nothing. The DM's request area gets «⚠ Barnet står fast. Trollmynt er gjemt i KJEKSGROTTA (rom 5)». When a task is left, the iPad names the task.
+- **The deep round is realistic now.** The automaton no longer searches every room by habit. It only looks around when nudged, in the rooms with 🔍, and the nudge must always lead on. This happened 597 times in 750 runs, which shows how often a child could have been stuck before.
+
 ## 2026-10-28 - No false leads: everything that asks can be answered from the iPad
 
 Owner's playtest «Ønskebrønnen»: three figures each asked for a thing, the things were out of reach behind a figure, and the only way on was to override the game. «Vi er altså ennå ikke i boks med bulletproof oppsett.»

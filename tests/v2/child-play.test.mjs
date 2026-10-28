@@ -10,13 +10,14 @@ import { acceptedRun } from '../../tools/runsim/accept.mjs';
 import { missionIds } from '../../tools/runsim/theme.mjs';
 import { playerView } from '../../prototype/player-view.mjs';
 import * as table from '../../prototype/table.mjs';
+import { stuckHint } from '../../prototype/stuck.mjs';
 
 const content = loadContent();
 const SEEDS = Number(process.env.SEEDS || 25);
 // The DM steps that belong to the DM by design: saying yes to a task she was shown and says she did.
 const DM_OK = new Set(['task']);
 const dmSteps = {}, stuck = [];
-let runs = 0, childActions = 0;
+let runs = 0, childActions = 0, nudges = 0;
 
 function play(content, run, where) {
   const t = { content, run, state: table.freshState(run) };
@@ -50,8 +51,6 @@ function play(content, run, where) {
       }
       const make = v.recipes[0];
       if (!acted && make) { table.resolve(t, table.nodeById(t, make.id)); acted = true; }
-      if (!acted && !(t.state.searched || []).includes(t.state.here) && table.search(t)) { table.rolled(t, 6); acted = true; }
-      t.state.searched = [...new Set([...(t.state.searched || []), t.state.here])];
       if (!acted) break;
       childActions++; did = true;
     }
@@ -61,9 +60,24 @@ function play(content, run, where) {
     let progress = false;
     for (const room of reachable()) { walkTo(room); if (actHere()) progress = true; if (table.isFinished(t)) return t; }
     if (progress) continue;
-    // Nothing more she can do by herself: back to the entrance if that finishes it, else ask the DM.
+    // Nothing more she can do by herself: back to the entrance if that finishes it.
     walkTo(run.map.start);
     if (table.isFinished(t)) return t;
+    // A real child does not search every room by habit. She looks around when the iPad nudges her
+    // (prototype/stuck.mjs), in the rooms her map shows with 🔍. The nudge must always lead on.
+    const hint = stuckHint(t);
+    assert.ok(hint, `${where}: nothing more she can do, but the iPad does not see that she is stuck`);
+    if (hint.kind === 'search') {
+      assert.ok(playerView(run, t.state, { nudge: hint.child }).nudge, `${where}: stuck with something hidden, but no nudge on the iPad`);
+      nudges++;
+      let found = false;
+      for (const room of reachable().filter((r) => !(t.state.looked || []).includes(r))) {
+        walkTo(room);
+        if (table.search(t)) { table.rolled(t, 1); table.search(t); table.rolled(t, 1); found = true; break; } // even two low rolls find it
+      }
+      assert.ok(found, `${where}: the nudge said look around, but no room with 🔍 had anything`);
+      continue;
+    }
     const open = run.nodes.filter((n) => !table.isDone(t, n.id) && (n.room === null || reachable().includes(n.room)));
     const recipe = open.find((n) => n.kind === 'recipe' && n.needs.every((x) => t.state.inventory.includes(table.nodeById(t, x.provider)?.item?.name)));
     if (recipe) { dm('recipe', recipe); continue; }
@@ -100,4 +114,4 @@ const extra = Object.keys(dmSteps).filter((k) => !DM_OK.has(k));
 if (process.env.VERBOSE || stuck.length || extra.length) { console.log('DM steps:', JSON.stringify(dmSteps)); for (const s of stuck.slice(0, 15)) console.log('  STUCK', s); console.log(`  ${stuck.length} stuck of ${runs}`); }
 assert.equal(stuck.length, 0, `${stuck.length} runs could not be finished from the iPad`);
 assert.deepEqual(extra, [], `DM steps that should not be needed: ${extra.join(', ')}`);
-console.log(`child play test: ${runs} runs played only through the iPad, ${childActions} things she did herself, DM only for ${JSON.stringify(dmSteps)}, OK`);
+console.log(`child play test: ${runs} runs played only through the iPad, ${childActions} things she did herself, ${nudges} times stuck with something hidden and nudged to look around (it always led on), DM only for ${JSON.stringify(dmSteps)}, OK`);
