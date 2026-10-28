@@ -4,6 +4,7 @@
 // 3. every provider is placed in a zone <= the zone of what it serves
 // 4. alternatives and ambient figures are added afterwards and never relied on
 // The playthrough automaton (playthrough.mjs) decides whether the run is accepted.
+import { rejectedFor } from '../lib/fits.mjs';
 import { makeRng } from './rng.mjs';
 import { generateMap, LENGTHS } from './map.mjs';
 import { figureNeeds, isCarryTag } from '../lib/content-core.mjs';
@@ -228,8 +229,9 @@ function signFor(card, tag) {
 
 // ---------- providers ----------
 
-function itemsWithTag(ctx, tag, { containerOnly = false } = {}) {
-  return ctx.content.items.filter((i) => !i.persistent && i.tags.includes(tag) && !ctx.usedItems.has(i.id) && (!containerOnly || i.container));
+// `forCard`: the figure or obstacle it is for; things it rejects for this tag are left out (lib/fits.mjs).
+function itemsWithTag(ctx, tag, { containerOnly = false, forCard = null } = {}) {
+  return ctx.content.items.filter((i) => !i.persistent && i.tags.includes(tag) && !ctx.usedItems.has(i.id) && (!containerOnly || i.container) && !rejectedFor(forCard, tag, i.id));
 }
 
 function sourceTypeWeight(ctx, type) {
@@ -254,17 +256,18 @@ function provideTagInner(ctx, tag, consumer, depth, { containerOnly }) {
   const nestedOk = ctx.budget > 0 && depth < 4;
   const options = [];
 
-  const items = itemsWithTag(ctx, tag, { containerOnly });
+  const forCard = consumer.card;
+  const items = itemsWithTag(ctx, tag, { containerOnly, forCard });
   if (items.length) { options.push('LIGGER'); options.push('GJEMT'); }
   if (nestedOk && !containerOnly) {
-    if (content.figures.some((f) => isUsableTrader(ctx, f, tag))) options.push('HANDEL');
-    if (content.figures.some((f) => isUsableQuest(ctx, f, tag))) options.push('BELONNING');
-    if (!ctx.usedRecipe && content.recipes.some((r) => r.output.tags.includes(tag) && r.inputs.every((id) => !ctx.usedItems.has(id)))) options.push('OPPSKRIFT');
+    if (content.figures.some((f) => isUsableTrader(ctx, f, tag, false, forCard))) options.push('HANDEL');
+    if (content.figures.some((f) => isUsableQuest(ctx, f, tag, forCard))) options.push('BELONNING');
+    if (!ctx.usedRecipe && content.recipes.some((r) => r.output.tags.includes(tag) && !rejectedFor(forCard, tag, r.id) && r.inputs.every((id) => !ctx.usedItems.has(id)))) options.push('OPPSKRIFT');
   }
-  if (containerOnly && nestedOk && content.figures.some((f) => isUsableTrader(ctx, f, tag, true))) options.push('HANDEL');
+  if (containerOnly && nestedOk && content.figures.some((f) => isUsableTrader(ctx, f, tag, true, forCard))) options.push('HANDEL');
   if (!containerOnly) {
     if (content.figures.some((f) => isUsableCompanion(ctx, f, tag, nestedOk))) options.push('VENN');
-    if (content.sources.some((s) => s.gives === tag && (s.requires === null || nestedOk))) options.push('MILJO');
+    if (content.sources.some((s) => s.gives === tag && !rejectedFor(forCard, tag, s.id) && (s.requires === null || nestedOk))) options.push('MILJO');
   }
 
   const order = [];
@@ -284,13 +287,13 @@ function provideTagInner(ctx, tag, consumer, depth, { containerOnly }) {
   return null;
 }
 
-function isUsableTrader(ctx, f, tag, containerOnly = false) {
+function isUsableTrader(ctx, f, tag, containerOnly = false, forCard = null) {
   return (f.roles || []).includes('trader') && !ctx.usedFigures.has(f.id) && (f.gives?.sells || []).includes(tag)
-    && itemsWithTag(ctx, tag, { containerOnly }).length > 0
+    && itemsWithTag(ctx, tag, { containerOnly, forCard }).length > 0
     && (f.wants || []).some((w) => w.type === 'BYTTE' && w.accepts.some((t) => isCarryTag(ctx.content, t)));
 }
-function isUsableQuest(ctx, f, tag) {
-  return (f.roles || []).includes('quest') && !ctx.usedFigures.has(f.id) && (f.gives?.rewards || []).includes(tag) && itemsWithTag(ctx, tag).length > 0;
+function isUsableQuest(ctx, f, tag, forCard = null) {
+  return (f.roles || []).includes('quest') && !ctx.usedFigures.has(f.id) && (f.gives?.rewards || []).includes(tag) && itemsWithTag(ctx, tag, { forCard }).length > 0;
 }
 function isUsableCompanion(ctx, f, tag, nestedOk) {
   if (!(f.roles || []).includes('companion') || ctx.usedFigures.has(f.id) || !(f.gives?.ability || []).includes(tag)) return false;
@@ -307,7 +310,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
   const nearRoom = consumer.room;
 
   if (type === 'LIGGER' || type === 'GJEMT') {
-    const item = rng.pick(itemsWithTag(ctx, tag, { containerOnly }));
+    const item = rng.pick(itemsWithTag(ctx, tag, { containerOnly, forCard: consumer.card }));
     const room = chooseRoom(ctx, maxZone, nearRoom);
     if (!item || !room) return null;
     ctx.usedItems.add(item.id); markType(ctx, type);
@@ -318,7 +321,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
     const trader = rng.pick(content.figures.filter((f) => isUsableTrader(ctx, f, tag, containerOnly)));
     const room = trader && chooseRoom(ctx, maxZone, nearRoom);
     if (!trader || !room) return null;
-    const stock = rng.pick(itemsWithTag(ctx, tag, { containerOnly }));
+    const stock = rng.pick(itemsWithTag(ctx, tag, { containerOnly, forCard: consumer.card }));
     ctx.usedFigures.add(trader.id); ctx.usedItems.add(stock.id); ctx.budget -= 1; markType(ctx, type);
     const node = addNode(ctx, { kind: 'trader', sourceType: type, card: trader, item: itemInstance(stock), provides: tag, consumer: consumer.id, room: room.id, zone: room.zone, needs: [] });
     const payTags = trader.wants.find((w) => w.type === 'BYTTE').accepts.filter((t) => isCarryTag(content, t) && t !== tag);
@@ -334,7 +337,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
     const quest = quests.length && pickQuest(ctx, quests);
     const room = quest && chooseRoom(ctx, maxZone, nearRoom);
     if (!quest || !room) return null;
-    const reward = rng.pick(itemsWithTag(ctx, tag));
+    const reward = rng.pick(itemsWithTag(ctx, tag, { forCard: consumer.card }));
     ctx.usedFigures.add(quest.id); ctx.usedItems.add(reward.id); ctx.budget -= 1; markType(ctx, type);
     const node = addNode(ctx, { kind: 'quest', sourceType: type, card: quest, item: itemInstance(reward), provides: tag, consumer: consumer.id, room: room.id, zone: room.zone, needs: [] });
     return resolveFigureWant(ctx, node, quest, depth) ? node : null;
@@ -352,13 +355,13 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
 
   if (type === 'MILJO') {
     const zoneName = ctx.map.rooms[nearRoom]?.zoneName;
-    const candidates = content.sources.filter((s) => s.gives === tag && (s.requires === null || ctx.budget > 0));
+    const candidates = content.sources.filter((s) => s.gives === tag && !rejectedFor(consumer.card, tag, s.id) && (s.requires === null || ctx.budget > 0));
     if (!candidates.length) return null;
     const source = rng.weighted(candidates.map((s) => [s, (s.zones || []).includes(zoneName) ? 3 : 1]));
     const room = chooseRoom(ctx, maxZone, nearRoom);
     if (!room) return null;
     markType(ctx, type);
-    const filled = { specificId: null, name: source.requires === 'BEHOLDER' ? `beholder med ${content.tagById.get(tag).label}` : `${content.tagById.get(tag).label} fra ${source.name.toLowerCase()}`, icon: source.requires === 'BEHOLDER' ? content.tagById.get(tag).icon : source.icon, tags: [tag], consumable: true };
+    const filled = { specificId: null, cardId: source.id, name: source.requires === 'BEHOLDER' ? `beholder med ${content.tagById.get(tag).label}` : `${content.tagById.get(tag).label} fra ${source.name.toLowerCase()}`, icon: source.requires === 'BEHOLDER' ? content.tagById.get(tag).icon : source.icon, tags: [tag], consumable: true };
     const node = addNode(ctx, { kind: 'source', sourceType: type, card: source, item: filled, provides: tag, consumer: consumer.id, room: room.id, zone: room.zone, needs: [] });
     if (source.requires) {
       ctx.budget -= 1;
@@ -370,10 +373,10 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
   }
 
   if (type === 'OPPSKRIFT') {
-    const recipe = rng.pick(content.recipes.filter((r) => r.output.tags.includes(tag) && r.inputs.every((id) => !ctx.usedItems.has(id))));
+    const recipe = rng.pick(content.recipes.filter((r) => r.output.tags.includes(tag) && !rejectedFor(consumer.card, tag, r.id) && r.inputs.every((id) => !ctx.usedItems.has(id))));
     if (!recipe) return null;
     ctx.usedRecipe = true; ctx.budget -= 1; markType(ctx, type);
-    const node = addNode(ctx, { kind: 'recipe', sourceType: type, card: recipe, item: { specificId: null, name: recipe.output.name, icon: recipe.output.icon, tags: recipe.output.tags, consumable: recipe.output.consumable }, provides: tag, consumer: consumer.id, room: null, zone: consumer.zone, needs: [] });
+    const node = addNode(ctx, { kind: 'recipe', sourceType: type, card: recipe, item: { specificId: null, cardId: recipe.id, name: recipe.output.name, icon: recipe.output.icon, tags: recipe.output.tags, consumable: recipe.output.consumable }, provides: tag, consumer: consumer.id, room: null, zone: consumer.zone, needs: [] });
     for (const id of recipe.inputs) {
       const item = content.itemById.get(id);
       const ingredient = provideSpecific(ctx, { ...itemInstance(item), specificId: id }, node, depth + 1, { onlyPlaced: true });
@@ -462,7 +465,7 @@ function addAlternatives(ctx, run) {
     const tags = node.cardKind === 'figure' ? figureNeeds(card).map((n) => n.tag) : card.solvedBy.map((s) => s.tag);
     const carry = tags.filter((t) => isCarryTag(content, t));
     const tag = rng.pick(carry);
-    const item = tag && rng.pick(itemsWithTag(ctx, tag));
+    const item = tag && rng.pick(itemsWithTag(ctx, tag, { forCard: card }));
     const room = item && chooseRoom(ctx, node.zone, node.room);
     if (!item || !room) continue;
     ctx.usedItems.add(item.id);

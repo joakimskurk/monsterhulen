@@ -107,6 +107,23 @@ for (const m of c.missions) {
 
 for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${tag.id}`, 'carry tag needs a phrase for signs');
 
+// The matrix review (lib/fits.mjs): a reject names a tag the card wants and things that exist and have
+// that tag, says why, and leaves at least one thing, recipe or source that still fits.
+{
+  const ids = new Map([...c.items.map((i) => [i.id, i.tags]), ...c.recipes.map((r) => [r.id, r.output.tags || []]), ...c.sources.map((x) => [x.id, [x.gives]])]);
+  for (const card of [...c.figures, ...c.obstacles]) {
+    const wanted = new Set([...(card.wants || []).flatMap((w) => [...(w.tags || []), ...(w.accepts || []), ...(w.needs || [])]), ...(card.weakness || []).map((w) => w.tag), ...(card.solvedBy || []).map((w) => w.tag)]);
+    for (const r of card.rejects || []) {
+      const at = `${card.id} rejects ${r.tag}`;
+      if (!wanted.has(r.tag)) err(at, 'the card does not want this tag');
+      if (!r.why) err(at, 'missing why (one sentence the DM could say)');
+      for (const id of r.items) if (!ids.has(id)) err(at, `unknown thing ${id}`); else if (!ids.get(id).includes(r.tag)) err(at, `${id} does not have ${r.tag}`);
+      const left = [...ids].filter(([id, tags]) => tags.includes(r.tag) && !r.items.includes(id) && !c.items.find((i) => i.id === id)?.persistent);
+      if (!left.length) err(at, 'nothing is left that fits');
+    }
+  }
+}
+
 // Everything that is to be generated lives in content/assets.json, one entry per card (owner, 2026-10-28).
 // Every card has exactly one asset, every asset belongs to a card, and every asset has its own file.
 {

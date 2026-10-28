@@ -3,6 +3,7 @@
 // no alternatives, no ambient figures, no DM override, no lucky dice.
 // A provider bound to one consumer is never spent on another.
 // Returns { ok, steps[], reason }.
+import { rejectedFor } from '../lib/fits.mjs';
 import { reachable } from './map.mjs';
 
 export function playthrough(run) {
@@ -26,7 +27,7 @@ export function playthrough(run) {
     for (const need of node.needs) {
       if (need.local) continue;
       const match = (it, i) => !reserved.has(i) && fits(it, node)
-        && (need.specific ? it.specificId === need.specific : it.tags.includes(need.tag));
+        && (need.specific ? it.specificId === need.specific : it.tags.includes(need.tag) && !rejectedFor(node.card, need.tag, it.cardId));
       // Prefer the item that was planned for this consumer.
       let i = inventory.findIndex((it, j) => match(it, j) && it.boundTo === node.id);
       if (i < 0) i = inventory.findIndex(match);

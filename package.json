@@ -20,6 +20,7 @@
     "assets:orders": "node tools/assets/orders.mjs",
     "test:map": "node tests/v2/map.test.mjs",
     "test:overview": "node tests/v2/overview.test.mjs",
+    "matrix": "node tools/runsim/matrix-report.mjs",
     "test:dice": "node tests/v2/dice.test.mjs",
     "test:doors": "node tests/v2/doors.test.mjs",
     "test:matrix": "node tests/v2/matrix.test.mjs",

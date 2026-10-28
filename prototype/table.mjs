@@ -2,6 +2,7 @@
 // No DOM and no storage, so the same code runs in the browser and in tests/v2/table-play.test.mjs.
 // Every function takes `t = { content, run, state }` and changes `t.state` in place.
 import { reachable } from '../tools/runsim/map.mjs';
+import { rejectedFor } from '../tools/lib/fits.mjs';
 
 export function freshState(run) {
   return { here: run.map.start, visited: [run.map.start], done: [], openGates: [], passed: [], inventory: [], companions: [], log: ['Eventyret begynner ved inngangen.'] };
@@ -41,6 +42,12 @@ function tagsOfName(t, name) {
   const fromRun = t.run.nodes.find((n) => n.item?.name === name)?.item?.tags;
   return fromRun || t.content.items.find((i) => i.name === name)?.tags || [];
 }
+// True if a thing with this name has the tag and the figure does not reject it (lib/fits.mjs).
+function tagFits(t, node, tag, name) {
+  if (!tag || !tagsOfName(t, name).includes(tag)) return false;
+  const id = t.run.nodes.find((n) => n.item?.name === name)?.item?.cardId || t.content.items.find((i) => i.name === name)?.id;
+  return !rejectedFor(node.card, tag, id);
+}
 
 // Which open need a given thing or friend answers. Falls back to the first open need: the DM already said it works.
 export function needFor(t, node, { given, friend }) {
@@ -48,7 +55,7 @@ export function needFor(t, node, { given, friend }) {
   const fits = (i) => {
     const need = node.needs[i];
     const p = need.provider && nodeById(t, need.provider);
-    if (given) return p?.item?.name === given || (need.tag && tagsOfName(t, given).includes(need.tag));
+    if (given) return p?.item?.name === given || tagFits(t, node, need.tag, given);
     if (friend) { const f = t.run.nodes.find((n) => n.kind === 'companion' && n.card.name === friend); return !!(need.tag && f?.ability.includes(need.tag)); }
     return false;
   };
@@ -199,7 +206,8 @@ export function bring(t, { friend = null, ting = null }) {
 export function broughtFits(t, need) {
   const b = t.state.brought || {};
   if (!need.tag) return [];
-  return [b.friend && b.friend.ability.includes(need.tag) ? b.friend.name : null, b.ting && b.ting.tags.includes(need.tag) ? b.ting.name : null].filter(Boolean);
+  const card = t.run.nodes.find((n) => n.needs.includes(need))?.card;
+  return [b.friend && b.friend.ability.includes(need.tag) ? b.friend.name : null, b.ting && b.ting.tags.includes(need.tag) && !rejectedFor(card, need.tag, b.ting.id) ? b.ting.name : null].filter(Boolean);
 }
 
 // ---------- what the child may do without the DM (owner, 2026-10-28) ----------
@@ -214,7 +222,7 @@ export function fits(t, id, { given, friend } = {}) {
   return openNeeds(t, node).some((i) => {
     const need = node.needs[i];
     const p = need.provider && nodeById(t, need.provider);
-    if (given) return p?.item?.name === given || (!!need.tag && tagsOfName(t, given).includes(need.tag)) || (!!need.tag && t.state.brought?.ting?.name === given && t.state.brought.ting.tags.includes(need.tag));
+    if (given) return p?.item?.name === given || tagFits(t, node, need.tag, given) || (!!need.tag && t.state.brought?.ting?.name === given && t.state.brought.ting.tags.includes(need.tag) && !rejectedFor(node.card, need.tag, t.state.brought.ting.id));
     if (friend) {
       const f = t.run.nodes.find((n) => n.kind === 'companion' && n.card.name === friend);
       const ability = f?.ability || (t.state.brought?.friend?.name === friend ? t.state.brought.friend.ability : []);

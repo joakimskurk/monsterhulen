@@ -2,14 +2,14 @@
   "status": "draft-1",
   "updated": "2026-10-28",
   "items": [
-    { "id": "ROD_FJAER",       "name": "Rød fjær",        "origin": "treasure-review", "tags": ["LUFT", "MYK", "LATTER"], "consumable": false },
+    { "id": "ROD_FJAER",       "name": "Rød fjær",        "origin": "treasure-review", "tags": ["LATTER"], "consumable": false },
     { "id": "SPOKELSESGLASS",  "name": "Spøkelsesglass",  "origin": "treasure-review", "tags": ["BEHOLDER"], "consumable": false, "container": true },
     { "id": "TROLLMYNT",       "name": "Trollmynt",       "origin": "treasure-review", "tags": ["MYNT", "METALL"], "consumable": true },
-    { "id": "HONNINGKJEKS",    "name": "Honningkjeks",    "origin": "treasure-review", "tags": ["MAT", "DUFT"], "consumable": true },
-    { "id": "GLASSKULE",       "name": "Glasskule",       "origin": "treasure-review", "tags": ["GLITTER", "LYS"], "consumable": true },
+    { "id": "HONNINGKJEKS",    "name": "Honningkjeks",    "origin": "treasure-review", "tags": ["MAT"], "consumable": true },
+    { "id": "GLASSKULE",       "name": "Glasskule",       "origin": "treasure-review", "tags": ["GLITTER"], "consumable": true },
     { "id": "GULLTRAD",        "name": "Gulltråd",        "origin": "treasure-review", "tags": ["REPARASJON", "GLITTER"], "consumable": true },
     { "id": "BATEN_I_FLASKA",  "name": "Båten i flaska",  "origin": "treasure-review", "tags": ["HISTORIE"], "consumable": true },
-    { "id": "MESSINGKNAPP",    "name": "Messingknapp",    "origin": "treasure-review", "tags": ["METALL", "REPARASJON", "MYNT"], "consumable": true },
+    { "id": "MESSINGKNAPP",    "name": "Messingknapp",    "origin": "treasure-review", "tags": ["METALL"], "consumable": true },
 
     { "id": "BOTTE",           "name": "Bøtte",           "origin": "new", "tags": ["BEHOLDER"], "consumable": false, "container": true },
     { "id": "KRUKKE",          "name": "Krukke",          "origin": "new", "tags": ["BEHOLDER"], "consumable": false, "container": true },
@@ -21,7 +21,7 @@
     { "id": "BJELLE",          "name": "Bjelle",          "origin": "new", "tags": ["MUSIKK", "METALL"], "consumable": false },
     { "id": "TROMME",          "name": "Liten tromme",    "origin": "new", "tags": ["MUSIKK"], "consumable": false },
     { "id": "EPLE",            "name": "Eple",            "origin": "new", "tags": ["MAT"], "consumable": true },
-    { "id": "OSTEBIT",         "name": "Ostebit",         "origin": "new", "tags": ["MAT", "DUFT"], "consumable": true },
+    { "id": "OSTEBIT",         "name": "Ostebit",         "origin": "new", "tags": ["MAT"], "consumable": true },
     { "id": "PANNEKAKE",       "name": "Pannekake",       "origin": "new", "tags": ["MAT"], "consumable": true },
     { "id": "BAER",            "name": "En neve bær",     "origin": "new", "tags": ["MAT"], "consumable": true },
     { "id": "VARMESTEIN",      "name": "Varmestein",      "origin": "new", "tags": ["VARME"], "consumable": false },
@@ -33,6 +33,7 @@
     { "id": "PERLE",           "name": "Glassperle",      "origin": "new", "tags": ["GLITTER"], "consumable": true },
     { "id": "MYNTPUNG",        "name": "Myntpung",        "origin": "new", "tags": ["MYNT"], "consumable": true },
     { "id": "PUTE",            "name": "Liten pute",      "origin": "new", "tags": ["MYK"], "consumable": true },
+    { "id": "ULLNOSTE",        "name": "Ullnøste",        "origin": "matrix-review", "tags": ["MYK"], "consumable": true },
     { "id": "PARAPLY",         "name": "Paraply",         "origin": "new", "tags": ["LY"], "consumable": false },
     { "id": "HAMMER",          "name": "Liten hammer",    "origin": "new", "tags": ["REPARASJON", "METALL"], "consumable": false },
     { "id": "SPADE",           "name": "Spade",           "origin": "new", "tags": ["GRAVE"], "consumable": false },
@@ -52,7 +53,7 @@
     { "id": "THING_GRABBER_CLAW",   "name": "Gripekloa",     "origin": "thing-spec", "tags": ["GRIPE"], "persistent": true },
     { "id": "THING_MAGNET_STONE",   "name": "Magnetsteinen", "origin": "thing-spec", "tags": ["METALL"], "persistent": true },
     { "id": "THING_FOLDING_LADDER", "name": "Foldestigen",   "origin": "thing-spec", "tags": ["HOYDE"], "persistent": true },
-    { "id": "THING_REPAIR_KIT",     "name": "Lappesettet",   "origin": "thing-spec", "tags": ["REPARASJON", "MYK"], "persistent": true },
+    { "id": "THING_REPAIR_KIT",     "name": "Lappesettet",   "origin": "thing-spec", "tags": ["REPARASJON"], "persistent": true },
     { "id": "THING_WINDUP_MOUSE",   "name": "Opptrekksmusa", "origin": "thing-spec", "tags": ["LATTER"], "persistent": true }
   ]
 }

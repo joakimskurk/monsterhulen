@@ -33,6 +33,7 @@
     { "key": "item:PERLE", "name": "Glassperle", "describe": "Glassperle.", "placeholder": "🫧", "file": "assets/item/PERLE.png", "status": "placeholder" },
     { "key": "item:MYNTPUNG", "name": "Myntpung", "describe": "Myntpung.", "placeholder": "👛", "file": "assets/item/MYNTPUNG.png", "status": "placeholder" },
     { "key": "item:PUTE", "name": "Liten pute", "describe": "Liten pute.", "placeholder": "🛏️", "file": "assets/item/PUTE.png", "status": "placeholder" },
+    { "key": "item:ULLNOSTE", "name": "Ullnøste", "describe": "Et mykt nøste av ull i en varm farge.", "placeholder": "🧶", "file": "assets/item/ULLNOSTE.png", "status": "placeholder" },
     { "key": "item:PARAPLY", "name": "Paraply", "describe": "Paraply.", "placeholder": "☂️", "file": "assets/item/PARAPLY.png", "status": "placeholder" },
     { "key": "item:HAMMER", "name": "Liten hammer", "describe": "Liten hammer.", "placeholder": "🔨", "file": "assets/item/HAMMER.png", "status": "placeholder" },
     { "key": "item:SPADE", "name": "Spade", "describe": "Spade.", "placeholder": "🪏", "file": "assets/item/SPADE.png", "status": "placeholder" },

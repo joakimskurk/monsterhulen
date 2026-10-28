@@ -11,6 +11,7 @@ import { acceptedRun } from '../../tools/runsim/accept.mjs';
 import { missionIds } from '../../tools/runsim/theme.mjs';
 import * as table from '../../prototype/table.mjs';
 import { playerView } from '../../prototype/player-view.mjs';
+import { rejectedFor } from '../../tools/lib/fits.mjs';
 
 const content = loadContent();
 const FIGURES = new Set(['blocker', 'trader', 'quest', 'companion', 'target', 'lock', 'machine', 'goal', 'exit', 'deliver']);
@@ -22,6 +23,11 @@ for (const missionId of missionIds(content)) {
       const where = `${missionId}/${length}/${seed} «${run.mission.name}»`;
       runs++;
       for (const tag of run.mission.goal?.tags || []) assert.ok(!run.nodes.some((n) => n.needs.some((x) => x.tag === tag)), `${where}: the cave wants ${tag}, which the treasure is`);
+      // The matrix review: no planned solution is one the figure rejects (a feather for a toothache).
+      for (const n of run.nodes) for (const need of n.needs.filter((x) => x.tag && x.provider)) {
+        const p = run.nodes.find((x) => x.id === need.provider);
+        assert.ok(!rejectedFor(n.card, need.tag, p.item?.cardId || p.card?.id), `${where}: ${p.item?.name || p.card?.name} is planned for ${n.card?.name}, which rejects it`);
+      }
       // Everything she has to use is on her screen in its room (owner's playtest: the well was not).
       // Hidden things are found by searching instead.
       for (const n of run.nodes.filter((x) => x.room !== null && x.room !== undefined && !(x.kind === 'item' && x.hidden))) {

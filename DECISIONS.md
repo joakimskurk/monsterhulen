@@ -4,6 +4,21 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - The matrix: every solution must make sense to a five-year-old
+
+Owner's playtest: the crocodile's toothache was solved with a feather, because both were tagged «noe mykt». The simulated workshop is `docs/v2/workshops/2026-10-28_matrisen.md`.
+
+- **M1, the test for every pair:** if the DM says the sign, would a five-year-old see why this thing helps?
+- **M2, the fix:**
+  - Things only keep the tags they plainly have. Feather: laughter only. Brass button: metal only. Honey cookie and cheese: food only. Glass ball: glitter only. There are also fewer tags on the repair kit, berry pancake, wind chime and little shelter.
+  - The crocodile now wants something cold for its swollen cheek, and the mole's sign says it needs something that makes a sound.
+  - Pairs that have the right tag but make no sense for one figure are blocked on its card with `rejects` and a reason. Examples: a cat eats no fruit, a bridge is fastened with rope and not a ladder, and a string is fixed with thread and not a hammer.
+  - A new thing, Ullnøste (soft), keeps «noe mykt» from having a single answer.
+- **M3, how it holds:** one rule in `tools/lib/fits.mjs` is used by the generator, the playthrough automaton, the table rules and the DM overview.
+  - `validate-content` checks that every reject names a wanted tag, gives a reason and leaves at least one way to solve it.
+  - The matrix test checks that no planned solution is rejected.
+  - `npm run matrix` writes the whole matrix with signs to `docs/v2/MATRISE.md` for the owner to read through: 382 pairs.
+
 ## 2026-10-28 - The iPad without direction buttons, with room symbols and a big backpack
 
 The owner decided this (E1–E3). How it is done comes from the simulated workshop `docs/v2/workshops/2026-10-28_ipad_kart_og_romsymboler.md`:
