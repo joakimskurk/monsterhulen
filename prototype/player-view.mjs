@@ -51,12 +51,18 @@ export function playerView(run, state, extra = {}) {
       const total = n.needs.filter((x) => !x.local).length;
       const met = (state.needsMet?.[n.id] || []).length;
       const progress = total > 1 && met > 0 ? ` (${met} av ${total} er på plass)` : '';
-      things.push({ id: n.id, kind: 'figure', name: n.card.name, icon: iconOf(n.card.name), text: `${n.card.intro || ''}${progress}`.trim() });
+      // A task to act out (owner's playtest «Ønskebrønnen»: it was on the DM's screen only, so the way on
+      // looked impossible). She does it at the table and taps GJORT; the DM says yes.
+      const tasks = n.needs.filter((x, i) => x.local && !(state.needsMet?.[n.id] || []).includes(i)).map((x) => x.task);
+      things.push({ id: n.id, kind: 'figure', name: n.card.name, icon: iconOf(n.card.name), text: `${n.card.intro || ''}${progress}`.trim(), ...(tasks.length ? { task: tasks.join(' og ') } : {}) });
     }
   }
   for (const a of run.alternatives) if (a.room === room && !done.has(`alt:${a.room}`)) things.push({ id: `alt:${a.room}`, kind: 'item', name: a.item, icon: iconOf(a.item), text: `Her ligger ${a.item.toLowerCase()}.` });
   if (run.giver && run.giver.room === room) things.unshift({ id: 'giver', kind: 'giver', name: run.giver.name, icon: run.giver.icon || '🧙', text: `«${run.giver.says}»` });
-  for (const a of run.ambient) if (a.room === room && !done.has(`amb:${a.room}`)) things.push({ id: `amb:${a.room}`, kind: 'figure', name: a.figure.name, icon: iconOf(a.figure.name), text: a.figure.intro || '' });
+  for (const a of run.ambient) if (a.room === room && !done.has(`amb:${a.room}`)) {
+    const task = a.task || null;
+    things.push({ id: `amb:${a.room}`, kind: 'figure', name: a.figure.name, icon: iconOf(a.figure.name), text: a.figure.intro || '', ...(task ? { task } : {}) });
+  }
   return things;
   };
   const things = thingsIn(here);

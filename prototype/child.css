@@ -189,3 +189,7 @@ body.child .info-card .found-thing { width: min(30vh, 220px); height: min(30vh, 
 body.child .info-close { width: 100%; min-height: 64px; height: auto; border-style: solid; font-size: 24px; font-weight: 800; background: #ffd95c; color: #271b00; }
 body.child .thing h3 { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 body.waiting #game .chipbtn { opacity: 1; pointer-events: auto; }
+
+/* A task to act out at the table (Ønskebrønnen playtest): shown on the card, with GJORT. */
+body.child .thing .task { grid-area: auto / 1 / auto / -1; margin: 4px 0 0; color: #ffd95c; -webkit-line-clamp: 2; }
+body.child .thing .done-task { background: #ffd95c; color: #271b00; }

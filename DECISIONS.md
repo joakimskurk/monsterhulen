@@ -4,6 +4,16 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - No false leads: everything that asks can be answered from the iPad
+
+Owner's playtest «Ønskebrønnen»: three figures each asked for a thing, the things were out of reach behind a figure, and the only way on was to override the game. «Vi er altså ennå ikke i boks med bulletproof oppsett.»
+
+The checks so far trusted two things a child at the table cannot see, so they did not catch this:
+
+- **Wandering figures asked for things that were not in the run.** This happened in 315 of 750 runs. On the iPad they look like any other figure, with GI and a figure symbol. Now a wandering figure is only placed where something it asks for can be had in the run, from a room it can reach. Otherwise it asks for a task. Figures looking for one lost thing never wander.
+- **Some things could only be had by doing a task** (act it out with the DM). This happened in 243 runs. The task was only on the DM page, so the way on looked impossible. Now the figure's card on the iPad shows «OPPGAVE: …» and «✋ GJORT!». The DM gets «Hun sier hun har klart oppgaven …» with «Ja, det stemmer», and the figure gives what it gives.
+- **The deep round is strict now.** The automaton may only ask the DM to say yes to a task the iPad showed her. Anything else the DM would have to do fails the test. The matrix test checks that every wandering figure asks for something that can be had where it stands, or shows a task: 754 wandering figures.
+
 ## 2026-10-28 - ✓ when she is done looking, and no lost taps on the magnifier
 
 The owner sometimes had to press «se deg rundt» twice before the room got its ✓.

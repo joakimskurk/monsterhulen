@@ -252,6 +252,11 @@ function renderRequests() {
       return el('div', { class: 'card' }, el('p', {}, `Hun vil ta ${r.name}.`),
         el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing); ack(r); } }, 'Ja'), no));
     }
+    if (r.type === 'TASK') {
+      return el('div', { class: 'card urgent' }, el('p', {}, `Hun sier hun har klart oppgaven til ${r.name}: «${r.task}».`),
+        el('p', { class: 'hint' }, 'Spill den gjerne ut sammen først. Si ja når den er gjort.'),
+        el('div', { class: 'actions' }, el('button', { onclick: () => { table.taskDone(T(), r.thing); save(); render(); ack(r); } }, 'Ja, det stemmer'), no));
+    }
     if (r.type === 'MAKE') {
       return el('div', { class: 'card' }, el('p', {}, `Hun vil lage ${r.name}.`),
         el('div', { class: 'actions' }, el('button', { onclick: () => { resolve(nodeById(r.thing)); ack(r); } }, 'Ja'), no));

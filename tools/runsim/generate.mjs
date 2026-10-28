@@ -483,9 +483,29 @@ function addAmbient(ctx, run) {
   const free = ctx.map.rooms.filter((r) => !ctx.occupied.has(r.id));
   // Not someone who wants what the treasure is (see the clash check in generateRun).
   const avoid = new Set(ctx.mission.goal?.tags || []);
-  const wantsTreasure = (f) => [...(f.wants || []).flatMap((w) => [...(w.tags || []), ...(w.accepts || []), ...(w.needs || [])]), ...(f.weakness || []).map((w) => w.tag)].some((tag) => avoid.has(tag));
+  const asks = (f) => [...(f.wants || []).flatMap((w) => [...(w.tags || []), ...(w.accepts || []), ...(w.needs || [])]), ...(f.weakness || []).map((w) => w.tag)];
+  const wantsTreasure = (f) => asks(f).some((tag) => avoid.has(tag));
+  // A wandering figure that asks for something is met like any other figure, so it may only ask for
+  // what can be had in this run where it stands (owner's playtest «Ønskebrønnen»: figures asked for
+  // things that were nowhere, and the way on looked impossible). One that only asks for a task is fine.
+  const things = [...ctx.nodes.filter((n) => n.item).map((n) => ({ tags: n.item.tags || [], id: n.item.cardId, zone: n.zone })),
+    ...run.alternatives.map((a) => ({ tags: content.items.find((i) => i.name === a.item)?.tags || [a.tag], id: content.items.find((i) => i.name === a.item)?.id, zone: a.zone }))];
+  const canHave = (f, zone) => {
+    if ((f.wants || []).some((w) => w.type === 'MISTET')) return false; // looks for one lost thing that is not in this run
+    const carry = asks(f).filter((tag) => isCarryTag(content, tag));
+    if (!carry.length) return true;
+    return carry.some((tag) => things.some((x) => x.zone <= zone && x.tags.includes(tag) && !rejectedFor(f, tag, x.id)));
+  };
   const figures = rng.shuffle(content.figures.filter((f) => !ctx.usedFigures.has(f.id) && !wantsTreasure(f)));
   for (const room of free) {
-    if (rng() < 0.55 && figures.length) run.ambient.push({ room: room.id, zone: room.zone, figure: figures.pop() });
+    if (!(rng() < 0.55)) continue;
+    const i = figures.findIndex((f) => canHave(f, room.zone));
+    if (i < 0) continue;
+    const figure = figures.splice(i, 1)[0];
+    // What it asks for when nothing can be carried to it: a task to act out, said the same way as a
+    // figure's own task (see resolveFigureWant).
+    const local = asks(figure).some((tag) => isCarryTag(content, tag)) ? null : (figure.wants || [])[0];
+    const task = local ? local.task || (local.tags || []).map((t) => content.tagById.get(t).label).join(' / ') : null;
+    run.ambient.push({ room: room.id, zone: room.zone, figure, ...(task ? { task } : {}) });
   }
 }

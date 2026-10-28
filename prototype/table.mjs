@@ -72,7 +72,7 @@ export function markNeed(t, node, i, { improvised = false, handedOver = false } 
   t.state.needsMet = { ...(t.state.needsMet || {}), [node.id]: [...metOf(t, node), i] };
   if (!openNeeds(t, node).length) { resolve(t, node, { improvised }); return; }
   const need = node.needs[i];
-  log(t, `${node.card.name}: ${need.specific ? need.name : label(t, need.tag)} er på plass. ${openNeeds(t, node).length} igjen.${improvised ? ' (Forteller bestemte)' : ''}`);
+  log(t, `${node.card.name}: ${need.local ? need.task : need.specific ? need.name : label(t, need.tag)} er på plass. ${openNeeds(t, node).length} igjen.${improvised ? ' (Forteller bestemte)' : ''}`);
 }
 
 // True if the `name` in the backpack is the planned answer to an open need somewhere other than `id`,
@@ -86,6 +86,16 @@ function stillPlanned(t, name, id) {
   if (here && plannedIn(here)) return false;
   const elsewhere = t.run.nodes.filter((n) => n.id !== id && !isDone(t, n.id)).reduce((sum, n) => sum + plannedIn(n), 0);
   return elsewhere > 0 && elsewhere >= t.state.inventory.filter((x) => x === name).length;
+}
+
+// A task to act out (a riddle, a race, being quiet): she says she has done it on the iPad, and the DM
+// says yes. Never on its own: the DM saw it done at the table.
+export function taskDone(t, id) {
+  if (isDone(t, id)) return;
+  if (id.startsWith('amb:')) { acceptThing(t, id); return; }
+  const node = nodeById(t, id);
+  node.needs.forEach((need, i) => { if (need.local && !metOf(t, node).includes(i)) markNeed(t, node, i, { handedOver: true }); });
+  if (!isDone(t, id) && !openNeeds(t, node).length) resolve(t, node);
 }
 
 // A request from the iPad the DM said yes to: take a thing, give a thing, or let a friend help.

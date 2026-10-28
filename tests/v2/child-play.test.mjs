@@ -1,7 +1,8 @@
 // The deep round (owner, 2026-10-28): every run played only through the child's iPad. It sees only the
 // player view, does only what the iPad offers, and the table handles only what it would handle by
 // itself: walking, taking, filling, giving what fits, a friend who fits, searching with the die. When
-// nothing more can be done, the DM is asked, and every DM step is counted by kind. A run that the DM
+// nothing more can be done, the DM may only say yes to a task the iPad showed her (OPPGAVE, GJORT);
+// anything else the DM would have to do is a failure, counted by kind. A run that the DM
 // cannot finish with the steps allowed is a failure.
 import assert from 'node:assert/strict';
 import { loadContent } from '../../tools/lib/content.mjs';
@@ -12,7 +13,7 @@ import * as table from '../../prototype/table.mjs';
 
 const content = loadContent();
 const SEEDS = Number(process.env.SEEDS || 25);
-// The DM steps that belong to the DM by design: a task to act out (no thing fits it).
+// The DM steps that belong to the DM by design: saying yes to a task she was shown and says she did.
 const DM_OK = new Set(['task']);
 const dmSteps = {}, stuck = [];
 let runs = 0, childActions = 0;
@@ -66,8 +67,16 @@ function play(content, run, where) {
     const open = run.nodes.filter((n) => !table.isDone(t, n.id) && (n.room === null || reachable().includes(n.room)));
     const recipe = open.find((n) => n.kind === 'recipe' && n.needs.every((x) => t.state.inventory.includes(table.nodeById(t, x.provider)?.item?.name)));
     if (recipe) { dm('recipe', recipe); continue; }
-    const task = open.find((n) => n.room !== null && n.needs.length && n.needs.every((x, i) => x.local || table.metOf(t, n).includes(i)));
-    if (task) { walkTo(task.room); dm('task', task); continue; }
+    // A task she can see on the iPad («OPPGAVE …», GJORT): she does it at the table, the DM says yes.
+    // The only DM step allowed, and only for a task she was shown.
+    const taskRoom = reachable().find((r) => playerView(run, { ...t.state, here: r }).room.things.some((x) => x.task && !x.id.startsWith('amb:')));
+    if (taskRoom !== undefined) {
+      walkTo(taskRoom);
+      const thing = playerView(run, t.state).room.things.find((x) => x.task && !x.id.startsWith('amb:'));
+      dmSteps.task = (dmSteps.task || 0) + 1;
+      table.taskDone(t, thing.id);
+      continue;
+    }
     const none = open.find((n) => n.room !== null && !n.needs.length && n.kind !== 'item');
     if (none) { walkTo(none.room); dm(`no need: ${none.kind}`, none); continue; }
     stuck.push(`${where}: stuck in room ${t.state.here}; open: ${open.map((n) => `${n.card?.name || n.item?.name} (${n.kind}, needs ${n.needs.map((x) => x.tag || x.name || x.task).join('/')})`).join('; ')}; backpack [${t.state.inventory}]`);

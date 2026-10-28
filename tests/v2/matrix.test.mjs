@@ -15,7 +15,7 @@ import { rejectedFor } from '../../tools/lib/fits.mjs';
 
 const content = loadContent();
 const FIGURES = new Set(['blocker', 'trader', 'quest', 'companion', 'target', 'lock', 'machine', 'goal', 'exit', 'deliver']);
-let runs = 0, wrongGifts = 0, ambientGifts = 0, visible = 0, fills = 0, givers = 0;
+let runs = 0, wrongGifts = 0, ambientGifts = 0, visible = 0, fills = 0, givers = 0, wanderers = 0;
 for (const missionId of missionIds(content)) {
   for (const length of ['KORT', 'VANLIG', 'STORT']) {
     for (let seed = 1; seed <= 25; seed++) {
@@ -29,6 +29,15 @@ for (const missionId of missionIds(content)) {
         const at = playerView(run, table.freshState(run)).room.things.find((x) => x.kind === 'giver');
         assert.ok(at && at.text.length > 10, `${where}: the one waiting at the entrance is not on the child's screen`);
         givers++;
+      }
+      // Every wandering figure that asks for a thing asks for one that can be had where it stands (owner's
+      // playtest «Ønskebrønnen»); one that asks for a task shows the task.
+      for (const a of run.ambient) {
+        const asks = [...(a.figure.wants || []).flatMap((w) => [...(w.tags || []), ...(w.accepts || []), ...(w.needs || [])]), ...(a.figure.weakness || []).map((w) => w.tag)].filter((tag) => content.tagById.get(tag)?.carry);
+        const here = [...run.nodes.filter((n) => n.item && n.zone <= a.zone).map((n) => ({ tags: n.item.tags || [], id: n.item.cardId })), ...run.alternatives.filter((x) => x.zone <= a.zone).map((x) => ({ tags: content.items.find((i) => i.name === x.item)?.tags || [x.tag], id: content.items.find((i) => i.name === x.item)?.id }))];
+        if (asks.length) assert.ok(asks.some((tag) => here.some((x) => x.tags.includes(tag) && !rejectedFor(a.figure, tag, x.id))), `${where}: ${a.figure.name} (wandering, room ${a.room}) asks for ${asks.join('/')}, which is nowhere it can be had`);
+        else assert.ok(playerView(run, { ...table.freshState(run), here: a.room }).room.things.find((x) => x.id === `amb:${a.room}`)?.task, `${where}: ${a.figure.name} (wandering) asks for nothing it can be given, and shows no task`);
+        wanderers++;
       }
       // The matrix review: no planned solution is one the figure rejects (a feather for a toothache).
       for (const n of run.nodes) for (const need of n.needs.filter((x) => x.tag && x.provider)) {
@@ -82,4 +91,4 @@ for (const missionId of missionIds(content)) {
   }
 }
 assert.ok(wrongGifts > 0 && visible > 0 && fills > 0);
-console.log(`matrix test: ${runs} runs, ${givers} with the quest giver at the entrance, ${visible} things and figures all on the child's screen, ${fills} sources filled from the iPad, ${wrongGifts} gifts to a wrong figure that fits and ${ambientGifts} to wandering figures; the planned thing always comes back, OK`);
+console.log(`matrix test: ${runs} runs, ${wanderers} wandering figures all asking for something that can be had (or a task), ${givers} with the quest giver at the entrance, ${visible} things and figures all on the child's screen, ${fills} sources filled from the iPad, ${wrongGifts} gifts to a wrong figure that fits and ${ambientGifts} to wandering figures; the planned thing always comes back, OK`);

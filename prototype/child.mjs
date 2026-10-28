@@ -105,6 +105,7 @@ function render() {
     // Text first (owner, 2026-10-28); the picture is a small placeholder until assets are generated.
     el('h3', {}, pic(t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
+    t.task ? el('p', { class: 'task' }, el('b', {}, 'OPPGAVE: '), t.task) : null,
     el('div', { class: 'actions' },
       t.kind === 'giver' ? null
       : t.kind === 'item' || (t.kind === 'source' && !t.fill)
@@ -114,6 +115,7 @@ function render() {
         : t.kind === 'source'
           ? el('button', { onclick: () => pick(`HVA VIL DU FYLLE VED ${t.name.toUpperCase()}?`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'FYLL NOE')
           : [
+            t.task ? el('button', { class: 'done-task', onclick: () => request('TASK', { thing: t.id, name: t.name, task: t.task }) }, '✋ GJORT!') : null,
             // Dragging from the backpack is the main way; GI is the same as a list, things and friends together.
             el('button', { onclick: () => pick(`GI TIL ${t.name.toUpperCase()}`, [...v.inventory.map((name) => ({ label: name, name })), ...v.companions.map((name) => ({ label: `🤝 ${name}`, name, friend: true }))],
               (o) => (o.friend ? request('FRIEND', { friend: o.name, thing: t.id, name: t.name }) : request('GIVE', { item: o.name, thing: t.id, name: t.name }))) }, 'GI'),
