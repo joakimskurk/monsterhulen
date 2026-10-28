@@ -290,6 +290,7 @@
     { "key": "ui:magnifier", "name": "Lupa", "describe": "Et stort forstørrelsesglass: se deg rundt i rommet.", "placeholder": "🔍", "file": "assets/ui/magnifier.png", "status": "placeholder" },
     { "key": "ui:room-thing", "name": "Noe å ta", "describe": "Merke på kartet: her ligger noe du kan ta.", "placeholder": "✨", "file": "assets/ui/room-thing.png", "status": "placeholder" },
     { "key": "ui:room-look", "name": "Ikke sett deg rundt", "describe": "Merke på kartet: du har ikke sett deg rundt her ennå.", "placeholder": "🔍", "file": "assets/ui/room-look.png", "status": "placeholder" },
-    { "key": "ui:room-done", "name": "Ferdig", "describe": "Merke på kartet: dette rommet er ferdig.", "placeholder": "✓", "file": "assets/ui/room-done.png", "status": "placeholder" }
+    { "key": "ui:room-looked", "name": "Sett deg rundt", "describe": "Merke på kartet: du har sett deg rundt her (en hake).", "placeholder": "✓", "file": "assets/ui/room-looked.png", "status": "placeholder" },
+    { "key": "ui:player", "name": "Spilleren", "describe": "Merke på kartet: her er du (spillerens figur, sett ovenfra eller som et lite merke).", "placeholder": "★", "file": "assets/ui/player.png", "status": "placeholder" }
   ]
 }

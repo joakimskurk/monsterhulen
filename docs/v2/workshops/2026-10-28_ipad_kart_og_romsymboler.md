@@ -68,6 +68,11 @@ Symbolene, i den rekkefølgen de vises (høyst to per rom):
 
 > **Avgjørelse K3:** Funnet-popupen viser tingen stor til venstre og en like stor sekk til høyre. Når tingen slippes over sekken, eller sekken trykkes, glir tingen ned bak sekken og krymper (0,6 s), sekken hopper, og popupen lukkes. Sluppet utenfor glir tingen tilbake.
 
+## Endret av eieren etter første versjon
+
+- Symbolene står **midt i rommet**, ikke i et hjørne. Stjerna, eller spillerens figur når grafikken kommer, står først. De er alltid store nok til at alle får plass, også i et rom på 1×1.
+- 🔍 eller ✓ vises **alltid**. ✓ betyr «du har sett deg rundt her» og forsvinner ikke selv om det er figurer eller ting i rommet. Før ble ✓ bare vist i tomme rom.
+
 ## Etterpå
 
 Alle tre er laget i `prototype/child.*`, `player-view.mjs` og `map-view.mjs`. Leak-testen dekker K2.

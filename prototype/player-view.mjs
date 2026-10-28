@@ -59,11 +59,12 @@ export function playerView(run, state, extra = {}) {
   return things;
   };
   const things = thingsIn(here);
-  // Symbols on the rooms she has been in (workshop 2026-10-28, K2), at most two: who still needs
-  // something (their own picture), something to take (✨), not looked around yet (🔍), or done (✓).
+  // Symbols on the rooms she has been in (workshop 2026-10-28, K2): who still needs something (their
+  // own picture), something to take (✨), and always whether she has looked around there: 🔍 not yet,
+  // ✓ done (owner: the ✓ must not disappear when something else is in the room).
   // Built only from what she sees there, so nothing hidden shows: a room with something hidden looks
   // like an empty one until she has looked around.
-  const ui = { 'room-thing': '✨', 'room-look': '🔍', 'room-done': '✓', ...extra.ui };
+  const ui = { 'room-thing': '✨', 'room-look': '🔍', 'room-looked': '✓', ...extra.ui };
   const looked = new Set(state.looked || []);
   const marksFor = (room) => {
     const seen = thingsIn(room);
@@ -71,8 +72,7 @@ export function playerView(run, state, extra = {}) {
     const figure = seen.find((x) => x.kind === 'figure');
     if (figure) marks.push({ kind: 'figure', icon: figure.icon, label: figure.name });
     if (seen.some((x) => x.kind !== 'figure')) marks.push({ kind: 'thing', icon: ui['room-thing'], label: 'Noe å ta' });
-    if (marks.length < 2 && !looked.has(room)) marks.push({ kind: 'look', icon: ui['room-look'], label: 'Ikke sett deg rundt' });
-    if (!marks.length) marks.push({ kind: 'done', icon: ui['room-done'], label: 'Ferdig' });
+    marks.push(looked.has(room) ? { kind: 'looked', icon: ui['room-looked'], label: 'Du har sett deg rundt her' } : { kind: 'look', icon: ui['room-look'], label: 'Ikke sett deg rundt ennå' });
     return marks;
   };
 
@@ -122,7 +122,7 @@ export function playerView(run, state, extra = {}) {
       ...(extra.end ? [...extra.end.helped, ...extra.end.found, ...extra.end.friends.map((f) => f.name), ...extra.end.offer.map((o) => o.name)] : [])].map((n) => [n, iconOf(n)])),
     book: extra.book || null,
     pack: extra.pack || null,
-    ui: { backpack: '🎒', magnifier: '🔍', ...extra.ui },
+    ui: { backpack: '🎒', magnifier: '🔍', player: '★', ...extra.ui },
     log: state.log.slice(-3).map((l) => l.replace(' (Forteller bestemte)', '')),
     news: latestNews(state.log),
   };

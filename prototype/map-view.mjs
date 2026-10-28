@@ -60,11 +60,13 @@ const STYLE = `
 .cave-tile.fresh > img { animation: cave-fade .8s ease-out var(--delay, .35s) both; }
 @keyframes cave-fade { from { opacity: var(--from, 0); } to { opacity: 1; } }
 .cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
-/* Room symbols on the child's map (workshop K2): small round badges in the room's top-right corner. */
-.cave-tile .marks { position: absolute; top: 4%; right: 4%; z-index: 5; display: flex; gap: 2px; pointer-events: none; }
-.cave-tile .mk { width: calc(var(--cell) * .42); height: calc(var(--cell) * .42); display: grid; place-items: center; border-radius: 50%; background: rgba(7, 5, 13, .78); border: 1px solid #ffd95c; font-size: calc(var(--cell) * .27); line-height: 1; }
-.cave-tile .mk img { width: 80%; height: 80%; object-fit: contain; }
-.cave-tile .mk-done { border-color: #7fe0a0; color: #7fe0a0; font-weight: 800; }
+/* Room symbols on the child's map (workshop K2; owner: in the middle): a box over the whole room
+   (--rw × --rh cells), the symbols centred in it at --s cells each. */
+.cave-tile .marks { position: absolute; left: 0; top: 0; width: calc(100% * var(--rw)); height: calc(100% * var(--rh)); z-index: 5; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: calc(var(--cell) * .04); pointer-events: none; }
+.cave-tile .mk { width: calc(var(--cell) * var(--s) * .92); height: calc(var(--cell) * var(--s) * .92); display: grid; place-items: center; border-radius: 50%; background: rgba(7, 5, 13, .8); border: max(1px, calc(var(--cell) * .03)) solid #ffd95c; font-size: calc(var(--cell) * var(--s) * .55); line-height: 1; box-sizing: border-box; }
+.cave-tile .mk img { width: 82%; height: 82%; object-fit: contain; }
+.cave-tile .mk-here { background: #ffd95c; color: #271b00; border-color: #07050d; font-weight: 800; }
+.cave-tile .mk-looked { border-color: #7fe0a0; color: #7fe0a0; font-weight: 800; }
 .cave-tile .mk-look { border-color: #8fa0c0; }
 /* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
 .cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #07050d; border-radius: 3px; background: #ffd95c; color: #271b00; box-shadow: 2px 2px 0 #07050d; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
@@ -194,12 +196,18 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
       }
       // A star in the middle cell where the child is; the room number in the corner for the DM.
       const midX = r.x + Math.floor((r.w - 1) / 2), midY = r.y + Math.floor((r.h - 1) / 2);
-      if (x === midX && y === midY && r.look === 'here') tile.append(span('mark', '★'));
+      if (x === midX && y === midY && r.look === 'here' && !r.marks) tile.append(span('mark', '★'));
       if (x === r.x && y === r.y && r.corner) tile.append(span('corner', r.corner));
-      // Symbols (child's map only): in the top-right tile of the room.
-      if (r.marks?.length && x === r.x + r.w - 1 && y === r.y) {
+      // Symbols (child's map only, owner: in the middle of the room): the player first, then the room's
+      // own symbols, in a box over the whole room, sized so they always fit, also in a 1×1 room.
+      if (r.marks && x === r.x && y === r.y) {
+        const items = [...(r.look === 'here' ? [{ kind: 'here', icon: model.player || '★', label: 'Her er du' }] : []), ...r.marks];
+        // Rows that give the biggest symbols: n symbols in `rows` rows across a w × h room (in cells).
+        let best = 0;
+        for (let rows = 1; rows <= Math.max(1, r.h * 2); rows++) best = Math.max(best, Math.min(0.62, (0.9 * r.w) / Math.ceil(items.length / rows), (0.9 * r.h) / rows));
         const box = span('marks', '');
-        for (const m of r.marks) {
+        box.style.setProperty('--rw', r.w); box.style.setProperty('--rh', r.h); box.style.setProperty('--s', best.toFixed(3));
+        for (const m of items) {
           const b = span(`mk mk-${m.kind}`, '');
           b.title = m.label || '';
           if (String(m.icon).startsWith('assets/')) b.append(Object.assign(document.createElement('img'), { src: `/${m.icon}`, alt: '' })); else b.textContent = m.icon;

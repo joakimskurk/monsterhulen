@@ -91,14 +91,16 @@ console.log(`player-view leak test: ${views} views checked, OK; ${pictured} view
     const { run } = acceptedRun(content, missionId, seed, 'VANLIG');
     const hiddenRooms = new Set(run.nodes.filter((n) => n.kind === 'item' && n.hidden).map((n) => n.room));
     const all = run.map.rooms.map((r) => r.id);
-    const state = { here: run.map.start, visited: all, done: [], openGates: [], inventory: [], companions: [], log: [], looked: [] };
+    for (const looked of [[], all]) {
+    const state = { here: run.map.start, visited: all, done: [], openGates: [], inventory: [], companions: [], log: [], looked };
     const view = playerView(run, state);
     for (const r of view.cave.rooms) {
       const own = playerView(run, { ...state, here: r.id }).room.things;
       const expected = [...(own.some((x) => x.kind === 'figure') ? ['figure'] : []), ...(own.some((x) => x.kind !== 'figure') ? ['thing'] : [])];
-      if (expected.length < 2) expected.push('look');
+      expected.push(looked.length ? 'looked' : 'look'); // always there, whatever else is in the room
       assert.deepEqual(r.marks.map((m) => m.kind), expected, `${missionId}/${seed} room ${r.id}${hiddenRooms.has(r.id) ? ' (something hidden)' : ''}: symbols ${r.marks.map((m) => m.kind)} give away more than she sees`);
       rooms++;
+    }
     }
   }
   console.log(`map symbols: ${rooms} rooms, built only from what she sees there; hidden things never show, OK`);

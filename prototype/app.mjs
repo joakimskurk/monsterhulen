@@ -213,7 +213,7 @@ function publish() {
       ...book.ting.map((x) => [x.name, content.items.find((i) => i.id === x.id)?.icon]),
     ].filter(([, icon]) => icon)),
     // The iPad's own symbols (content/assets.json, ui:*): placeholders until the pictures come.
-    ui: Object.fromEntries(['backpack', 'magnifier', 'room-thing', 'room-look', 'room-done'].map((k) => [k, content.ui(k)])),
+    ui: Object.fromEntries(['backpack', 'magnifier', 'player', 'room-thing', 'room-look', 'room-looked'].map((k) => [k, content.ui(k)])),
   });
   fetch(`/api/${SESSION}/player`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(view) }).catch(() => {});
 }

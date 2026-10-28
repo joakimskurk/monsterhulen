@@ -308,7 +308,7 @@ function renderMap(v) {
   $('#bagIcon').replaceChildren(uiPic(v.ui?.backpack || '🎒'));
   // The cave as in the original: rooms and doors, fog over the unknown (prototype/map-view.mjs).
   const canGo = (id) => v.cave.rooms.some((r) => r.id === id && r.canGo) || v.cave.probes.some((p) => p.room === id && !p.locked);
-  $('#map').replaceChildren(caveGrid(v.cave, { memo: `child:${v.runCode}`, onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));
+  $('#map').replaceChildren(caveGrid({ ...v.cave, player: v.ui?.player }, { memo: `child:${v.runCode}`, onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));
 }
 
 $('#search').addEventListener('click', () => view && request('SEARCH', { room: view.here }));
