@@ -5,26 +5,14 @@
 //   node tools/runsim/cli.mjs --batch 1000                                      all missions x lengths, statistics
 //   node tools/runsim/cli.mjs --selftest                                        proves the automaton rejects broken runs
 import { loadContent } from '../lib/content.mjs';
-import { generateRun } from './generate.mjs';
+import { acceptedRun as acceptFor } from './accept.mjs';
 import { playthrough, bypassCheck } from './playthrough.mjs';
 import { dmTemplate, chainSignature } from './report.mjs';
 import { LENGTHS } from './map.mjs';
 
-const MAX_ATTEMPTS = 40;
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, all) => (a.startsWith('--') ? [a.slice(2), all[i + 1]?.startsWith('--') || all[i + 1] === undefined ? true : all[i + 1]] : null)).filter(Boolean));
 const content = loadContent();
-
-// Generate until the playthrough and bypass check both accept, like the real generator would.
-export function acceptedRun(missionId, seed, length) {
-  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-    const g = generateRun(content, { missionId, seed: `${seed}#${attempt}`, length });
-    if (!g.ok) continue;
-    const result = playthrough(g.run);
-    const bypass = bypassCheck(g.run);
-    if (result.ok && bypass.ok) return { run: g.run, result, attempts: attempt + 1 };
-  }
-  return null;
-}
+const acceptedRun = (missionId, seed, length) => acceptFor(content, missionId, seed, length);
 
 if (args.selftest) {
   selftest();

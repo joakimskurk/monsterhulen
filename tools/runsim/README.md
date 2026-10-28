@@ -44,6 +44,7 @@ Saboterer godkjente løp og sjekker at automaten oppdager det.
 - En kilde plasseres i en sone ≤ sonen til det den hjelper. Hele kjeden ligger dermed foran hinderet øverst i kjeden.
 - **Et merke kan aldri trengs inne i sin egen kjede.** «For å få vind trenger du vind» er forbudt. Selvtesten fant dette.
 - Antall ledd begrenses av lengden (KORT 2, VANLIG 4, STORT 6).
+- To ledd som henger direkte sammen, kan ikke ha samme kildetype (ingen handel betalt med handel).
 - Alternativer og frie møter legges ut *etterpå* og brukes aldri av automaten.
 
 ## Hva automaten gjør

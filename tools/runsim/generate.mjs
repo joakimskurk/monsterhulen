@@ -6,7 +6,7 @@
 // The playthrough automaton (playthrough.mjs) decides whether the run is accepted.
 import { makeRng } from './rng.mjs';
 import { generateMap, LENGTHS } from './map.mjs';
-import { figureNeeds, isCarryTag } from '../lib/content.mjs';
+import { figureNeeds, isCarryTag } from '../lib/content-core.mjs';
 
 const ROUTES = [
   ['SOPPSKOGEN', 'GRAVPLASSEN', 'HEKSETÅRNET', 'HEKSETÅRNET'],
@@ -191,7 +191,8 @@ function provideTagInner(ctx, tag, consumer, depth, { containerOnly }) {
   }
 
   const order = [];
-  const remaining = new Set(options);
+  // Variety rule 1, strict for direct links: a trade is never paid for with another trade, etc.
+  const remaining = new Set(options.filter((t) => t !== consumer.sourceType));
   while (remaining.size) {
     const t = rng.weighted([...remaining].map((x) => [x, sourceTypeWeight(ctx, x)]));
     order.push(t); remaining.delete(t);

@@ -13,6 +13,7 @@ M3 work started early as a **standalone prototype** that does not touch the runt
 - `content/`: V2 card data, draft 1 (66 figures, 9 obstacles, 49 items, 11 sources, 3 recipes, 5 missions). `npm run validate:content` is green.
 - `tools/runsim/`: chain-first generator + playthrough automaton + DM template (`tools/runsim/README.md`).
 - Evidence (run from repository bytes): 15 000 runs accepted (5 missions × 3 lengths × 1000 seeds); selftest 4 258 sabotages, 0 missed. `npm run check` reproduces a smaller version.
+- `prototype/`: table prototype page for playing a generated run with physical dice (`npm run prototype`, see `prototype/README.md`). Browser-tested on desktop and phone width; a full GLASS_HEART run was played through.
 - Not proven: fun, child comprehension, card text quality, real map geometry, integration with the app.
 
 ## Runtime candidate (unchanged since 2026-10-27 morning)
@@ -33,7 +34,7 @@ Map navigation by tap, physical-die entry, searchable rooms with fail-forward, p
 In the app: trade/buying, fetch quests with rewards, figures that give items, followers with abilities, DM override actions (LØS / GI LIKEVEL / ANGRE), two-device play. Tag vocabulary, chain generator and playthrough automaton exist only as the standalone prototype (`content/`, `tools/runsim/`).
 
 ## Next actions
-0. Owner: read a few generated DM templates (`npm run sim -- --mission CRYSTAL_MACHINE --seed 3`) and correct `content/` where figures, wants or weaknesses feel wrong.
+0. Owner: play one or two runs at the table with the prototype (`prototype/README.md`) and note what the child understood. Also read a few generated DM templates (`npm run sim -- --mission CRYSTAL_MACHINE --seed 3`) and correct `content/` where figures, wants or weaknesses feel wrong.
 1. Owner: put `index.html` + runtime assets into the repo (M0).
 2. Owner: bring wishes from the original ChatGPT conversation into `docs/v2/OWNER_WISHES.md`.
 3. Owner: review `docs/v2/CONTENT_MATRIX_V2.md` (vocabulary, weaknesses, open questions).

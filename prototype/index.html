@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Monsterhulen bordprototype</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Monsterhulen <span>bordprototype V2</span></h1>
+    <form id="setup">
+      <label>Oppdrag <select id="mission"></select></label>
+      <label>Lengde
+        <select id="length">
+          <option value="KORT">Kort</option>
+          <option value="VANLIG" selected>Vanlig</option>
+          <option value="STORT">Stort</option>
+        </select>
+      </label>
+      <label>Kode <input id="seed" inputmode="numeric" size="6"></label>
+      <button type="submit">Vis løp</button>
+      <button type="button" id="newRun">Nytt løp</button>
+    </form>
+  </header>
+
+  <main>
+    <section id="intro" class="panel"></section>
+
+    <section class="panel">
+      <h2>Kart</h2>
+      <p class="hint">Trykk på et rom. Grå rom ligger bak et hinder. Rødt strek = hinder, grønt = åpnet, prikker = hemmelig dør.</p>
+      <div id="map"></div>
+    </section>
+
+    <section class="panel" id="room"></section>
+
+    <section class="panel two">
+      <div>
+        <h2>Sekken</h2>
+        <ul id="inventory"></ul>
+        <div id="crafting"></div>
+        <h2>Venner</h2>
+        <ul id="companions"></ul>
+      </div>
+      <div>
+        <h2>Logg</h2>
+        <ol id="log"></ol>
+      </div>
+    </section>
+
+    <section class="panel">
+      <details>
+        <summary>Hele kjeden (Forteller-mal)</summary>
+        <pre id="template"></pre>
+      </details>
+      <button type="button" id="reset" class="ghost">Start løpet på nytt</button>
+    </section>
+  </main>
+
+  <script type="module" src="app.mjs"></script>
+</body>
+</html>
