@@ -1,0 +1,35 @@
+{
+  "status": "draft-1",
+  "version": 1,
+  "updated": "2026-10-28",
+  "note": "Felles stil for alt som genereres (content/assets.json). Hvert bilde bestilles som: style.prompt + framing for sin type + beskrivelsen av motivet. Endres stilen, øk version: bilder laget med en eldre versjon kan da finnes og lages på nytt. Se content/README.md.",
+  "style": {
+    "about": "Varm, rolig billedbokstil for barn 5–7 år. Monstrene er rare og litt tøysete, aldri skumle. Alt skal kunne kjennes igjen i liten størrelse på en iPad.",
+    "prompt": "Children's picture-book illustration, soft gouache and watercolour texture, warm muted palette with a few clear accent colours, gentle rounded shapes, clean readable silhouette, friendly expressive faces, soft even light, simple shading. Whimsical Nordic fairy-tale mood, curious and cosy, never scary. Single subject, centred, fully visible, plain transparent background, no text, no letters, no frame, no border.",
+    "avoid": "scary, gore, blood, sharp teeth close-up, horror, realistic photo, 3D render, text, letters, watermark, signature, frame, busy background, multiple subjects, cropped subject"
+  },
+  "output": {
+    "format": "png",
+    "width": 1024,
+    "height": 1024,
+    "background": "transparent"
+  },
+  "framing": {
+    "figure": "A full-body character, standing or sitting, facing the viewer slightly turned.",
+    "item": "A single object, slightly from above, like a sticker.",
+    "obstacle": "A small scene of the obstacle in a cave passage, seen from the front.",
+    "source": "A small scene of the place in a cave, the source clearly visible.",
+    "recipe": "A single crafted object, slightly from above, like a sticker.",
+    "tag": "A very simple symbol for the idea, bold and flat, readable at 32 pixels.",
+    "mission": "The goal of an adventure, shown as a single important thing or character.",
+    "theme": "A single thing or character, like a sticker.",
+    "generic": "A very simple symbol, bold and flat, readable at 32 pixels.",
+    "ui": "A simple, friendly symbol for a child's game screen, bold and flat, readable at 32 pixels, on a transparent background."
+  },
+  "review": [
+    "Passer stilen med de andre godkjente bildene?",
+    "Er det tydelig hva det er, også lite på iPaden?",
+    "Er det vennlig nok for en femåring?",
+    "Ingen tekst, vannmerke eller signatur i bildet?"
+  ]
+}

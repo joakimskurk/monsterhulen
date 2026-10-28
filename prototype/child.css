@@ -1,0 +1,196 @@
+/* The child's screen is always the dark cave, whatever the iPad is set to (owner: the page went white
+   on an iPad in light mode). Same colours as the dark theme in style.css. */
+:root {
+  --bg: #17141f;
+  --panel: #221e2c;
+  --text: #efe9f7;
+  --muted: #a99fb8;
+  --line: #3a3348;
+  --accent: #b9a2ff;
+  --zone0: #3a3157;
+  --zone1: #2a4436;
+  --zone2: #4d3a2a;
+  --zone3: #2b3a4f;
+  color-scheme: dark;
+  background: var(--bg);
+}
+body.child { font-size: 20px; }
+body.child h1 { font-size: 28px; letter-spacing: .03em; }
+body.child h2 { font-size: 20px; letter-spacing: .04em; margin-top: 12px; }
+body.child main { max-width: 900px; }
+body.child button { font-size: 20px; min-height: 56px; padding: 10px 18px; border-radius: 14px; }
+body.child button.big { width: 100%; }
+#join { max-width: 420px; margin: 40px auto; text-align: center; }
+#join input { font-size: 28px; text-align: center; letter-spacing: .2em; width: 100%; margin: 12px 0; text-transform: uppercase; }
+.mission { margin: 4px 0 8px; font-size: 18px; font-weight: 700; letter-spacing: .04em; color: var(--accent); text-align: center; }
+.end { border: 3px solid var(--accent); text-align: center; }
+.end .headline { font-size: 24px; font-weight: 700; }
+.sticker { display: inline-block; padding: 8px 12px; border-radius: 999px; background: var(--zone0); }
+.sticker.ting { background: var(--accent); color: #fff; }
+.thumb { width: 40px; height: 40px; object-fit: contain; vertical-align: middle; }
+.icon { font-size: 22px; vertical-align: middle; opacity: .85; }
+.chipbtn { display: inline-flex; align-items: center; gap: 6px; }
+.speak { min-height: 44px !important; padding: 4px 10px !important; margin-left: 10px; font-size: 22px !important; }
+#pickList button { font-size: 22px; }
+.news { margin: 6px 0 10px; padding: 10px 14px; border-radius: 12px; background: var(--zone0); font-weight: 700; font-size: 22px; }
+.news.fresh { animation: pop 1.2s ease-out; }
+.chipbtn.new { outline: 3px solid var(--accent); animation: pop 1.2s ease-out; }
+@keyframes pop { 0% { transform: scale(1.08); } 100% { transform: scale(1); } }
+.found { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: rgba(10, 6, 24, .72); }
+.found[hidden] { display: none; }
+.found-card { width: min(420px, 90vw); padding: 22px 18px 16px; border: 4px solid #07050d; border-radius: 18px; background: #30205f; color: #fff9e8; text-align: center; box-shadow: 6px 6px 0 #07050d; }
+.found-text { margin: 0 0 8px; font-size: 24px; font-weight: 800; color: #ffd95c; }
+.found-thing { margin: 6px auto; width: 140px; height: 140px; display: grid; place-items: center; font-size: 104px; line-height: 1; cursor: grab; touch-action: none; user-select: none; }
+.found-thing img { width: 140px; height: 140px; object-fit: contain; pointer-events: none; }
+.found-thing.dragging { cursor: grabbing; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .5)); }
+.found-name { margin: 4px 0 14px; font-size: 22px; font-weight: 800; }
+.found-bag { width: 100%; min-height: 72px; font-size: 26px; font-weight: 800; background: #ffd95c; color: #271b00; border: 4px solid #07050d; border-radius: 14px; }
+.found-hint { margin: 10px 0 0; font-size: 14px; color: #c5b9ff; }
+.bag-pop { animation: pop .7s ease-out; }
+.pad { display: grid; grid-template-columns: 1fr 1.2fr 1fr; grid-template-areas: ". n ." "w look e" ". s ."; gap: 10px; margin-top: 12px; }
+.pad .dir[data-dir="n"] { grid-area: n; } .pad .dir[data-dir="w"] { grid-area: w; } .pad .dir[data-dir="e"] { grid-area: e; } .pad .dir[data-dir="s"] { grid-area: s; }
+.pad .look { grid-area: look; background: #ffd95c; color: #271b00; }
+.pad button { min-height: 64px; font-size: 22px; font-weight: 800; }
+.pad .dir:disabled { opacity: .35; }
+.pad .dir.locked { opacity: .7; border-color: #ff7a7a; }
+.die-faces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 10px 0; }
+.die-face { aspect-ratio: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 14% !important; min-height: 0 !important; background: #fff9e8 !important; border: 4px solid #07050d !important; border-radius: 16px !important; box-shadow: 4px 4px 0 #07050d; }
+.die-face .pip { width: 70%; height: 70%; margin: auto; border-radius: 50%; background: #271b00; }
+.die-face:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #07050d; }
+.place { color: var(--muted); margin: 0 0 8px; text-transform: lowercase; }
+.thing { border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; margin: 10px 0; }
+.thing h3 { font-size: 22px; margin: 0 0 4px; }
+.thing p { margin: 0 0 8px; }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin: 6px 0 10px; }
+.chips .empty { color: var(--muted); }
+.say { position: sticky; top: 8px; z-index: 3; margin: 8px 0; padding: 14px 18px; border-radius: 16px; background: var(--accent); color: #fff; font-size: 22px; font-style: italic; }
+.status { text-align: center; color: var(--muted); min-height: 1.5em; }
+dialog { border: none; border-radius: 18px; padding: 18px; max-width: 520px; width: 92vw; background: var(--panel); color: var(--text); }
+dialog::backdrop { background: rgba(0, 0, 0, .45); }
+.room-node.go circle { stroke: var(--accent); stroke-width: 4; }
+body.waiting #game button, body.waiting .room-node { opacity: .5; pointer-events: none; }
+
+/* ---------- One screen, landscape, like an app: nothing scrolls (owner, 2026-10-28) ----------
+   Sized for iPads in landscape, also with Safari's bars (down to about 1024 × 660). Sizes follow the
+   screen height, so a small iPad gets smaller text rather than a scrollbar. */
+html, body.child { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body.child { --u: clamp(13px, 2.3vh, 22px); font-size: var(--u); touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+body.child main.app {
+  max-width: none; margin: 0; height: 100vh; height: 100dvh; box-sizing: border-box; overflow: hidden;
+  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  display: grid; gap: 8px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(330px, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "top top" "map room" "bag bag";
+}
+body.child main.app[hidden] { display: none; }
+.app .panel { padding: 10px 12px; min-height: 0; min-width: 0; }
+.top { grid-area: top; display: flex; align-items: center; gap: 12px; padding: 0 4px; background: none; border: none; position: static; }
+.top .mission { margin: 0; flex: 1; text-align: left; font-size: calc(var(--u) * .9); }
+.top .status { margin: 0; min-height: 0; font-size: calc(var(--u) * .8); }
+body.child .top-btn { min-height: 36px; padding: 2px 12px; font-size: calc(var(--u) * .8); border-radius: 10px; }
+
+/* The map fills its box, as large as both its width and height allow (map-view.mjs sets --aspect). */
+.map-panel { grid-area: map; display: grid; padding: 6px !important; }
+.map-box { container-type: size; min-height: 0; display: grid; place-items: center; }
+.map-box .cave-wrap { width: min(100cqw, calc((100cqh - 18px) * var(--aspect, 1) + 18px)); }
+
+/* The room: title, what just happened, what is here, and the doors. Only the list of things may give
+   way (smaller), never the doors. */
+.room-panel { grid-area: room; display: flex; flex-direction: column; gap: 6px; }
+.room-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+body.child .room-head h1 { margin: 0; font-size: calc(var(--u) * 1.3); }
+.room-head .place { margin: 0; font-size: calc(var(--u) * .85); }
+body.child .say { position: static; margin: 0; padding: 8px 12px; font-size: var(--u); }
+body.child .news { margin: 0; padding: 6px 12px; font-size: var(--u); }
+.things-box { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 6px; }
+body.child .thing { margin: 0; padding: 8px 10px; border-radius: 12px; flex: 0 1 auto; min-height: 0; overflow: hidden; }
+body.child .thing h3 { font-size: calc(var(--u) * 1.05); display: flex; align-items: center; gap: 6px; }
+body.child .thing p { margin: 0 0 6px; font-size: calc(var(--u) * .9); line-height: 1.3; }
+body.child .thing .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+body.child .thing button, body.child button.speak { min-height: 44px; font-size: var(--u); padding: 4px 14px; }
+body.child .things-box > p { margin: 0; color: var(--muted); }
+body.child .pad { margin: 0; gap: 6px; flex: 0 0 auto; }
+body.child .pad button { min-height: 0; height: clamp(44px, 8.5vh, 70px); padding: 0 8px; font-size: var(--u); border-radius: 12px; }
+
+/* The backpack and friends along the bottom, one row each half. */
+.bag-panel { grid-area: bag; display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; padding: 6px 12px !important; }
+.bag-part { display: flex; align-items: center; gap: 10px; min-width: 0; }
+body.child .bag-part h2 { margin: 0; font-size: calc(var(--u) * .85); white-space: nowrap; }
+.bag-part .chips { margin: 0; gap: 6px; flex-wrap: nowrap; overflow: hidden; min-width: 0; }
+body.child .bag-part .chipbtn { min-height: 40px; padding: 2px 10px; font-size: calc(var(--u) * .85); white-space: nowrap; border-radius: 10px; }
+
+/* Packing, the end and the hero book open on top of the game. */
+.layer { position: fixed; inset: 0; z-index: 15; display: grid; place-items: center; background: rgba(10, 6, 24, .78); padding: 3vh 3vw; }
+.layer[hidden] { display: none; }
+.layer-card { width: min(760px, 92vw); max-height: 94vh; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+.layer-card h1 { font-size: calc(var(--u) * 1.4); margin: 0; }
+.layer-card h2 { font-size: var(--u); margin: 4px 0; }
+.layer-card p { margin: 0; }
+body.child .layer-card .chips button.big { width: auto; }
+
+/* Turn the iPad: shown only when a touch screen is held upright. */
+.turn { display: none; }
+@media (orientation: portrait) and (pointer: coarse) {
+  .turn { position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; text-align: center; background: var(--bg); color: #ffd95c; font-weight: 800; }
+  .turn div { font-size: 96px; animation: turnme 2s ease-in-out infinite; }
+  .turn p { font-size: 32px; letter-spacing: .08em; }
+}
+@keyframes turnme { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+/* A thing: name and buttons on one row, the text under (two lines; one when the room is full). */
+body.child .thing { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title actions" "text text"; align-items: center; column-gap: 8px; }
+body.child .thing h3 { grid-area: title; margin: 0; min-width: 0; }
+body.child .thing p { grid-area: text; margin: 4px 0 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+body.child .thing .actions { grid-area: actions; flex-wrap: nowrap; }
+body.child .things-box.many .thing p { -webkit-line-clamp: 1; }
+body.child .thing .speak { min-height: 36px; margin-left: 4px; padding: 0 8px; }
+/* A full backpack wraps to a second row (the map gives way), never off the screen. */
+.bag-part .chips { flex-wrap: wrap; max-height: calc(2 * 40px + 6px); }
+
+/* ---------- No direction buttons; the magnifier (workshop K1) ---------- */
+body.child main.app { grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); }
+.look-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; flex: 0 0 auto; }
+.walk-hint { margin: 0; color: var(--muted); font-size: calc(var(--u) * .8); }
+body.child .lupe { width: clamp(96px, 17vh, 140px); height: clamp(96px, 17vh, 140px); min-height: 0; padding: 0; border-radius: 50%; background: #ffd95c; color: #271b00; border: 4px solid #07050d; box-shadow: 4px 4px 0 #07050d; display: grid; place-content: center; justify-items: center; gap: 2px; }
+body.child .lupe:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #07050d; }
+.lupe-icon { font-size: clamp(40px, 8vh, 64px); line-height: 1; }
+.lupe-icon img { width: clamp(44px, 8vh, 68px); height: auto; }
+.lupe-text { font-size: calc(var(--u) * .62); font-weight: 800; letter-spacing: .02em; }
+/* The whole room is the place to tap. */
+body.child .cave-tile.room { cursor: pointer; }
+
+/* ---------- Found: the thing and the backpack side by side, the same size (workshop K3) ---------- */
+body.child .found-card { width: min(720px, 92vw); padding: 18px 22px 14px; }
+.found-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+.found-slot { display: grid; justify-items: center; gap: 4px; position: relative; }
+body.child .found-thing, body.child .found-bag { width: min(34vh, 260px); height: min(34vh, 260px); margin: 0; }
+body.child .found-thing { position: relative; z-index: 1; font-size: min(24vh, 180px); }
+body.child .found-thing img { width: 100%; height: 100%; }
+body.child .found-bag { position: relative; z-index: 2; display: grid; place-items: center; min-height: 0; padding: 0; font-size: min(24vh, 180px); line-height: 1; background: transparent; border: 4px dashed rgba(255, 217, 92, .55); border-radius: 28px; }
+body.child .found-bag img { width: 90%; height: 90%; object-fit: contain; }
+body.child .found-bag.hot { border-color: #ffd95c; background: rgba(255, 217, 92, .12); }
+body.child .found-name { margin: 0; }
+/* Dropped on the backpack: the thing slides down behind it and gets smaller; the backpack hops. */
+.found-bag.gulp { animation: gulp .45s ease-out; }
+@keyframes gulp { 0% { transform: scale(1); } 40% { transform: scale(1.08, .94); } 100% { transform: scale(1); } }
+body.child .found-thing.dragging { z-index: 3; }
+
+/* ---------- Hold and drag from the backpack (owner, 2026-10-28) ---------- */
+.drag-ghost { position: fixed; z-index: 40; width: clamp(72px, 14vh, 110px); height: clamp(72px, 14vh, 110px); transform: translate(-50%, -50%); display: grid; place-items: center; font-size: clamp(56px, 11vh, 88px); line-height: 1; pointer-events: none; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .55)); }
+.drag-ghost img, .drag-ghost .thumb { width: 100%; height: 100%; object-fit: contain; }
+.drag-ghost .icon { font-size: inherit; opacity: 1; }
+.drag-ghost.given { transition: left .35s ease-in, top .35s ease-in, transform .35s ease-in, opacity .35s ease-in; transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+.drag-ghost.back { transition: left .3s ease-out, top .3s ease-out, transform .3s ease-out; transform: translate(-50%, -50%) scale(.5); }
+body.dragging .thing.drop-ok { border-color: #ffd95c; border-style: dashed; }
+body.dragging .thing.drop-hot { border-style: solid; background: rgba(255, 217, 92, .14); transform: scale(1.02); }
+body.dragging .thing:not(.drop-ok) { opacity: .5; }
+.info-card { width: min(420px, 90vw) !important; display: grid; justify-items: center; gap: 6px; }
+body.child .info-card .found-thing { width: min(30vh, 220px); height: min(30vh, 220px); font-size: min(22vh, 160px); cursor: default; }
+body.child .info-close { width: 100%; min-height: 64px; height: auto; border-style: solid; font-size: 24px; font-weight: 800; background: #ffd95c; color: #271b00; }
+body.child .thing h3 { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+body.waiting #game .chipbtn { opacity: 1; pointer-events: auto; }
+
+/* A task to act out at the table (Ønskebrønnen playtest): shown on the card, with GJORT. */
+body.child .thing .task { grid-area: auto / 1 / auto / -1; margin: 4px 0 0; color: #ffd95c; -webkit-line-clamp: 2; }
+body.child .thing .done-task { background: #ffd95c; color: #271b00; }
+body.child .say.nudge { background: #3a2f12; border: 2px dashed #ffd95c; color: #ffe9a8; font-style: normal; }

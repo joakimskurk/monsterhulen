@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="nb">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Monsterhulen">
+  <link rel="manifest" href="manifest.webmanifest">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#17141f">
+  <title>Monsterhulen</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="child.css">
+</head>
+<body class="child">
+  <section id="join" class="panel" hidden>
+    <h1>MONSTERHULEN</h1>
+    <p>Skriv koden Forteller ser på sin skjerm.</p>
+    <form id="joinForm">
+      <input id="code" autocomplete="off" autocapitalize="characters" maxlength="6" placeholder="KODE">
+      <button type="submit">BLI MED</button>
+    </form>
+  </section>
+
+  <!-- Landscape, one screen, like an app: nothing scrolls (owner, 2026-10-28). The map on the left, the
+       room and the doors on the right, the backpack along the bottom; everything else opens on top. -->
+  <main id="game" class="app" hidden>
+    <header class="top">
+      <p id="mission" class="mission"></p>
+      <p id="status" class="status"></p>
+      <button id="bookBtn" class="ghost top-btn" type="button" hidden>📖 HELTEBOKA</button>
+    </header>
+    <section class="panel map-panel">
+      <div id="map" class="map-box"></div>
+    </section>
+    <section class="panel room-panel">
+      <div class="room-head">
+        <h1 id="roomTitle"></h1>
+        <p id="place" class="place"></p>
+      </div>
+      <div id="say" class="say" hidden></div>
+      <p id="news" class="news" hidden></p>
+      <div id="things" class="things-box"></div>
+      <!-- She walks by tapping rooms on the map (workshop K1); the magnifier is «se deg rundt». -->
+      <div class="look-row">
+        <p class="walk-hint">Trykk på et rom på kartet for å gå dit.</p>
+        <button id="search" class="lupe" type="button" aria-label="Se deg rundt"><span id="lupeIcon" class="lupe-icon">🔍</span><span class="lupe-text">SE DEG RUNDT</span></button>
+      </div>
+    </section>
+    <section class="panel bag-panel">
+      <div class="bag-part"><h2>🎒 SEKKEN</h2><div id="inventory" class="chips"></div></div>
+      <div class="bag-part"><h2>VENNER</h2><div id="companions" class="chips"></div></div>
+    </section>
+  </main>
+
+  <!-- On top of the game: before the run, at the end, and the hero book. -->
+  <div id="packLayer" class="layer" hidden><section id="pack" class="panel layer-card"></section></div>
+  <div id="endLayer" class="layer" hidden><section id="end" class="panel end layer-card"></section></div>
+  <div id="bookLayer" class="layer" hidden>
+    <section class="panel layer-card"><div id="book"></div><button id="bookClose" type="button">LUKK</button></section>
+  </div>
+
+  <!-- The iPad held upright: ask her to turn it. -->
+  <div class="turn" aria-hidden="true"><div>🔄</div><p>SNU IPADEN</p></div>
+
+  <div id="dieBox" class="found" hidden>
+    <div class="found-card">
+      <p class="found-text">KAST TERNINGEN!</p>
+      <p id="dieText" class="found-name"></p>
+      <div id="dieFaces" class="die-faces"></div>
+      <p class="found-hint">TRYKK PÅ DEN SIDEN DU FIKK</p>
+    </div>
+  </div>
+
+  <div id="found" class="found" hidden>
+    <div class="found-card">
+      <p id="foundText" class="found-text"></p>
+      <!-- The thing and the backpack, the same size, side by side (workshop K3). -->
+      <div class="found-row">
+        <div class="found-slot"><div id="foundThing" class="found-thing" aria-label="Dra meg ned i sekken"></div><p id="foundName" class="found-name"></p></div>
+        <div class="found-slot"><button id="foundBag" class="found-bag" type="button" aria-label="Sekken"><span id="bagIcon">🎒</span></button><p class="found-name">SEKKEN</p></div>
+      </div>
+      <p class="found-hint">DRA TINGEN NED I SEKKEN</p>
+    </div>
+  </div>
+
+  <!-- A tap on something in the backpack or a friend: shown big. -->
+  <div id="info" class="found" hidden>
+    <div class="found-card info-card">
+      <div id="infoThing" class="found-thing"></div>
+      <p id="infoName" class="found-name"></p>
+      <p id="infoText" class="found-hint"></p>
+      <button id="infoClose" class="found-bag info-close" type="button">LUKK</button>
+    </div>
+  </div>
+
+  <dialog id="pick">
+    <h2 id="pickTitle"></h2>
+    <div id="pickList" class="chips"></div>
+    <button id="pickCancel" class="ghost">AVBRYT</button>
+  </dialog>
+
+  <script type="module" src="child.mjs"></script>
+</body>
+</html>

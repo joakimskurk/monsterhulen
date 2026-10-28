@@ -1,0 +1,83 @@
+# Bordprototype V2
+
+Status: **PROTOTYPE FOR PLAYTEST** (2026-10-28). Ikke den ekte appen.
+
+En enkel Forteller-side som lar deg spille et løp fra V2-generatoren ved bordet med fysisk terning, *før* noe bygges inn i appen. Den bruker nøyaktig samme generator og gjennomspillingsautomat som `tools/runsim/`. Hvert løp den viser er derfor bevist løsbart.
+
+## Start
+
+**Én skjerm** (bare Forteller):
+
+```bash
+npm run prototype
+```
+
+Åpne <http://127.0.0.1:8765/prototype/>.
+
+**To skjermer** (Forteller + barnets iPad på samme Wi-Fi):
+
+```bash
+npm run prototype:lan
+```
+
+1. Åpne Forteller-siden på maskinen: <http://127.0.0.1:8765/prototype/>.
+2. Øverst står **Barnets skjerm** med en kode (f.eks. `VJFF`) og en lenke. Åpne lenken i Safari på iPaden. Legg den gjerne til på Hjem-skjermen for fullskjerm.
+3. Barnet trykker. Du får forespørselen i boksen **Fra iPaden** og godtar eller sier «Ikke ennå».
+
+`prototype:lan` gjør prototypen synlig for andre enheter på hjemmenettet. Bruk den bare på et nett du stoler på.
+
+### Hva barnet kan gjøre på iPaden
+iPaden viser tekst. Et lite bilde foran navnet er en plassholder til tegningene er laget (`content/assets.json`). 🔊 på et kort leser det høyt med iPadens norske stemme, bare når barnet trykker. Fortellingen er din.
+
+- trykke på et rom på kartet for å gå dit (hun ser bare rom hun har vært i og naborommene),
+- **Lupa 🔍** («se deg rundt»: du ser om noe er gjemt og kaster terning ved behov),
+- **TA** en ting som ligger synlig,
+- **GI NOE** til en figur, eller **BE EN VENN HJELPE**.
+
+Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekkes automatisk av `npm run test:leak`. Reglene for hva som skjer når du godtar, løser eller bruker opp noe, ligger i `table.mjs` og testes av `npm run test:table`. Trykk **Vis på iPad** ved et tegn for å vise det som en boble på skjermen hennes. Mens en forespørsel venter, er knappene hennes låst, så dobbeltrykk ikke gir dobbel effekt.
+
+## Forteller-siden
+
+- **Venstre:** oppdraget, kartet og rommet barnet er i (eller rommet du har valgt).
+- **Høyre (blir stående når du blar):** forespørsler fra iPaden, sekken og vennene, **Ting i hulen** og loggen.
+- **Ting i hulen** viser alt barnet kan finne i løpet: hvor det er, hvordan hun får det, om hun har det, og hvem i hulen som vil ha det eller er svak mot det. Den tenkte løsningen er uthevet. Bruk det til å så frø tidlig: «Trollet elsker honningkjeks …»
+- **Faner nederst:** *Figurer i hulen* (hva hver figur vil ha, og hvilke ting som passer), *Hele kjeden*, *Barnets skjerm* (kode, lenke, fri ferdsel) og *Helteboka*.
+- Hjelpestigen ligger sammenfoldet på hvert kort.
+- **Terning** (til høyre): Når hun ser seg rundt i et rom der noe er gjemt, kommer «KAST TERNINGEN!» på iPaden. Hun kaster en ekte terning og trykker samme side. 3–6 finner det. 1–2 gir et tydeligere hint, og neste forsøk finner det. Trykk **Be henne kaste** når noe er usikkert (en kamp, en vågal idé), eller trykk siden selv. Du får forslag til hva som skjer.
+- **Barnet gjør selv** (fanen «Barnets skjerm»): gå gjennom åpne dører, ta ting som ligger, gi ting eller be en venn når det åpenbart passer, og lete med terningen. Slå av det du vil godkjenne selv. Det som ikke åpenbart passer, kommer til deg.
+
+## Slik spiller du
+1. Velg oppdrag og lengde. Under **Nytt hver gang** gir hver kode et nytt tema (for eksempel «Beinnøkkelen og dragekrona» eller «Regla ved steindøra»). Under **Klassikere** ligger de faste eventyrene. **Overrask meg** velger en annen oppdragstype og en kode med et tema dere ikke har hatt i de tre siste løpene. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
+   - **Når barnet får noe,** kommer tingen opp stort på iPaden med en sekk under. Hun drar den ned i sekken (eller trykker på sekken), og bildet forsvinner. Tingen ligger allerede i sekken; popupen er for å gjøre øyeblikket synlig.
+   - **Flere behov:** Et mål med flere behov, som en drage som først må løses og så roes, eller en maskin med tre fester, kan løses ett behov om gangen. Godta det barnet gir, eller trykk **Denne er på plass**. iPaden viser «1 av 2 er på plass».
+   - **Regle:** Ved døra viser kortet hele regla til deg. På kort løp står første linje over døra. Linjene finnes rundt i hulen, og barnet sier regla høyt ved døra, gjerne etter deg. **Vis regla på iPad** viser den som boble.
+2. Trykk på et rom på kartet når barnet går dit. Grå rom ligger bak et hinder som ikke er løst.
+3. Romkortet viser det du leser høyt, hva figuren vil, tegnet og hjelpestigen, og hvor den garanterte løsningen ligger.
+4. Barnet foreslår. Kast terning bare når utfallet er usikkert. Trykk:
+   - **Ta / Byttet / Ble med / Løst …** når det skjer i fortellingen,
+   - **GI LIKEVEL** når du vil la henne lykkes uansett (logges som Forteller-valg).
+5. Sekken, vennene og loggen oppdateres. Løpet lagres i nettleseren og kan fortsettes.
+6. **Hele kjeden** nederst viser Forteller-malen: hele løsningen på én gang.
+7. **Når løpet er ferdig** (målet nådd, og hjemme igjen når noen er reddet eller noe levert), viser begge skjermer hva barnet gjorde. Barnet velger én av to varige TING på iPaden, og du trykker **Skriv i Helteboka**.
+8. **Neste løp:** Før barnet går fra inngangen, kan det ta med én venn og én TING fra Helteboka (**Pakk sekken**, eller fra iPaden). Forteller-kortet viser «Passer også» der det passer. Løpet kan alltid løses uten.
+
+Helteboka lagres i nettleseren på Forteller-enheten. Trykk **Lagre kopi** nederst av og til, og **Hent kopi** for å legge den tilbake (for eksempel på en annen maskin). Bakgrunn: `docs/v2/workshops/2026-10-28_helteboka.md`.
+
+## Hva vi vil lære av en økt
+Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
+- Forsto barnet hva figurene ville ha, ut fra tegnene?
+- Føltes kjedene som eventyr eller som henting?
+- Hvor ofte trengte du hjelpestigen, og hvor ofte GI LIKEVEL?
+- Brukte barnet venner eller ting på uventede måter?
+- Hvor lang var økten, og hvor mange rom?
+
+## Begrensninger
+- Kartet følger originalen: rom i ulike størrelser, steinflisene fra originalen (`assets/tileset/v3-map/`), og tåke over alt barnet ikke har utforsket. På iPaden står «?» ved dørene ut av rommet hun er i (🔒 hvis døra er låst).
+- **Dørene:** Barnet går ved å trykke på et rom på kartet: et naborom bak en åpen dør, eller «?» i tåka (workshop 2026-10-28, iPad-kart og romsymboler). Retningsknappene er borte. Gjennom en åpen dør går hun med en gang, og du ser det i loggen. Låste dører må du løse som før.
+- **Gå langt:** Trykker barnet på et rom hun har vært i langt unna, går stjerna dit selv. Den går rom for rom gjennom dørene, omtrent ett rom i sekundet, og bruker aldri låste dører eller ukjente rom. Hvert steg vises i loggen din, så du har tid til neste replikk.
+- **Symboler på kartet:** På rom hun har vært i, viser kartet figurens bilde (noen trenger noe), ✨ (noe å ta), og alltid 🔍 (ikke sett seg rundt ennå) eller ✓ (har sett seg rundt), midt i rommet sammen med stjerna. Noe gjemt røpes aldri.
+- **Bruke ting:** Barnet holder på en ting eller en venn i sekken og drar den til en figur eller kilde i rommet. Et kort trykk viser tingen stort. «GI» på figuren er en reserve med samme valg som en liste.
+- **Funnet:** Tingen vises stor, med en like stor sekk ved siden av. Hun drar tingen over sekken, eller trykker på sekken, og tingen glir ned bak den.
+- To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
+- Teksten på kortene er utkast fra `content/`.
+- Åpner du Forteller-siden i flere faner i samme nettleser, er det den nyeste som styrer barnets skjerm. De eldre sier ifra og slutter å sende.

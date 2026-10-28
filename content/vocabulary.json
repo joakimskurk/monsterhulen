@@ -1,0 +1,69 @@
+{
+  "status": "draft-1",
+  "updated": "2026-10-28",
+  "tags": [
+    { "id": "VANN",       "label": "vann", "phrase": "vann",          "family": "element", "carry": true },
+    { "id": "ILD",        "label": "ild", "phrase": "ild",           "family": "element", "carry": true },
+    { "id": "KULDE",      "label": "kulde", "phrase": "noe kaldt",         "family": "element", "carry": true },
+    { "id": "LUFT",       "label": "luft / vind", "phrase": "vind",   "family": "element", "carry": true },
+    { "id": "JORD",       "label": "jord", "phrase": "jord",          "family": "element", "carry": true },
+    { "id": "LYS",        "label": "lys", "phrase": "lys",           "family": "sans",    "carry": true },
+    { "id": "MORKE",      "label": "mørke",         "family": "sans",    "carry": false, "note": "skapes ved handling (dekke til, slukke)" },
+    { "id": "MUSIKK",     "label": "musikk / lyd", "phrase": "musikk",  "family": "sans",    "carry": true },
+    { "id": "STILLHET",   "label": "stillhet",      "family": "sans",    "carry": false, "note": "barnet gjør det" },
+    { "id": "DUFT",       "label": "god lukt", "phrase": "noe som lukter godt",      "family": "sans",    "carry": true },
+    { "id": "MAT",        "label": "mat", "phrase": "mat",           "family": "omsorg",  "carry": true },
+    { "id": "VARME",      "label": "varme", "phrase": "varme",         "family": "omsorg",  "carry": true },
+    { "id": "MYK",        "label": "noe mykt", "phrase": "noe mykt",      "family": "omsorg",  "carry": true },
+    { "id": "SOVN",       "label": "søvn / ro",     "family": "omsorg",  "carry": false, "note": "vuggesang, mørke, stillhet" },
+    { "id": "LY",         "label": "ly / tak", "phrase": "et tak å krype under",      "family": "omsorg",  "carry": true },
+    { "id": "GLITTER",    "label": "noe som glitrer", "phrase": "noe som glitrer", "family": "verdi", "carry": true },
+    { "id": "MYNT",       "label": "mynt", "phrase": "en mynt",          "family": "verdi",   "carry": true },
+    { "id": "HISTORIE",   "label": "ting med en historie", "phrase": "noe med en historie", "family": "verdi", "carry": true },
+    { "id": "BEHOLDER",   "label": "beholder", "phrase": "noe å ha det i",      "family": "verktoy", "carry": true },
+    { "id": "HOYDE",      "label": "nå høyt / klatre", "phrase": "noe å klatre på", "family": "verktoy", "carry": true },
+    { "id": "GRIPE",      "label": "gripe på avstand", "phrase": "noe som når langt", "family": "verktoy", "carry": true },
+    { "id": "GRAVE",      "label": "grave", "phrase": "noe å grave med",         "family": "verktoy", "carry": true },
+    { "id": "REPARASJON", "label": "reparere", "phrase": "å bli reparert",      "family": "verktoy", "carry": true },
+    { "id": "METALL",     "label": "metall", "phrase": "noe av metall",        "family": "verktoy", "carry": true },
+    { "id": "LATTER",     "label": "latter / kiling", "phrase": "latter", "family": "sosial", "carry": true, "note": "også ved handling" },
+    { "id": "ROS",        "label": "ros",           "family": "sosial",  "carry": false, "note": "barnet sier det" },
+    { "id": "MOT",        "label": "mot",           "family": "sosial",  "carry": false, "note": "barnet viser det" }
+  ],
+  "wantTypes": [
+    { "id": "SORT",   "label": "vil ha noe av en sort",   "chain": true },
+    { "id": "BYTTE",  "label": "vil bytte",               "chain": true },
+    { "id": "MISTET", "label": "har mistet noe bestemt",  "chain": true },
+    { "id": "GJORE",  "label": "vil at du gjør noe",      "chain": true, "note": "kjedbart når needs har bærbare merker, ellers lokalt" },
+    { "id": "VITE",   "label": "vil vite noe",            "chain": false, "note": "løses lokalt (tenke, observere)" },
+    { "id": "KAMP",   "label": "vil sloss eller konkurrere", "chain": false, "note": "kamp eller lek; aldri eneste garanterte vei" }
+  ],
+  "sourceTypes": [
+    { "id": "LIGGER",    "label": "ligger åpent i et rom" },
+    { "id": "GJEMT",     "label": "gjemt (søk, fail-forward)" },
+    { "id": "HANDEL",    "label": "kjøpe eller bytte hos en figur" },
+    { "id": "BELONNING", "label": "belønning for å hjelpe en figur" },
+    { "id": "VENN",      "label": "en venn med en evne" },
+    { "id": "MILJO",     "label": "kilde i et rom (ofte med beholder)" },
+    { "id": "OPPSKRIFT", "label": "kombinere to ting" }
+  ],
+  "dispositions": ["friendly", "neutral", "hostile"],
+  "roles": {
+    "blocker":   "kan stå på en kant og sperre",
+    "trader":    "selger eller bytter",
+    "quest":     "gir oppdrag og belønning",
+    "companion": "kan bli med og bruke evnen sin"
+  },
+  "combat": {
+    "none":   "ingen kamp",
+    "ok":     "kamp mulig, kan vinnes",
+    "strong": "kamp mulig, men kan bare vinnes med svakheten",
+    "wants":  "figuren vil sloss eller konkurrere"
+  },
+  "zones": [
+    "MÅNESKOGEN", "KRYSTALLGROTTEN", "BEINKATAKOMBENE",
+    "SOPPSKOGEN", "GRAVPLASSEN", "HEKSETÅRNET",
+    "REGNBUEDALEN", "SKYGGEGANGENE", "KLOKKETÅRNET",
+    "LANTERNEHAGEN", "TÅKESUMPEN", "ZOMBIESLOTTET"
+  ]
+}
