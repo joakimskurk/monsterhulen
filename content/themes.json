@@ -31,14 +31,14 @@
 
   "FINN": {
     "treasures": [
-      { "id": "KRYSTALLHJERTET", "def": "krystallhjertet", "about": "et hjerte av krystall som gløder svakt" },
-      { "id": "GULLEGGET", "def": "gullegget", "about": "et egg av gull som er varmt å holde i" },
-      { "id": "DRAGEKRONA", "def": "dragekrona", "about": "en liten krone som en drage har glemt" },
+      { "id": "KRYSTALLHJERTET", "def": "krystallhjertet", "about": "et hjerte av krystall som gløder svakt", "tags": ["LYS"] },
+      { "id": "GULLEGGET", "def": "gullegget", "about": "et egg av gull som er varmt å holde i", "tags": ["VARME"] },
+      { "id": "DRAGEKRONA", "def": "dragekrona", "about": "en liten krone som en drage har glemt", "tags": ["GLITTER"] },
       { "id": "STJERNEKARTET", "def": "stjernekartet", "about": "et kart over alle stjernene på himmelen" },
-      { "id": "SPILLEDASEN", "def": "spilledåsen", "about": "en gammel spilledåse som spiller en vuggevise" },
-      { "id": "FONIKSFJAERA", "def": "føniksfjæra", "about": "ei fjær som brenner uten å bli varm" },
-      { "id": "MANESPEILET", "def": "månespeilet", "about": "et speil som viser månen, selv midt på dagen" },
-      { "id": "TRYLLESTAVEN", "def": "tryllestaven", "about": "en gammel tryllestav som fortsatt glitrer i tuppen" }
+      { "id": "SPILLEDASEN", "def": "spilledåsen", "about": "en gammel spilledåse som spiller en vuggevise", "tags": ["MUSIKK"] },
+      { "id": "FONIKSFJAERA", "def": "føniksfjæra", "about": "ei fjær som brenner uten å bli varm", "tags": ["ILD"] },
+      { "id": "MANESPEILET", "def": "månespeilet", "about": "et speil som viser månen, selv midt på dagen", "tags": ["LYS"] },
+      { "id": "TRYLLESTAVEN", "def": "tryllestaven", "about": "en gammel tryllestav som fortsatt glitrer i tuppen", "tags": ["GLITTER"] }
     ],
     "locks": [
       { "id": "GLASSDORA", "def": "glassdøra", "short": "døra", "prep": "bak", "openers": ["KEY", "MAGIC", "RHYME", "TAG"],

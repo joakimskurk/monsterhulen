@@ -4,6 +4,13 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - The treasure is a thing, and nobody in the cave wants what it is
+
+The owner's playtest of «Finn skatten» nearly reached the end and then stalled. The music box looked like a figure asking for something, and the skeleton dancer wanted music, so the natural move was to give it the music box.
+
+- The treasure is never shown as a figure. Behind a door it lies there with TA, and the child takes it herself («Du fant spilledåsen! 🎉»). In a chest, the card is the chest («Gullkista: Kista er låst. Inni ligger …»), and she gives the key to the chest.
+- Each treasure in `content/themes.json` has `tags`, meaning what it plainly is (the music box is MUSIKK, the crystal heart is LYS, and so on). A run where any figure, door or ambient figure wants one of those is regenerated, and a door that opens for that same kind is never picked. This is tested in `tests/v2/table-play.test.mjs`.
+
 ## 2026-10-28 - Less waiting for the DM; the die is back
 **Owner input from the table:** play froze because the DM had to approve everything, and no die roll ever happened.
 - The child does by herself, without DM approval: walk through open doors, take what lies in a room, give a thing or ask a friend when it obviously fits (the planned item, a fitting tag, a fitting ability), search with the die, and the hero book choices. Each can be turned off on the DM page («Barnets skjerm»). Anything uncertain or creative still goes to the DM, and everything is in the log.

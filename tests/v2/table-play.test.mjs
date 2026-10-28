@@ -215,3 +215,25 @@ assert.ok(tingGiven > 0, 'a brought TING was never given where it fits');
 assert.ok(altUsed > 0, 'no extra thing was ever used');
 assert.ok(friendHelped > 0, 'a brought friend never helped');
 console.log(`table play test: ${runs} runs (+${tingRuns} with a brought TING, given ${tingGiven} times; +${altRuns} using ${altUsed} extra things; +${friendRuns} with a brought friend, helped ${friendHelped} times), ${actions} actions (${stepwise} one need at a time), backpack exact, end and summary right, GI LIKEVEL finishes, OK`);
+
+// The treasure in «Finn skatten» is a thing, never a figure that asks for something, and nobody in the
+// cave wants what it is (owner's playtest: the music box looked like the music the skeleton dancer wanted).
+{
+  let finn = 0;
+  for (const length of ['KORT', 'VANLIG', 'STORT']) for (let seed = 1; seed <= 60; seed++) {
+    const { run } = acceptedRun(content, 'NY_FINN', seed, length);
+    const where = `NY_FINN/${length}/${seed}`;
+    const goal = run.nodes.find((n) => n.kind === 'goal');
+    assert.ok(goal.treasure, `${where}: the goal has no treasure`);
+    const tags = new Set(run.mission.goal.tags);
+    assert.ok(!run.nodes.some((n) => n.needs.some((x) => tags.has(x.tag))), `${where}: someone wants what ${goal.treasure.name} is`);
+    for (const a of run.ambient) assert.ok(!JSON.stringify([a.figure.wants, a.figure.weakness]).match(new RegExp(`"(${[...tags].join('|') || '-'})"`)), `${where}: ${a.figure.name} wants what the treasure is`);
+    const t = { content, run, state: table.freshState(run) };
+    t.state.here = goal.room;
+    const seen = playerView(run, t.state).room.things.find((x) => x.id === goal.id);
+    if (goal.needs.length) assert.notEqual(seen.name, goal.treasure.name, `${where}: the chest is named as the treasure`);
+    else assert.equal(seen.kind, 'item', `${where}: the treasure is shown as a figure`);
+    finn++;
+  }
+  console.log(`treasure test: ${finn} «Finn skatten» runs, the treasure is a thing and nobody wants what it is, OK`);
+}

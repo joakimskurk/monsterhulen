@@ -50,6 +50,9 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   run.goal = makeGoal(ctx, lastGate);
   if (!run.goal) return { ok: false, reason: 'goal could not be built' };
   if (ctx.failed) return { ok: false, reason: ctx.failed };
+  // Nobody in the cave may want what the treasure is (no music wanted where the treasure is a music box).
+  const clash = (mission.goal?.tags || []).find((tag) => ctx.nodes.some((n) => n.needs.some((x) => x.tag === tag)));
+  if (clash) return { ok: false, reason: `the treasure is ${clash}, which the cave wants` };
 
   addAlternatives(ctx, run);
   addAmbient(ctx, run);
@@ -169,8 +172,11 @@ function makeGoal(ctx, lastGate) {
   const endZone = lastGate;
   if (mission.type === 'FINN') {
     const lock = mission.goal.lock;
-    if (!lock.inGoal) return addNode(ctx, { kind: 'goal', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
-    const node = addNode(ctx, { kind: 'goal', opener: lock.opener.kind, card: { name: `${mission.goal.name} i ${lock.name.charAt(0).toLowerCase()}${lock.name.slice(1)}`, intro: lock.intro, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
+    // The treasure is a thing, never a figure that asks for something (owner, playtest 2026-10-28):
+    // behind a door it just lies there; in a chest, the chest is what she opens.
+    const treasure = { name: mission.goal.name, icon: mission.goal.icon, about: mission.goal.about };
+    if (!lock.inGoal) return addNode(ctx, { kind: 'goal', treasure, card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
+    const node = addNode(ctx, { kind: 'goal', treasure, opener: lock.opener.kind, card: { name: lock.name, intro: `${lock.intro} Inni ligger ${mission.goal.about}.`, icon: lock.icon || mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
     return addOpenerNeeds(ctx, node, lock.opener) ? node : null;
   }
   if (mission.type === 'KOM_UT') {
@@ -468,7 +474,10 @@ function addAlternatives(ctx, run) {
 function addAmbient(ctx, run) {
   const { content, rng } = ctx;
   const free = ctx.map.rooms.filter((r) => !ctx.occupied.has(r.id));
-  const figures = rng.shuffle(content.figures.filter((f) => !ctx.usedFigures.has(f.id)));
+  // Not someone who wants what the treasure is (see the clash check in generateRun).
+  const avoid = new Set(ctx.mission.goal?.tags || []);
+  const wantsTreasure = (f) => [...(f.wants || []).flatMap((w) => [...(w.tags || []), ...(w.accepts || []), ...(w.needs || [])]), ...(f.weakness || []).map((w) => w.tag)].some((tag) => avoid.has(tag));
+  const figures = rng.shuffle(content.figures.filter((f) => !ctx.usedFigures.has(f.id) && !wantsTreasure(f)));
   for (const room of free) {
     if (rng() < 0.55 && figures.length) run.ambient.push({ room: room.id, zone: room.zone, figure: figures.pop() });
   }

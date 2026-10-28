@@ -111,6 +111,7 @@ export function resolve(t, node, { improvised = false } = {}) {
   if (['blocker', 'lock', 'machine'].includes(node.kind)) { state.openGates.push(node.gate); log(t, `${node.card.name} er løst – veien videre er åpen.${note}`); }
   else if (node.kind === 'companion') { state.companions.push(node.card.name); log(t, `${node.card.name} ble med!${note}`); }
   else if (node.kind === 'target') { state.companions.push(node.card.name); state.say = `${node.card.name} følger med deg. Ta den trygt med hjem!`; log(t, `${node.card.name} er rolig og følger med hjem.${note}`); }
+  else if (node.treasure) { state.say = `Du fant ${node.treasure.name.toLowerCase()}! 🎉`; log(t, `Dere fant ${node.treasure.name}! 🎉${note}`); }
   else if (['goal', 'exit'].includes(node.kind)) { state.say = `Du klarte det! ${node.card.name}! 🎉`; log(t, `Dere nådde ${node.card.name}! 🎉${note}`); }
   else if (node.kind === 'deliver') { state.inventory.push(node.item.name); log(t, `Fant ${node.item.name}.${note}`); }
   else if (node.item) { state.inventory.push(node.item.name); log(t, `${node.kind === 'item' ? 'Tok' : 'Fikk'} ${node.item.name}${node.kind === 'item' ? '' : ` (${node.card.name})`}.${note}`); }

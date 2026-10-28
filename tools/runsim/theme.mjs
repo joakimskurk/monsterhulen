@@ -44,7 +44,8 @@ export function composeMission(content, missionId, seed) {
 function composeFinn(rng, f, base, route) {
   const treasure = rng.pick(f.treasures);
   const lock = rng.pick(f.locks);
-  const kind = rng.pick(lock.openers);
+  // Not a door that opens for music around a music box: the treasure would look like the answer.
+  const kind = rng.pick(lock.openers.filter((k) => k !== 'TAG' || !(treasure.tags || []).includes(lock.tag.tag)));
   const values = { treasure: treasure.def, Treasure: cap(treasure.def), lock: lock.def, prep: lock.prep };
   const where = `${cap(lock.prep)} ${lock.def} ligger ${treasure.about}.`;
   let opener, intro, themeOpener;
@@ -80,7 +81,7 @@ function composeFinn(rng, f, base, route) {
     ...base,
     name: fill(rng.pick(f.titles[kind]), values),
     intro,
-    goal: { name: cap(treasure.def), icon: treasure.icon, lock: { name: cap(lock.def), icon: lock.icon, intro: lockIntro, inGoal: lock.prep === 'i', opener } },
+    goal: { name: cap(treasure.def), icon: treasure.icon, about: treasure.about, tags: treasure.tags || [], lock: { name: cap(lock.def), icon: lock.icon, intro: lockIntro, inGoal: lock.prep === 'i', opener } },
     theme: { goal: treasure.id, opener: themeOpener },
   };
 }

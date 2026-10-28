@@ -37,6 +37,7 @@ export function playerView(run, state, extra = {}) {
   for (const n of run.nodes) {
     if (n.room !== here || done.has(n.id)) continue;
     if (n.kind === 'item') { if (!n.hidden) things.push({ id: n.id, kind: 'item', name: n.item.name, icon: iconOf(n.item.name), text: n.item.found || `Her ligger ${n.item.name.toLowerCase()}.` }); continue; }
+    if (n.treasure && !n.needs.length) { things.push({ id: n.id, kind: 'item', name: n.treasure.name, icon: iconOf(n.treasure.name), text: `Her ligger ${n.treasure.about}!` }); continue; }
     if (FIGURE_KINDS.has(n.kind)) {
       // Progress on several needs, as a count only (never which ones are left).
       const total = n.needs.filter((x) => !x.local).length;
