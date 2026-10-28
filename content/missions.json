@@ -5,22 +5,22 @@
   "missions": [
     { "id": "GLASS_HEART", "name": "Glassnøkkelen og krystallhjertet", "type": "FINN", "legacyBlueprint": "GLASS_HEART",
       "route": ["MÅNESKOGEN", "KRYSTALLGROTTEN", "BEINKATAKOMBENE", "BEINKATAKOMBENE"],
-      "goal": { "name": "Krystallhjertet", "lock": { "name": "Glassdøra", "key": "Glassnøkkelen" } },
+      "goal": { "icon": "💎", "name": "Krystallhjertet", "lock": { "icon": "🚪", "name": "Glassdøra", "key": "Glassnøkkelen", "keyIcon": "🗝️" } },
       "intro": "Bak en dør av glass ligger et hjerte av krystall. Et sted i hulen finnes nøkkelen." },
     { "id": "WITCH_CAT", "name": "Heksekatten som forsvant", "type": "REDD", "legacyBlueprint": "WITCH_CAT",
       "route": ["SOPPSKOGEN", "GRAVPLASSEN", "HEKSETÅRNET", "HEKSETÅRNET"],
-      "goal": { "name": "Heksekatten", "calm": ["MAT", "MYK", "MUSIKK"] },
+      "goal": { "icon": "🐈‍⬛", "name": "Heksekatten", "calm": ["MAT", "MYK", "MUSIKK"] },
       "intro": "Heksekatten har gått seg vill dypt inne i hulen. Finn den og få den trygt hjem." },
     { "id": "CRYSTAL_MACHINE", "name": "Krystallmaskinen", "type": "SAMLE", "legacyBlueprint": "CRYSTAL_MACHINE",
       "route": ["REGNBUEDALEN", "SKYGGEGANGENE", "KLOKKETÅRNET", "KLOKKETÅRNET"],
-      "goal": { "name": "Krystallmaskinen", "count": 3, "pool": ["LYS", "MUSIKK", "VARME", "VANN", "GLITTER", "LUFT"] },
+      "goal": { "icon": "⚙️", "name": "Krystallmaskinen", "count": 3, "pool": ["LYS", "MUSIKK", "VARME", "VANN", "GLITTER", "LUFT"] },
       "intro": "En gammel maskin har tre tomme fester. Hvert feste lyser i en farge og trenger noe forskjellig for å våkne." },
     { "id": "ZOMBIE_DELIVERY", "name": "Zombien som ikke stjal noe", "type": "LEVER", "legacyBlueprint": "ZOMBIE_DELIVERY",
       "route": ["LANTERNEHAGEN", "TÅKESUMPEN", "ZOMBIESLOTTET", "ZOMBIESLOTTET"],
-      "goal": { "name": "Den bortkomne zombien", "item": "den mistede tingen zombien skal levere", "deliver": "en mistet ting tilbake til eieren ved inngangen" },
+      "goal": { "icon": "🧟", "name": "Den bortkomne zombien", "itemIcon": "🎁", "item": "den mistede tingen zombien skal levere", "deliver": "en mistet ting tilbake til eieren ved inngangen" },
       "intro": "Alle tror zombien er en tyv. Men kanskje prøver den å levere noe tilbake?" },
     { "id": "UT_AV_HULEN", "name": "Ut på andre siden", "type": "KOM_UT",
-      "goal": { "name": "Utgangen" },
+      "goal": { "icon": "🚪", "name": "Utgangen" },
       "intro": "Hulen har en utgang på andre siden. Finn veien gjennom." }
   ]
 }

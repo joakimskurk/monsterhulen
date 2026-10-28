@@ -24,6 +24,10 @@ Sjekk dataene med:
 node tools/validate-content.mjs
 ```
 
+## Bilder
+
+Alle kort barnet kan se, har et `icon` (emoji nå, tegning senere): ting, figurer, hinder, kilder, oppskrifter (`output.icon`), merker (reserve for ting som lages, som «beholder med vann») og delene i `themes.json`. Validatoren krever det. Bakgrunn: `docs/v2/workshops/2026-10-28_ipad_for_ikke-lesere.md`.
+
 ## Grunnregel
 
 Kort kobles **bare** gjennom merker i `vocabulary.json`. En figur som vil ha `MAT` passer med alle ting, kilder, selgere og venner som gir `MAT`. Ingen par skrives eksplisitt.

@@ -104,6 +104,24 @@ for (const m of c.missions) {
 
 for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${tag.id}`, 'carry tag needs a phrase for signs');
 
+// Every card the child can see has a picture (workshop C1, docs/v2/workshops/2026-10-28_ipad_for_ikke-lesere.md).
+{
+  const needIcon = (where, card) => { if (!card?.icon) err(where, 'missing icon (picture for the iPad)'); };
+  c.items.forEach((x) => needIcon(`item ${x.id}`, x));
+  c.figures.forEach((x) => needIcon(`figure ${x.id}`, x));
+  c.obstacles.forEach((x) => needIcon(`obstacle ${x.id}`, x));
+  c.sources.forEach((x) => needIcon(`source ${x.id}`, x));
+  c.recipes.forEach((x) => needIcon(`recipe ${x.id}`, x.output));
+  c.vocabulary.tags.forEach((x) => needIcon(`tag ${x.id}`, x));
+  c.missions.forEach((m) => { needIcon(`mission ${m.id}`, m.goal); if (m.goal.lock) needIcon(`mission ${m.id} lock`, m.goal.lock); });
+  const th = c.themes;
+  for (const [kind, list] of Object.entries({ treasure: th.FINN.treasures, lock: th.FINN.locks, key: th.FINN.keys, magic: th.FINN.magic, creature: th.REDD.creatures, device: th.SAMLE.devices, thing: th.LEVER.things, place: th.LEVER.places, exit: th.KOM_UT.exits })) {
+    list.forEach((x) => needIcon(`themes ${kind} ${x.id}`, x));
+  }
+  th.SAMLE.devices.filter((d) => d.part).forEach((d) => needIcon(`themes device ${d.id} part`, d.part));
+  th.KOM_UT.exits.filter((e) => e.need?.part).forEach((e) => needIcon(`themes exit ${e.id} need`, e.need));
+}
+
 // Themes for composed missions (content/themes.json, workshop 2026-10-28).
 {
   const t = c.themes;

@@ -27,6 +27,8 @@ npm run prototype:lan
 `prototype:lan` gjør prototypen synlig for andre enheter på hjemmenettet. Bruk den bare på et nett du stoler på.
 
 ### Hva barnet kan gjøre på iPaden
+Alt har et bilde, og knappene har bilde og ord (✋ TA, 🎁 GI NOE, 🤝 BE EN VENN HJELPE, 👀 SE DEG RUNDT), så barnet ikke trenger å lese. 🔊 på et kort leser det høyt med iPadens norske stemme, bare når barnet trykker.
+
 - trykke på et rom på kartet for å gå dit (hun ser bare rom hun har vært i og naborommene),
 - **SE DEG RUNDT** (du ser om noe er gjemt og kaster terning ved behov),
 - **TA** en ting som ligger synlig,

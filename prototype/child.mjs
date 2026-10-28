@@ -18,6 +18,25 @@ let waiting = false; // one request at a time; cleared when the DM sends a new v
 
 function status(text) { $('#status').textContent = text; }
 
+// Read aloud with the device's own Norwegian voice, only when the child asks (workshop C2).
+// No Norwegian voice on the device: no button.
+let voice = null;
+function findVoice() {
+  if (!('speechSynthesis' in window)) return;
+  const voices = speechSynthesis.getVoices();
+  voice = voices.find((v) => /^(nb|no|nn)(-|_|$)/i.test(v.lang)) || null;
+}
+if ('speechSynthesis' in window) { findVoice(); speechSynthesis.addEventListener('voiceschanged', () => { findVoice(); if (view) render(); }); }
+function speak(text) {
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.voice = voice; u.lang = voice.lang; u.rate = 0.9;
+  speechSynthesis.speak(u);
+}
+const speaker = (text) => (voice ? el('button', { class: 'speak ghost', 'aria-label': 'Les høyt', onclick: () => speak(text) }, '🔊') : null);
+const icon = (v, name) => v.icons?.[name] || '❔';
+const chip = (v, name, onclick) => el('button', { class: 'ghost chipbtn', ...(onclick ? { onclick } : {}) }, el('span', { class: 'icon' }, icon(v, name)), ' ', name);
+
 async function request(type, payload) {
   if (waiting) return;
   waiting = true;
@@ -54,22 +73,23 @@ function render() {
   $('#mission').textContent = v.mission.name;
   const say = $('#say');
   say.hidden = !v.say;
-  say.textContent = v.say || '';
+  say.replaceChildren(...[v.say || '', v.say ? speaker(v.say) : null].filter(Boolean));
   $('#roomTitle').textContent = v.room.title.toUpperCase();
   $('#place').textContent = v.room.place;
   $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing' },
-    el('h3', {}, t.name.toUpperCase()),
+    el('div', { class: 'big-icon' }, t.icon || '❔'),
+    el('h3', {}, t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
     el('div', { class: 'actions' },
       t.kind === 'item'
-        ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, 'TA')
+        ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, '✋ TA')
         : [
-            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'GI NOE'),
-            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: name, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
+            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, '🎁 GI NOE'),
+            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, '🤝 BE EN VENN HJELPE') : null,
           ],
     ))) : [el('p', {}, 'Det ser tomt ut her …')]));
-  $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => el('span', { class: 'chip' }, el('button', { class: 'ghost' }, n))) : [el('span', { class: 'empty' }, 'Tom')]));
-  $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => el('span', {}, el('button', { class: 'ghost' }, n))) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
+  $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Tom')]));
+  $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
   renderMap(v);
   renderEnd(v);
   renderBook(v);
@@ -82,11 +102,12 @@ function renderEnd(v) {
   if (!v.end) return;
   const e = v.end;
   const line = (title, items) => (items.length ? el('p', {}, el('b', {}, `${title}: `), items.join(', ')) : null);
-  box.replaceChildren(...[el('h1', {}, 'DU KLARTE DET! 🎉'), el('p', { class: 'headline' }, e.headline),
-    line('DU HJALP', e.helped), line('NYE VENNER', e.friends.map((f) => f.name)), line('DU FANT', e.found),
+  const pictures = (names) => names.map((n) => `${icon(v, n)} ${n}`);
+  box.replaceChildren(...[el('h1', {}, 'DU KLARTE DET! 🎉'), el('p', { class: 'headline' }, e.headline, speaker(e.headline)),
+    line('DU HJALP', pictures(e.helped)), line('NYE VENNER', pictures(e.friends.map((f) => f.name))), line('DU FANT', pictures(e.found)),
     e.chosen ? el('p', { class: 'headline' }, `${e.chosen} er din nå!`)
       : e.offer.length ? el('div', {}, el('h2', {}, 'VELG EN TING TIL HELTEBOKA'),
-        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, o.name.toUpperCase())))) : null].filter(Boolean));
+        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, el('span', { class: 'big-icon' }, icon(v, o.name)), o.name.toUpperCase())))) : null].filter(Boolean));
 }
 
 // Packing before the run, and the hero book itself (workshop B4).
@@ -96,14 +117,14 @@ function renderBook(v) {
   if (v.pack) {
     pack.replaceChildren(el('h2', {}, 'TA MED FRA HELTEBOKA'), el('p', {}, 'Du kan ta med én venn og én ting.'),
       el('div', { class: 'chips' },
-        ...v.pack.friends.filter((n) => !v.companions.includes(n)).map((n) => el('button', { class: 'ghost', onclick: () => request('BRING', { kind: 'friend', name: n }) }, n)),
-        ...v.pack.ting.filter((n) => !v.inventory.includes(n)).map((n) => el('button', { class: 'ghost', onclick: () => request('BRING', { kind: 'ting', name: n }) }, n))));
+        ...v.pack.friends.filter((n) => !v.companions.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'friend', name: n }))),
+        ...v.pack.ting.filter((n) => !v.inventory.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'ting', name: n })))));
   }
   const book = $('#book');
   book.hidden = !v.book || (!v.book.friends.length && !v.book.ting.length);
   if (book.hidden) return;
   book.replaceChildren(el('h2', {}, `HELTEBOKA · ${v.book.runs} LØP`),
-    el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, n)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, n))));
+    el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, `${icon(v, n)} ${n}`)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, `${icon(v, n)} ${n}`))));
 }
 
 function renderMap(v) {

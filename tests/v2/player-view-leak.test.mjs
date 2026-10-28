@@ -36,4 +36,21 @@ for (const missionId of missionIds(content)) {
     }
   }
 }
-console.log(`player-view leak test: ${views} views checked, OK`);
+// Every thing, item and friend the child sees has a picture (workshop C1): the child may not read yet.
+let pictured = 0;
+for (const missionId of missionIds(content)) {
+  for (const length of ['KORT', 'VANLIG', 'STORT']) {
+    for (let seed = 1; seed <= 20; seed++) {
+      const { run } = acceptedRun(content, missionId, seed, length);
+      const inventory = run.nodes.filter((n) => n.item).map((n) => n.item.name);
+      const companions = run.nodes.filter((n) => ['companion', 'target'].includes(n.kind)).map((n) => n.card.name);
+      for (const room of run.map.rooms) {
+        const view = playerView(run, { here: room.id, visited: run.map.rooms.map((r) => r.id), done: [], openGates: [], inventory, companions, log: [], runCode: 'X' });
+        for (const th of view.room.things) assert.ok(th.icon && th.icon !== '❔', `${missionId}/${length}/${seed}: no picture for ${th.name}`);
+        for (const [name, icon] of Object.entries(view.icons)) assert.ok(icon !== '❔', `${missionId}/${length}/${seed}: no picture for ${name} in the backpack`);
+        pictured++;
+      }
+    }
+  }
+}
+console.log(`player-view leak test: ${views} views checked, OK; ${pictured} views with a picture for everything`);

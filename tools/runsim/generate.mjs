@@ -100,15 +100,15 @@ function makeBlocker(ctx, room, gate) {
 // KEY and MAGIC are one specific thing, RHYME is 2–3 lines found separately, TAG is anything with a tag.
 function makeLock(ctx, room, gate) {
   const lock = ctx.mission.goal.lock;
-  const opener = lock.opener || { kind: 'KEY', item: lock.key, sign: `${lock.name} har et lite nøkkelhull.` };
-  const node = addNode(ctx, { kind: 'lock', opener: opener.kind, card: { name: lock.name, intro: lock.intro }, room, zone: zoneOf(ctx, room), gate, needs: [] });
+  const opener = lock.opener || { kind: 'KEY', item: lock.key, icon: lock.keyIcon, sign: `${lock.name} har et lite nøkkelhull.` };
+  const node = addNode(ctx, { kind: 'lock', opener: opener.kind, card: { name: lock.name, intro: lock.intro, icon: lock.icon }, room, zone: zoneOf(ctx, room), gate, needs: [] });
   return addOpenerNeeds(ctx, node, opener) ? node : null;
 }
 
 // Adds what the opener needs to `node` (a door at a gate, or the chest that is the goal). False if it cannot be provided.
 function addOpenerNeeds(ctx, node, opener) {
   if (opener.kind === 'KEY' || opener.kind === 'MAGIC') {
-    const provider = provideSpecific(ctx, { specificId: 'KEY', name: opener.item, tags: [], consumable: true }, node, 0);
+    const provider = provideSpecific(ctx, { specificId: 'KEY', name: opener.item, icon: opener.icon || '🗝️', tags: [], consumable: true }, node, 0);
     if (!provider) return false;
     node.needs.push({ specific: 'KEY', name: opener.item, provider: provider.id, sign: opener.sign });
     return true;
@@ -121,7 +121,7 @@ function addOpenerNeeds(ctx, node, opener) {
       ? `Over ${opener.door} står første linje: ${opener.lines[0]} … Resten er visket bort.`
       : `Over ${opener.door} er det risset tre linjer, men bokstavene er visket bort.`;
     for (let i = shown; i < opener.lines.length; i++) {
-      const line = { specificId: `RHYME:${i + 1}`, name: `Regle-linje ${i + 1}: «${opener.lines[i]}»`, found: `Noen har risset en linje i veggen: «${opener.lines[i]}»`, tags: [], consumable: true };
+      const line = { specificId: `RHYME:${i + 1}`, name: `Regle-linje ${i + 1}: «${opener.lines[i]}»`, icon: '📜', found: `Noen har risset en linje i veggen: «${opener.lines[i]}»`, tags: [], consumable: true };
       const provider = provideSpecific(ctx, line, node, 0);
       if (!provider) return false;
       node.needs.push({ specific: line.specificId, name: line.name, via: 'rhyme', provider: provider.id, sign: i === shown ? doorSign : `Linje ${i + 1} mangler i innskriften.` });
@@ -136,9 +136,9 @@ function addOpenerNeeds(ctx, node, opener) {
 
 function makeMachine(ctx, room, gate) {
   const { rng, mission } = ctx;
-  const node = addNode(ctx, { kind: 'machine', card: { name: mission.goal.name }, room, zone: zoneOf(ctx, room), gate, needs: [] });
+  const node = addNode(ctx, { kind: 'machine', card: { name: mission.goal.name, icon: mission.goal.icon }, room, zone: zoneOf(ctx, room), gate, needs: [] });
   const part = mission.goal.part;
-  if (part && !addThemeNeed(ctx, node, { part: part.name, sign: part.sign }, 'part')) return null;
+  if (part && !addThemeNeed(ctx, node, { part: part.name, icon: part.icon, sign: part.sign }, 'part')) return null;
   const tags = rng.shuffle(mission.goal.pool).slice(0, mission.goal.count - (part ? 1 : 0));
   for (const tag of tags) {
     const provider = provideTag(ctx, tag, node, 0);
@@ -154,23 +154,23 @@ function makeGoal(ctx, lastGate) {
   const endZone = lastGate;
   if (mission.type === 'FINN') {
     const lock = mission.goal.lock;
-    if (!lock.inGoal) return addNode(ctx, { kind: 'goal', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
-    const node = addNode(ctx, { kind: 'goal', opener: lock.opener.kind, card: { name: `${mission.goal.name} i ${lock.name.charAt(0).toLowerCase()}${lock.name.slice(1)}`, intro: lock.intro }, room: map.end, zone: endZone, needs: [] });
+    if (!lock.inGoal) return addNode(ctx, { kind: 'goal', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
+    const node = addNode(ctx, { kind: 'goal', opener: lock.opener.kind, card: { name: `${mission.goal.name} i ${lock.name.charAt(0).toLowerCase()}${lock.name.slice(1)}`, intro: lock.intro, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
     return addOpenerNeeds(ctx, node, lock.opener) ? node : null;
   }
   if (mission.type === 'KOM_UT') {
-    const node = addNode(ctx, { kind: 'exit', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+    const node = addNode(ctx, { kind: 'exit', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
     return !mission.goal.need || addThemeNeed(ctx, node, mission.goal.need, 'exit') ? node : null;
   }
-  if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}` }, room: map.end, zone: endZone, needs: [] });
+  if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}`, icon: '🚪' }, room: map.end, zone: endZone, needs: [] });
   if (mission.type === 'LEVER') {
-    const node = addNode(ctx, { kind: 'deliver', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [], deliverTo: map.start });
-    node.item = { specificId: 'DELIVERY', name: mission.goal.item, tags: [], consumable: true };
+    const node = addNode(ctx, { kind: 'deliver', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [], deliverTo: map.start });
+    node.item = { specificId: 'DELIVERY', name: mission.goal.item, icon: mission.goal.itemIcon || '🎁', tags: [], consumable: true };
     if (mission.goal.need && !addThemeNeed(ctx, node, mission.goal.need, 'guard')) return null;
     return node;
   }
   if (mission.type === 'REDD') {
-    const node = addNode(ctx, { kind: 'target', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+    const node = addNode(ctx, { kind: 'target', card: { name: mission.goal.name, icon: mission.goal.icon }, room: map.end, zone: endZone, needs: [] });
     // First get it loose (if its problem says so), then calm it.
     if (mission.goal.free && !addThemeNeed(ctx, node, mission.goal.free, 'free')) return null;
     const tag = rng.pick(mission.goal.calm);
@@ -189,7 +189,7 @@ const phraseOf = (ctx, tag) => ctx.content.tagById.get(tag).phrase || ctx.conten
 // A need that comes from a theme part (decision A9): a tag ({ tag, sign }) or one specific part ({ part, sign }).
 function addThemeNeed(ctx, node, need, via) {
   if (need.part) {
-    const provider = provideSpecific(ctx, { specificId: 'PART', name: need.part, tags: [], consumable: true }, node, 0);
+    const provider = provideSpecific(ctx, { specificId: 'PART', name: need.part, icon: need.icon || '⚙️', tags: [], consumable: true }, node, 0);
     if (!provider) return false;
     node.needs.push({ specific: 'PART', name: need.part, via, provider: provider.id, sign: need.sign });
     return true;
@@ -337,7 +337,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
     const room = chooseRoom(ctx, maxZone, nearRoom);
     if (!room) return null;
     markType(ctx, type);
-    const filled = { specificId: null, name: source.requires === 'BEHOLDER' ? `beholder med ${content.tagById.get(tag).label}` : `${content.tagById.get(tag).label} fra ${source.name.toLowerCase()}`, tags: [tag], consumable: true };
+    const filled = { specificId: null, name: source.requires === 'BEHOLDER' ? `beholder med ${content.tagById.get(tag).label}` : `${content.tagById.get(tag).label} fra ${source.name.toLowerCase()}`, icon: source.requires === 'BEHOLDER' ? content.tagById.get(tag).icon : source.icon, tags: [tag], consumable: true };
     const node = addNode(ctx, { kind: 'source', sourceType: type, card: source, item: filled, provides: tag, consumer: consumer.id, room: room.id, zone: room.zone, needs: [] });
     if (source.requires) {
       ctx.budget -= 1;
@@ -352,7 +352,7 @@ function buildProvider(ctx, type, tag, consumer, maxZone, depth, { containerOnly
     const recipe = rng.pick(content.recipes.filter((r) => r.output.tags.includes(tag) && r.inputs.every((id) => !ctx.usedItems.has(id))));
     if (!recipe) return null;
     ctx.usedRecipe = true; ctx.budget -= 1; markType(ctx, type);
-    const node = addNode(ctx, { kind: 'recipe', sourceType: type, card: recipe, item: { specificId: null, name: recipe.output.name, tags: recipe.output.tags, consumable: recipe.output.consumable }, provides: tag, consumer: consumer.id, room: null, zone: consumer.zone, needs: [] });
+    const node = addNode(ctx, { kind: 'recipe', sourceType: type, card: recipe, item: { specificId: null, name: recipe.output.name, icon: recipe.output.icon, tags: recipe.output.tags, consumable: recipe.output.consumable }, provides: tag, consumer: consumer.id, room: null, zone: consumer.zone, needs: [] });
     for (const id of recipe.inputs) {
       const item = content.itemById.get(id);
       const ingredient = provideSpecific(ctx, { ...itemInstance(item), specificId: id }, node, depth + 1, { onlyPlaced: true });
@@ -401,7 +401,7 @@ function resolveFigureWant(ctx, node, figure, depth) {
   if (nestedOk) {
     for (const w of chainable) {
       if (w.type === 'MISTET') {
-        const lost = provideSpecific(ctx, { specificId: `LOST:${figure.id}`, name: w.what, tags: [], consumable: true }, node, depth + 1, { onlyPlaced: true });
+        const lost = provideSpecific(ctx, { specificId: `LOST:${figure.id}`, name: w.what, icon: '🎁', tags: [], consumable: true }, node, depth + 1, { onlyPlaced: true });
         if (lost) { node.needs.push({ specific: `LOST:${figure.id}`, name: w.what, via: 'lost', provider: lost.id, sign: w.sign }); return true; }
         continue;
       }
@@ -429,7 +429,7 @@ function pickQuest(ctx, quests) {
 const w2via = (w) => ({ VITE: 'vite', KAMP: 'kamp', GJORE: 'gjore', SORT: 'handling' }[w.type] || 'lokal');
 
 function itemInstance(item) {
-  return { specificId: null, cardId: item.id, name: item.name, tags: item.tags, consumable: item.consumable !== false };
+  return { specificId: null, cardId: item.id, name: item.name, icon: item.icon, tags: item.tags, consumable: item.consumable !== false };
 }
 
 // ---------- extras (never used by the automaton) ----------
@@ -446,7 +446,7 @@ function addAlternatives(ctx, run) {
     if (!item || !room) continue;
     ctx.usedItems.add(item.id);
     ctx.occupied.add(room.id);
-    run.alternatives.push({ for: node.id, tag, item: item.name, room: room.id, zone: room.zone });
+    run.alternatives.push({ for: node.id, tag, item: item.name, icon: item.icon, room: room.id, zone: room.zone });
   }
 }
 

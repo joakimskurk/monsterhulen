@@ -134,6 +134,11 @@ function publish() {
     end: finished ? { ...table.summary(T()), offer: book.runs.some((r) => r.code === current.code) ? [] : offer(), chosen: state.chosenTing?.name || null } : null,
     book: { friends: book.friends.map((f) => f.name), ting: book.ting.map((x) => x.name), runs: book.runs.length },
     pack: canPack() ? { friends: book.friends.map((f) => f.name), ting: book.ting.map((x) => x.name) } : null,
+    // Pictures for what comes from the hero book (not part of this run).
+    icons: Object.fromEntries([
+      ...book.friends.map((f) => [f.name, content.figures.find((x) => x.name === f.name)?.icon]),
+      ...book.ting.map((x) => [x.name, content.items.find((i) => i.id === x.id)?.icon]),
+    ].filter(([, icon]) => icon)),
   });
   fetch(`/api/${SESSION}/player`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(view) }).catch(() => {});
 }
