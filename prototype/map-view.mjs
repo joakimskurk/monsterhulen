@@ -1,67 +1,140 @@
-// Draws the cave as in the owner's original: rooms of different sizes on a grid, doors in the walls,
-// fog over what is not explored yet. Shared by the DM page and the iPad, so both see the same cave.
+// Draws the cave as the owner's original does (V0.12.3, docs/reference/original-v0.12.3/): a grid of
+// tiles, each room cell with a floor tile, stone walls where the room ends, corners, and door tiles
+// where the doors are; everything else is fog. The tiles are the original's own
+// (assets/tileset/v3-map/). Shared by the DM page and the iPad.
 //
 // model = {
-//   rooms: [{ id, x, y, w, h, label, tone, look: 'here' | 'visited' | 'fog' | 'closed' | 'open', canGo, corner }],
-//   doors: [{ aCell, bCell, dir, kind: 'open' | 'locked' | 'unlocked' | 'secret' }],
+//   bounds: { minX, minY, maxX, maxY },                     the grid to draw; outside rooms is fog
+//   rooms:  [{ id, x, y, w, h, look: 'here' | 'visited' | 'open' | 'closed', canGo, label, corner }],
+//   doors:  [{ x, y, dir: 'n'|'e'|'s'|'w', kind: 'open' | 'locked' | 'unlocked' | 'passage' | 'secret' }],
+//   probes: [{ x, y, room, locked }],                        «?» or 🔒 in the fog beyond an exit
 // }
-const NS = 'http://www.w3.org/2000/svg';
-const mk = (tag, attrs = {}, text) => {
-  const n = document.createElementNS(NS, tag);
-  for (const [k, v] of Object.entries(attrs)) if (v !== undefined && v !== null) n.setAttribute(k, v);
-  if (text !== undefined) n.textContent = text;
-  return n;
+const ROOT = '/assets/tileset/v3-map/';
+const FLOORS = 9;
+const SIDE = { n: 'N', e: 'E', s: 'S', w: 'W' };
+// Door kinds in the model -> the original's connection tiles.
+const DOOR_TILE = { open: 'door_open', unlocked: 'door_open', locked: 'door_locked', passage: 'passage_open', secret: 'passage_open' };
+
+const STYLE = `
+.cave-grid { display: grid; gap: 0; background: #070b10; padding: 6px; border: 3px solid #07050d; border-radius: 6px; image-rendering: pixelated; width: max-content; max-width: 100%; overflow-x: auto; }
+.cave-tile { position: relative; width: var(--cell); height: var(--cell); background: #070b10; overflow: hidden; }
+.cave-tile img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
+.cave-tile.closed img { filter: brightness(.45) saturate(.6); }
+/* Frames sit above the tile images (a plain inset shadow would be hidden under them). */
+.cave-tile.here::after, .cave-tile.go::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+.cave-tile.here::after { box-shadow: inset 0 0 0 3px #ffd95c; }
+.cave-tile.go { cursor: pointer; }
+.cave-tile.go::after { box-shadow: inset 0 0 0 2px rgba(99, 242, 255, .75); }
+.cave-tile .mark, .cave-tile .corner { z-index: 3; }
+.cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
+.cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 11px 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
+.cave-tile .secret { position: absolute; inset: 2px; border: 2px dashed #ff73b8; pointer-events: none; }
+.cave-probe { width: 100%; height: 100%; min-height: 0 !important; margin: 0; padding: 0 !important; border: 2px dashed #63f2ff; border-radius: 4px; background: rgba(99, 242, 255, .08); color: #63f2ff; font: 700 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
+.cave-probe.locked { border-color: #ff7a7a; color: #ff7a7a; background: rgba(255, 122, 122, .08); cursor: default; }
+`;
+function ensureStyle() {
+  if (document.getElementById('cave-style')) return;
+  const s = document.createElement('style');
+  s.id = 'cave-style';
+  s.textContent = STYLE;
+  document.head.append(s);
+}
+const img = (file, rot) => {
+  const i = document.createElement('img');
+  i.src = ROOT + file;
+  i.alt = '';
+  if (rot) i.style.transform = `rotate(${rot}deg)`;
+  return i;
 };
+const span = (cls, text) => { const s = document.createElement('span'); s.className = cls; s.textContent = text; return s; };
 
-// Palette from the original (V0.12.3): deep purple floor, pixel-dark walls, warm marks.
-const FLOOR = { LYS: '#6b4ab0', MØRK: '#3f2c72', RAR: '#7b3f91', BLANDET: '#56408a' };
-const COLORS = { wall: '#07050d', fog: '#1d1533', closed: '#2a2045', text: '#fff9e8', muted: '#c5b9ff', here: '#ffd95c', go: '#63f2ff', gate: '#ff7a7a', gateOpen: '#7dff9a', door: '#c5b9ff', secret: '#ff73b8' };
+export function caveGrid(model, { cell = 40, onRoom = null } = {}) {
+  ensureStyle();
+  const { minX, minY, maxX, maxY } = model.bounds;
+  const grid = document.createElement('div');
+  grid.className = 'cave-grid';
+  grid.style.setProperty('--cell', `${cell}px`);
+  grid.style.gridTemplateColumns = `repeat(${maxX - minX + 1}, var(--cell))`;
+  grid.setAttribute('role', 'img');
+  grid.setAttribute('aria-label', 'Kart over hulen');
 
-// Fits a room name into its width: smaller text first, then shortened with … (the full name is in
-// the room's tooltip and in the room title).
-function fitLabel(label, width) {
-  const size = Math.max(8, Math.min(13, (width - 8) / Math.max(4, label.length * 0.62)));
-  const fits = Math.floor((width - 8) / (size * 0.62));
-  return { size, text: label.length > fits ? `${label.slice(0, Math.max(1, fits - 1))}…` : label };
+  const roomAt = (x, y) => model.rooms.find((r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
+  const probeAt = (x, y) => (model.probes || []).find((p) => p.x === x && p.y === y);
+
+  for (let y = minY; y <= maxY; y++) {
+    for (let x = minX; x <= maxX; x++) {
+      const tile = document.createElement('div');
+      tile.className = 'cave-tile';
+      const r = roomAt(x, y);
+      if (!r) {
+        // Fog. Beyond an exit of the room the child is in: «?» to explore, 🔒 if the door is locked.
+        const p = probeAt(x, y);
+        if (p) {
+          const b = document.createElement('button');
+          b.type = 'button';
+          b.className = `cave-probe${p.locked ? ' locked' : ''}`;
+          b.textContent = p.locked ? '🔒' : '?';
+          b.setAttribute('aria-label', p.locked ? 'Låst dør' : 'Utforsk');
+          if (!p.locked && onRoom) b.addEventListener('click', () => onRoom(p.room));
+          tile.append(b);
+        }
+        grid.append(tile);
+        continue;
+      }
+      tile.classList.add('room', r.look);
+      if (r.canGo) tile.classList.add('go');
+      tile.title = r.label || '';
+
+      // Floor: one of the variants, fixed by position and rotated, as in the original.
+      const seed = Math.abs(((x + 17) * 73856093) ^ ((y + 31) * 19349663));
+      tile.append(img(`floors-${(seed % FLOORS) + 1}.png`, (Math.abs(seed >>> 3) % 4) * 90));
+
+      const join = { N: roomAt(x, y - 1) === r, E: roomAt(x + 1, y) === r, S: roomAt(x, y + 1) === r, W: roomAt(x - 1, y) === r };
+      const doors = Object.fromEntries(model.doors.filter((d) => d.x === x && d.y === y).map((d) => [SIDE[d.dir], d]));
+      for (const s of ['N', 'E', 'S', 'W']) if (!join[s] && !doors[s]) tile.append(img(`wall-${s}.png`));
+      if (!join.N && !join.W) tile.append(img('outer-NW.png'));
+      if (!join.N && !join.E) tile.append(img('outer-NE.png'));
+      if (!join.S && !join.E) tile.append(img('outer-SE.png'));
+      if (!join.S && !join.W) tile.append(img('outer-SW.png'));
+      // Inner corners only where a room is not a plain rectangle (kept for other room shapes).
+      const diag = (dx, dy) => roomAt(x + dx, y + dy) === r;
+      if (join.N && join.W && !diag(-1, -1)) tile.append(img('inner-NW.png'));
+      if (join.N && join.E && !diag(1, -1)) tile.append(img('inner-NE.png'));
+      if (join.S && join.E && !diag(1, 1)) tile.append(img('inner-SE.png'));
+      if (join.S && join.W && !diag(-1, 1)) tile.append(img('inner-SW.png'));
+      for (const [s, d] of Object.entries(doors)) {
+        tile.append(img(`connection-${DOOR_TILE[d.kind]}-${s}.png`));
+        if (d.kind === 'secret') tile.append(span('secret', ''));
+      }
+
+      // A star in the middle cell where the child is; the room number in the corner for the DM.
+      const midX = r.x + Math.floor((r.w - 1) / 2), midY = r.y + Math.floor((r.h - 1) / 2);
+      if (x === midX && y === midY && r.look === 'here') tile.append(span('mark', '★'));
+      if (x === r.x && y === r.y && r.corner) tile.append(span('corner', r.corner));
+      if (onRoom) tile.addEventListener('click', () => onRoom(r.id));
+      grid.append(tile);
+    }
+  }
+  return grid;
 }
 
-export function caveSvg(model, { cell = 44, onRoom = null } = {}) {
-  const xs = model.rooms.flatMap((r) => [r.x, r.x + r.w]);
-  const ys = model.rooms.flatMap((r) => [r.y, r.y + r.h]);
-  const minX = Math.min(...xs), maxX = Math.max(...xs), minY = Math.min(...ys), maxY = Math.max(...ys);
-  const pad = cell * 0.35;
-  const W = (maxX - minX) * cell + 2 * pad, H = (maxY - minY) * cell + 2 * pad;
-  const px = (x) => (x - minX) * cell + pad, py = (y) => (y - minY) * cell + pad;
-  const svg = mk('svg', { viewBox: `0 0 ${W} ${H}`, width: W, height: H, class: 'cave', role: 'img', 'aria-label': 'Kart over hulen' });
-  svg.style.maxWidth = '100%';
-  svg.style.height = 'auto';
-
-  for (const r of model.rooms) {
-    const g = mk('g', { class: `cave-room ${r.look}${r.canGo ? ' go' : ''}`, role: onRoom ? 'button' : null, 'aria-label': `${r.label}` });
-    const fill = r.look === 'fog' ? COLORS.fog : r.look === 'closed' ? COLORS.closed : FLOOR[r.tone] || FLOOR.BLANDET;
-    const stroke = r.look === 'here' ? COLORS.here : r.canGo ? COLORS.go : COLORS.wall;
-    g.append(mk('rect', { x: px(r.x) + 3, y: py(r.y) + 3, width: r.w * cell - 6, height: r.h * cell - 6, rx: 4, fill, stroke, 'stroke-width': r.look === 'here' || r.canGo ? 4 : 3 }));
-    const cx = px(r.x) + (r.w * cell) / 2, cy = py(r.y) + (r.h * cell) / 2;
-    if (r.look === 'here') g.append(mk('text', { x: cx, y: cy - 4, 'text-anchor': 'middle', 'font-size': 18, fill: COLORS.here }, '★'));
-    const label = r.label || '';
-    const fit = r.look === 'fog' ? { size: 18, text: label } : fitLabel(label, r.w * cell);
-    g.append(mk('title', {}, label));
-    g.append(mk('text', { x: cx, y: r.look === 'here' ? cy + 14 : cy + 4, 'text-anchor': 'middle', 'font-size': fit.size, 'font-family': 'Courier New, monospace', 'font-weight': 700, fill: r.look === 'fog' ? COLORS.muted : COLORS.text }, fit.text));
-    if (r.corner) g.append(mk('text', { x: px(r.x) + 8, y: py(r.y) + 15, 'font-size': 10, 'font-family': 'Courier New, monospace', fill: COLORS.muted }, r.corner));
-    if (onRoom) { g.style.cursor = 'pointer'; g.addEventListener('click', () => onRoom(r.id)); }
-    svg.append(g);
+// Door tiles for the rooms that are drawn: a door sits on the cell of each drawn room it belongs to.
+export function doorsFor(edges, drawn, kindOf) {
+  const opp = { n: 's', e: 'w', s: 'n', w: 'e' };
+  const out = [];
+  for (const e of edges) {
+    const kind = kindOf(e);
+    if (!kind) continue;
+    if (drawn.has(e.a)) out.push({ x: e.aCell.x, y: e.aCell.y, dir: e.aDir, kind });
+    if (drawn.has(e.b)) out.push({ x: e.bCell.x, y: e.bCell.y, dir: opp[e.aDir], kind });
   }
+  return out;
+}
 
-  // Doors sit on the wall between the two cells they join, bridging the gap between the rooms.
-  for (const d of model.doors) {
-    const a = d.aCell;
-    const vertical = d.dir === 'e' || d.dir === 'w';
-    const wx = d.dir === 'e' ? px(a.x + 1) : d.dir === 'w' ? px(a.x) : px(a.x) + cell / 2;
-    const wy = d.dir === 's' ? py(a.y + 1) : d.dir === 'n' ? py(a.y) : py(a.y) + cell / 2;
-    const [w, h] = vertical ? [12, cell * 0.42] : [cell * 0.42, 12];
-    const color = { open: COLORS.door, locked: COLORS.gate, unlocked: COLORS.gateOpen, secret: 'none' }[d.kind];
-    svg.append(mk('rect', { x: wx - w / 2, y: wy - h / 2, width: w, height: h, fill: color, stroke: d.kind === 'secret' ? COLORS.secret : COLORS.wall, 'stroke-width': 2, 'stroke-dasharray': d.kind === 'secret' ? '3 3' : null }));
-    if (d.kind === 'locked') svg.append(mk('text', { x: wx, y: wy + 5, 'text-anchor': 'middle', 'font-size': 13 }, '🔒'));
-  }
-  return svg;
+// The grid to draw: all rooms of the cave with one cell of fog around (the original does the same).
+export function caveBounds(rooms) {
+  return {
+    minX: Math.min(...rooms.map((r) => r.x)) - 1, minY: Math.min(...rooms.map((r) => r.y)) - 1,
+    maxX: Math.max(...rooms.map((r) => r.x + r.w - 1)) + 1, maxY: Math.max(...rooms.map((r) => r.y + r.h - 1)) + 1,
+  };
 }

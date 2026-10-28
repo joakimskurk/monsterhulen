@@ -167,7 +167,17 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
   const listed = new Set(c.assets.flatMap((a) => [a.file, sidecarPath(a)]));
   const walk = (dir) => readdirSync(dir).flatMap((n) => { const p = join(dir, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
   const assetsDir = join(REPO_ROOT, 'assets');
-  if (existsSync(assetsDir)) for (const f of walk(assetsDir)) { const rel = f.slice(REPO_ROOT.length + 1); if (!listed.has(rel) && !rel.endsWith('README.md')) warn(`file ${rel}`, 'not listed in content/assets.json'); }
+  // The tileset (assets/tileset/) is the owner's, not generated: it has its own index instead.
+  const isTileset = (rel) => rel.startsWith('assets/tileset/');
+  if (existsSync(assetsDir)) for (const f of walk(assetsDir)) { const rel = f.slice(REPO_ROOT.length + 1); if (!listed.has(rel) && !rel.endsWith('README.md') && !isTileset(rel)) warn(`file ${rel}`, 'not listed in content/assets.json'); }
+  const tilesetDir = join(REPO_ROOT, 'assets', 'tileset', 'v3-map');
+  if (!existsSync(join(tilesetDir, 'tileset.json'))) err('tileset', 'assets/tileset/v3-map/tileset.json is missing (the map tiles)');
+  else {
+    const ts = JSON.parse(readFileSync(join(tilesetDir, 'tileset.json'), 'utf8'));
+    const files = [...ts.floors, ...Object.values(ts.wall), ...Object.values(ts.outer), ...Object.values(ts.inner), ...Object.values(ts.connection).flatMap((d) => Object.values(d))];
+    for (const f of files) if (!existsSync(join(tilesetDir, f))) err('tileset', `${f} is missing`);
+    if (ts.floors.length !== 9) err('tileset', 'the map draws 9 floor variants');
+  }
 }
 
 // Room names and mood per zone (content/places.json, from the owner's original).

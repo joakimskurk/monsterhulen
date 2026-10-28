@@ -1,6 +1,6 @@
 // The child's iPad: shows the filtered player view and sends requests to the DM.
 // It never changes the game itself; the DM device accepts or declines every request.
-import { caveSvg } from './map-view.mjs';
+import { caveGrid } from './map-view.mjs';
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
   const node = document.createElement(tag);
@@ -190,7 +190,8 @@ function renderBook(v) {
 
 function renderMap(v) {
   // The cave as in the original: rooms and doors, fog over the unknown (prototype/map-view.mjs).
-  $('#map').replaceChildren(caveSvg(v.cave, { cell: 52, onRoom: (id) => { if (v.cave.rooms.find((r) => r.id === id)?.canGo) request('MOVE', { room: id }); } }));
+  const canGo = (id) => v.cave.rooms.some((r) => r.id === id && r.canGo) || v.cave.probes.some((p) => p.room === id && !p.locked);
+  $('#map').replaceChildren(caveGrid(v.cave, { cell: 44, onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));
 }
 
 $('#search').addEventListener('click', () => view && request('SEARCH', { room: view.here }));

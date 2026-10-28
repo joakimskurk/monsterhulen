@@ -5,7 +5,7 @@ import { acceptedRun } from '../tools/runsim/accept.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView } from './player-view.mjs';
-import { caveSvg } from './map-view.mjs';
+import { caveGrid, doorsFor, caveBounds } from './map-view.mjs';
 import * as table from './table.mjs';
 import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
 
@@ -366,19 +366,21 @@ function renderFinish() {
 }
 
 function renderMap() {
-  // The whole cave for the DM: every room with its name and number, every door including secret
-  // ones, and the rooms behind a closed gate darker (prototype/map-view.mjs).
+  // The whole cave for the DM, drawn with the original's tiles: every room with its number, every
+  // door including secret ones, and the rooms behind a closed gate darker (prototype/map-view.mjs).
   const { map } = current.run;
   const open = reach();
   const openGates = new Set(state.openGates);
-  $('#map').replaceChildren(caveSvg({
+  $('#map').replaceChildren(caveGrid({
+    bounds: caveBounds(map.rooms),
     rooms: map.rooms.map((r) => ({
-      id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, tone: r.tone, label: r.name, corner: String(r.id),
+      id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, label: `${r.id} · ${r.name}`, corner: String(r.id),
       look: r.id === state.here ? 'here' : !open.has(r.id) ? 'closed' : state.visited.includes(r.id) ? 'visited' : 'open',
       canGo: r.id === state.selected && r.id !== state.here,
     })),
-    doors: map.edges.map((e) => ({ aCell: e.aCell, bCell: e.bCell, dir: e.aDir, kind: e.secret ? 'secret' : e.gate === null ? 'open' : openGates.has(e.gate) ? 'unlocked' : 'locked' })),
-  }, { cell: 46, onRoom: (id) => goTo(id) }));
+    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null ? (openGates.has(e.gate) ? 'unlocked' : 'locked') : e.loop ? 'passage' : 'open')),
+    probes: [],
+  }, { cell: 36, onRoom: (id) => goTo(id) }));
 }
 
 function needBlock(node, need, i) {

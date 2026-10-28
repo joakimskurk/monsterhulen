@@ -1,6 +1,7 @@
 // What the child's iPad may see. Built only from an allow-list of fields:
 // never needs, signs, providers, solutions, hidden items, zones ahead or the DM template.
 import { reachable } from '../tools/runsim/map.mjs';
+import { doorsFor, caveBounds } from './map-view.mjs';
 
 const FIGURE_KINDS = new Set(['blocker', 'trader', 'quest', 'companion', 'target', 'lock', 'machine', 'goal', 'exit', 'deliver']);
 
@@ -24,13 +25,6 @@ export function playerView(run, state, extra = {}) {
   const openGates = new Set(state.openGates);
   const reach = reachable(map, { openGates });
   const visited = new Set(state.visited);
-  // Known rooms: visited ones and their direct neighbours (not through secret doors).
-  const known = new Set(visited);
-  for (const e of map.edges) {
-    if (e.secret) continue;
-    if (visited.has(e.a)) known.add(e.b);
-    if (visited.has(e.b)) known.add(e.a);
-  }
   const done = new Set(state.done);
 
   const here = state.here;
@@ -61,19 +55,22 @@ export function playerView(run, state, extra = {}) {
     runCode: state.runCode,
     mission: { name: run.mission.name, intro: run.mission.intro },
     here,
-    // The cave as the child knows it (map-view.mjs): rooms she has been in, with their names, and the
-    // rooms next to them in fog. Secret doors and what lies beyond the known rooms are never sent.
+    // Fog of war as in the original (map-view.mjs): only rooms she has been in are drawn; everything
+    // else is fog, with «?» (or 🔒) just beyond the doors of the room she is in. Secret doors and the
+    // shape of unexplored rooms are never sent.
     cave: {
-      rooms: map.rooms.filter((r) => known.has(r.id)).map((r) => ({
-        id: r.id, x: r.x, y: r.y, w: r.w, h: r.h,
-        look: r.id === here ? 'here' : visited.has(r.id) ? 'visited' : 'fog',
-        tone: visited.has(r.id) ? r.tone : null,
-        label: visited.has(r.id) ? r.name : '?',
+      bounds: caveBounds(map.rooms),
+      rooms: map.rooms.filter((r) => visited.has(r.id)).map((r) => ({
+        id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, label: r.name,
+        look: r.id === here ? 'here' : 'visited',
         canGo: reach.has(r.id) && r.id !== here,
       })),
-      doors: map.edges.filter((e) => !e.secret && known.has(e.a) && known.has(e.b)).map((e) => ({
-        aCell: e.aCell, bCell: e.bCell, dir: e.aDir, kind: e.gate === null ? 'open' : openGates.has(e.gate) ? 'unlocked' : 'locked',
-      })),
+      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null ? (openGates.has(e.gate) ? 'unlocked' : 'locked') : e.loop ? 'passage' : 'open')),
+      probes: map.edges.filter((e) => !e.secret && (e.a === here || e.b === here) && !visited.has(e.a === here ? e.b : e.a)).map((e) => {
+        const other = e.a === here ? e.b : e.a;
+        const cell = e.a === here ? e.bCell : e.aCell;
+        return { x: cell.x, y: cell.y, room: other, locked: e.gate !== null && !openGates.has(e.gate) };
+      }),
     },
     room: { id: here, title: map.rooms[here].name || `Rom ${here}`, place: map.rooms[here].zoneName, things },
     inventory: state.inventory.slice(),

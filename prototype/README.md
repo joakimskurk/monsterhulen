@@ -62,7 +62,7 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 - Hvor lang var økten, og hvor mange rom?
 
 ## Begrensninger
-- Kartet følger originalen (rom i ulike størrelser, dører i veggene, tåke over det ukjente), men er tegnet enkelt. Bildene kommer via `content/assets.json`.
+- Kartet følger originalen: rom i ulike størrelser, steinflisene fra originalen (`assets/tileset/v3-map/`), og tåke over alt barnet ikke har utforsket. På iPaden står «?» ved dørene ut av rommet hun er i (🔒 hvis døra er låst). Trykk på «?» for å gå dit.
 - To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.
 - Åpner du Forteller-siden i flere faner i samme nettleser, er det den nyeste som styrer barnets skjerm. De eldre sier ifra og slutter å sende.

@@ -53,4 +53,32 @@ for (const missionId of missionIds(content)) {
     }
   }
 }
-console.log(`player-view leak test: ${views} views checked, OK; ${pictured} views with a picture for everything`);
+// Fog of war (as in the original): walking a path from the start, the iPad gets only the rooms she has
+// been in, doors only on those rooms, «?» only beyond the doors of the room she is in, and never a
+// secret door.
+let fogged = 0;
+for (const missionId of missionIds(content)) {
+  for (let seed = 1; seed <= 20; seed++) {
+    const { run } = acceptedRun(content, missionId, seed, 'VANLIG');
+    const { map } = run;
+    const secretCells = new Set(map.edges.filter((e) => e.secret).flatMap((e) => [`${e.aCell.x},${e.aCell.y},${e.aDir}`, `${e.bCell.x},${e.bCell.y}`]));
+    const visited = [map.start];
+    for (const step of [...map.rooms.map((r) => r.id).filter((id) => map.rooms[id].zone === 0)].slice(0, 5)) {
+      if (!visited.includes(step)) visited.push(step);
+      const here = step;
+      const view = playerView(run, { here, visited: visited.slice(), done: [], openGates: [], inventory: [], companions: [], log: [], runCode: 'X' });
+      const cave = view.cave;
+      const where = `${missionId}/${seed} at ${here}`;
+      assert.deepEqual(cave.rooms.map((r) => r.id).sort(), visited.slice().sort(), `${where}: rooms not visited were sent`);
+      for (const d of cave.doors) assert.ok(cave.rooms.some((r) => d.x >= r.x && d.x < r.x + r.w && d.y >= r.y && d.y < r.y + r.h), `${where}: door outside a visited room`);
+      for (const d of cave.doors) assert.ok(!secretCells.has(`${d.x},${d.y},${d.dir}`), `${where}: secret door sent`);
+      for (const p of cave.probes) {
+        const e = map.edges.find((x) => !x.secret && ((x.a === here && x.b === p.room) || (x.b === here && x.a === p.room)));
+        assert.ok(e && !visited.includes(p.room), `${where}: «?» not beyond a door of the current room`);
+      }
+      assert.ok(!JSON.stringify(cave).includes('secret'), `${where}: the word secret in the cave`);
+      fogged++;
+    }
+  }
+}
+console.log(`player-view leak test: ${views} views checked, OK; ${pictured} views with a picture for everything; fog of war holds in ${fogged} views`);
