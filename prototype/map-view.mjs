@@ -32,9 +32,8 @@ const STYLE = `
 .cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
 /* A door is an opening through the wall: the walls stay, and floor stones are laid across both walls
    (each wall is 6 of 32 pixels) where the door is, so you see a passage of the same stones as the floor.
-   Drawn once, centred on the boundary. Open: just the opening with dark edges; locked: a wooden door in
-   the opening with a lock; closed (not walked through yet): the same wooden door without the lock;
-   extra passage: the opening with stone edges; secret (DM only): dashed pink. */
+   Drawn once, centred on the boundary, with a wooden leaf (below); extra passage: stone edges;
+   secret (DM only): dashed pink, no leaf. */
 .cave-tile .door { position: absolute; z-index: 4; pointer-events: none; box-sizing: border-box; --t: calc(var(--cell) * .42); --edge: max(2px, calc(var(--cell) * .05));
   background: url('/assets/tileset/v3-map/floors-1.png') center / var(--cell) var(--cell); image-rendering: pixelated; }
 .cave-tile .door.dir-e, .cave-tile .door.dir-w { top: 25%; height: 50%; width: var(--t); }
@@ -44,17 +43,22 @@ const STYLE = `
 .cave-tile .door.dir-e, .cave-tile .door.dir-w { border-top: var(--edge) solid #1a1426; border-bottom: var(--edge) solid #1a1426; }
 .cave-tile .door.dir-n, .cave-tile .door.dir-s { border-left: var(--edge) solid #1a1426; border-right: var(--edge) solid #1a1426; }
 .cave-tile .door.loop { border-color: #6f7690 !important; }
-/* Every open door has a door leaf, swung open: hinged at one end of the opening and turned into the
-   room farther from the entrance (into = 'out' across the boundary, 'in' back into this room). */
-.cave-tile .door .leaf { position: absolute; background: #8a5a2b; border: 1px solid #3b2210; box-shadow: inset 0 0 0 1px #a8743d; --len: calc(var(--cell) * .4); --thick: max(3px, calc(var(--cell) * .09)); }
-.cave-tile .door.dir-e .leaf, .cave-tile .door.dir-w .leaf { top: 0; height: var(--thick); width: var(--len); }
-.cave-tile .door.dir-n .leaf, .cave-tile .door.dir-s .leaf { left: 0; width: var(--thick); height: var(--len); }
-.cave-tile .door.dir-e .leaf.out, .cave-tile .door.dir-w .leaf.in { left: 50%; }
-.cave-tile .door.dir-e .leaf.in, .cave-tile .door.dir-w .leaf.out { right: 50%; }
-.cave-tile .door.dir-s .leaf.out, .cave-tile .door.dir-n .leaf.in { top: 50%; }
-.cave-tile .door.dir-s .leaf.in, .cave-tile .door.dir-n .leaf.out { bottom: 50%; }
-.cave-tile .door.locked, .cave-tile .door.closed { background: #8a5a2b; border: 2px solid #3b2210 !important; box-shadow: inset 0 0 0 2px #a8743d; }
-.cave-tile .door.locked::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; min-width: 5px; min-height: 5px; transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; }
+/* Every door has a wooden leaf. Closed: lying across the opening, centred on the boundary (locked: with
+   a yellow lock on it). Open: turned 90 degrees on its hinge into the room farther from the entrance
+   (into = 'out' across the boundary, 'in' back into this room). A door the child has just walked through
+   swings open (.swing); the room behind it fades in (.fresh). */
+.cave-tile .door .leaf { position: absolute; background: #8a5a2b; border: 1px solid #3b2210; box-shadow: inset 0 0 0 1px #a8743d; box-sizing: border-box; --thick: max(3px, calc(var(--cell) * .12)); --rot: 0deg; transform: rotate(var(--rot)); }
+.cave-tile .door.dir-e .leaf, .cave-tile .door.dir-w .leaf { top: 0; height: 100%; left: calc(50% - var(--thick) / 2); width: var(--thick); transform-origin: 50% 0; }
+.cave-tile .door.dir-n .leaf, .cave-tile .door.dir-s .leaf { left: 0; width: 100%; top: calc(50% - var(--thick) / 2); height: var(--thick); transform-origin: 0 50%; }
+.cave-tile .door.open.dir-e .leaf.out, .cave-tile .door.open.dir-w .leaf.in, .cave-tile .door.open.dir-n .leaf.out, .cave-tile .door.open.dir-s .leaf.in,
+.cave-tile .door.loop.dir-e .leaf.out, .cave-tile .door.loop.dir-w .leaf.in, .cave-tile .door.loop.dir-n .leaf.out, .cave-tile .door.loop.dir-s .leaf.in { --rot: -90deg; }
+.cave-tile .door.open.dir-e .leaf.in, .cave-tile .door.open.dir-w .leaf.out, .cave-tile .door.open.dir-n .leaf.in, .cave-tile .door.open.dir-s .leaf.out,
+.cave-tile .door.loop.dir-e .leaf.in, .cave-tile .door.loop.dir-w .leaf.out, .cave-tile .door.loop.dir-n .leaf.in, .cave-tile .door.loop.dir-s .leaf.out { --rot: 90deg; }
+.cave-tile .door .leaf.swing { animation: cave-swing .5s ease-out both; }
+@keyframes cave-swing { from { transform: rotate(0deg); } to { transform: rotate(var(--rot)); } }
+.cave-tile .door.locked .leaf::after { content: ''; position: absolute; left: 50%; top: 50%; width: max(5px, calc(var(--cell) * .16)); height: max(5px, calc(var(--cell) * .16)); transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; box-sizing: border-box; }
+.cave-tile.fresh > img { animation: cave-fade .8s ease-out var(--delay, .35s) both; }
+@keyframes cave-fade { from { opacity: var(--from, 0); } to { opacity: 1; } }
 .cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
 /* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
 .cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #07050d; border-radius: 3px; background: #ffd95c; color: #271b00; box-shadow: 2px 2px 0 #07050d; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
@@ -76,9 +80,22 @@ const img = (file, rot) => {
 };
 const span = (cls, text) => { const s = document.createElement('span'); s.className = cls; s.textContent = text; return s; };
 
+// What each screen showed before, so a door the child just walked through swings open and the room
+// behind it fades in, once. Keyed by `memo` (screen + run code); the first render animates nothing.
+// A render during an animation continues it (negative delay) instead of starting it again.
+const memory = new Map();
+const SWING_MS = 1200;
+
 // `maxWidth`: the largest the map may grow (it always fills the width it is given up to that).
-export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
+export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } = {}) {
   ensureStyle();
+  const now = Date.now();
+  const before = memo ? memory.get(memo) : null;
+  const seen = { doors: new Map(), rooms: new Map() };
+  if (memo) memory.set(memo, seen);
+  // Since when this was shown, or null if it is new now (nothing is new on the first render).
+  const since = (map, key, first) => (before ? (before[map].has(key) ? before[map].get(key) : null) : first);
+  const remember = (map, key, t) => { seen[map].set(key, t); return t; };
   const { minX, minY, maxX, maxY } = model.bounds;
   const wrap = document.createElement('div');
   wrap.className = 'cave-wrap';
@@ -114,6 +131,14 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
         continue;
       }
       tile.classList.add('room', r.look);
+      if (r.look !== 'unexplored') {
+        const t = remember('rooms', r.id, since('rooms', r.id, 0) ?? now);
+        if (now - t < SWING_MS) {
+          tile.classList.add('fresh');
+          tile.style.setProperty('--from', before?.wasFaint?.has(r.id) ? '.3' : '0');
+          tile.style.setProperty('--delay', `${0.35 - (now - t) / 1000}s`);
+        }
+      } else (seen.wasFaint ||= new Set()).add(r.id);
       if (r.canGo) tile.classList.add('go');
       tile.title = r.label || '';
 
@@ -138,7 +163,15 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
       for (const d of Object.values(doors)) {
         if (!d.draw) continue;
         const door = span(`door ${d.kind} dir-${d.dir}`, '');
-        if (d.kind === 'open' || d.kind === 'loop') door.append(span(`leaf ${d.into}`, ''));
+        if (d.kind !== 'secret') {
+          const leaf = span(`leaf ${d.into}`, '');
+          if (d.kind === 'open' || d.kind === 'loop') {
+            const key = `${d.x},${d.y},${d.dir}`;
+            const t = remember('doors', key, since('doors', key, 0) ?? now);
+            if (now - t < SWING_MS) { leaf.classList.add('swing'); leaf.style.animationDelay = `${-(now - t) / 1000}s`; }
+          }
+          door.append(leaf);
+        }
         tile.append(door);
       }
 

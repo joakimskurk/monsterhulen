@@ -460,7 +460,7 @@ function renderMap() {
     })),
     doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), doorKind(state, map.edges, { secret: 'secret' }), map.distance[map.start]),
     probes: [],
-  }, { maxWidth: 760, onRoom: clickRoom }));
+  }, { maxWidth: 760, onRoom: clickRoom, memo: `dm:${current.code}` }));
 }
 
 function needBlock(node, need, i) {
