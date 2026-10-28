@@ -123,6 +123,7 @@ async function start() {
 const SELF = {
   move: 'går gjennom åpne dører',
   take: 'tar ting som ligger',
+  make: 'lager noe når alle delene er i sekken',
   give: 'gir en ting eller ber en venn når det åpenbart passer',
   search: 'leter med terningen',
 };
@@ -143,7 +144,8 @@ function handleBySelf(r) {
   if (r.type === 'ROLL') { if (state.roll && state.roll.id === r.rollId) { table.rolled(T0, Number(r.value)); save(); render(); } return true; }
   if (r.type === 'MOVE' && bySelf('move') && throughOpenDoor(r.room)) { goTo(r.room); return true; }
   if (r.type === 'TAKE' && bySelf('take') && !r.thing.startsWith('amb:')) { const n = nodeById(r.thing); if (r.thing.startsWith('alt:') || (n?.kind === 'item' && !n.hidden)) { acceptThing(r.thing); return true; }
-    if ((n?.treasure || n?.kind === 'source') && !n.needs.length && state.here === n.room) { resolve(n); return true; } }
+    if ((n?.treasure || ['source', 'exit', 'deliver'].includes(n?.kind)) && !n.needs.length && state.here === n.room) { resolve(n); return true; } }
+  if (r.type === 'MAKE' && bySelf('make')) { const n = nodeById(r.thing); if (n?.kind === 'recipe' && playerView(current.run, state).recipes.some((x) => x.id === n.id)) { resolve(n); return true; } }
   if ((r.type === 'GIVE' || r.type === 'FRIEND') && bySelf('give') && table.fits(T0, r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend })) {
     acceptThing(r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend });
     return true;
@@ -247,6 +249,10 @@ function renderRequests() {
     if (r.type === 'TAKE') {
       return el('div', { class: 'card' }, el('p', {}, `Hun vil ta ${r.name}.`),
         el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing); ack(r); } }, 'Ja'), no));
+    }
+    if (r.type === 'MAKE') {
+      return el('div', { class: 'card' }, el('p', {}, `Hun vil lage ${r.name}.`),
+        el('div', { class: 'actions' }, el('button', { onclick: () => { resolve(nodeById(r.thing)); ack(r); } }, 'Ja'), no));
     }
     if (r.type === 'SEARCH') {
       const hidden = current.run.nodes.filter((n) => n.room === r.room && n.kind === 'item' && n.hidden && !isDone(n.id));

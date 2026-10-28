@@ -103,6 +103,8 @@ function render() {
     el('div', { class: 'actions' },
       t.kind === 'item' || (t.kind === 'source' && !t.fill)
         ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, t.kind === 'source' ? 'HENT' : 'TA')
+        : t.kind === 'exit'
+          ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, 'KOM FRAM 🎉')
         : t.kind === 'source'
           ? el('button', { onclick: () => pick(`HVA VIL DU FYLLE VED ${t.name.toUpperCase()}?`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'FYLL NOE')
           : [
@@ -118,6 +120,8 @@ function render() {
     if (fresh.has(n)) c.classList.add('new');
     return c;
   }) : [el('span', { class: 'empty' }, 'Tom')]));
+  // Something she can make now: a button next to the backpack.
+  $('#inventory').append(...(v.recipes || []).map((r) => el('button', { class: 'make', onclick: () => request('MAKE', { thing: r.id, name: r.name }) }, '✨ LAG ', r.name.toUpperCase())));
   $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
   renderMap(v);
   renderEnd(v);

@@ -40,6 +40,9 @@ export function playerView(run, state, extra = {}) {
     // A source (a well, a flower meadow): fill something there, or just take from it (owner's playtest:
     // the well was on the DM's screen only, so the water could not be found).
     if (n.kind === 'source') { things.push({ id: n.id, kind: 'source', fill: n.needs.length > 0, name: n.card.name, icon: iconOf(n.card.name), text: n.card.intro || '' }); continue; }
+    // The deep round: reaching the way out and picking up what is to be delivered waited for the DM.
+    if (n.kind === 'exit' && !n.needs.length) { things.push({ id: n.id, kind: 'exit', name: n.card.name, icon: iconOf(n.card.name), text: n.card.intro || 'Her er veien videre!' }); continue; }
+    if (n.kind === 'deliver' && !n.needs.length) { things.push({ id: n.id, kind: 'item', name: n.item.name, icon: n.item.icon || iconOf(n.card.name), text: `Her er ${n.item.name.toLowerCase()}!` }); continue; }
     if (n.treasure && !n.needs.length) { things.push({ id: n.id, kind: 'item', name: n.treasure.name, icon: iconOf(n.treasure.name), text: `Her ligger ${n.treasure.about}!` }); continue; }
     if (FIGURE_KINDS.has(n.kind)) {
       // Progress on several needs, as a count only (never which ones are left).
@@ -84,6 +87,9 @@ export function playerView(run, state, extra = {}) {
     })),
     room: { id: here, title: map.rooms[here].name || `Rom ${here}`, place: map.rooms[here].zoneName, things },
     inventory: state.inventory.slice(),
+    // Something she can make now: every part of it is in the backpack (never before, so nothing is told early).
+    recipes: run.nodes.filter((n) => n.kind === 'recipe' && !done.has(n.id) && n.needs.every((x) => state.inventory.includes(run.nodes.find((p) => p.id === x.provider)?.item?.name)))
+      .map((n) => ({ id: n.id, name: n.item.name, icon: n.item.icon || '✨' })),
     companions: state.companions.slice(),
     say: state.say || null,
     // The die: only that she should roll, never why the DM asked.
