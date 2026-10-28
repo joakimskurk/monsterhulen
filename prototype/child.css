@@ -1,3 +1,19 @@
+/* The child's screen is always the dark cave, whatever the iPad is set to (owner: the page went white
+   on an iPad in light mode). Same colours as the dark theme in style.css. */
+:root {
+  --bg: #17141f;
+  --panel: #221e2c;
+  --text: #efe9f7;
+  --muted: #a99fb8;
+  --line: #3a3348;
+  --accent: #b9a2ff;
+  --zone0: #3a3157;
+  --zone1: #2a4436;
+  --zone2: #4d3a2a;
+  --zone3: #2b3a4f;
+  color-scheme: dark;
+  background: var(--bg);
+}
 body.child { font-size: 20px; }
 body.child h1 { font-size: 28px; letter-spacing: .03em; }
 body.child h2 { font-size: 20px; letter-spacing: .04em; margin-top: 12px; }

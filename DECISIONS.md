@@ -4,6 +4,10 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - The child's screen is always dark
+
+On a real iPad in light mode the child's page turned white with black text, because the colours followed the device setting. The Mac in dark mode had hidden this. `child.css` now sets the dark cave colours whatever the device says (`color-scheme: dark`, plus the `color-scheme` and `theme-color` meta tags). The DM page still follows the Mac.
+
 ## 2026-10-28 - The treasure is a thing, and nobody in the cave wants what it is
 
 The owner's playtest of «Finn skatten» nearly reached the end and then stalled. The music box looked like a figure asking for something, and the skeleton dancer wanted music, so the natural move was to give it the music box.
