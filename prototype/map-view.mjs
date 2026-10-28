@@ -6,14 +6,15 @@
 // model = {
 //   bounds: { minX, minY, maxX, maxY },                     the grid to draw; outside rooms is fog
 //   rooms:  [{ id, x, y, w, h, look: 'here' | 'visited' | 'open' | 'closed', canGo, label, corner }],
-//   doors:  [{ x, y, dir: 'n'|'e'|'s'|'w', kind: 'open' | 'locked' | 'unlocked' | 'passage' | 'secret' }],
+//   doors:  [{ x, y, dir: 'n'|'e'|'s'|'w', kind: 'leaf' | 'gap' | 'locked' | 'secret' }],   see doorsFor
 //   probes: [{ x, y, room, locked }],                        «?» or 🔒 in the fog beyond an exit
 // }
 const ROOT = '/assets/tileset/v3-map/';
 const FLOORS = 9;
 const SIDE = { n: 'N', e: 'E', s: 'S', w: 'W' };
-// Door kinds in the model -> the original's connection tiles.
-const DOOR_TILE = { open: 'door_open', unlocked: 'door_open', locked: 'door_locked', passage: 'passage_open', secret: 'passage_open' };
+// Door kinds in the model -> the original's connection tiles. Each tile is half a door: the opening in
+// this room's wall, and for door_open a door leaf swung into this room.
+const DOOR_TILE = { leaf: 'door_open', gap: 'passage_open', locked: 'door_locked', secret: 'passage_open' };
 
 const STYLE = `
 .cave-wrap { container-type: inline-size; width: 100%; }
@@ -22,11 +23,12 @@ const STYLE = `
 .cave-tile { position: relative; aspect-ratio: 1; background: #070b10; overflow: hidden; }
 .cave-tile img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
 .cave-tile.closed img { filter: brightness(.45) saturate(.6); }
-/* Frames sit above the tile images (a plain inset shadow would be hidden under them). */
-.cave-tile.here::after, .cave-tile.go::after { content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-.cave-tile.here::after { box-shadow: inset 0 0 0 3px #ffd95c; }
+/* One frame around the whole room (not one per tile): yellow where she is, light blue where she can go
+   back to. The frame sits above the tile images. */
+.cave-tile .frame { position: absolute; inset: 0; pointer-events: none; z-index: 2; border: 0 solid transparent; }
+.cave-tile.here .frame { border-color: #ffd95c; }
 .cave-tile.go { cursor: pointer; }
-.cave-tile.go::after { box-shadow: inset 0 0 0 2px rgba(99, 242, 255, .75); }
+.cave-tile.go .frame { border-color: rgba(99, 242, 255, .8); }
 .cave-tile .mark, .cave-tile .corner { z-index: 3; }
 .cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
 .cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
@@ -114,6 +116,16 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
         if (d.kind === 'secret') tile.append(span('secret', ''));
       }
 
+      // The frame: a border only on the sides where the room ends.
+      if (r.look === 'here' || r.canGo) {
+        const f = span('frame', '');
+        const w = r.look === 'here' ? '3px' : '2px';
+        if (!join.N) f.style.borderTopWidth = w;
+        if (!join.E) f.style.borderRightWidth = w;
+        if (!join.S) f.style.borderBottomWidth = w;
+        if (!join.W) f.style.borderLeftWidth = w;
+        tile.append(f);
+      }
       // A star in the middle cell where the child is; the room number in the corner for the DM.
       const midX = r.x + Math.floor((r.w - 1) / 2), midY = r.y + Math.floor((r.h - 1) / 2);
       if (x === midX && y === midY && r.look === 'here') tile.append(span('mark', '★'));
@@ -125,15 +137,21 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
   return wrap;
 }
 
-// Door tiles for the rooms that are drawn: a door sits on the cell of each drawn room it belongs to.
-export function doorsFor(edges, drawn, kindOf) {
+// Door tiles for the rooms that are drawn. Every door is drawn once and always opens the same way:
+// the leaf swings into the room farther from the entrance (the way you go when exploring), and the
+// other side shows just the opening. A locked door is a closed door with a lock on the side you come
+// from. Extra open doors (loops) are openings without a leaf; secret doors are marked for the DM.
+// kindOf(edge) -> 'door' | 'locked' | 'loop' | 'secret' | null (not drawn); depth = distance from the entrance.
+export function doorsFor(edges, drawn, kindOf, depth) {
   const opp = { n: 's', e: 'w', s: 'n', w: 'e' };
   const out = [];
   for (const e of edges) {
     const kind = kindOf(e);
     if (!kind) continue;
-    if (drawn.has(e.a)) out.push({ x: e.aCell.x, y: e.aCell.y, dir: e.aDir, kind });
-    if (drawn.has(e.b)) out.push({ x: e.bCell.x, y: e.bCell.y, dir: opp[e.aDir], kind });
+    const far = (depth[e.b] ?? 0) >= (depth[e.a] ?? 0) ? 'b' : 'a';
+    const tileFor = (side) => (kind === 'door' ? (side === far ? 'leaf' : 'gap') : kind === 'locked' ? (side === far ? 'gap' : 'locked') : kind === 'loop' ? 'gap' : 'secret');
+    if (drawn.has(e.a)) out.push({ x: e.aCell.x, y: e.aCell.y, dir: e.aDir, kind: tileFor('a') });
+    if (drawn.has(e.b)) out.push({ x: e.bCell.x, y: e.bCell.y, dir: opp[e.aDir], kind: tileFor('b') });
   }
   return out;
 }

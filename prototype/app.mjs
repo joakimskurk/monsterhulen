@@ -400,7 +400,7 @@ function renderMap() {
       look: r.id === state.here ? 'here' : !open.has(r.id) ? 'closed' : state.visited.includes(r.id) ? 'visited' : 'open',
       canGo: r.id === state.selected && r.id !== state.here,
     })),
-    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null ? (openGates.has(e.gate) ? 'unlocked' : 'locked') : e.loop ? 'passage' : 'open')),
+    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'door'), map.distance[map.start]),
     probes: [],
   }, { maxWidth: 760, onRoom: (id) => goTo(id) }));
 }

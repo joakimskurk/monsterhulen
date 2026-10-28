@@ -65,7 +65,7 @@ export function playerView(run, state, extra = {}) {
         look: r.id === here ? 'here' : 'visited',
         canGo: reach.has(r.id) && r.id !== here,
       })),
-      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null ? (openGates.has(e.gate) ? 'unlocked' : 'locked') : e.loop ? 'passage' : 'open')),
+      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'door'), map.distance[map.start]),
       probes: map.edges.filter((e) => !e.secret && (e.a === here || e.b === here) && !visited.has(e.a === here ? e.b : e.a)).map((e) => {
         const other = e.a === here ? e.b : e.a;
         const cell = e.a === here ? e.bCell : e.aCell;

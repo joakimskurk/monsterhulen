@@ -10,6 +10,7 @@ Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/
 - Room names and mood per zone come from the original (`content/places.json`); the start is STARTPORTEN.
 - Both screens draw the cave with the original's own stone tiles (floors, walls, corners, doors; extracted unchanged to `assets/tileset/v3-map/`), in `prototype/map-view.mjs`.
 - **Fog of war as in the original:** the iPad draws only rooms the child has been in; everything else is fog, with «?» (or 🔒 for a locked door) just beyond the doors of the room she is in. The shape of unexplored rooms and secret doors are never sent to the iPad (tested).
+- Every door is drawn once and opens one way: the original's door tiles are half doors (an opening, and a leaf swung into that room), so the leaf is drawn only in the room farther from the entrance and the other side shows the opening; a locked door shows a closed door with a lock on the side the child comes from. The room the child is in has one yellow frame around it (not one per tile).
 - Doors as in the original: big direction buttons on the iPad (a door shows its arrow, a locked door a lock, no door is greyed). Walking through an open door needs no DM approval by default (owner found approving every step slow); the DM can turn that off. The map fills the screen width.
 - When the child gets a thing, it pops up big on the iPad with a backpack; she drags it into the backpack (or taps the backpack). Owner request.
 
