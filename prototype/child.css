@@ -175,3 +175,18 @@ body.child .found-name { margin: 0; }
 .found-bag.gulp { animation: gulp .45s ease-out; }
 @keyframes gulp { 0% { transform: scale(1); } 40% { transform: scale(1.08, .94); } 100% { transform: scale(1); } }
 body.child .found-thing.dragging { z-index: 3; }
+
+/* ---------- Hold and drag from the backpack (owner, 2026-10-28) ---------- */
+.drag-ghost { position: fixed; z-index: 40; width: clamp(72px, 14vh, 110px); height: clamp(72px, 14vh, 110px); transform: translate(-50%, -50%); display: grid; place-items: center; font-size: clamp(56px, 11vh, 88px); line-height: 1; pointer-events: none; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .55)); }
+.drag-ghost img, .drag-ghost .thumb { width: 100%; height: 100%; object-fit: contain; }
+.drag-ghost .icon { font-size: inherit; opacity: 1; }
+.drag-ghost.given { transition: left .35s ease-in, top .35s ease-in, transform .35s ease-in, opacity .35s ease-in; transform: translate(-50%, -50%) scale(.3); opacity: 0; }
+.drag-ghost.back { transition: left .3s ease-out, top .3s ease-out, transform .3s ease-out; transform: translate(-50%, -50%) scale(.5); }
+body.dragging .thing.drop-ok { border-color: #ffd95c; border-style: dashed; }
+body.dragging .thing.drop-hot { border-style: solid; background: rgba(255, 217, 92, .14); transform: scale(1.02); }
+body.dragging .thing:not(.drop-ok) { opacity: .5; }
+.info-card { width: min(420px, 90vw) !important; display: grid; justify-items: center; gap: 6px; }
+body.child .info-card .found-thing { width: min(30vh, 220px); height: min(30vh, 220px); font-size: min(22vh, 160px); cursor: default; }
+body.child .info-close { width: 100%; min-height: 64px; height: auto; border-style: solid; font-size: 24px; font-weight: 800; background: #ffd95c; color: #271b00; }
+body.child .thing h3 { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+body.waiting #game .chipbtn { opacity: 1; pointer-events: auto; }

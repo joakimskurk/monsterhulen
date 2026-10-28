@@ -75,6 +75,7 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 - Kartet følger originalen: rom i ulike størrelser, steinflisene fra originalen (`assets/tileset/v3-map/`), og tåke over alt barnet ikke har utforsket. På iPaden står «?» ved dørene ut av rommet hun er i (🔒 hvis døra er låst).
 - **Dørene:** Barnet går ved å trykke på et rom på kartet: et naborom bak en åpen dør, eller «?» i tåka (workshop 2026-10-28, iPad-kart og romsymboler). Retningsknappene er borte. Gjennom en åpen dør går hun med en gang, og du ser det i loggen. Låste dører må du løse som før.
 - **Symboler på kartet:** På rom hun har vært i, viser kartet figurens bilde (noen trenger noe), ✨ (noe å ta), 🔍 (ikke sett seg rundt ennå) eller ✓ (ferdig). Noe gjemt røpes aldri.
+- **Bruke ting:** Barnet holder på en ting eller en venn i sekken og drar den til en figur eller kilde i rommet. Et kort trykk viser tingen stort. «GI» på figuren er en reserve med samme valg som en liste.
 - **Funnet:** Tingen vises stor, med en like stor sekk ved siden av. Hun drar tingen over sekken, eller trykker på sekken, og tingen glir ned bak den.
 - To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.

@@ -96,7 +96,7 @@ function render() {
   }
   $('#place').textContent = v.room.place;
   $('#things').classList.toggle('many', v.room.things.length >= 3);
-  $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing' },
+  $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing', 'data-id': t.id, 'data-kind': t.kind, 'data-name': t.name },
     // Text first (owner, 2026-10-28); the picture is a small placeholder until assets are generated.
     el('h3', {}, pic(t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
@@ -108,21 +108,23 @@ function render() {
         : t.kind === 'source'
           ? el('button', { onclick: () => pick(`HVA VIL DU FYLLE VED ${t.name.toUpperCase()}?`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'FYLL NOE')
           : [
-            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'GI NOE'),
-            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: name, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
+            // Dragging from the backpack is the main way; GI is the same as a list, things and friends together.
+            el('button', { onclick: () => pick(`GI TIL ${t.name.toUpperCase()}`, [...v.inventory.map((name) => ({ label: name, name })), ...v.companions.map((name) => ({ label: `🤝 ${name}`, name, friend: true }))],
+              (o) => (o.friend ? request('FRIEND', { friend: o.name, thing: t.id, name: t.name }) : request('GIVE', { item: o.name, thing: t.id, name: t.name }))) }, 'GI'),
           ],
     ))) : [el('p', {}, 'Det ser tomt ut her …')]));
   const fresh = new Set(knownItems ? v.inventory.filter((n) => !knownItems.includes(n)) : []);
   knownItems = v.inventory.slice();
   for (const name of fresh) showFound(v, name);
   $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => {
-    const c = chip(v, n, voice ? () => speak(n) : null);
+    const c = chip(v, n);
+    holdToDrag(c, v, { kind: 'ting', name: n });
     if (fresh.has(n)) c.classList.add('new');
     return c;
   }) : [el('span', { class: 'empty' }, 'Tom')]));
   // Something she can make now: a button next to the backpack.
   $('#inventory').append(...(v.recipes || []).map((r) => el('button', { class: 'make', onclick: () => request('MAKE', { thing: r.id, name: r.name }) }, '✨ LAG ', r.name.toUpperCase())));
-  $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
+  $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => { const c = chip(v, n); holdToDrag(c, v, { kind: 'friend', name: n }); return c; }) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
   renderMap(v);
   renderEnd(v);
   renderDie(v);
@@ -199,6 +201,71 @@ function closeFound() {
   });
   bag.addEventListener('click', intoBag);
 })();
+
+// ---------- using what she has: tap for more, hold and drag to someone (owner, 2026-10-28) ----------
+// A thing from the backpack goes to a figure or a source in the room; a friend goes to a figure.
+// Dropped there, it is the same request as GI NOE / BE EN VENN HJELPE. A tap shows the thing big.
+const canTake = (what, kind) => (what.kind === 'ting' ? kind === 'figure' || kind === 'source' : kind === 'figure');
+function holdToDrag(node, v, what) {
+  node.style.touchAction = 'none';
+  node.addEventListener('pointerdown', (e) => {
+    if (e.button > 0) return;
+    e.preventDefault();
+    if (waiting) { showInfo(v, what); return; } // waiting for the DM: look, but give nothing yet
+    node.setPointerCapture(e.pointerId);
+    const from = { x: e.clientX, y: e.clientY };
+    let ghost = null, target = null;
+    const begin = (x, y) => {
+      ghost = el('div', { class: 'drag-ghost' }, pic(icon(v, what.name)));
+      document.body.append(ghost);
+      document.body.classList.add('dragging', `dragging-${what.kind}`);
+      for (const t of document.querySelectorAll('#things .thing')) t.classList.toggle('drop-ok', canTake(what, t.dataset.kind));
+      place(x, y);
+    };
+    const place = (x, y) => { ghost.style.left = `${x}px`; ghost.style.top = `${y}px`; };
+    const hold = setTimeout(() => { if (!ghost) begin(from.x, from.y); }, 220);
+    const over = (x, y) => document.elementFromPoint(x, y)?.closest('#things .thing.drop-ok') || null;
+    const move = (ev) => {
+      if (!ghost && Math.hypot(ev.clientX - from.x, ev.clientY - from.y) > 8) begin(ev.clientX, ev.clientY);
+      if (!ghost) return;
+      place(ev.clientX, ev.clientY);
+      const now = over(ev.clientX, ev.clientY);
+      if (now !== target) { target?.classList.remove('drop-hot'); now?.classList.add('drop-hot'); target = now; }
+    };
+    const end = () => {
+      clearTimeout(hold);
+      node.removeEventListener('pointermove', move);
+      node.removeEventListener('pointerup', end);
+      node.removeEventListener('pointercancel', end);
+      if (!ghost) { showInfo(v, what); return; }
+      document.body.classList.remove('dragging', `dragging-${what.kind}`);
+      for (const t of document.querySelectorAll('#things .thing')) t.classList.remove('drop-ok', 'drop-hot');
+      // Given: it shrinks into the one it was given to. Not given: it flies back.
+      const to = target ? target.getBoundingClientRect() : node.getBoundingClientRect();
+      ghost.classList.add(target ? 'given' : 'back');
+      place(to.left + to.width / 2, to.top + to.height / 2);
+      const g = ghost;
+      setTimeout(() => g.remove(), 380);
+      if (target) {
+        const id = target.dataset.id, name = target.dataset.name;
+        if (what.kind === 'ting') request('GIVE', { item: what.name, thing: id, name });
+        else request('FRIEND', { friend: what.name, thing: id, name });
+      }
+    };
+    node.addEventListener('pointermove', move);
+    node.addEventListener('pointerup', end);
+    node.addEventListener('pointercancel', end);
+  });
+}
+
+// A tap on a thing or a friend: show it big, with what she can do with it.
+function showInfo(v, what) {
+  $('#infoThing').replaceChildren(String(icon(v, what.name)).startsWith('assets/') ? el('img', { src: `/${icon(v, what.name)}`, alt: '' }) : el('span', {}, icon(v, what.name)));
+  $('#infoName').replaceChildren(what.name.toUpperCase(), speaker(what.name) || '');
+  $('#infoText').textContent = what.kind === 'ting' ? 'Hold og dra meg til noen som kan bruke meg.' : 'Vennen din. Hold og dra meg til noen som trenger hjelp.';
+  $('#info').hidden = false;
+}
+$('#info').addEventListener('click', (e) => { if (e.target.id === 'info' || e.target.id === 'infoClose') $('#info').hidden = true; });
 
 // The end of the run: what she did, and one of two lasting TING to choose (workshop B1, B3).
 function renderEnd(v) {

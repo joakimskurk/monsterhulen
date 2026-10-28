@@ -11,6 +11,13 @@ The owner decided this (E1–E3). How it is done comes from the simulated worksh
 - **K1:** No direction buttons. She walks by tapping the room on the map (the whole room, or «?» in the fog), and the map gets the space. «SE DEG RUNDT» is a big round magnifier button 🔍.
 - **K2:** Rooms she has been in get at most two symbols: the figure's own picture (someone needs something), ✨ (something to take), 🔍 (not looked around yet) or ✓ (done). They are built only from what she sees there, so nothing hidden shows. This is tested in the leak test. `state.looked` remembers where she has used the magnifier.
 - **K3:** The found popup shows the thing big, with a backpack of the same size beside it. Dropped on the backpack, or with the backpack tapped, the thing slides down behind it and shrinks, the backpack hops, and the popup closes.
+- **Hold and drag from the backpack** (owner: «trykk – mer info, hold og dra for å dra en til mottakere»). This is the main way to use something:
+  - **Tap** a thing or friend: it is shown big, with «Hold og dra meg til noen som kan bruke meg».
+  - **Hold or drag:** the thing follows her finger. The figures and sources in the room that can take it get a dashed yellow frame, and the rest fade. Dropping it on one is the same request as before, and it shrinks into the figure. Dropped elsewhere, it flies back.
+  - Friends are dragged to figures the same way.
+  - The old buttons are now one small **GI** fallback, with things and friends in one list. **FYLL NOE** stays on sources.
+  - While the iPad waits for the DM, a tap still shows the thing, but nothing can be given.
+  - Where things are placed on the screen is not settled (owner); this works with the current layout.
 - **Pictures:** every new symbol has its own entry in `content/assets.json` (`ui:backpack`, `ui:magnifier`, `ui:room-thing`, `ui:room-look`, `ui:room-done`), with emoji as placeholders until the pictures come.
 
 ## 2026-10-28 - The iPad plays in landscape, on one screen, like an app
