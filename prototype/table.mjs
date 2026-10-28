@@ -19,6 +19,7 @@ export function consumableByName(t, name) {
   const fromRun = t.run.nodes.find((n) => n.item?.name === name)?.item;
   if (fromRun) return fromRun.consumable !== false;
   const card = t.content.items.find((i) => i.name === name);
+  if (card?.persistent) return false; // a lasting TING from the hero book is never used up
   return card ? card.consumable !== false : true;
 }
 
@@ -122,4 +123,57 @@ export function goTo(t, roomId) {
   if (!reach(t).has(roomId)) return;
   state.here = roomId;
   if (!state.visited.includes(roomId)) { state.visited.push(roomId); log(t, `Gikk inn i rom ${roomId}.`); }
+}
+
+// ---------- end of the run (workshop B1) ----------
+
+const GOAL_KINDS = ['goal', 'exit', 'deliver', 'target'];
+const lower = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+
+// Done when the goal is reached; rescuing and delivering also means being back at the entrance.
+export function isFinished(t) {
+  const goal = t.run.nodes.find((n) => GOAL_KINDS.includes(n.kind));
+  if (!isDone(t, goal.id)) return false;
+  return !['target', 'deliver'].includes(goal.kind) || t.state.here === t.run.map.start;
+}
+
+// What the child did, for both screens. Short sentences; never anything about GI LIKEVEL.
+export function summary(t) {
+  const { run, state } = t;
+  const goal = run.nodes.find((n) => GOAL_KINDS.includes(n.kind));
+  const machine = run.nodes.find((n) => n.kind === 'machine');
+  const headline = {
+    FINN: `Du fant ${lower(goal.card.name)}!`,
+    REDD: `Du reddet ${lower(goal.card.name)}!`,
+    LEVER: `Du brakte ${goal.item?.name} hjem!`,
+    SAMLE: `Du fikk ${lower(machine?.card.name || run.mission.goal.name)} i gang!`,
+    KOM_UT: `Du fant veien ut: ${lower(goal.card.name)}!`,
+  }[run.mission.type];
+  const done = run.nodes.filter((n) => isDone(t, n.id));
+  const brought = state.brought || {};
+  return {
+    title: run.mission.name,
+    headline,
+    helped: done.filter((n) => ['blocker', 'quest', 'trader'].includes(n.kind) && n.cardKind !== 'obstacle').map((n) => n.card.name),
+    passed: done.filter((n) => n.cardKind === 'obstacle' || n.kind === 'lock' || n.kind === 'machine').map((n) => n.card.name),
+    friends: done.filter((n) => n.kind === 'companion' && n.card.name !== brought.friend?.name).map((n) => ({ name: n.card.name, ability: n.ability })),
+    found: done.filter((n) => n.kind === 'item').map((n) => n.item.name),
+    rooms: state.visited.length,
+  };
+}
+
+// ---------- bringing things from the hero book (workshop B4) ----------
+// At most one friend and one TING. The run is proven without them; they are an extra way.
+export function bring(t, { friend = null, ting = null }) {
+  const { state } = t;
+  state.brought = { ...(state.brought || {}) };
+  if (friend && !state.brought.friend) { state.brought.friend = friend; state.companions.push(friend.name); log(t, `${friend.name} ble med fra Helteboka.`); }
+  if (ting && !state.brought.ting) { state.brought.ting = ting; state.inventory.push(ting.name); log(t, `${ting.name} ble med fra Helteboka.`); }
+}
+
+// What was brought along that fits a need (same tag), for the DM card.
+export function broughtFits(t, need) {
+  const b = t.state.brought || {};
+  if (!need.tag) return [];
+  return [b.friend && b.friend.ability.includes(need.tag) ? b.friend.name : null, b.ting && b.ting.tags.includes(need.tag) ? b.ting.name : null].filter(Boolean);
 }

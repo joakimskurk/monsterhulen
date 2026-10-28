@@ -59,6 +59,7 @@ Hver milepæl har en **spillbar exit**: noe som kan spilles og vurderes ved bord
 - **Exit:** en hel økt spilt med Forteller-enhet + iPad.
 
 ### M5 - Løp og Helteboka
+> Prøvd i bordprototypen (2026-10-28): slutt på løpet med oppsummering, Helteboka (venner, varige TING, minner) og å ta med én venn og én TING. Se `docs/v2/workshops/2026-10-28_helteboka.md`. Gjenstår: lagring per barn via relé, integrasjon i appen, spilletest.
 - Oppdragskort (FINN, REDD, LEVER, SAMLE, KOM UT; dagens 4 eventyr som temakort).
 - Tilbaketrekking i stedet for tap, venner som blir med, oppsummering etter løpet, opplåsing.
 - **Exit:** barnet vil spille et nytt løp, og Helteboka viser hva hun har gjort.

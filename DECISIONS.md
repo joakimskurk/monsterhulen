@@ -4,6 +4,17 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - End of the run and Helteboka (M5 in the prototype)
+Discussed in a simulated workshop (`docs/v2/workshops/2026-10-28_helteboka.md`, decisions B1–B6; roles simulated by Claude, not real people).
+
+- A run ends when the goal is reached, and for REDD and LEVER when the child is also back at the entrance. Both screens show a short child-facing summary; GI LIKEVEL is never mentioned.
+- Friends who joined go into Helteboka automatically. After each finished run the child chooses one of two lasting TING she does not have yet.
+- Before a run the child may bring at most one friend and one TING. The generator ignores them: the run is still proven solvable without them, and what is brought is an extra way. The DM card shows where it fits. A lasting TING is never used up.
+- No unlocking for now; the collection is the progression.
+- In the prototype the book lives on the DM device; the iPad shows it and sends requests, never changes it.
+
+Rationale: M5's exit is that the child wants another run and the book shows what she did. Limiting what is brought keeps the challenge; keeping the proof independent of it keeps every run solvable.
+
 ## 2026-10-28 - Missions are composed from parts; classics keep a fixed theme
 Owner concern: fixed mission names feel repetitive; wanted variations such as glass, gold or bone keys, magic objects, or a rhyme ("mellon"). Discussed in a simulated workshop (`docs/v2/workshops/2026-10-28_sammensatte_oppdrag.md`, decisions A1–A8; the participants are roles Claude simulated, not real people).
 

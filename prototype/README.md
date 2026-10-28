@@ -45,6 +45,10 @@ Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekke
    - **GI LIKEVEL** når du vil la henne lykkes uansett (logges som Forteller-valg).
 5. Sekken, vennene og loggen oppdateres. Løpet lagres i nettleseren og kan fortsettes.
 6. **Hele kjeden** nederst viser Forteller-malen: hele løsningen på én gang.
+7. **Når løpet er ferdig** (målet nådd, og hjemme igjen når noen er reddet eller noe levert), viser begge skjermer hva barnet gjorde. Barnet velger én av to varige TING på iPaden, og du trykker **Skriv i Helteboka**.
+8. **Neste løp:** Før barnet går fra inngangen, kan det ta med én venn og én TING fra Helteboka (**Pakk sekken**, eller fra iPaden). Forteller-kortet viser «Passer også» der det passer. Løpet kan alltid løses uten.
+
+Helteboka lagres i nettleseren på Forteller-enheten. Bakgrunn: `docs/v2/workshops/2026-10-28_helteboka.md`.
 
 ## Hva vi vil lære av en økt
 Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):

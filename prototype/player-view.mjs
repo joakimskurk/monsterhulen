@@ -16,7 +16,8 @@ export function layoutMap(map) {
   return { pos, width: 92 + Math.max(...columns.keys()) * colW, height: 80 + (maxRows - 1) * rowH };
 }
 
-export function playerView(run, state) {
+// `extra`: the end of the run, the hero book and packing, prepared by the DM page (child-facing only).
+export function playerView(run, state, extra = {}) {
   const { map } = run;
   const openGates = new Set(state.openGates);
   const reach = reachable(map, { openGates });
@@ -63,6 +64,9 @@ export function playerView(run, state) {
     inventory: state.inventory.slice(),
     companions: state.companions.slice(),
     say: state.say || null,
+    end: extra.end || null,
+    book: extra.book || null,
+    pack: extra.pack || null,
     log: state.log.slice(-3).map((l) => l.replace(' (Forteller bestemte)', '')),
   };
 }

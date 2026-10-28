@@ -12,7 +12,8 @@ import * as table from '../../prototype/table.mjs';
 const content = loadContent();
 const SEEDS = Number(process.env.TABLE_SEEDS || 25);
 const GOALS = ['goal', 'exit', 'deliver', 'target'];
-let runs = 0, actions = 0, stepwise = 0;
+let runs = 0, actions = 0, stepwise = 0, tingRuns = 0, tingGiven = 0;
+const LASTING = content.items.filter((i) => i.persistent).map((i) => ({ id: i.id, name: i.name, tags: i.tags }));
 
 const count = (list) => list.reduce((m, x) => m.set(x, (m.get(x) || 0) + 1), new Map());
 const sameBag = (a, b) => JSON.stringify([...count(a)].sort()) === JSON.stringify([...count(b)].sort());
@@ -34,13 +35,19 @@ function expectedAfter(t, node, needIndexes, before) {
 
 // One accepted action, as the DM page does it: GIVE / FRIEND go through acceptThing, the rest through resolve.
 // `byButton`: the DM presses «Denne er på plass» for the need instead of accepting it from the iPad.
-function act(t, node, need, where, { byButton = false } = {}) {
+// `withTing`: the child gives the lasting TING brought from the hero book; it is never used up,
+// and the item planned for this need stays in the backpack.
+function act(t, node, need, where, { byButton = false, withTing = null } = {}) {
   const before = t.state.inventory.slice();
   const i = node.needs.indexOf(need);
   const several = need && !['recipe', 'source', 'item'].includes(node.kind) && table.openNeeds(t, node).length > 1;
-  const expected = expectedAfter(t, node, need ? [i] : table.openNeeds(t, node), before);
+  const finishes = !need || table.openNeeds(t, node).length === 1;
+  const expected = withTing
+    ? [...before, ...(finishes && node.item && !['target', 'goal', 'exit'].includes(node.kind) ? [node.item.name] : [])]
+    : expectedAfter(t, node, need ? [i] : table.openNeeds(t, node), before);
   const p = need?.provider && table.nodeById(t, need.provider);
-  if (!need || ['recipe', 'source', 'item'].includes(node.kind)) table.resolve(t, node);
+  if (withTing) table.acceptThing(t, node.id, { given: withTing });
+  else if (!need || ['recipe', 'source', 'item'].includes(node.kind)) table.resolve(t, node);
   else if (byButton && several) table.markNeed(t, node, i);
   else if (p.kind === 'companion') table.acceptThing(t, node.id, { friend: p.card.name });
   else table.acceptThing(t, node.id, { given: p.item.name });
@@ -72,8 +79,10 @@ function ready(t, node, need) {
   return p.kind === 'companion' ? t.state.companions.includes(p.card.name) : t.state.inventory.includes(p.item.name);
 }
 
-function playByTheRules(run, where, { byButton }) {
+function playByTheRules(run, where, { byButton, ting = null }) {
   const t = { content, run, state: table.freshState(run) };
+  if (ting) table.bring(t, { ting });
+  let tingUsed = 0;
   for (let guard = 0; guard < 300; guard++) {
     let progress = false;
     const rooms = table.reach(t);
@@ -85,7 +94,11 @@ function playByTheRules(run, where, { byButton }) {
       if (!open.every((need) => ready(t, node, need))) continue;
       // Recipes ("Lag den") and sources ("Hentet") are one press on the DM page, whatever they need.
       if (!open.length || ['recipe', 'source'].includes(node.kind)) { act(t, node, null, where); progress = true; continue; }
-      for (const need of open) act(t, node, need, where, { byButton });
+      for (const need of open) {
+        const fits = ting && table.broughtFits(t, need).includes(ting.name) && !['recipe', 'source'].includes(node.kind);
+        if (fits) tingUsed++;
+        act(t, node, need, where, { byButton, withTing: fits ? ting.name : null });
+      }
       assert.ok(table.isDone(t, node.id), `${where}: ${node.card.name} not done after all needs were met`);
       progress = true;
     }
@@ -94,6 +107,19 @@ function playByTheRules(run, where, { byButton }) {
   const stuck = run.nodes.filter((n) => !table.isDone(t, n.id)).map((n) => n.card.name);
   assert.deepEqual(stuck, [], `${where}: not finished by the table rules: ${stuck.join(', ')}`);
   const goal = run.nodes.find((n) => GOALS.includes(n.kind));
+  // The end of the run (workshop B1): rescuing and delivering also means coming home.
+  if (['target', 'deliver'].includes(goal.kind) && t.state.here !== run.map.start) assert.ok(!table.isFinished(t), `${where}: finished before coming home`);
+  table.goTo(t, run.map.start);
+  assert.ok(table.isFinished(t), `${where}: not finished at the entrance with the goal done`);
+  const s = table.summary(t);
+  const text = JSON.stringify(s);
+  assert.ok(s.headline && !/undefined|null/.test(s.headline), `${where}: bad headline ${s.headline}`);
+  assert.ok(!/LIKEVEL|Forteller|Garantert/.test(text), `${where}: DM wording in the summary`);
+  for (const f of s.friends) assert.ok(t.state.companions.includes(f.name) && f.ability.length, `${where}: friend ${f.name} in summary but not with us`);
+  if (ting) {
+    assert.ok(t.state.inventory.includes(ting.name), `${where}: the lasting TING ${ting.name} was used up`);
+    tingRuns++; tingGiven += tingUsed;
+  }
   if (goal.kind === 'deliver') assert.ok(t.state.inventory.includes(goal.item.name), `${where}: the thing to deliver is not in the backpack`);
   if (goal.kind === 'target') assert.ok(t.state.companions.includes(goal.card.name), `${where}: the rescued one is not following`);
   assert.ok(table.reach(t).has(run.map.start), `${where}: cannot get back to the entrance`);
@@ -117,10 +143,13 @@ for (const missionId of missionIds(content)) {
       const where = `${missionId}/${length}/${seed}`;
       // Odd seeds: needs accepted from the iPad. Even seeds: the DM presses «Denne er på plass».
       playByTheRules(run, where, { byButton: seed % 2 === 0 });
+      // Again with a lasting TING brought along (workshop B4): it may be given where it fits, and stays.
+      playByTheRules(run, `${where} +TING`, { byButton: seed % 2 === 1, ting: LASTING[seed % LASTING.length] });
       playByOverride(run, where);
       runs++;
     }
   }
 }
 assert.ok(stepwise > 0, 'no node with several needs was played step by step');
-console.log(`table play test: ${runs} runs, ${actions} actions (${stepwise} one need at a time), backpack exact, GI LIKEVEL finishes, OK`);
+assert.ok(tingGiven > 0, 'a brought TING was never given where it fits');
+console.log(`table play test: ${runs} runs (+${tingRuns} with a brought TING, given ${tingGiven} times), ${actions} actions (${stepwise} one need at a time), backpack exact, end and summary right, GI LIKEVEL finishes, OK`);

@@ -71,6 +71,39 @@ function render() {
   $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => el('span', { class: 'chip' }, el('button', { class: 'ghost' }, n))) : [el('span', { class: 'empty' }, 'Tom')]));
   $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => el('span', {}, el('button', { class: 'ghost' }, n))) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
   renderMap(v);
+  renderEnd(v);
+  renderBook(v);
+}
+
+// The end of the run: what she did, and one of two lasting TING to choose (workshop B1, B3).
+function renderEnd(v) {
+  const box = $('#end');
+  box.hidden = !v.end;
+  if (!v.end) return;
+  const e = v.end;
+  const line = (title, items) => (items.length ? el('p', {}, el('b', {}, `${title}: `), items.join(', ')) : null);
+  box.replaceChildren(...[el('h1', {}, 'DU KLARTE DET! 🎉'), el('p', { class: 'headline' }, e.headline),
+    line('DU HJALP', e.helped), line('NYE VENNER', e.friends.map((f) => f.name)), line('DU FANT', e.found),
+    e.chosen ? el('p', { class: 'headline' }, `${e.chosen} er din nå!`)
+      : e.offer.length ? el('div', {}, el('h2', {}, 'VELG EN TING TIL HELTEBOKA'),
+        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, o.name.toUpperCase())))) : null].filter(Boolean));
+}
+
+// Packing before the run, and the hero book itself (workshop B4).
+function renderBook(v) {
+  const pack = $('#pack');
+  pack.hidden = !v.pack;
+  if (v.pack) {
+    pack.replaceChildren(el('h2', {}, 'TA MED FRA HELTEBOKA'), el('p', {}, 'Du kan ta med én venn og én ting.'),
+      el('div', { class: 'chips' },
+        ...v.pack.friends.filter((n) => !v.companions.includes(n)).map((n) => el('button', { class: 'ghost', onclick: () => request('BRING', { kind: 'friend', name: n }) }, n)),
+        ...v.pack.ting.filter((n) => !v.inventory.includes(n)).map((n) => el('button', { class: 'ghost', onclick: () => request('BRING', { kind: 'ting', name: n }) }, n))));
+  }
+  const book = $('#book');
+  book.hidden = !v.book || (!v.book.friends.length && !v.book.ting.length);
+  if (book.hidden) return;
+  book.replaceChildren(el('h2', {}, `HELTEBOKA · ${v.book.runs} LØP`),
+    el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, n)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, n))));
 }
 
 function renderMap(v) {

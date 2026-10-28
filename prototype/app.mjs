@@ -6,6 +6,7 @@ import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView, layoutMap } from './player-view.mjs';
 import * as table from './table.mjs';
+import { emptyBook, tingOffer, recordRun } from './herobook.mjs';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -127,7 +128,13 @@ async function connectRelay() {
 
 function publish() {
   if (!relay || !current || !active) return;
-  const view = playerView(current.run, { ...state, runCode: current.code });
+  const book = loadBook();
+  const finished = table.isFinished(T());
+  const view = playerView(current.run, { ...state, runCode: current.code }, {
+    end: finished ? { ...table.summary(T()), offer: book.runs.some((r) => r.code === current.code) ? [] : offer(), chosen: state.chosenTing?.name || null } : null,
+    book: { friends: book.friends.map((f) => f.name), ting: book.ting.map((x) => x.name), runs: book.runs.length },
+    pack: canPack() ? { friends: book.friends.map((f) => f.name), ting: book.ting.map((x) => x.name) } : null,
+  });
   fetch(`/api/${SESSION}/player`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(view) }).catch(() => {});
 }
 
@@ -178,9 +185,26 @@ function renderRequests() {
         el('p', { class: 'hint' }, 'Passer det med det figuren vil ha eller er svak mot? Kast terning bare hvis det er usikkert.'),
         el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend }); ack(r); } }, 'Det virker!'), no));
     }
+    if (r.type === 'BRING') {
+      const book = loadBook();
+      const friend = r.kind === 'friend' ? book.friends.find((f) => f.name === r.name) : null;
+      const ting = r.kind === 'ting' ? book.ting.find((x) => x.name === r.name) : null;
+      return el('div', { class: 'card' }, el('p', {}, `Hun vil ta med ${r.name}.`),
+        el('div', { class: 'actions' }, el('button', { onclick: () => { if (canPack()) { table.bring(T(), { friend, ting }); save(); render(); } ack(r); } }, 'Ja'), no));
+    }
+    if (r.type === 'PICK_TING') {
+      const pick = offer().find((c) => c.id === r.id);
+      return el('div', { class: 'card' }, el('p', {}, `Hun velger ${r.name} til Helteboka.`),
+        el('div', { class: 'actions' }, el('button', { onclick: () => { if (pick && !state.chosenTing) chooseTing(pick); ack(r); } }, 'Ja'), no));
+    }
     return el('div', { class: 'card' }, el('p', {}, JSON.stringify(r)), el('div', { class: 'actions' }, no));
   }));
 }
+
+// Helteboka lives on the DM device in the prototype (workshop B6). The iPad only shows it.
+const BOOK_KEY = 'monsterhulen-bord:helteboka';
+function loadBook() { try { return JSON.parse(localStorage.getItem(BOOK_KEY)) || emptyBook(); } catch { return emptyBook(); } }
+function saveBook(book) { try { localStorage.setItem(BOOK_KEY, JSON.stringify(book)); } catch { /* ignore */ } }
 
 // Themes of recent runs on this DM device (decision A6). The code itself stays fully reproducible;
 // only the choice of a new code skips themes that were just played.
@@ -255,8 +279,55 @@ function render() {
   renderInventory();
   $('#log').replaceChildren(...state.log.slice().reverse().map((t) => el('li', {}, t)));
   $('#template').textContent = dmTemplate(content, run, current.result);
+  renderFinish();
+  renderPack();
   renderRequests();
   publish();
+}
+
+// ---------- end of the run and Helteboka (workshop B1–B6) ----------
+
+// Packing is possible before the child has moved, until the DM closes it or one friend and one TING are along.
+const canPack = () => state.visited.length === 1 && !state.brought?.done && !(state.brought?.friend && state.brought?.ting)
+  && (loadBook().friends.length || loadBook().ting.length);
+const offer = () => tingOffer(loadBook(), content, current.code);
+const chooseTing = (t) => { state.chosenTing = t; log(`Valgte ${t.name} til Helteboka.`); save(); render(); };
+
+function renderPack() {
+  const box = $('#pack');
+  box.hidden = !canPack();
+  if (box.hidden) return;
+  const book = loadBook();
+  const friendSel = el('select', {}, el('option', { value: '' }, 'Ingen venn'), ...book.friends.map((f, i) => el('option', { value: String(i) }, f.name)));
+  const tingSel = el('select', {}, el('option', { value: '' }, 'Ingen TING'), ...book.ting.map((x, i) => el('option', { value: String(i) }, x.name)));
+  box.replaceChildren(el('h2', {}, 'Pakk sekken'),
+    el('p', { class: 'hint' }, 'Barnet kan ta med én venn og én TING fra Helteboka. Løpet kan løses uten. Det som tas med, er en ekstra vei.'),
+    el('div', { class: 'actions' }, friendSel, tingSel,
+      el('button', { onclick: () => { table.bring(T(), { friend: book.friends[friendSel.value] || null, ting: book.ting[tingSel.value] || null }); state.brought.done = true; save(); render(); } }, 'Ta med'),
+      el('button', { class: 'ghost', onclick: () => { state.brought = { ...(state.brought || {}), done: true }; save(); render(); } }, 'Ingenting i dag')));
+}
+
+function renderFinish() {
+  const box = $('#finish');
+  box.hidden = !table.isFinished(T());
+  if (box.hidden) return;
+  const s = table.summary(T());
+  const choices = offer();
+  const book = loadBook();
+  const recorded = book.runs.some((r) => r.code === current.code);
+  const list = (title, items) => (items.length ? el('p', {}, el('b', {}, `${title}: `), items.join(', ')) : null);
+  box.replaceChildren(...[el('h2', {}, 'Løpet er ferdig! 🎉'),
+    el('p', { class: 'read' }, s.headline),
+    list('Hjalp', s.helped), list('Kom forbi', s.passed), list('Nye venner', s.friends.map((f) => f.name)), list('Fant', s.found),
+    el('p', {}, `${s.rooms} rom utforsket.`),
+    recorded ? el('p', { class: 'hint' }, `Skrevet i Helteboka ✓ · ${book.runs.length} løp, ${book.friends.length} venner, ${book.ting.length} av 12 TING.`)
+      : el('div', {},
+        choices.length ? el('p', {}, el('b', {}, 'Barnet velger én TING: '), state.chosenTing ? state.chosenTing.name : 'ikke valgt ennå') : null,
+        !state.chosenTing && choices.length ? el('div', { class: 'actions' }, ...choices.map((c) => el('button', { class: 'ghost', onclick: () => chooseTing(c) }, c.name))) : null,
+        el('div', { class: 'actions' }, el('button', { ...(state.chosenTing || !choices.length ? {} : { class: 'ghost' }), onclick: () => {
+          saveBook(recordRun(loadBook(), { code: current.code, summary: s, ting: state.chosenTing || null, date: new Date().toISOString().slice(0, 10) }));
+          log('Skrevet i Helteboka.'); save(); render();
+        } }, 'Skriv i Helteboka')))].filter(Boolean));
 }
 
 function renderMap() {
@@ -300,6 +371,7 @@ function needBlock(node, need, i) {
       met ? el('b', {}, ' · på plass ✓') : several && !isDone(node.id) && !need.local ? el('button', { class: 'small ghost', onclick: () => markNeed(node, i) }, 'Denne er på plass') : null),
     need.sign ? el('div', {}, el('b', {}, 'Tegn: '), `«${need.sign}»`, relay ? el('button', { class: 'small ghost', onclick: () => { state.say = need.sign; save(); render(); } }, 'Vis på iPad') : null) : null,
     need.provider ? el('div', { class: 'sure' }, `Garantert: ${providerText(need.provider)}`) : null,
+    ...table.broughtFits(T(), need).map((name) => el('div', { class: 'sure' }, `Passer også: ${name} (tatt med fra Helteboka)`)),
   );
 }
 
