@@ -16,6 +16,7 @@
     "prototype:lan": "node tools/server.mjs --lan",
     "test:leak": "node tests/v2/player-view-leak.test.mjs",
     "test:table": "node tests/v2/table-play.test.mjs",
-    "test:herobook": "node tests/v2/herobook.test.mjs"
+    "test:herobook": "node tests/v2/herobook.test.mjs",
+    "assets:orders": "node tools/assets/orders.mjs"
   }
 }

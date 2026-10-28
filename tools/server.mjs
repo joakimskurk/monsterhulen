@@ -16,7 +16,7 @@ const PORT = 8765;
 const LAN = process.argv.includes('--lan');
 const HOST = LAN ? '0.0.0.0' : '127.0.0.1';
 const TYPES = { '.html': 'text/html; charset=utf-8', '.mjs': 'text/javascript; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.json': 'application/json; charset=utf-8', '.md': 'text/plain; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png' };
-const ALLOWED_DIRS = ['prototype', 'tools', 'content'];
+const ALLOWED_DIRS = ['prototype', 'tools', 'content', 'assets'];
 
 const sessions = new Map();
 function session(code) {

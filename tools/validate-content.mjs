@@ -2,7 +2,10 @@
 // Validates content/*.json against the V2 card format (content/README.md)
 // and prints tag coverage: who needs a tag vs. who can provide it.
 // Exit code 1 on errors. Warnings do not fail.
-import { loadContent, isCarryTag } from './lib/content.mjs';
+import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
+import { loadContent, isCarryTag, REPO_ROOT } from './lib/content.mjs';
+import { kindOf, sidecarPath } from './lib/asset-prompt.mjs';
 
 const c = loadContent();
 const errors = [];
@@ -134,7 +137,8 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
     if (!expected.has(a.key)) err(at, 'belongs to no card (remove it, or fix the key)');
     if (!a.name) err(at, 'missing name (what to draw)');
     if (!a.placeholder) err(at, 'missing placeholder');
-    if (!['placeholder', 'generated'].includes(a.status)) err(at, `bad status ${a.status}`);
+    if (!['placeholder', 'generated', 'approved'].includes(a.status)) err(at, `bad status ${a.status}`);
+    if (!a.describe) err(at, 'missing describe (the subject for the image order)');
     if (!/^assets\/[a-z0-9-]+(\/[A-Za-z0-9_-]+)+\.(png|webp|svg)$/.test(a.file || '')) err(at, `bad file ${a.file}`);
     if (files.has(a.file)) err(at, `file ${a.file} is used twice`);
     files.add(a.file);
@@ -142,6 +146,28 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
   const have = new Set(c.assets.map((a) => a.key));
   if (have.size !== c.assets.length) err('assets', 'the same key twice');
   for (const key of expected) if (!have.has(key)) err(`asset ${key}`, 'missing in content/assets.json');
+
+  // The shared style (content/art-style.json) and the sidecar of every made image.
+  const style = JSON.parse(readFileSync(join(REPO_ROOT, 'content', 'art-style.json'), 'utf8'));
+  if (!Number.isInteger(style.version) || !style.style?.prompt || !style.style?.avoid || !style.output?.width) err('art-style', 'needs version, style.prompt, style.avoid and output');
+  for (const kind of new Set(c.assets.map(kindOf))) if (!style.framing?.[kind]) err('art-style', `no framing for kind ${kind}`);
+  for (const a of c.assets.filter((x) => x.status !== 'placeholder')) {
+    const at = `asset ${a.key} (${a.status})`;
+    if (!existsSync(join(REPO_ROOT, a.file))) { err(at, `image ${a.file} is missing`); continue; }
+    const side = join(REPO_ROOT, sidecarPath(a));
+    if (!existsSync(side)) { err(at, `sidecar ${sidecarPath(a)} is missing (how the image was made)`); continue; }
+    let s;
+    try { s = JSON.parse(readFileSync(side, 'utf8')); } catch { err(at, 'sidecar is not valid JSON'); continue; }
+    if (s.key !== a.key) err(at, `sidecar is for ${s.key}`);
+    for (const field of ['prompt', 'tool', 'model', 'created', 'styleVersion']) if (s[field] === undefined || s[field] === '') err(at, `sidecar missing ${field}`);
+    if (a.status === 'approved' && s.approved !== true) err(at, 'status approved, but the sidecar does not say approved: true');
+    if (s.styleVersion < style.version) warn(at, `made with style version ${s.styleVersion}, current is ${style.version}: consider making it again`);
+  }
+  // Files under assets/ that no asset points to (left over after a rename, or a stray download).
+  const listed = new Set(c.assets.flatMap((a) => [a.file, sidecarPath(a)]));
+  const walk = (dir) => readdirSync(dir).flatMap((n) => { const p = join(dir, n); return statSync(p).isDirectory() ? walk(p) : [p]; });
+  const assetsDir = join(REPO_ROOT, 'assets');
+  if (existsSync(assetsDir)) for (const f of walk(assetsDir)) { const rel = f.slice(REPO_ROOT.length + 1); if (!listed.has(rel) && !rel.endsWith('README.md')) warn(`file ${rel}`, 'not listed in content/assets.json'); }
 }
 
 // Themes for composed missions (content/themes.json, workshop 2026-10-28).

@@ -35,7 +35,9 @@ function speak(text) {
 }
 const speaker = (text) => (voice ? el('button', { class: 'speak ghost', 'aria-label': 'Les høyt', onclick: () => speak(text) }, '🔊') : null);
 const icon = (v, name) => v.icons?.[name] || '❔';
-const chip = (v, name, onclick) => el('button', { class: 'ghost chipbtn', ...(onclick ? { onclick } : {}) }, el('span', { class: 'icon' }, icon(v, name)), ' ', name);
+// An approved image (a path under assets/) or the placeholder (content/assets.json).
+const pic = (value) => (String(value).startsWith('assets/') ? el('img', { class: 'thumb', src: `/${value}`, alt: '' }) : el('span', { class: 'icon' }, value));
+const chip = (v, name, onclick) => el('button', { class: 'ghost chipbtn', ...(onclick ? { onclick } : {}) }, pic(icon(v, name)), ' ', name);
 
 async function request(type, payload) {
   if (waiting) return;
@@ -78,14 +80,14 @@ function render() {
   $('#place').textContent = v.room.place;
   $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing' },
     // Text first (owner, 2026-10-28); the picture is a small placeholder until assets are generated.
-    el('h3', {}, el('span', { class: 'icon' }, t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
+    el('h3', {}, pic(t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
     t.text ? el('p', {}, t.text) : null,
     el('div', { class: 'actions' },
       t.kind === 'item'
         ? el('button', { onclick: () => request('TAKE', { thing: t.id, name: t.name }) }, 'TA')
         : [
-            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'GI NOE'),
-            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: `${icon(v, name)} ${name}`, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
+            el('button', { onclick: () => pick(`GI NOE TIL ${t.name.toUpperCase()}`, v.inventory.map((name) => ({ label: name, name })), (o) => request('GIVE', { item: o.name, thing: t.id, name: t.name })) }, 'GI NOE'),
+            v.companions.length ? el('button', { class: 'ghost', onclick: () => pick('HVEM SKAL HJELPE?', v.companions.map((name) => ({ label: name, name })), (o) => request('FRIEND', { friend: o.name, thing: t.id, name: t.name })) }, 'BE EN VENN HJELPE') : null,
           ],
     ))) : [el('p', {}, 'Det ser tomt ut her …')]));
   $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Tom')]));
@@ -102,12 +104,12 @@ function renderEnd(v) {
   if (!v.end) return;
   const e = v.end;
   const line = (title, items) => (items.length ? el('p', {}, el('b', {}, `${title}: `), items.join(', ')) : null);
-  const pictures = (names) => names.map((n) => `${icon(v, n)} ${n}`);
+  const pictures = (names) => names;
   box.replaceChildren(...[el('h1', {}, 'DU KLARTE DET! 🎉'), el('p', { class: 'headline' }, e.headline, speaker(e.headline)),
     line('DU HJALP', pictures(e.helped)), line('NYE VENNER', pictures(e.friends.map((f) => f.name))), line('DU FANT', pictures(e.found)),
     e.chosen ? el('p', { class: 'headline' }, `${e.chosen} er din nå!`)
       : e.offer.length ? el('div', {}, el('h2', {}, 'VELG EN TING TIL HELTEBOKA'),
-        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, el('span', { class: 'icon' }, icon(v, o.name)), ' ', o.name.toUpperCase())))) : null].filter(Boolean));
+        el('div', { class: 'chips' }, ...e.offer.map((o) => el('button', { class: 'big', onclick: () => request('PICK_TING', { id: o.id, name: o.name }) }, pic(icon(v, o.name)), ' ', o.name.toUpperCase())))) : null].filter(Boolean));
 }
 
 // Packing before the run, and the hero book itself (workshop B4).
@@ -124,7 +126,7 @@ function renderBook(v) {
   book.hidden = !v.book || (!v.book.friends.length && !v.book.ting.length);
   if (book.hidden) return;
   book.replaceChildren(el('h2', {}, `HELTEBOKA · ${v.book.runs} LØP`),
-    el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, `${icon(v, n)} ${n}`)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, `${icon(v, n)} ${n}`))));
+    el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, pic(icon(v, n)), ' ', n)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, pic(icon(v, n)), ' ', n))));
 }
 
 function renderMap(v) {

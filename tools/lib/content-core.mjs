@@ -11,10 +11,11 @@ export function buildContent(raw) {
 }
 
 // Pictures live in content/assets.json (everything that is to be generated, one entry each).
-// Until a drawing exists, each card gets the asset's placeholder as `icon` when content is loaded.
+// Each card gets `icon` when content is loaded: the image file once it is approved, otherwise the
+// placeholder. Views show an image when `icon` is a path under assets/.
 function attachPlaceholders(content) {
   content.assetByKey = new Map((content.assets || []).map((a) => [a.key, a]));
-  const ph = (key) => content.assetByKey.get(key)?.placeholder;
+  const ph = (key) => { const a = content.assetByKey.get(key); return a?.status === 'approved' ? a.file : a?.placeholder; };
   content.generic = (name) => ph(`generic:${name}`);
   for (const [list, kind] of [[content.items, 'item'], [content.figures, 'figure'], [content.obstacles, 'obstacle'], [content.sources, 'source'], [content.vocabulary.tags, 'tag']]) {
     for (const card of list) card.icon = ph(`${kind}:${card.id}`);

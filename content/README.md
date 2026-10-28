@@ -26,15 +26,36 @@ node tools/validate-content.mjs
 
 ## Assets (alt som skal genereres)
 
-`assets.json` er den ene filen for alt som skal genereres. Kortene selv har ingen bildefelt. Én linje per asset:
+Tre ting hører sammen:
+
+| Fil | Hva |
+|---|---|
+| `assets.json` | **Bestillingslisten.** Én linje per bilde som skal lages. |
+| `art-style.json` | **Felles stil** for alle bilder (`version`, `style.prompt`, `style.avoid`, `output`, `framing` per type, `review`). |
+| `assets/<…>.png` + `assets/<…>.json` | **Hvert ferdige bilde** i sin egen fil, med en sporingsfil ved siden av. |
+
+En linje i `assets.json`:
 
 ```json
-{ "key": "figure:LAVAMONSTERET", "name": "Lavamonsteret", "placeholder": "🌋", "file": "assets/figure/LAVAMONSTERET.png", "status": "placeholder" }
+{ "key": "figure:LAVAMONSTERET", "name": "Lavamonsteret", "describe": "Lavamonsteret. En glødende klump bobler i gangen. Det er for varmt å gå forbi.", "placeholder": "🌋", "file": "assets/figure/LAVAMONSTERET.png", "status": "placeholder" }
 ```
 
-- `key` peker på kortet: `item:`, `figure:`, `obstacle:`, `source:`, `recipe:`, `tag:` (reserve for ting som lages underveis, som «beholder med vann»), `mission:ID` (og `:lock`, `:key`, `:item`), `theme:<del>:ID` og `generic:` (regle-linje, mistet ting, del, nøkkel, dør, ukjent).
-- `name` er hva som skal tegnes. `placeholder` vises til tegningen finnes. `file` er der den genererte filen skal ligge, én fil per asset. `status` er `placeholder` eller `generated`.
-- Validatoren krever nøyaktig én asset per kort og ingen assets uten kort. Nytt kort = ny linje her.
+- `key` peker på kortet: `item:`, `figure:`, `obstacle:`, `source:`, `recipe:`, `tag:` (reserve for ting som lages underveis), `mission:ID` (og `:lock`, `:key`, `:item`), `theme:<del>:ID` og `generic:`.
+- `describe` er motivet. Første utkast kommer fra kortenes egne tekster. Rett gjerne.
+- `placeholder` vises til bildet er godkjent. Deretter viser iPaden bildet.
+- `status`: `placeholder` → `generated` (laget, ikke sett på) → `approved` (godkjent av eier).
+
+**Arbeidsflyt med en AI-leverandør:**
+
+1. `npm run assets:orders -- --kind figure --out bestilling.jsonl` lager én bestilling per bilde: felles stil + utsnitt for typen + motivet, hva som skal unngås, størrelse og bakgrunn, og filen bildet hører til. Uten `--kind` kommer alle med `placeholder`. `--key figure:LAVAMONSTERET` gir ett.
+2. Lagre bildet på `file`, og skriv sporingsfilen ved siden av (samme navn, `.json`):
+   ```json
+   { "key": "figure:LAVAMONSTERET", "styleVersion": 1, "prompt": "…teksten som faktisk ble brukt…", "negative": "…", "tool": "…", "model": "…", "created": "2026-11-01", "approved": false, "license": "…" }
+   ```
+   Sett `status` til `generated`.
+3. Se på bildet mot spørsmålene i `review` i `art-style.json`. Godkjent: sett `"approved": true` (og gjerne `approvedBy`) i sporingsfilen, og `status` til `approved`.
+
+`npm run validate:content` sjekker at hver linje hører til et kort og hvert kort har én linje, at hvert bilde har sin egen fil, at `generated` og `approved` har både bilde og sporingsfil, at `approved` står i sporingsfilen, og at ingen filer under `assets/` mangler i listen. Bilder laget med en eldre stilversjon gir en advarsel.
 
 ## Grunnregel
 
