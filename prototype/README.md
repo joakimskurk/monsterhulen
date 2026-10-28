@@ -36,6 +36,14 @@ iPaden viser tekst. Et lite bilde foran navnet er en plassholder til tegningene 
 
 Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekkes automatisk av `npm run test:leak`. Reglene for hva som skjer når du godtar, løser eller bruker opp noe, ligger i `table.mjs` og testes av `npm run test:table`. Trykk **Vis på iPad** ved et tegn for å vise det som en boble på skjermen hennes. Mens en forespørsel venter, er knappene hennes låst, så dobbeltrykk ikke gir dobbel effekt.
 
+## Forteller-siden
+
+- **Venstre:** oppdraget, kartet og rommet barnet er i (eller rommet du har valgt).
+- **Høyre (blir stående når du blar):** forespørsler fra iPaden, sekken og vennene, **Ting i hulen** og loggen.
+- **Ting i hulen** viser alt barnet kan finne i løpet: hvor det er, hvordan hun får det, om hun har det, og hvem i hulen som vil ha det eller er svak mot det. Den tenkte løsningen er uthevet. Bruk det til å så frø tidlig: «Trollet elsker honningkjeks …»
+- **Faner nederst:** *Figurer i hulen* (hva hver figur vil ha, og hvilke ting som passer), *Hele kjeden*, *Barnets skjerm* (kode, lenke, fri ferdsel) og *Helteboka*.
+- Hjelpestigen ligger sammenfoldet på hvert kort.
+
 ## Slik spiller du
 1. Velg oppdrag og lengde. Under **Nytt hver gang** gir hver kode et nytt tema (for eksempel «Beinnøkkelen og dragekrona» eller «Regla ved steindøra»). Under **Klassikere** ligger de faste eventyrene. **Overrask meg** velger en annen oppdragstype og en kode med et tema dere ikke har hatt i de tre siste løpene. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
    - **Når barnet får noe,** kommer tingen opp stort på iPaden med en sekk under. Hun drar den ned i sekken (eller trykker på sekken), og bildet forsvinner. Tingen ligger allerede i sekken; popupen er for å gjøre øyeblikket synlig.

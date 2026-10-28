@@ -8,7 +8,10 @@
 </head>
 <body>
   <header>
-    <h1>Monsterhulen <span>bordprototype V2</span></h1>
+    <div class="topline">
+      <h1>Monsterhulen <span>Forteller</span></h1>
+      <span id="ipadStatus" class="pill"></span>
+    </div>
     <form id="setup">
       <label>Oppdrag <select id="mission"></select></label>
       <label>Lengde
@@ -25,44 +28,62 @@
     </form>
   </header>
 
-  <main>
-    <section id="intro" class="panel"></section>
-    <section id="pair" class="panel" hidden></section>
-    <section id="requests" class="panel" hidden></section>
-    <section id="finish" class="panel" hidden></section>
-    <section id="pack" class="panel" hidden></section>
+  <main class="dm">
+    <!-- Left: the adventure, the cave and the room the child is in. -->
+    <div class="col-main">
+      <section id="intro" class="panel"></section>
+      <section class="panel">
+        <div class="panel-head">
+          <h2>Kart</h2>
+          <details class="legend">
+            <summary>Tegnforklaring</summary>
+            <p class="hint">Trykk på et naborom med blå ramme for å gå dit; andre rom velges bare, så du kan lese om dem. ★ og gul ramme = der barnet er. Svake rom har barnet ikke vært i (barnet ser tåke). Dør med karm = åpen, lukket tredør med gul lås = låst, rosa stiplet = hemmelig dør (bare for deg).</p>
+          </details>
+        </div>
+        <div id="map"></div>
+      </section>
+      <section class="panel" id="room"></section>
+    </div>
 
-    <section class="panel">
-      <h2>Kart</h2>
-      <p class="hint">Trykk på et naborom med blå ramme for å gå dit; andre rom velges bare, så du kan lese om dem. ★ og gul ramme = der barnet er. Svake rom har barnet ikke vært i (barnet ser tåke). Dør med karm = åpen, lukket tredør med gul lås = låst, rosa stiplet = hemmelig dør (bare for deg).</p>
-      <div id="map"></div>
-    </section>
-
-    <section class="panel" id="room"></section>
-
-    <section class="panel two">
-      <div>
+    <!-- Right: what needs the DM now, and what is in the cave. Stays in view while scrolling. -->
+    <aside class="col-side">
+      <section id="requests" class="panel urgent" hidden></section>
+      <section id="finish" class="panel" hidden></section>
+      <section id="pack" class="panel" hidden></section>
+      <section class="panel">
         <h2>Sekken</h2>
-        <ul id="inventory"></ul>
+        <ul id="inventory" class="compact"></ul>
         <div id="crafting"></div>
         <h2>Venner</h2>
-        <ul id="companions"></ul>
-      </div>
-      <div>
+        <ul id="companions" class="compact"></ul>
+      </section>
+      <section class="panel">
+        <h2>Ting i hulen</h2>
+        <p class="hint">Alt barnet kan finne i dette løpet, og hvem som vil ha det. Bruk det til å så frø: «Trollet elsker honningkjeks …»</p>
+        <ul id="things" class="things"></ul>
+      </section>
+      <section class="panel">
         <h2>Logg</h2>
-        <ol id="log"></ol>
+        <ol id="log" class="compact"></ol>
+      </section>
+    </aside>
+
+    <!-- Bottom: everything else, one tab at a time. -->
+    <section class="panel tabs-panel">
+      <div class="tabs" role="tablist">
+        <button type="button" class="tab active" data-tab="figures">Figurer i hulen</button>
+        <button type="button" class="tab" data-tab="chain">Hele kjeden</button>
+        <button type="button" class="tab" data-tab="pair">Barnets skjerm</button>
+        <button type="button" class="tab" data-tab="book">Helteboka</button>
       </div>
-    </section>
-
-    <section class="panel">
-      <details>
-        <summary>Hele kjeden (Forteller-mal)</summary>
+      <div class="tab-body" data-body="figures"><div id="figures"></div></div>
+      <div class="tab-body" data-body="chain" hidden>
         <pre id="template"></pre>
-      </details>
-      <button type="button" id="reset" class="ghost">Start løpet på nytt</button>
+        <button type="button" id="reset" class="ghost">Start løpet på nytt</button>
+      </div>
+      <div class="tab-body" data-body="pair" hidden><div id="pair"><p class="hint">To skjermer er ikke i gang. Start med «npm run prototype:lan».</p></div></div>
+      <div class="tab-body" data-body="book" hidden><div id="herobook"></div></div>
     </section>
-
-    <section class="panel" id="herobook"></section>
   </main>
 
   <script type="module" src="app.mjs"></script>

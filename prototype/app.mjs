@@ -8,6 +8,7 @@ import { playerView } from './player-view.mjs';
 import { caveGrid, doorsFor, caveBounds } from './map-view.mjs';
 import * as table from './table.mjs';
 import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
+import { caveOverview } from './overview.mjs';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -96,6 +97,14 @@ async function start() {
     $('#seed').value = freshSeed(missionId);
     generate();
   });
+  // Tabs at the bottom: one body at a time.
+  for (const tab of document.querySelectorAll('.tab')) {
+    tab.addEventListener('click', () => {
+      for (const t of document.querySelectorAll('.tab')) t.classList.toggle('active', t === tab);
+      for (const b of document.querySelectorAll('.tab-body')) b.hidden = b.dataset.body !== tab.dataset.tab;
+    });
+  }
+  $('#ipadStatus').textContent = 'Én skjerm';
   $('#reset').addEventListener('click', () => { if (confirm('Starte dette løpet på nytt?')) { state = freshState(current.run); save(); render(); } });
   await connectRelay();
   generate();
@@ -120,6 +129,7 @@ async function connectRelay() {
     relay = true;
     const urls = info.urls.map((u) => `${u}/prototype/child.html#k=${SESSION}`);
     $('#pair').hidden = false;
+    $('#ipadStatus').textContent = `iPad-kode ${SESSION}`;
     $('#pair').replaceChildren(
       el('h2', {}, 'Barnets skjerm'),
       el('p', {}, 'Kode: ', el('b', { class: 'code' }, SESSION)),
@@ -300,12 +310,13 @@ function render() {
   $('#intro').replaceChildren(
     el('h2', {}, run.mission.name),
     el('p', { class: 'read' }, run.mission.intro),
-    el('p', { class: 'hint' }, `Kode: ${current.code} · ${run.map.rooms.length} rom · soner: ${[...new Set(run.map.rooms.map((r) => r.zoneName))].join(' → ')}`),
+    el('p', { class: 'hint' }, `Kode ${current.code} · ${run.map.rooms.length} rom · ${[...new Set(run.map.rooms.map((r) => r.zoneName))].join(' → ').toLowerCase()} · barnet er i ${run.map.rooms[state.here].name}`),
   );
+  renderOverview();
   renderMap();
   renderRoom(state.selected ?? state.here);
   renderInventory();
-  $('#log').replaceChildren(...state.log.slice().reverse().map((t) => el('li', {}, t)));
+  $('#log').replaceChildren(...state.log.slice(-12).reverse().map((t) => el('li', {}, t)));
   $('#template').textContent = dmTemplate(content, run, current.result);
   renderFinish();
   renderPack();
@@ -435,11 +446,13 @@ function ladder(node) {
     ? '«Resten av regla må finnes et sted. Kanskje noen i hulen kan den, eller den står skrevet på en vegg?»'
     : first.specific ? `«Har du ${first.name.toLowerCase()}? Kanskje i sekken, eller et annet sted i hulen?»`
       : `«Har du noe som er ${label(first.tag)}? Kanskje i sekken, eller et annet sted i hulen?»`;
-  return el('ol', { class: 'ladder' },
-    el('li', {}, first.sign ? `Beskriv tegnet: «${first.sign}»` : 'Beskriv det barnet ser og spør hva hun vil gjøre.'),
-    el('li', {}, `Tydeligere: ${clearer}`),
-    el('li', {}, 'Fortsatt fast? Bruk LØS eller GI LIKEVEL.'),
-  );
+  // Folded away: the sign is already on the card; open it when she is stuck.
+  return el('details', { class: 'ladder-box' }, el('summary', {}, 'Hjelpestige'),
+    el('ol', { class: 'ladder' },
+      el('li', {}, first.sign ? `Beskriv tegnet: «${first.sign}»` : 'Beskriv det barnet ser og spør hva hun vil gjøre.'),
+      el('li', {}, `Tydeligere: ${clearer}`),
+      el('li', {}, 'Fortsatt fast? Bruk LØS eller GI LIKEVEL.'),
+    ));
 }
 
 const KIND = { blocker: 'Hinder', lock: 'Låst dør', machine: 'Maskin', trader: 'Bytter', quest: 'Trenger hjelp', companion: 'Mulig venn', source: 'Kilde', item: 'Ting', target: 'Den dere skal redde', goal: 'Målet', exit: 'Målet', deliver: 'Det som skal leveres' };
@@ -507,6 +520,30 @@ function renderRoom(roomId) {
   ];
   if (!nodes.length && !alts.length && !ambient.length) parts.push(el('p', { class: 'read' }, 'Rommet er tomt. Beskriv stemningen, eller la barnet se seg rundt.'));
   $('#room').replaceChildren(...parts.filter(Boolean));
+}
+
+// ---------- everything in the cave (prototype/overview.mjs) ----------
+// Things in the side panel: what she can find, where, and who wants it, so the DM can plant hints early.
+// Figures in the tab below: what each wants and which things in the cave fit.
+const STATUS = { 'i sekken': 'i sekken', brukt: 'brukt', 'ikke funnet': '' };
+function renderOverview() {
+  const o = caveOverview(content, current.run, state);
+  const where = (r) => (r ? `${r.name} (rom ${r.id})` : '');
+  $('#things').replaceChildren(...(o.things.length ? o.things.map((t) => el('li', { class: `thing-row ${t.status === 'brukt' ? 'used' : ''}` },
+    el('div', { class: 'thing-top' },
+      el('span', { class: 'icon' }, t.icon || '❔'), el('b', {}, t.name),
+      t.status !== 'ikke funnet' ? el('span', { class: 'badge' }, STATUS[t.status]) : null),
+    el('div', { class: 'hint' }, [where(t.room), t.how].filter(Boolean).join(' · ')),
+    t.fits.length ? el('div', { class: 'fits' }, ...t.fits.map((f) => el('span', { class: `fit${f.planned ? ' planned' : ''}`, title: f.planned ? 'Tenkt løsning' : 'Passer også' }, `${f.figure} ${f.how} ${f.tag}`))) : null,
+  )) : [el('li', { class: 'hint' }, 'Ingen ting i dette løpet.')]));
+  $('#figures').replaceChildren(el('table', { class: 'figures' },
+    el('thead', {}, el('tr', {}, el('th', {}, 'Figur'), el('th', {}, 'Hvor'), el('th', {}, 'Vil ha / svak mot'), el('th', {}, 'Ting i hulen som passer'))),
+    el('tbody', {}, ...o.figures.map((f) => el('tr', { class: f.done ? 'used' : '' },
+      el('td', {}, el('span', { class: 'icon' }, f.icon || ''), ' ', el('b', {}, f.name), f.ambient ? el('span', { class: 'hint' }, ' (fritt møte)') : null),
+      el('td', {}, where(f.room)),
+      el('td', {}, [...f.wantLabels, ...f.tasks].join(', ') || '–'),
+      el('td', {}, f.fitting.join(', ') || '–'),
+    )))));
 }
 
 function renderInventory() {
