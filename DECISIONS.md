@@ -4,6 +4,15 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - Walking far: tap a room, and the avatar walks the way
+
+Owner: tapping through every room is clumsy when the way is long. «Kanskje vi kan trykke på rom langt vekk, og avataren vår vandrer da veien … Da skjer det noe visuelt samtidig som DM har tid til å forberede seg på neste replikk.»
+
+- **Tapping a room she has been in** finds the shortest way through what her map shows: rooms she has been in, and doors that are not locked. It never uses a secret door, an unknown room or the fog. This is `walkPath` in `map-view.mjs`, tested in `tests/v2/walk.test.mjs`: 595 walks, always the shortest, never through a locked door or an unknown room.
+- **The avatar walks it room by room.** The star glides out to the door and into the next room, about 0.75 s for each room.
+- **Every step is an ordinary MOVE.** The DM page takes it by itself through an open door, and the DM sees each room in the log. If a step is refused, the walk stops.
+- **Unknown rooms** are still entered one at a time, through «?» next to the room she is in.
+
 ## 2026-10-28 - Every story starts with someone who asks, and ends with their thanks
 
 Two playtests from the owner pointed the same way.

@@ -1,6 +1,6 @@
 // The child's iPad: shows the filtered player view and sends requests to the DM.
 // It never changes the game itself; the DM device accepts or declines every request.
-import { caveGrid } from './map-view.mjs';
+import { caveGrid, walkPath, doorBetween } from './map-view.mjs';
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
   const node = document.createElement(tag);
@@ -325,7 +325,45 @@ function renderMap(v) {
   $('#bagIcon').replaceChildren(uiPic(v.ui?.backpack || '🎒'));
   // The cave as in the original: rooms and doors, fog over the unknown (prototype/map-view.mjs).
   const canGo = (id) => v.cave.rooms.some((r) => r.id === id && r.canGo) || v.cave.probes.some((p) => p.room === id && !p.locked);
-  $('#map').replaceChildren(caveGrid({ ...v.cave, player: v.ui?.player }, { memo: `child:${v.runCode}`, onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));
+  const before = document.querySelector('#map .mk-here')?.getBoundingClientRect() || null;
+  const onRoom = (id) => {
+    if (walking.next !== null) return; // already on the way
+    if (canGo(id)) { walking.rest = []; step(id); return; }
+    // A room further away that she has been in: walk the way, room by room through the doors.
+    const path = walkPath(v.cave, v.here, id);
+    if (path?.length) { walking.rest = path.slice(1); step(path[0]); }
+  };
+  $('#map').replaceChildren(caveGrid({ ...v.cave, player: v.ui?.player }, { memo: `child:${v.runCode}`, onRoom }));
+  if (before && walking.from !== null && walking.from !== v.here) walkAnimation(v, walking.from, before);
+  walking.from = v.here;
+  // The next step of a walk, once the DM page has moved her (or stop: it did not).
+  if (walking.next !== null) {
+    if (v.here === walking.next) {
+      walking.next = null;
+      if (walking.rest.length) setTimeout(() => { if (walking.next === null && walking.rest.length) step(walking.rest.shift()); }, STEP_MS);
+    } else if (!waiting) { walking.next = null; walking.rest = []; }
+  }
+}
+
+// ---------- walking far (owner, 2026-10-28) ----------
+// She taps a room she has been in, far away; the star walks there one room at a time, through the
+// doors. Every step is an ordinary MOVE (the DM sees it in the log), so the DM has time for the next line.
+const STEP_MS = 750;
+const walking = { from: null, next: null, rest: [] };
+function step(room) { if (waiting) { walking.rest = []; return; } walking.next = room; request('MOVE', { room }); }
+// The star glides from where it was, out through the door, into the middle of the new room.
+function walkAnimation(v, from, before) {
+  const star = document.querySelector('#map .mk-here');
+  const door = doorBetween(v.cave, from, v.here);
+  if (!star || !door) return;
+  const tile = document.querySelector(`#map .cave-tile[data-x="${door.x}"][data-y="${door.y}"]`)?.getBoundingClientRect();
+  const now = star.getBoundingClientRect();
+  if (!tile) return;
+  const mid = (r) => ({ x: r.left + r.width / 2, y: r.top + r.height / 2 });
+  const a = mid(before), b = mid(now);
+  const d = { n: { x: tile.left + tile.width / 2, y: tile.top }, s: { x: tile.left + tile.width / 2, y: tile.bottom }, e: { x: tile.right, y: tile.top + tile.height / 2 }, w: { x: tile.left, y: tile.top + tile.height / 2 } }[door.dir];
+  const at = (p) => `translate(${p.x - b.x}px, ${p.y - b.y}px)`;
+  star.animate([{ transform: at(a) }, { transform: at(d), offset: 0.55 }, { transform: 'translate(0, 0)' }], { duration: STEP_MS - 50, easing: 'ease-in-out' });
 }
 
 $('#search').addEventListener('click', () => view && request('SEARCH', { room: view.here }));

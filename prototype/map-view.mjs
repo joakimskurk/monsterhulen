@@ -123,6 +123,7 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
     for (let x = minX; x <= maxX; x++) {
       const tile = document.createElement('div');
       tile.className = 'cave-tile';
+      tile.dataset.x = x; tile.dataset.y = y; // where a walk animates through (child.mjs)
       const r = roomAt(x, y);
       if (!r) {
         // Fog. Beyond an exit of the room the child is in: «?» to explore, 🔒 if the door is locked.
@@ -254,4 +255,39 @@ export function caveBounds(rooms) {
     minX: Math.min(...rooms.map((r) => r.x)) - 1, minY: Math.min(...rooms.map((r) => r.y)) - 1,
     maxX: Math.max(...rooms.map((r) => r.x + r.w - 1)) + 1, maxY: Math.max(...rooms.map((r) => r.y + r.h - 1)) + 1,
   };
+}
+
+// ---------- walking far (owner, 2026-10-28: tap a room far away, and the avatar walks the way) ----------
+// Only through what the child's map shows: rooms she has been in, and doors that are not locked (secret
+// doors are never in the child's map). Pure, so tests/v2/walk.test.mjs checks it.
+const STEP = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] };
+const WALKABLE = new Set(['open', 'loop', 'closed']);
+function roomAtIn(cave, x, y) { return cave.rooms.find((r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h); }
+
+// The door between two neighbouring rooms, on room a's side: { x, y, dir }, or null.
+export function doorBetween(cave, a, b) {
+  for (const d of cave.doors) {
+    if (!WALKABLE.has(d.kind)) continue;
+    const here = roomAtIn(cave, d.x, d.y), there = roomAtIn(cave, d.x + STEP[d.dir][0], d.y + STEP[d.dir][1]);
+    if (here?.id === a && there?.id === b) return d;
+  }
+  return null;
+}
+
+// The shortest way from room `from` to room `to`, as the rooms to walk into (not `from`), or null.
+export function walkPath(cave, from, to) {
+  if (from === to) return [];
+  const prev = new Map([[from, null]]), queue = [from];
+  while (queue.length) {
+    const r = queue.shift();
+    for (const d of cave.doors) {
+      if (!WALKABLE.has(d.kind)) continue;
+      const here = roomAtIn(cave, d.x, d.y), there = roomAtIn(cave, d.x + STEP[d.dir][0], d.y + STEP[d.dir][1]);
+      if (here?.id !== r || !there || prev.has(there.id)) continue;
+      prev.set(there.id, r);
+      if (there.id === to) { const path = []; for (let x = to; x !== from; x = prev.get(x)) path.unshift(x); return path; }
+      queue.push(there.id);
+    }
+  }
+  return null;
 }
