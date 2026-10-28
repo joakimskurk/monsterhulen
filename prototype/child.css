@@ -69,3 +69,80 @@ dialog { border: none; border-radius: 18px; padding: 18px; max-width: 520px; wid
 dialog::backdrop { background: rgba(0, 0, 0, .45); }
 .room-node.go circle { stroke: var(--accent); stroke-width: 4; }
 body.waiting #game button, body.waiting .room-node { opacity: .5; pointer-events: none; }
+
+/* ---------- One screen, landscape, like an app: nothing scrolls (owner, 2026-10-28) ----------
+   Sized for iPads in landscape, also with Safari's bars (down to about 1024 × 660). Sizes follow the
+   screen height, so a small iPad gets smaller text rather than a scrollbar. */
+html, body.child { height: 100%; overflow: hidden; overscroll-behavior: none; }
+body.child { --u: clamp(13px, 2.3vh, 22px); font-size: var(--u); touch-action: manipulation; -webkit-user-select: none; user-select: none; -webkit-tap-highlight-color: transparent; -webkit-touch-callout: none; }
+body.child main.app {
+  max-width: none; margin: 0; height: 100vh; height: 100dvh; box-sizing: border-box; overflow: hidden;
+  padding: max(8px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  display: grid; gap: 8px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(330px, 1fr);
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-areas: "top top" "map room" "bag bag";
+}
+body.child main.app[hidden] { display: none; }
+.app .panel { padding: 10px 12px; min-height: 0; min-width: 0; }
+.top { grid-area: top; display: flex; align-items: center; gap: 12px; padding: 0 4px; background: none; border: none; position: static; }
+.top .mission { margin: 0; flex: 1; text-align: left; font-size: calc(var(--u) * .9); }
+.top .status { margin: 0; min-height: 0; font-size: calc(var(--u) * .8); }
+body.child .top-btn { min-height: 36px; padding: 2px 12px; font-size: calc(var(--u) * .8); border-radius: 10px; }
+
+/* The map fills its box, as large as both its width and height allow (map-view.mjs sets --aspect). */
+.map-panel { grid-area: map; display: grid; padding: 6px !important; }
+.map-box { container-type: size; min-height: 0; display: grid; place-items: center; }
+.map-box .cave-wrap { width: min(100cqw, calc((100cqh - 18px) * var(--aspect, 1) + 18px)); }
+
+/* The room: title, what just happened, what is here, and the doors. Only the list of things may give
+   way (smaller), never the doors. */
+.room-panel { grid-area: room; display: flex; flex-direction: column; gap: 6px; }
+.room-head { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
+body.child .room-head h1 { margin: 0; font-size: calc(var(--u) * 1.3); }
+.room-head .place { margin: 0; font-size: calc(var(--u) * .85); }
+body.child .say { position: static; margin: 0; padding: 8px 12px; font-size: var(--u); }
+body.child .news { margin: 0; padding: 6px 12px; font-size: var(--u); }
+.things-box { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; gap: 6px; }
+body.child .thing { margin: 0; padding: 8px 10px; border-radius: 12px; flex: 0 1 auto; min-height: 0; overflow: hidden; }
+body.child .thing h3 { font-size: calc(var(--u) * 1.05); display: flex; align-items: center; gap: 6px; }
+body.child .thing p { margin: 0 0 6px; font-size: calc(var(--u) * .9); line-height: 1.3; }
+body.child .thing .actions { display: flex; gap: 8px; flex-wrap: wrap; }
+body.child .thing button, body.child button.speak { min-height: 44px; font-size: var(--u); padding: 4px 14px; }
+body.child .things-box > p { margin: 0; color: var(--muted); }
+body.child .pad { margin: 0; gap: 6px; flex: 0 0 auto; }
+body.child .pad button { min-height: 0; height: clamp(44px, 8.5vh, 70px); padding: 0 8px; font-size: var(--u); border-radius: 12px; }
+
+/* The backpack and friends along the bottom, one row each half. */
+.bag-panel { grid-area: bag; display: grid; grid-template-columns: 1.6fr 1fr; gap: 12px; padding: 6px 12px !important; }
+.bag-part { display: flex; align-items: center; gap: 10px; min-width: 0; }
+body.child .bag-part h2 { margin: 0; font-size: calc(var(--u) * .85); white-space: nowrap; }
+.bag-part .chips { margin: 0; gap: 6px; flex-wrap: nowrap; overflow: hidden; min-width: 0; }
+body.child .bag-part .chipbtn { min-height: 40px; padding: 2px 10px; font-size: calc(var(--u) * .85); white-space: nowrap; border-radius: 10px; }
+
+/* Packing, the end and the hero book open on top of the game. */
+.layer { position: fixed; inset: 0; z-index: 15; display: grid; place-items: center; background: rgba(10, 6, 24, .78); padding: 3vh 3vw; }
+.layer[hidden] { display: none; }
+.layer-card { width: min(760px, 92vw); max-height: 94vh; overflow: hidden; display: flex; flex-direction: column; gap: 8px; }
+.layer-card h1 { font-size: calc(var(--u) * 1.4); margin: 0; }
+.layer-card h2 { font-size: var(--u); margin: 4px 0; }
+.layer-card p { margin: 0; }
+body.child .layer-card .chips button.big { width: auto; }
+
+/* Turn the iPad: shown only when a touch screen is held upright. */
+.turn { display: none; }
+@media (orientation: portrait) and (pointer: coarse) {
+  .turn { position: fixed; inset: 0; z-index: 50; display: grid; place-content: center; text-align: center; background: var(--bg); color: #ffd95c; font-weight: 800; }
+  .turn div { font-size: 96px; animation: turnme 2s ease-in-out infinite; }
+  .turn p { font-size: 32px; letter-spacing: .08em; }
+}
+@keyframes turnme { 0%, 30% { transform: rotate(0); } 60%, 100% { transform: rotate(-90deg); } }
+/* A thing: name and buttons on one row, the text under (two lines; one when the room is full). */
+body.child .thing { display: grid; grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "title actions" "text text"; align-items: center; column-gap: 8px; }
+body.child .thing h3 { grid-area: title; margin: 0; min-width: 0; }
+body.child .thing p { grid-area: text; margin: 4px 0 0; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
+body.child .thing .actions { grid-area: actions; flex-wrap: nowrap; }
+body.child .things-box.many .thing p { -webkit-line-clamp: 1; }
+body.child .thing .speak { min-height: 36px; margin-left: 4px; padding: 0 8px; }
+/* A full backpack wraps to a second row (the map gives way), never off the screen. */
+.bag-part .chips { flex-wrap: wrap; max-height: calc(2 * 40px + 6px); }

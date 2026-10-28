@@ -2,8 +2,12 @@
 <html lang="nb">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
   <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Monsterhulen">
+  <link rel="manifest" href="manifest.webmanifest">
   <meta name="color-scheme" content="dark">
   <meta name="theme-color" content="#17141f">
   <title>Monsterhulen</title>
@@ -20,16 +24,25 @@
     </form>
   </section>
 
-  <main id="game" hidden>
-    <p id="mission" class="mission"></p>
-    <div id="say" class="say" hidden></div>
-    <section id="end" class="panel end" hidden></section>
-    <section id="pack" class="panel" hidden></section>
-    <section class="panel">
-      <h1 id="roomTitle"></h1>
-      <p id="place" class="place"></p>
+  <!-- Landscape, one screen, like an app: nothing scrolls (owner, 2026-10-28). The map on the left, the
+       room and the doors on the right, the backpack along the bottom; everything else opens on top. -->
+  <main id="game" class="app" hidden>
+    <header class="top">
+      <p id="mission" class="mission"></p>
+      <p id="status" class="status"></p>
+      <button id="bookBtn" class="ghost top-btn" type="button" hidden>📖 HELTEBOKA</button>
+    </header>
+    <section class="panel map-panel">
+      <div id="map" class="map-box"></div>
+    </section>
+    <section class="panel room-panel">
+      <div class="room-head">
+        <h1 id="roomTitle"></h1>
+        <p id="place" class="place"></p>
+      </div>
+      <div id="say" class="say" hidden></div>
       <p id="news" class="news" hidden></p>
-      <div id="things"></div>
+      <div id="things" class="things-box"></div>
       <!-- Doors as in the original: one big button per direction, «SE DEG RUNDT» in the middle. -->
       <div class="pad">
         <button class="dir" data-dir="n"></button>
@@ -39,19 +52,21 @@
         <button class="dir" data-dir="s"></button>
       </div>
     </section>
-    <section class="panel">
-      <h2>KARTET</h2>
-      <div id="map"></div>
+    <section class="panel bag-panel">
+      <div class="bag-part"><h2>🎒 SEKKEN</h2><div id="inventory" class="chips"></div></div>
+      <div class="bag-part"><h2>VENNER</h2><div id="companions" class="chips"></div></div>
     </section>
-    <section class="panel">
-      <h2>SEKKEN</h2>
-      <div id="inventory" class="chips"></div>
-      <h2>VENNER</h2>
-      <div id="companions" class="chips"></div>
-    </section>
-    <section id="book" class="panel" hidden></section>
-    <p id="status" class="status"></p>
   </main>
+
+  <!-- On top of the game: before the run, at the end, and the hero book. -->
+  <div id="packLayer" class="layer" hidden><section id="pack" class="panel layer-card"></section></div>
+  <div id="endLayer" class="layer" hidden><section id="end" class="panel end layer-card"></section></div>
+  <div id="bookLayer" class="layer" hidden>
+    <section class="panel layer-card"><div id="book"></div><button id="bookClose" type="button">LUKK</button></section>
+  </div>
+
+  <!-- The iPad held upright: ask her to turn it. -->
+  <div class="turn" aria-hidden="true"><div>🔄</div><p>SNU IPADEN</p></div>
 
   <div id="dieBox" class="found" hidden>
     <div class="found-card">

@@ -127,9 +127,9 @@ export function resolve(t, node, { improvised = false } = {}) {
   if (['blocker', 'lock', 'machine'].includes(node.kind)) { state.openGates.push(node.gate); log(t, `${node.card.name} er løst – veien videre er åpen.${note}`); }
   else if (node.kind === 'companion') { state.companions.push(node.card.name); log(t, `${node.card.name} ble med!${note}`); }
   else if (node.kind === 'target') { state.companions.push(node.card.name); state.say = `${node.card.name} følger med deg. Ta den trygt med hjem!`; log(t, `${node.card.name} er rolig og følger med hjem.${note}`); }
-  else if (node.treasure) { state.say = `Du fant ${node.treasure.name.toLowerCase()}! 🎉`; log(t, `Dere fant ${node.treasure.name}! 🎉${note}`); }
-  else if (['goal', 'exit'].includes(node.kind)) { state.say = `Du klarte det! ${node.card.name}! 🎉`; log(t, `Dere nådde ${node.card.name}! 🎉${note}`); }
-  else if (node.kind === 'deliver') { state.inventory.push(node.item.name); log(t, `Fant ${node.item.name}.${note}`); }
+  else if (node.treasure) { state.say = `Du fant ${node.treasure.name.toLowerCase()}! 🎉`; log(t, `Du fant ${node.treasure.name.toLowerCase()}! 🎉${note}`); }
+  else if (['goal', 'exit'].includes(node.kind)) { state.say = `Du klarte det! ${node.card.name}! 🎉`; log(t, `Du kom fram til ${node.card.name.toLowerCase()}! 🎉${note}`); }
+  else if (node.kind === 'deliver') { state.inventory.push(node.item.name); log(t, `Du fant ${node.item.name.toLowerCase()}.${note}`); }
   else if (node.item) { state.inventory.push(node.item.name); log(t, `${node.kind === 'item' ? 'Tok' : 'Fikk'} ${node.item.name}${node.kind === 'item' ? '' : ` (${node.card.name})`}.${note}`); }
   state.done.push(node.id);
 }
@@ -240,10 +240,10 @@ const hiddenHere = (t, room) => t.run.nodes.filter((n) => n.kind === 'item' && n
 export function search(t, room = t.state.here) {
   if (hiddenHere(t, room).length) {
     t.state.roll = { id: nextRollId(t), kind: 'search', room, text: 'Kast terningen for å lete!' };
-    log(t, `Hun leter i ${t.run.map.rooms[room].name}. Terningen avgjør.`);
+    log(t, `Du leter i ${t.run.map.rooms[room].name}. Kast terningen!`);
     return true;
   }
-  log(t, 'Hun så seg rundt, men fant ingenting gjemt.');
+  log(t, 'Du ser deg rundt, men finner ingenting.');
   return false;
 }
 
@@ -264,7 +264,7 @@ export function rolled(t, value) {
     t.state.searchTries = { ...(t.state.searchTries || {}), [roll.room]: ((t.state.searchTries || {})[roll.room] || 0) + 1 };
     const found = band !== 'low' || t.state.searchTries[roll.room] >= 2;
     if (found) { const n = hiddenHere(t, roll.room)[0]; t.state.say = null; if (n) resolve(t, n); return { band, found: true }; }
-    log(t, `Terningen viste ${value}. Ingen funn ennå, men noe er gjemt her. Prøv igjen!`);
+    log(t, `Terningen viste ${value}. Du finner ingenting ennå, men noe er gjemt her. Prøv igjen!`);
     t.state.say = 'Noe er gjemt her … Prøv å se deg rundt én gang til!';
     return { band, found: false };
   }

@@ -13,7 +13,11 @@ const el = (tag, attrs = {}, ...kids) => {
   return node;
 };
 
+// The code from the link, or the last one used: opened from the home screen, the app has no code in its link.
+const CODE_KEY = 'monsterhulen-barn:kode';
 let code = new URLSearchParams(location.hash.slice(1)).get('k');
+let fromStore = false;
+try { if (code) localStorage.setItem(CODE_KEY, code); else { code = localStorage.getItem(CODE_KEY); fromStore = !!code; } } catch { /* private mode */ }
 let view = null;
 let waiting = false; // one request at a time; cleared when the DM sends a new view
 let seenNews = -1;    // the newest news line already shown, so a new one can stand out
@@ -64,6 +68,8 @@ function connect() {
   const source = new EventSource(`/api/${code}/player-stream`);
   source.addEventListener('view', (e) => { view = JSON.parse(e.data); waiting = false; document.body.classList.remove('waiting'); status(''); render(); });
   source.onerror = () => status('Mistet kontakten. Prøver igjen …');
+  // An old code from last time that no DM is using any more: ask for the new one.
+  if (fromStore) setTimeout(() => { if (!view) { source.close(); $('#game').hidden = true; $('#join').hidden = false; $('#code').value = code; } }, 6000);
 }
 
 function pick(title, options, onPick) {
@@ -89,6 +95,7 @@ function render() {
     seenNews = Math.max(seenNews, v.news.id);
   }
   $('#place').textContent = v.room.place;
+  $('#things').classList.toggle('many', v.room.things.length >= 3);
   $('#things').replaceChildren(...(v.room.things.length ? v.room.things.map((t) => el('div', { class: 'thing' },
     // Text first (owner, 2026-10-28); the picture is a small placeholder until assets are generated.
     el('h3', {}, pic(t.icon || '❔'), ' ', t.name.toUpperCase(), speaker(`${t.name}. ${t.text || ''}`)),
@@ -175,7 +182,7 @@ function closeFound() {
 // The end of the run: what she did, and one of two lasting TING to choose (workshop B1, B3).
 function renderEnd(v) {
   const box = $('#end');
-  box.hidden = !v.end;
+  $('#endLayer').hidden = !v.end;
   if (!v.end) return;
   const e = v.end;
   const line = (title, items) => (items.length ? el('p', {}, el('b', {}, `${title}: `), items.join(', ')) : null);
@@ -190,16 +197,18 @@ function renderEnd(v) {
 // Packing before the run, and the hero book itself (workshop B4).
 function renderBook(v) {
   const pack = $('#pack');
-  pack.hidden = !v.pack;
+  $('#packLayer').hidden = !v.pack;
   if (v.pack) {
     pack.replaceChildren(el('h2', {}, 'TA MED FRA HELTEBOKA'), el('p', {}, 'Du kan ta med én venn og én ting.'),
       el('div', { class: 'chips' },
         ...v.pack.friends.filter((n) => !v.companions.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'friend', name: n }))),
         ...v.pack.ting.filter((n) => !v.inventory.includes(n)).map((n) => chip(v, n, () => request('BRING', { kind: 'ting', name: n })))));
   }
+  // The hero book behind a button at the top, so it never takes room from the game.
   const book = $('#book');
-  book.hidden = !v.book || (!v.book.friends.length && !v.book.ting.length);
-  if (book.hidden) return;
+  const empty = !v.book || (!v.book.friends.length && !v.book.ting.length);
+  $('#bookBtn').hidden = empty;
+  if (empty) { $('#bookLayer').hidden = true; return; }
   book.replaceChildren(el('h2', {}, `HELTEBOKA · ${v.book.runs} LØP`),
     el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, pic(icon(v, n)), ' ', n)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, pic(icon(v, n)), ' ', n))));
 }
@@ -227,11 +236,14 @@ function renderMap(v) {
 
 $('#search').addEventListener('click', () => view && request('SEARCH', { room: view.here }));
 $('#pickCancel').addEventListener('click', () => $('#pick').close());
+$('#bookBtn').addEventListener('click', () => { $('#bookLayer').hidden = false; });
+$('#bookClose').addEventListener('click', () => { $('#bookLayer').hidden = true; });
 $('#joinForm').addEventListener('submit', (e) => {
   e.preventDefault();
   code = $('#code').value.trim().toUpperCase();
   if (!code) return;
   location.hash = `k=${code}`;
+  try { localStorage.setItem(CODE_KEY, code); } catch { /* private mode */ }
   connect();
 });
 if (code) connect(); else $('#join').hidden = false;

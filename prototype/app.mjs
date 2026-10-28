@@ -254,7 +254,7 @@ function renderRequests() {
         el('p', { class: 'hint' }, hidden.length ? 'Noe er gjemt her. Kast terning hvis det er usikkert: 1–2 gir et tydeligere spor, prøver hun igjen finner hun det.' : 'Ingenting gjemt her. Beskriv noe fint eller rart hun legger merke til.'),
         el('div', { class: 'actions' }, hidden.length ? el('button', { onclick: () => { table.search(T(), r.room); save(); render(); ack(r); } }, 'La henne kaste terningen') : null,
           ...hidden.map((n) => el('button', { class: 'ghost', onclick: () => { resolve(n); ack(r); } }, `Fant: ${n.item.name}`)),
-          el('button', { class: 'ghost', onclick: () => { log('Hun så seg rundt.'); save(); render(); ack(r); } }, hidden.length ? 'Ikke ennå' : 'OK')));
+          el('button', { class: 'ghost', onclick: () => { log('Du ser deg rundt.'); save(); render(); ack(r); } }, hidden.length ? 'Ikke ennå' : 'OK')));
     }
     if (r.type === 'GIVE' || r.type === 'FRIEND') {
       const text = r.type === 'GIVE' ? `Hun vil gi ${r.item} til ${r.name}.` : `Hun vil at ${r.friend} skal hjelpe med ${r.name}.`;
@@ -371,7 +371,7 @@ function render() {
 const canPack = () => state.visited.length === 1 && !state.brought?.done && !(state.brought?.friend && state.brought?.ting)
   && (loadBook().friends.length || loadBook().ting.length);
 const offer = () => tingOffer(loadBook(), content, current.code);
-const chooseTing = (t) => { state.chosenTing = t; log(`Valgte ${t.name} til Helteboka.`); save(); render(); };
+const chooseTing = (t) => { state.chosenTing = t; log(`Du valgte ${t.name.toLowerCase()} til Helteboka.`); save(); render(); };
 
 function renderPack() {
   const box = $('#pack');
@@ -554,7 +554,7 @@ function renderRoom(roomId) {
         el('p', {}, el('b', {}, 'Figuren: '), wantsText(f).join(' · ') || '–'),
         ...(f.weakness || []).map((w) => el('p', {}, el('b', {}, `Svak mot ${label(w.tag)}: `), `«${w.sign}»`)),
         el('p', { class: 'hint' }, 'Ikke nødvendig for oppdraget. Improviser fritt, men ikke gjør det til en ny nøkkel.'),
-        isDone(key) ? null : el('div', { class: 'actions' }, el('button', { onclick: () => { state.done.push(key); log(`Møtte ${f.name}.`); save(); render(); } }, 'Ferdig')));
+        isDone(key) ? null : el('div', { class: 'actions' }, el('button', { onclick: () => { state.done.push(key); log(`Du møtte ${f.name.toLowerCase()}.`); save(); render(); } }, 'Ferdig')));
     }),
   ];
   if (!nodes.length && !alts.length && !ambient.length) parts.push(el('p', { class: 'read' }, 'Rommet er tomt. Beskriv stemningen, eller la barnet se seg rundt.'));
@@ -613,7 +613,7 @@ function renderDice() {
 
 function renderInventory() {
   $('#inventory').replaceChildren(...(state.inventory.length ? state.inventory.map((name, i) => el('li', {}, name,
-    el('button', { class: 'small ghost', onclick: () => { state.inventory.splice(i, 1); log(`Brukte opp eller la fra seg ${name}.`); save(); render(); } }, 'Fjern'))) : [el('li', { class: 'hint' }, 'Tom')]));
+    el('button', { class: 'small ghost', onclick: () => { state.inventory.splice(i, 1); log(`Du brukte opp eller la fra deg ${name.toLowerCase()}.`); save(); render(); } }, 'Fjern'))) : [el('li', { class: 'hint' }, 'Tom')]));
   $('#companions').replaceChildren(...(state.companions.length ? state.companions.map((n) => el('li', {}, n)) : [el('li', { class: 'hint' }, 'Ingen ennå')]));
   // Recipes: offer to craft when both ingredients are in the backpack.
   const recipes = current.run.nodes.filter((n) => n.kind === 'recipe' && !isDone(n.id));

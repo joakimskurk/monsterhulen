@@ -103,6 +103,7 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
   const grid = document.createElement('div');
   grid.className = 'cave-grid';
   grid.style.setProperty('--cols', String(maxX - minX + 1));
+  wrap.style.setProperty('--aspect', String((maxX - minX + 1) / (maxY - minY + 1))); // for a screen that fits it to a height
   wrap.append(grid);
   grid.setAttribute('role', 'img');
   grid.setAttribute('aria-label', 'Kart over hulen');
