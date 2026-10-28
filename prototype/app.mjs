@@ -454,7 +454,7 @@ function renderMap() {
       look: r.id === state.here ? 'here' : state.visited.includes(r.id) ? 'visited' : 'unexplored',
       canGo: throughOpenDoor(r.id),
     })),
-    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open')),
+    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open'), map.distance[map.start]),
     probes: [],
   }, { maxWidth: 760, onRoom: clickRoom }));
 }

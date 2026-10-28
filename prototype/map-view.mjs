@@ -43,6 +43,15 @@ const STYLE = `
 .cave-tile .door.dir-e, .cave-tile .door.dir-w { border-top: var(--edge) solid #1a1426; border-bottom: var(--edge) solid #1a1426; }
 .cave-tile .door.dir-n, .cave-tile .door.dir-s { border-left: var(--edge) solid #1a1426; border-right: var(--edge) solid #1a1426; }
 .cave-tile .door.loop { border-color: #6f7690 !important; }
+/* Every open door has a door leaf, swung open: hinged at one end of the opening and turned into the
+   room farther from the entrance (into = 'out' across the boundary, 'in' back into this room). */
+.cave-tile .door .leaf { position: absolute; background: #8a5a2b; border: 1px solid #3b2210; box-shadow: inset 0 0 0 1px #a8743d; --len: calc(var(--cell) * .4); --thick: max(3px, calc(var(--cell) * .09)); }
+.cave-tile .door.dir-e .leaf, .cave-tile .door.dir-w .leaf { top: 0; height: var(--thick); width: var(--len); }
+.cave-tile .door.dir-n .leaf, .cave-tile .door.dir-s .leaf { left: 0; width: var(--thick); height: var(--len); }
+.cave-tile .door.dir-e .leaf.out, .cave-tile .door.dir-w .leaf.in { left: 50%; }
+.cave-tile .door.dir-e .leaf.in, .cave-tile .door.dir-w .leaf.out { right: 50%; }
+.cave-tile .door.dir-s .leaf.out, .cave-tile .door.dir-n .leaf.in { top: 50%; }
+.cave-tile .door.dir-s .leaf.in, .cave-tile .door.dir-n .leaf.out { bottom: 50%; }
 .cave-tile .door.locked { background: #8a5a2b; border: 2px solid #3b2210 !important; box-shadow: inset 0 0 0 2px #a8743d; }
 .cave-tile .door.locked::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; min-width: 5px; min-height: 5px; transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; }
 .cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
@@ -125,7 +134,12 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
       if (join.N && join.E && !diag(1, -1)) tile.append(img('inner-NE.png'));
       if (join.S && join.E && !diag(1, 1)) tile.append(img('inner-SE.png'));
       if (join.S && join.W && !diag(-1, 1)) tile.append(img('inner-SW.png'));
-      for (const d of Object.values(doors)) if (d.draw) tile.append(span(`door ${d.kind} dir-${d.dir}`, ''));
+      for (const d of Object.values(doors)) {
+        if (!d.draw) continue;
+        const door = span(`door ${d.kind} dir-${d.dir}`, '');
+        if (d.kind === 'open' || d.kind === 'loop') door.append(span(`leaf ${d.into}`, ''));
+        tile.append(door);
+      }
 
       // The frame: a border only on the sides where the room ends.
       if (r.look === 'here' || r.canGo) {
@@ -149,16 +163,18 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
 }
 
 // Doors for the rooms that are drawn: one entry per drawn room side, and the door itself is drawn once
-// (`draw`), as an opening across the boundary between the two rooms.
-// kindOf(edge) -> 'open' | 'locked' | 'loop' | 'secret' | null (not drawn).
-export function doorsFor(edges, drawn, kindOf) {
+// (`draw`), as an opening across the boundary between the two rooms. An open door's leaf turns into the
+// room farther from the entrance (`into`: 'out' across the boundary, 'in' into the room it is drawn from).
+// kindOf(edge) -> 'open' | 'locked' | 'loop' | 'secret' | null (not drawn); depth = distance from the entrance.
+export function doorsFor(edges, drawn, kindOf, depth = {}) {
   const opp = { n: 's', e: 'w', s: 'n', w: 'e' };
   const out = [];
   for (const e of edges) {
     const kind = kindOf(e);
     if (!kind) continue;
-    if (drawn.has(e.a)) out.push({ x: e.aCell.x, y: e.aCell.y, dir: e.aDir, kind, draw: true });
-    if (drawn.has(e.b)) out.push({ x: e.bCell.x, y: e.bCell.y, dir: opp[e.aDir], kind, draw: !drawn.has(e.a) });
+    const farIsB = (depth[e.b] ?? 0) >= (depth[e.a] ?? 0);
+    if (drawn.has(e.a)) out.push({ x: e.aCell.x, y: e.aCell.y, dir: e.aDir, kind, draw: true, into: farIsB ? 'out' : 'in' });
+    if (drawn.has(e.b)) out.push({ x: e.bCell.x, y: e.bCell.y, dir: opp[e.aDir], kind, draw: !drawn.has(e.a), into: farIsB ? 'in' : 'out' });
   }
   return out;
 }

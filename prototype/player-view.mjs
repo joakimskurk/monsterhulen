@@ -64,7 +64,7 @@ export function playerView(run, state, extra = {}) {
         // Only a neighbour behind an open door: no jumping across the cave.
         canGo: map.edges.some((e) => !e.secret && (e.gate === null || openGates.has(e.gate)) && ((e.a === here && e.b === r.id) || (e.b === here && e.a === r.id))),
       })),
-      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open')),
+      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open'), map.distance[map.start]),
       probes: map.edges.filter((e) => !e.secret && (e.a === here || e.b === here) && !visited.has(e.a === here ? e.b : e.a)).map((e) => {
         const other = e.a === here ? e.b : e.a;
         const cell = e.a === here ? e.bCell : e.aCell;
