@@ -45,6 +45,7 @@ export const CONTENT_FILES = {
   missions: ['missions.json', 'missions'],
   themes: ['themes.json', null],
   assets: ['assets.json', 'assets'],
+  places: ['places.json', null],
 };
 
 export const isCarryTag = (content, tag) => content.tagById.get(tag)?.carry === true;

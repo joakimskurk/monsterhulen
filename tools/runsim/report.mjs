@@ -22,7 +22,7 @@ export function dmTemplate(content, run, result) {
 
   const describe = (node, depth) => {
     const pad = '   '.repeat(depth);
-    const room = node.room === null ? '' : ` [rom ${node.room}, sone ${node.zone}]`;
+    const room = node.room === null ? '' : ` [rom ${node.room} ${map.rooms[node.room].name || ''}, sone ${node.zone}]`.replace(' ,', ',');
     if (depth === 0) {
       const gate = node.gate ? ` – sperrer veien inn til sone ${node.gate}` : '';
       lines.push(`${pad}• ${node.card.name}${room}${gate}`);
@@ -58,7 +58,7 @@ export function dmTemplate(content, run, result) {
     const amb = run.ambient.filter((a) => a.room === r.id).map((a) => `${a.figure.name} (fritt møte)`);
     const alt = run.alternatives.filter((a) => a.room === r.id).map((a) => a.item);
     const tagText = r.id === map.start ? ' START' : r.id === map.end ? ' MÅL' : '';
-    lines.push(`   rom ${String(r.id).padStart(2)} sone ${r.zone}${tagText}: ${[...here, ...alt, ...amb].join(', ') || '–'}`);
+    lines.push(`   rom ${String(r.id).padStart(2)} ${(r.name || '').padEnd(16)} sone ${r.zone} ${r.w}×${r.h}${tagText}: ${[...here, ...alt, ...amb].join(', ') || '–'}`);
   }
 
   lines.push('');

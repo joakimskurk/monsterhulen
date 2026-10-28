@@ -30,7 +30,7 @@ Saboterer godkjente løp og sjekker at automaten oppdager det.
 
 | Fil | Rolle |
 |---|---|
-| `map.mjs` | abstrakt kart: rom, ryggrad fra start til mål, hinderkanter (gates) som deler hulen i soner, greiner, løkker og en hemmelig dør innen samme sone |
+| `map.mjs` | kart som i eierens original: rom i ulike størrelser (1×1 til 3×2) på et rutenett, dører på delt vegg, én dør per side. Ryggrad fra start til det fjerneste rommet, låste dører (gates) på ryggraden som deler hulen i soner, og ekstra dører (åpne løkker, én hemmelig) bare innen én sone. Romnavn og stemning fra `content/places.json` |
 | `generate.mjs` | kjedegenerator: velger hinder per gate, bygger avhengigheter baklengs, plasserer etter soner, legger til alternativer og frie møter |
 | `playthrough.mjs` | gjennomspillingsautomat + snarvei-sjekk |
 | `theme.mjs` | sammensatte oppdrag: bygger tittel, intro, mål og åpner fra `content/themes.json` ut fra koden |
@@ -55,7 +55,7 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 ## Resultater 2026-10-28
 
 - **30 000 løp** (5 sammensatte + 5 klassiske oppdrag × KORT/VANLIG/STORT × 1000 seeds; for de sammensatte er hver seed også et nytt tema): alle godkjent, gjennomsnittlig 1,0–3,2 forsøk per løp (SAMLE på KORT trenger flest).
-- **Selvtest:** 8 457 sabotasjer, 0 uoppdaget:
+- **Selvtest:** 7 659 sabotasjer, 0 uoppdaget:
   - en garantert kilde flyttet bak hinderet kjeden er for,
   - en garantert kilde fjernet,
   - en hemmelig dør fra sone 0 inn i siste sone.

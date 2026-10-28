@@ -21,6 +21,7 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   const routes = content.themes.routes;
   const route = mission.route || rng.pick(routes);
   map.rooms.forEach((r) => { r.zoneName = route[Math.min(r.zone, route.length - 1)]; });
+  nameRooms(content.places, map);
 
   const ctx = {
     content, rng, map, mission, length,
@@ -53,6 +54,20 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   addAlternatives(ctx, run);
   addAmbient(ctx, run);
   return { ok: true, run };
+}
+
+// Room names and mood from the owner's original (content/places.json): rooms in a zone take its names
+// in order of distance from the start, with a number when the names run out; the start is STARTPORTEN.
+function nameRooms(places, map) {
+  const used = {};
+  const order = map.rooms.slice().sort((a, b) => map.distance[map.start][a.id] - map.distance[map.start][b.id] || a.id - b.id);
+  for (const r of order) {
+    const zone = places.zones[r.zoneName];
+    r.tone = zone.tone;
+    if (r.id === map.start) { r.name = places.start; continue; }
+    const i = used[r.zoneName] = (used[r.zoneName] ?? -1) + 1;
+    r.name = zone.rooms[i % zone.rooms.length] + (i >= zone.rooms.length ? ` ${Math.floor(i / zone.rooms.length) + 1}` : '');
+  }
 }
 
 // ---------- nodes ----------

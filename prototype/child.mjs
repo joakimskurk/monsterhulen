@@ -1,5 +1,6 @@
 // The child's iPad: shows the filtered player view and sends requests to the DM.
 // It never changes the game itself; the DM device accepts or declines every request.
+import { caveSvg } from './map-view.mjs';
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
   const node = document.createElement(tag);
@@ -81,8 +82,8 @@ function render() {
   $('#roomTitle').textContent = v.room.title.toUpperCase();
   // What just happened, so a taken or given thing never passes silently.
   const news = $('#news');
-  news.hidden = !v.news;
-  if (v.news) {
+  news.hidden = !v.news || v.news.kind === 'item';
+  if (v.news && v.news.kind !== 'item') {
     news.textContent = v.news.text;
     news.classList.toggle('fresh', v.news.id > seenNews);
     seenNews = Math.max(seenNews, v.news.id);
@@ -102,6 +103,7 @@ function render() {
     ))) : [el('p', {}, 'Det ser tomt ut her …')]));
   const fresh = new Set(knownItems ? v.inventory.filter((n) => !knownItems.includes(n)) : []);
   knownItems = v.inventory.slice();
+  for (const name of fresh) showFound(v, name);
   $('#inventory').replaceChildren(...(v.inventory.length ? v.inventory.map((n) => {
     const c = chip(v, n, voice ? () => speak(n) : null);
     if (fresh.has(n)) c.classList.add('new');
@@ -112,6 +114,47 @@ function render() {
   renderEnd(v);
   renderBook(v);
 }
+
+// ---------- a new thing: show it big, and let her drag it into the backpack ----------
+// Only presentation: the thing is already in the backpack (the DM accepted it). The popup makes the
+// moment visible; dropping it on the backpack (or tapping the backpack) puts the picture away.
+const foundQueue = [];
+function showFound(v, name) {
+  foundQueue.push({ name, icon: icon(v, name), text: v.news?.kind === 'item' ? v.news.text : `Du fant ${name.toLowerCase()}!` });
+  if (foundQueue.length === 1) openFound();
+}
+function openFound() {
+  const f = foundQueue[0];
+  if (!f) return;
+  $('#foundText').textContent = f.text.toUpperCase();
+  $('#foundName').textContent = f.name.toUpperCase();
+  const thing = $('#foundThing');
+  thing.replaceChildren(String(f.icon).startsWith('assets/') ? el('img', { src: `/${f.icon}`, alt: '' }) : el('span', {}, f.icon));
+  thing.style.transform = '';
+  $('#found').hidden = false;
+}
+function closeFound() {
+  $('#found').hidden = true;
+  foundQueue.shift();
+  document.querySelector('#inventory')?.closest('.panel')?.classList.add('bag-pop');
+  setTimeout(() => document.querySelector('#inventory')?.closest('.panel')?.classList.remove('bag-pop'), 700);
+  if (foundQueue.length) setTimeout(openFound, 250);
+}
+(() => {
+  const thing = $('#foundThing'), bag = $('#foundBag');
+  let start = null;
+  thing.addEventListener('pointerdown', (e) => { start = { x: e.clientX, y: e.clientY }; thing.setPointerCapture(e.pointerId); thing.classList.add('dragging'); });
+  thing.addEventListener('pointermove', (e) => { if (start) thing.style.transform = `translate(${e.clientX - start.x}px, ${e.clientY - start.y}px)`; });
+  thing.addEventListener('pointerup', (e) => {
+    if (!start) return;
+    start = null;
+    thing.classList.remove('dragging');
+    const b = bag.getBoundingClientRect();
+    const overBag = e.clientX >= b.left - 20 && e.clientX <= b.right + 20 && e.clientY >= b.top - 20 && e.clientY <= b.bottom + 20;
+    if (overBag) closeFound(); else thing.style.transform = '';
+  });
+  bag.addEventListener('click', closeFound);
+})();
 
 // The end of the run: what she did, and one of two lasting TING to choose (workshop B1, B3).
 function renderEnd(v) {
@@ -146,21 +189,8 @@ function renderBook(v) {
 }
 
 function renderMap(v) {
-  const ns = 'http://www.w3.org/2000/svg';
-  const mk = (tag, attrs) => { const n = document.createElementNS(ns, tag); for (const [k, val] of Object.entries(attrs)) n.setAttribute(k, val); return n; };
-  const svg = mk('svg', { width: v.width, height: v.height, viewBox: `0 0 ${v.width} ${v.height}` });
-  const at = Object.fromEntries(v.rooms.map((r) => [r.id, r]));
-  for (const e of v.edges) svg.append(mk('line', { x1: at[e.a].x, y1: at[e.a].y, x2: at[e.b].x, y2: at[e.b].y, stroke: e.locked ? 'var(--gate)' : 'var(--line)', 'stroke-width': e.locked ? 7 : 4 }));
-  for (const r of v.rooms) {
-    const g = mk('g', { class: `room-node${r.canGo ? ' go' : ''}`, role: 'button', 'aria-label': `Rom ${r.label}` });
-    g.append(mk('circle', { cx: r.x, cy: r.y, r: 26, fill: r.visited ? 'var(--zone0)' : 'var(--line)', stroke: r.id === v.here ? 'var(--here)' : 'transparent', 'stroke-width': 6 }));
-    const t = mk('text', { x: r.x, y: r.y + 6, 'text-anchor': 'middle' });
-    t.textContent = r.visited ? r.label : '?';
-    g.append(t);
-    if (r.canGo) g.addEventListener('click', () => request('MOVE', { room: r.id }));
-    svg.append(g);
-  }
-  $('#map').replaceChildren(svg);
+  // The cave as in the original: rooms and doors, fog over the unknown (prototype/map-view.mjs).
+  $('#map').replaceChildren(caveSvg(v.cave, { cell: 52, onRoom: (id) => { if (v.cave.rooms.find((r) => r.id === id)?.canGo) request('MOVE', { room: id }); } }));
 }
 
 $('#search').addEventListener('click', () => view && request('SEARCH', { room: view.here }));

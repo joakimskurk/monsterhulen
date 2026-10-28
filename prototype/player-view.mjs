@@ -4,19 +4,6 @@ import { reachable } from '../tools/runsim/map.mjs';
 
 const FIGURE_KINDS = new Set(['blocker', 'trader', 'quest', 'companion', 'target', 'lock', 'machine', 'goal', 'exit', 'deliver']);
 
-// Column layout: x = distance from start, y = order within that distance. Shared by both screens.
-export function layoutMap(map) {
-  const depth = map.distance[map.start];
-  const columns = new Map();
-  for (const r of map.rooms) { const d = depth[r.id]; if (!columns.has(d)) columns.set(d, []); columns.get(d).push(r.id); }
-  const pos = {};
-  const colW = 92, rowH = 74;
-  let maxRows = 1;
-  for (const [d, ids] of columns) { ids.forEach((id, i) => { pos[id] = { x: 46 + d * colW, y: 40 + i * rowH }; }); maxRows = Math.max(maxRows, ids.length); }
-  return { pos, width: 92 + Math.max(...columns.keys()) * colW, height: 80 + (maxRows - 1) * rowH };
-}
-
-// `extra`: the end of the run, the hero book and packing, prepared by the DM page (child-facing only).
 // The latest thing that happened, said to the child: «Du fant Sølvskje!» rather than the DM's log line.
 // Walking into a room is not news; the room itself shows that.
 function latestNews(log) {
@@ -26,7 +13,8 @@ function latestNews(log) {
     const took = line.match(/^Tok (.+)\.$/);
     const got = line.match(/^Fikk (.+) \((.+)\)\.$/);
     const text = took ? `Du fant ${took[1].toLowerCase()}!` : got ? `Du fikk ${got[1].toLowerCase()} av ${got[2].toLowerCase()}!` : line;
-    return { id: i, text };
+    // Getting a thing is shown as a popup on the iPad (drag it into the backpack), not as a line.
+    return { id: i, text, kind: took || got ? 'item' : 'event' };
   }
   return null;
 }
@@ -44,7 +32,6 @@ export function playerView(run, state, extra = {}) {
     if (visited.has(e.b)) known.add(e.a);
   }
   const done = new Set(state.done);
-  const { pos, width, height } = layoutMap(map);
 
   const here = state.here;
   // Pictures for everything the child sees (workshop C1). The run knows its own things and figures;
@@ -74,14 +61,21 @@ export function playerView(run, state, extra = {}) {
     runCode: state.runCode,
     mission: { name: run.mission.name, intro: run.mission.intro },
     here,
-    width, height,
-    rooms: map.rooms.filter((r) => known.has(r.id)).map((r) => ({
-      id: r.id, x: pos[r.id].x, y: pos[r.id].y,
-      label: r.id === map.start ? 'Start' : r.id === map.end && visited.has(r.id) ? 'Mål' : String(r.id),
-      visited: visited.has(r.id), canGo: reach.has(r.id) && r.id !== here,
-    })),
-    edges: map.edges.filter((e) => !e.secret && known.has(e.a) && known.has(e.b)).map((e) => ({ a: e.a, b: e.b, locked: e.gate !== null && !openGates.has(e.gate) })),
-    room: { id: here, title: here === map.start ? 'Inngangen' : `Rom ${here}`, place: map.rooms[here].zoneName, things },
+    // The cave as the child knows it (map-view.mjs): rooms she has been in, with their names, and the
+    // rooms next to them in fog. Secret doors and what lies beyond the known rooms are never sent.
+    cave: {
+      rooms: map.rooms.filter((r) => known.has(r.id)).map((r) => ({
+        id: r.id, x: r.x, y: r.y, w: r.w, h: r.h,
+        look: r.id === here ? 'here' : visited.has(r.id) ? 'visited' : 'fog',
+        tone: visited.has(r.id) ? r.tone : null,
+        label: visited.has(r.id) ? r.name : '?',
+        canGo: reach.has(r.id) && r.id !== here,
+      })),
+      doors: map.edges.filter((e) => !e.secret && known.has(e.a) && known.has(e.b)).map((e) => ({
+        aCell: e.aCell, bCell: e.bCell, dir: e.aDir, kind: e.gate === null ? 'open' : openGates.has(e.gate) ? 'unlocked' : 'locked',
+      })),
+    },
+    room: { id: here, title: map.rooms[here].name || `Rom ${here}`, place: map.rooms[here].zoneName, things },
     inventory: state.inventory.slice(),
     companions: state.companions.slice(),
     say: state.say || null,

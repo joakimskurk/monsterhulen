@@ -4,7 +4,8 @@ import { buildContent, CONTENT_FILES } from '../tools/lib/content-core.mjs';
 import { acceptedRun } from '../tools/runsim/accept.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
-import { playerView, layoutMap } from './player-view.mjs';
+import { playerView } from './player-view.mjs';
+import { caveSvg } from './map-view.mjs';
 import * as table from './table.mjs';
 import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
 
@@ -365,34 +366,19 @@ function renderFinish() {
 }
 
 function renderMap() {
+  // The whole cave for the DM: every room with its name and number, every door including secret
+  // ones, and the rooms behind a closed gate darker (prototype/map-view.mjs).
   const { map } = current.run;
   const open = reach();
-  const { pos, width, height } = layoutMap(map);
-  const ns = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(ns, 'svg');
-  svg.setAttribute('width', width); svg.setAttribute('height', height); svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-  const mk = (tag, attrs) => { const n = document.createElementNS(ns, tag); for (const [k, v] of Object.entries(attrs)) n.setAttribute(k, v); return n; };
-  for (const e of map.edges) {
-    const a = pos[e.a], b = pos[e.b];
-    const gateOpen = e.gate !== null && state.openGates.includes(e.gate);
-    const stroke = e.gate !== null ? (gateOpen ? 'var(--open)' : 'var(--gate)') : 'var(--line)';
-    svg.append(mk('line', { x1: a.x, y1: a.y, x2: b.x, y2: b.y, stroke, 'stroke-width': e.gate !== null ? 6 : 3, 'stroke-dasharray': e.secret ? '4 6' : '' }));
-  }
-  for (const r of map.rooms) {
-    const p = pos[r.id];
-    const g = mk('g', { class: 'room-node', role: 'button', 'aria-label': `Rom ${r.id}` });
-    const reachable = open.has(r.id);
-    const fill = reachable ? `var(--zone${Math.min(r.zone, 3)})` : 'var(--line)';
-    const stroke = r.id === state.here ? 'var(--here)' : r.id === state.selected ? 'var(--accent)' : 'transparent';
-    g.append(mk('circle', { cx: p.x, cy: p.y, r: 24, fill, stroke, 'stroke-width': 5 }));
-    const t = mk('text', { x: p.x, y: p.y + 5, 'text-anchor': 'middle' });
-    t.textContent = r.id === map.start ? 'Start' : r.id === map.end ? 'Mål' : String(r.id);
-    g.append(t);
-    if (state.visited.includes(r.id)) g.append(mk('circle', { cx: p.x + 17, cy: p.y - 17, r: 5, fill: 'var(--accent)' }));
-    g.addEventListener('click', () => goTo(r.id));
-    svg.append(g);
-  }
-  $('#map').replaceChildren(svg);
+  const openGates = new Set(state.openGates);
+  $('#map').replaceChildren(caveSvg({
+    rooms: map.rooms.map((r) => ({
+      id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, tone: r.tone, label: r.name, corner: String(r.id),
+      look: r.id === state.here ? 'here' : !open.has(r.id) ? 'closed' : state.visited.includes(r.id) ? 'visited' : 'open',
+      canGo: r.id === state.selected && r.id !== state.here,
+    })),
+    doors: map.edges.map((e) => ({ aCell: e.aCell, bCell: e.bCell, dir: e.aDir, kind: e.secret ? 'secret' : e.gate === null ? 'open' : openGates.has(e.gate) ? 'unlocked' : 'locked' })),
+  }, { cell: 46, onRoom: (id) => goTo(id) }));
 }
 
 function needBlock(node, need, i) {
@@ -460,7 +446,7 @@ function renderRoom(roomId) {
   const nodes = run.nodes.filter((n) => n.room === roomId);
   const alts = run.alternatives.filter((a) => a.room === roomId);
   const ambient = run.ambient.filter((a) => a.room === roomId);
-  const title = roomId === run.map.start ? 'Inngangen' : roomId === run.map.end ? 'Det innerste rommet' : `Rom ${roomId}`;
+  const title = `${room.name} · rom ${roomId}${roomId === run.map.end ? ' · målet' : ''}`;
   const parts = [
     el('h2', {}, `${title} · ${room.zoneName.toLowerCase()}`),
     !reachableNow ? el('p', { class: 'hint' }, 'Dette rommet ligger bak et hinder som ikke er løst ennå. (Du ser det fordi du er Forteller.)') : null,

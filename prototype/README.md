@@ -38,6 +38,7 @@ Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekke
 
 ## Slik spiller du
 1. Velg oppdrag og lengde. Under **Nytt hver gang** gir hver kode et nytt tema (for eksempel «Beinnøkkelen og dragekrona» eller «Regla ved steindøra»). Under **Klassikere** ligger de faste eventyrene. **Overrask meg** velger en annen oppdragstype og en kode med et tema dere ikke har hatt i de tre siste løpene. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
+   - **Når barnet får noe,** kommer tingen opp stort på iPaden med en sekk under. Hun drar den ned i sekken (eller trykker på sekken), og bildet forsvinner. Tingen ligger allerede i sekken; popupen er for å gjøre øyeblikket synlig.
    - **Flere behov:** Et mål med flere behov, som en drage som først må løses og så roes, eller en maskin med tre fester, kan løses ett behov om gangen. Godta det barnet gir, eller trykk **Denne er på plass**. iPaden viser «1 av 2 er på plass».
    - **Regle:** Ved døra viser kortet hele regla til deg. På kort løp står første linje over døra. Linjene finnes rundt i hulen, og barnet sier regla høyt ved døra, gjerne etter deg. **Vis regla på iPad** viser den som boble.
 2. Trykk på et rom på kartet når barnet går dit. Grå rom ligger bak et hinder som ikke er løst.
@@ -61,7 +62,7 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 - Hvor lang var økten, og hvor mange rom?
 
 ## Begrensninger
-- Kartet er abstrakt (rom og streker), ikke appens grafikk.
+- Kartet følger originalen (rom i ulike størrelser, dører i veggene, tåke over det ukjente), men er tegnet enkelt. Bildene kommer via `content/assets.json`.
 - To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.
 - Åpner du Forteller-siden i flere faner i samme nettleser, er det den nyeste som styrer barnets skjerm. De eldre sier ifra og slutter å sende.

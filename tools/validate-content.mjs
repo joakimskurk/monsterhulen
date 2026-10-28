@@ -170,6 +170,19 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
   if (existsSync(assetsDir)) for (const f of walk(assetsDir)) { const rel = f.slice(REPO_ROOT.length + 1); if (!listed.has(rel) && !rel.endsWith('README.md')) warn(`file ${rel}`, 'not listed in content/assets.json'); }
 }
 
+// Room names and mood per zone (content/places.json, from the owner's original).
+{
+  const p = c.places;
+  for (const z of zones) {
+    const zone = p.zones?.[z];
+    if (!zone) { err(`places ${z}`, 'missing'); continue; }
+    if (!p.tones?.[zone.tone]) err(`places ${z}`, `unknown tone ${zone.tone}`);
+    if (!(zone.rooms?.length >= 3)) err(`places ${z}`, 'needs at least 3 room names');
+  }
+  for (const z of Object.keys(p.zones || {})) if (!zones.has(z)) err(`places ${z}`, 'not a zone in vocabulary.json');
+  if (!p.start) err('places', 'missing start name');
+}
+
 // Themes for composed missions (content/themes.json, workshop 2026-10-28).
 {
   const t = c.themes;
