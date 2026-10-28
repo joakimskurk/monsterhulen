@@ -30,20 +30,22 @@ const STYLE = `
 .cave-tile .mark, .cave-tile .corner { z-index: 3; }
 .cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
 .cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
-/* A door is an opening in the wall between two rooms (the wall is left out on both sides), drawn once,
-   centred on the boundary: an open door is a doorway with wooden posts, a locked door a closed wooden
-   door with a lock, an extra passage a stone arch, a secret door (DM only) a dashed pink outline. */
-.cave-tile .door { position: absolute; z-index: 4; pointer-events: none; box-sizing: border-box; --t: calc(var(--cell) * .3); --post: calc(var(--cell) * .1); }
-.cave-tile .door.dir-e, .cave-tile .door.dir-w { top: 19%; height: 62%; width: var(--t); }
-.cave-tile .door.dir-n, .cave-tile .door.dir-s { left: 19%; width: 62%; height: var(--t); }
+/* A door is an opening through the wall: the walls stay, and floor stones are laid across both walls
+   (each wall is 6 of 32 pixels) where the door is, so you see a passage of the same stones as the floor.
+   Drawn once, centred on the boundary. Open: just the opening with dark edges; locked: a wooden door in
+   the opening with a lock; extra passage: the opening with stone edges; secret (DM only): dashed pink. */
+.cave-tile .door { position: absolute; z-index: 4; pointer-events: none; box-sizing: border-box; --t: calc(var(--cell) * .42); --edge: max(2px, calc(var(--cell) * .05));
+  background: url('/assets/tileset/v3-map/floors-1.png') center / var(--cell) var(--cell); image-rendering: pixelated; }
+.cave-tile .door.dir-e, .cave-tile .door.dir-w { top: 25%; height: 50%; width: var(--t); }
+.cave-tile .door.dir-n, .cave-tile .door.dir-s { left: 25%; width: 50%; height: var(--t); }
 .cave-tile .door.dir-e { right: calc(var(--t) / -2); } .cave-tile .door.dir-w { left: calc(var(--t) / -2); }
 .cave-tile .door.dir-s { bottom: calc(var(--t) / -2); } .cave-tile .door.dir-n { top: calc(var(--t) / -2); }
-.cave-tile .door.open.dir-e, .cave-tile .door.open.dir-w, .cave-tile .door.loop.dir-e, .cave-tile .door.loop.dir-w { border-top: var(--post) solid #7a4b23; border-bottom: var(--post) solid #7a4b23; }
-.cave-tile .door.open.dir-n, .cave-tile .door.open.dir-s, .cave-tile .door.loop.dir-n, .cave-tile .door.loop.dir-s { border-left: var(--post) solid #7a4b23; border-right: var(--post) solid #7a4b23; }
+.cave-tile .door.dir-e, .cave-tile .door.dir-w { border-top: var(--edge) solid #1a1426; border-bottom: var(--edge) solid #1a1426; }
+.cave-tile .door.dir-n, .cave-tile .door.dir-s { border-left: var(--edge) solid #1a1426; border-right: var(--edge) solid #1a1426; }
 .cave-tile .door.loop { border-color: #6f7690 !important; }
-.cave-tile .door.locked { background: #8a5a2b; border: 2px solid #3b2210; box-shadow: inset 0 0 0 2px #a8743d; }
-.cave-tile .door.locked::after { content: ''; position: absolute; left: 50%; top: 50%; width: 34%; height: 34%; min-width: 5px; min-height: 5px; transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; }
-.cave-tile .door.secret { border: 2px dashed #ff73b8; }
+.cave-tile .door.locked { background: #8a5a2b; border: 2px solid #3b2210 !important; box-shadow: inset 0 0 0 2px #a8743d; }
+.cave-tile .door.locked::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; min-width: 5px; min-height: 5px; transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; }
+.cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
 /* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
 .cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #07050d; border-radius: 3px; background: #ffd95c; color: #271b00; box-shadow: 2px 2px 0 #07050d; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
 .cave-probe.locked { background: #ff7a7a; cursor: default; }
@@ -111,7 +113,8 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
 
       const join = { N: roomAt(x, y - 1) === r, E: roomAt(x + 1, y) === r, S: roomAt(x, y + 1) === r, W: roomAt(x - 1, y) === r };
       const doors = Object.fromEntries(model.doors.filter((d) => d.x === x && d.y === y).map((d) => [SIDE[d.dir], d]));
-      for (const s of ['N', 'E', 'S', 'W']) if (!join[s] && !doors[s]) tile.append(img(`wall-${s}.png`));
+      // Walls stay where the room ends, also at doors: the door is cut through them (see .door).
+      for (const s of ['N', 'E', 'S', 'W']) if (!join[s]) tile.append(img(`wall-${s}.png`));
       if (!join.N && !join.W) tile.append(img('outer-NW.png'));
       if (!join.N && !join.E) tile.append(img('outer-NE.png'));
       if (!join.S && !join.E) tile.append(img('outer-SE.png'));
@@ -145,8 +148,8 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
   return wrap;
 }
 
-// Doors for the rooms that are drawn. Each door leaves out the wall on the side of every drawn room it
-// belongs to, and is drawn once (`draw`), on the boundary between the two rooms.
+// Doors for the rooms that are drawn: one entry per drawn room side, and the door itself is drawn once
+// (`draw`), as an opening across the boundary between the two rooms.
 // kindOf(edge) -> 'open' | 'locked' | 'loop' | 'secret' | null (not drawn).
 export function doorsFor(edges, drawn, kindOf) {
   const opp = { n: 's', e: 'w', s: 'n', w: 'e' };
