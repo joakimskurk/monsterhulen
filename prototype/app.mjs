@@ -112,15 +112,45 @@ async function start() {
 
 // ---------- two screens ----------
 
-// Walking through an open door needs no approval by default (the child explores; the DM narrates and
-// sees each step in the log). The DM can turn it off to approve every step. Remembered on this device.
-const FREE_MOVE_KEY = 'monsterhulen-bord:freeMove';
-const freeMove = () => { try { return localStorage.getItem(FREE_MOVE_KEY) !== 'off'; } catch { return true; } };
+// What the child may do by herself, without waiting for the DM (owner, 2026-10-28: less freezing).
+// Only what obviously works; anything uncertain or creative still comes to the DM. All on by default,
+// each can be turned off; remembered on this device.
+const SELF = {
+  move: 'går gjennom åpne dører',
+  take: 'tar ting som ligger',
+  give: 'gir en ting eller ber en venn når det åpenbart passer',
+  search: 'leter med terningen',
+};
+const selfKey = (k) => `monsterhulen-bord:self:${k}`;
+const bySelf = (k) => { try { return localStorage.getItem(selfKey(k)) !== 'off' && (k !== 'move' || localStorage.getItem('monsterhulen-bord:freeMove') !== 'off'); } catch { return true; } };
+const setSelf = (k, on) => { try { localStorage.setItem(selfKey(k), on ? 'on' : 'off'); if (k === 'move') localStorage.removeItem('monsterhulen-bord:freeMove'); } catch { /* ignore */ } };
 // True if `to` is next to where the child is, through a door that is not secret and not locked.
 function throughOpenDoor(to) {
   const openGates = new Set(state.openGates);
   return current.run.map.edges.some((e) => !e.secret && (e.gate === null || openGates.has(e.gate))
     && ((e.a === state.here && e.b === to) || (e.b === state.here && e.a === to)));
+}
+
+// Requests that need no DM decision: walking through an open door, taking what lies there, giving what
+// obviously fits, searching with the die, the die itself, and the hero book choices. True if handled.
+function handleBySelf(r) {
+  const T0 = T();
+  if (r.type === 'ROLL') { if (state.roll && state.roll.id === r.rollId) { table.rolled(T0, Number(r.value)); save(); render(); } return true; }
+  if (r.type === 'MOVE' && bySelf('move') && throughOpenDoor(r.room)) { goTo(r.room); return true; }
+  if (r.type === 'TAKE' && bySelf('take') && !r.thing.startsWith('amb:')) { const n = nodeById(r.thing); if (r.thing.startsWith('alt:') || (n?.kind === 'item' && !n.hidden)) { acceptThing(r.thing); return true; } }
+  if ((r.type === 'GIVE' || r.type === 'FRIEND') && bySelf('give') && table.fits(T0, r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend })) {
+    acceptThing(r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend });
+    return true;
+  }
+  if (r.type === 'SEARCH' && bySelf('search')) { table.search(T0, r.room); save(); render(); return true; }
+  // The hero book: bringing along and choosing a TING are the child's own choices.
+  if (r.type === 'BRING' && canPack()) {
+    const book = loadBook();
+    table.bring(T0, { friend: r.kind === 'friend' ? book.friends.find((f) => f.name === r.name) : null, ting: r.kind === 'ting' ? book.ting.find((x) => x.name === r.name) : null });
+    save(); render(); return true;
+  }
+  if (r.type === 'PICK_TING' && !state.chosenTing) { const pick = offer().find((c) => c.id === r.id); if (pick) { chooseTing(pick); return true; } }
+  return false;
 }
 
 async function connectRelay() {
@@ -137,12 +167,14 @@ async function connectRelay() {
         ? el('p', { class: 'hint' }, 'Åpne på iPaden (samme Wi-Fi): ', ...urls.map((u) => el('a', { href: u, target: '_blank' }, u)))
         : el('p', { class: 'hint' }, 'Kjør «npm run prototype:lan» for å koble til en iPad. Test på denne maskinen: ', el('a', { href: urls[0], target: '_blank' }, 'åpne barnets skjerm')),
       el('button', { class: 'ghost small', onclick: () => { state.say = null; save(); render(); } }, 'Fjern tekst på iPaden'),
-      el('label', { class: 'hint' }, (() => {
+      el('h3', {}, 'Barnet gjør selv, uten å vente på deg'),
+      ...Object.entries(SELF).map(([k, text]) => el('label', { class: 'check' }, (() => {
         const box = el('input', { type: 'checkbox' });
-        box.checked = freeMove();
-        box.addEventListener('change', () => { try { localStorage.setItem(FREE_MOVE_KEY, box.checked ? 'on' : 'off'); } catch { /* ignore */ } });
+        box.checked = bySelf(k);
+        box.addEventListener('change', () => setSelf(k, box.checked));
         return box;
-      })(), ' Barnet går gjennom åpne dører uten å spørre'),
+      })(), ` Barnet ${text}`)),
+      el('p', { class: 'hint' }, 'Alt som ikke åpenbart passer, kommer fortsatt til deg under «Fra iPaden». Du ser alt i loggen.'),
     );
     const source = new EventSource(`/api/${SESSION}/dm-stream`);
     // Only requests for the run on this page. Another DM page on the same session code (a second tab, an old
@@ -150,7 +182,7 @@ async function connectRelay() {
     source.addEventListener('request', (e) => {
       const r = JSON.parse(e.data);
       if (!active || r.runCode !== current?.code) return;
-      if (r.type === 'MOVE' && freeMove() && throughOpenDoor(r.room)) { goTo(r.room); ack(r); return; }
+      if (handleBySelf(r)) { ack(r); return; }
       if (!requests.some((x) => x.actionId === r.actionId)) { requests.push(r); renderRequests(); }
     });
     source.addEventListener('ack', (e) => { const { actionId } = JSON.parse(e.data); requests = requests.filter((x) => x.actionId !== actionId); renderRequests(); });
@@ -214,7 +246,8 @@ function renderRequests() {
       const hidden = current.run.nodes.filter((n) => n.room === r.room && n.kind === 'item' && n.hidden && !isDone(n.id));
       return el('div', { class: 'card' }, el('p', {}, `Hun ser seg rundt i rom ${r.room}.`),
         el('p', { class: 'hint' }, hidden.length ? 'Noe er gjemt her. Kast terning hvis det er usikkert: 1–2 gir et tydeligere spor, prøver hun igjen finner hun det.' : 'Ingenting gjemt her. Beskriv noe fint eller rart hun legger merke til.'),
-        el('div', { class: 'actions' }, ...hidden.map((n) => el('button', { onclick: () => { resolve(n); ack(r); } }, `Fant: ${n.item.name}`)),
+        el('div', { class: 'actions' }, hidden.length ? el('button', { onclick: () => { table.search(T(), r.room); save(); render(); ack(r); } }, 'La henne kaste terningen') : null,
+          ...hidden.map((n) => el('button', { class: 'ghost', onclick: () => { resolve(n); ack(r); } }, `Fant: ${n.item.name}`)),
           el('button', { class: 'ghost', onclick: () => { log('Hun så seg rundt.'); save(); render(); ack(r); } }, hidden.length ? 'Ikke ennå' : 'OK')));
     }
     if (r.type === 'GIVE' || r.type === 'FRIEND') {
@@ -313,6 +346,7 @@ function render() {
     el('p', { class: 'hint' }, `Kode ${current.code} · ${run.map.rooms.length} rom · ${[...new Set(run.map.rooms.map((r) => r.zoneName))].join(' → ').toLowerCase()} · barnet er i ${run.map.rooms[state.here].name}`),
   );
   renderOverview();
+  renderDice();
   renderMap();
   renderRoom(state.selected ?? state.here);
   renderInventory();
@@ -544,6 +578,32 @@ function renderOverview() {
       el('td', {}, [...f.wantLabels, ...f.tasks].join(', ') || '–'),
       el('td', {}, f.fitting.join(', ') || '–'),
     )))));
+}
+
+// ---------- the die ----------
+// The child rolls a real D6 and taps the face on the iPad. The DM can ask for a roll at any time, or
+// tap the face here (one screen, or when she says it out loud). Suggestions as in the original.
+const FACE = { 1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅' };
+const BAND = { low: '1–2', mid: '3–4', high: '5–6' };
+function renderDice() {
+  const roll = state.roll, last = state.lastRoll;
+  const faces = el('div', { class: 'dice' }, ...[1, 2, 3, 4, 5, 6].map((v) => el('button', { class: 'die', title: String(v), onclick: () => {
+    if (!state.roll) table.askRoll(T(), 'Forteller');
+    table.rolled(T(), v); save(); render();
+  } }, FACE[v])));
+  $('#dice').replaceChildren(...[
+    el('h2', {}, 'Terning'),
+    roll ? el('p', { class: 'hint' }, roll.kind === 'search' ? 'Venter på at hun kaster for å lete …' : `Venter på at hun kaster${roll.reason ? ` (${roll.reason})` : ''} …`) : null,
+    roll ? el('button', { class: 'small ghost', onclick: () => { state.roll = null; save(); render(); } }, 'Avbryt kastet') : null,
+    !roll ? el('div', { class: 'actions' },
+      el('button', { class: 'small', onclick: () => { table.askRoll(T(), 'usikkert'); save(); render(); } }, 'Be henne kaste'),
+    ) : null,
+    el('p', { class: 'hint' }, 'Eller trykk siden hun fikk:'), faces,
+    last ? el('div', { class: `last-roll ${last.band}` },
+      el('span', { class: 'face' }, FACE[last.value]),
+      el('div', {}, el('b', {}, `${last.value} (${BAND[last.band]})${last.reason ? ` · ${last.reason}` : ''}`),
+        el('p', { class: 'hint' }, last.reason === 'leting' ? (last.band === 'low' ? 'Ikke funnet ennå: et tydeligere hint. Neste forsøk finner det.' : 'Funnet!') : table.DICE_HINTS[last.band]))) : null,
+  ].filter(Boolean));
 }
 
 function renderInventory() {

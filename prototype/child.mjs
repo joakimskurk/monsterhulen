@@ -112,7 +112,23 @@ function render() {
   $('#companions').replaceChildren(...(v.companions.length ? v.companions.map((n) => chip(v, n, voice ? () => speak(n) : null)) : [el('span', { class: 'empty' }, 'Ingen ennå')]));
   renderMap(v);
   renderEnd(v);
+  renderDie(v);
   renderBook(v);
+}
+
+// ---------- the die: she rolls a real D6 and taps the same face ----------
+const PIPS = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
+let sentRoll = null;
+function renderDie(v) {
+  const box = $('#dieBox');
+  box.hidden = !v.roll || v.roll.id === sentRoll;
+  if (box.hidden) return;
+  $('#dieText').textContent = (v.roll.text || '').toUpperCase();
+  $('#dieFaces').replaceChildren(...[1, 2, 3, 4, 5, 6].map((value) => {
+    const face = el('button', { class: 'die-face', 'aria-label': `Terningside med ${value} prikker`, onclick: () => { sentRoll = v.roll.id; box.hidden = true; request('ROLL', { value, rollId: v.roll.id }); } });
+    for (let cell = 1; cell <= 9; cell++) face.append(el('span', { class: PIPS[value].includes(cell) ? 'pip' : 'nopip' }));
+    return face;
+  }));
 }
 
 // ---------- a new thing: show it big, and let her drag it into the backpack ----------

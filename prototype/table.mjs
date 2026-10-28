@@ -178,3 +178,75 @@ export function broughtFits(t, need) {
   if (!need.tag) return [];
   return [b.friend && b.friend.ability.includes(need.tag) ? b.friend.name : null, b.ting && b.ting.tags.includes(need.tag) ? b.ting.name : null].filter(Boolean);
 }
+
+// ---------- what the child may do without the DM (owner, 2026-10-28) ----------
+// Only what obviously works happens by itself; anything uncertain or creative still goes to the DM.
+
+// True if the thing she gives (or the friend who helps) clearly answers an open need of this figure:
+// the planned item, an item with a fitting tag, or a friend whose ability fits. Never for free encounters.
+export function fits(t, id, { given, friend } = {}) {
+  if (id.startsWith('alt:') || id.startsWith('amb:')) return false;
+  const node = nodeById(t, id);
+  if (!node || isDone(t, id)) return false;
+  return openNeeds(t, node).some((i) => {
+    const need = node.needs[i];
+    const p = need.provider && nodeById(t, need.provider);
+    if (given) return p?.item?.name === given || (!!need.tag && tagsOfName(t, given).includes(need.tag)) || (!!need.tag && t.state.brought?.ting?.name === given && t.state.brought.ting.tags.includes(need.tag));
+    if (friend) {
+      const f = t.run.nodes.find((n) => n.kind === 'companion' && n.card.name === friend);
+      const ability = f?.ability || (t.state.brought?.friend?.name === friend ? t.state.brought.friend.ability : []);
+      return !!need.tag && ability.includes(need.tag);
+    }
+    return false;
+  });
+}
+
+// ---------- the die (as in the owner's original V0.12.3) ----------
+// A physical D6 on the table; the child taps the same face on the iPad. 1–2 low, 3–4 mid, 5–6 high.
+export const bandFor = (value) => (value <= 2 ? 'low' : value <= 4 ? 'mid' : 'high');
+export const DICE_HINTS = {
+  low: 'Noe går skeivt eller koster litt, men historien fortsetter. Vis gjerne en ny mulighet i det som gikk galt.',
+  mid: 'Det virker, men med en liten kostnad, forsinkelse, lyd, valg eller ny komplikasjon.',
+  high: 'Det virker skikkelig bra. Gi gjerne en liten ekstra fordel, nyttig informasjon eller en fin detalj.',
+};
+
+// Every roll gets a number never used before in this run, so the iPad can tell a new roll from one it
+// already answered (restarting from 1 after each roll made the second search show no die).
+const nextRollId = (t) => (t.state.rollCount = (t.state.rollCount || 0) + 1);
+const hiddenHere = (t, room) => t.run.nodes.filter((n) => n.kind === 'item' && n.hidden && n.room === room && !isDone(t, n.id));
+
+// «SE DEG RUNDT»: if something is hidden here, the iPad asks for the die; otherwise she just looks.
+export function search(t, room = t.state.here) {
+  if (hiddenHere(t, room).length) {
+    t.state.roll = { id: nextRollId(t), kind: 'search', room, text: 'Kast terningen for å lete!' };
+    log(t, `Hun leter i ${t.run.map.rooms[room].name}. Terningen avgjør.`);
+    return true;
+  }
+  log(t, 'Hun så seg rundt, men fant ingenting gjemt.');
+  return false;
+}
+
+// The DM asks for a roll for something uncertain (a fight, a daring idea). The DM decides what happens.
+export function askRoll(t, reason) {
+  t.state.roll = { id: nextRollId(t), kind: 'dm', text: 'Kast terningen!', reason };
+}
+
+// The face she rolled. Searching is fail-forward as in the original: 3–6 finds it; 1–2 gives a clearer
+// hint the first time, and the second try finds it anyway. A DM roll is recorded with a suggestion.
+export function rolled(t, value) {
+  const roll = t.state.roll;
+  if (!roll || !(value >= 1 && value <= 6)) return null;
+  const band = bandFor(value);
+  t.state.roll = null;
+  t.state.lastRoll = { value, band, reason: roll.reason || (roll.kind === 'search' ? 'leting' : '') };
+  if (roll.kind === 'search') {
+    t.state.searchTries = { ...(t.state.searchTries || {}), [roll.room]: ((t.state.searchTries || {})[roll.room] || 0) + 1 };
+    const found = band !== 'low' || t.state.searchTries[roll.room] >= 2;
+    if (found) { const n = hiddenHere(t, roll.room)[0]; t.state.say = null; if (n) resolve(t, n); return { band, found: true }; }
+    log(t, `Terningen viste ${value}. Ingen funn ennå, men noe er gjemt her. Prøv igjen!`);
+    t.state.say = 'Noe er gjemt her … Prøv å se deg rundt én gang til!';
+    return { band, found: false };
+  }
+  log(t, `Terningen viste ${value}${roll.reason ? ` (${roll.reason})` : ''}.`);
+  return { band };
+}

@@ -37,6 +37,10 @@ body.child button.big { width: 100%; }
 .pad button { min-height: 64px; font-size: 22px; font-weight: 800; }
 .pad .dir:disabled { opacity: .35; }
 .pad .dir.locked { opacity: .7; border-color: #ff7a7a; }
+.die-faces { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 10px 0; }
+.die-face { aspect-ratio: 1; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); padding: 14% !important; min-height: 0 !important; background: #fff9e8 !important; border: 4px solid #07050d !important; border-radius: 16px !important; box-shadow: 4px 4px 0 #07050d; }
+.die-face .pip { width: 70%; height: 70%; margin: auto; border-radius: 50%; background: #271b00; }
+.die-face:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #07050d; }
 .place { color: var(--muted); margin: 0 0 8px; text-transform: lowercase; }
 .thing { border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; margin: 10px 0; }
 .thing h3 { font-size: 22px; margin: 0 0 4px; }

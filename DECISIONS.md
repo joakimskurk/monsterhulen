@@ -4,6 +4,11 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - Less waiting for the DM; the die is back
+**Owner input from the table:** play froze because the DM had to approve everything, and no die roll ever happened.
+- The child does by herself, without DM approval: walk through open doors, take what lies in a room, give a thing or ask a friend when it obviously fits (the planned item, a fitting tag, a fitting ability), search with the die, and the hero book choices. Each can be turned off on the DM page («Barnets skjerm»). Anything uncertain or creative still goes to the DM, and everything is in the log.
+- The die as in the original: a physical D6, the child taps the same face on the iPad; 1–2 low, 3–4 mid, 5–6 high. Searching a room with something hidden asks for the die; 3–6 finds it, 1–2 gives a clearer hint and the second try finds it (fail-forward). The DM can ask for a roll at any time (or tap the face) and gets the original's suggestions per band. The app never rolls.
+
 ## 2026-10-28 - The cave map follows the owner's original: rooms of different sizes and doors
 **Owner input from the first table session:** the abstract map (circles and lines) made playtesting hard; rooms of different sizes and doors are the core map mechanic of the original, which the owner shared (`Monsterhulen_CONNECTIONS_V2_IMPLEMENTED.html`, V0.12.3, now in `docs/reference/original-v0.12.3/`).
 - `tools/runsim/map.mjs` lays out the cave as the original's generator does: rectangular rooms (1×1 to 3×2) grown as a tree on a grid, a door on the shared wall, one door per room side. V2 adds the spine from the start to the farthest room, locked doors (gates) on it that split the cave into zones (a larger first zone, as before), and extra doors only inside one zone. Every run is still proven by the playthrough automaton.

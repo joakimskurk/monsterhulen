@@ -43,6 +43,8 @@ Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekke
 - **Ting i hulen** viser alt barnet kan finne i løpet: hvor det er, hvordan hun får det, om hun har det, og hvem i hulen som vil ha det eller er svak mot det. Den tenkte løsningen er uthevet. Bruk det til å så frø tidlig: «Trollet elsker honningkjeks …»
 - **Faner nederst:** *Figurer i hulen* (hva hver figur vil ha, og hvilke ting som passer), *Hele kjeden*, *Barnets skjerm* (kode, lenke, fri ferdsel) og *Helteboka*.
 - Hjelpestigen ligger sammenfoldet på hvert kort.
+- **Terning** (til høyre): Når hun ser seg rundt i et rom der noe er gjemt, kommer «KAST TERNINGEN!» på iPaden. Hun kaster en ekte terning og trykker samme side. 3–6 finner det. 1–2 gir et tydeligere hint, og neste forsøk finner det. Trykk **Be henne kaste** når noe er usikkert (en kamp, en vågal idé), eller trykk siden selv. Du får forslag til hva som skjer.
+- **Barnet gjør selv** (fanen «Barnets skjerm»): gå gjennom åpne dører, ta ting som ligger, gi ting eller be en venn når det åpenbart passer, og lete med terningen. Slå av det du vil godkjenne selv. Det som ikke åpenbart passer, kommer til deg.
 
 ## Slik spiller du
 1. Velg oppdrag og lengde. Under **Nytt hver gang** gir hver kode et nytt tema (for eksempel «Beinnøkkelen og dragekrona» eller «Regla ved steindøra»). Under **Klassikere** ligger de faste eventyrene. **Overrask meg** velger en annen oppdragstype og en kode med et tema dere ikke har hatt i de tre siste løpene. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.

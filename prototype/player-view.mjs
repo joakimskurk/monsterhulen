@@ -82,6 +82,8 @@ export function playerView(run, state, extra = {}) {
     inventory: state.inventory.slice(),
     companions: state.companions.slice(),
     say: state.say || null,
+    // The die: only that she should roll, never why the DM asked.
+    roll: state.roll ? { id: state.roll.id, text: state.roll.text } : null,
     end: extra.end || null,
     // name -> picture for the backpack, friends, the end screen and the hero book
     icons: Object.fromEntries([...state.inventory, ...state.companions, ...(extra.book?.friends || []), ...(extra.book?.ting || []),
