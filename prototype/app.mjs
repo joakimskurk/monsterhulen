@@ -103,6 +103,17 @@ async function start() {
 
 // ---------- two screens ----------
 
+// Walking through an open door needs no approval by default (the child explores; the DM narrates and
+// sees each step in the log). The DM can turn it off to approve every step. Remembered on this device.
+const FREE_MOVE_KEY = 'monsterhulen-bord:freeMove';
+const freeMove = () => { try { return localStorage.getItem(FREE_MOVE_KEY) !== 'off'; } catch { return true; } };
+// True if `to` is next to where the child is, through a door that is not secret and not locked.
+function throughOpenDoor(to) {
+  const openGates = new Set(state.openGates);
+  return current.run.map.edges.some((e) => !e.secret && (e.gate === null || openGates.has(e.gate))
+    && ((e.a === state.here && e.b === to) || (e.b === state.here && e.a === to)));
+}
+
 async function connectRelay() {
   try {
     const info = await (await fetch('/api/info')).json();
@@ -116,11 +127,22 @@ async function connectRelay() {
         ? el('p', { class: 'hint' }, 'Åpne på iPaden (samme Wi-Fi): ', ...urls.map((u) => el('a', { href: u, target: '_blank' }, u)))
         : el('p', { class: 'hint' }, 'Kjør «npm run prototype:lan» for å koble til en iPad. Test på denne maskinen: ', el('a', { href: urls[0], target: '_blank' }, 'åpne barnets skjerm')),
       el('button', { class: 'ghost small', onclick: () => { state.say = null; save(); render(); } }, 'Fjern tekst på iPaden'),
+      el('label', { class: 'hint' }, (() => {
+        const box = el('input', { type: 'checkbox' });
+        box.checked = freeMove();
+        box.addEventListener('change', () => { try { localStorage.setItem(FREE_MOVE_KEY, box.checked ? 'on' : 'off'); } catch { /* ignore */ } });
+        return box;
+      })(), ' Barnet går gjennom åpne dører uten å spørre'),
     );
     const source = new EventSource(`/api/${SESSION}/dm-stream`);
     // Only requests for the run on this page. Another DM page on the same session code (a second tab, an old
     // window) must neither show nor settle them, or it would swallow the child's taps.
-    source.addEventListener('request', (e) => { const r = JSON.parse(e.data); if (!active || r.runCode !== current?.code) return; if (!requests.some((x) => x.actionId === r.actionId)) { requests.push(r); renderRequests(); } });
+    source.addEventListener('request', (e) => {
+      const r = JSON.parse(e.data);
+      if (!active || r.runCode !== current?.code) return;
+      if (r.type === 'MOVE' && freeMove() && throughOpenDoor(r.room)) { goTo(r.room); ack(r); return; }
+      if (!requests.some((x) => x.actionId === r.actionId)) { requests.push(r); renderRequests(); }
+    });
     source.addEventListener('ack', (e) => { const { actionId } = JSON.parse(e.data); requests = requests.filter((x) => x.actionId !== actionId); renderRequests(); });
   } catch {
     relay = false; // served by a plain static server: one screen only
@@ -171,7 +193,7 @@ function renderRequests() {
     const no = el('button', { class: 'ghost', onclick: () => { log(r.type === 'MOVE' ? 'Ikke dit ennå.' : `${r.name || 'Det'}: ikke helt ennå.`); save(); render(); ack(r); } }, 'Ikke ennå');
     if (r.type === 'MOVE') {
       const ok = reach().has(r.room);
-      return el('div', { class: 'card' }, el('p', {}, `Hun vil gå til rom ${r.room}.`),
+      return el('div', { class: 'card' }, el('p', {}, `Hun vil gå til ${current.run.map.rooms[r.room]?.name || `rom ${r.room}`} (rom ${r.room}).`),
         el('div', { class: 'actions' }, ok ? el('button', { onclick: () => { goTo(r.room); ack(r); } }, 'Gå dit') : el('p', { class: 'hint' }, 'Bak et hinder.'), no));
     }
     if (r.type === 'TAKE') {
@@ -380,7 +402,7 @@ function renderMap() {
     })),
     doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null ? (openGates.has(e.gate) ? 'unlocked' : 'locked') : e.loop ? 'passage' : 'open')),
     probes: [],
-  }, { cell: 36, onRoom: (id) => goTo(id) }));
+  }, { maxWidth: 760, onRoom: (id) => goTo(id) }));
 }
 
 function needBlock(node, need, i) {

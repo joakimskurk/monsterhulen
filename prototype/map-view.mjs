@@ -16,8 +16,10 @@ const SIDE = { n: 'N', e: 'E', s: 'S', w: 'W' };
 const DOOR_TILE = { open: 'door_open', unlocked: 'door_open', locked: 'door_locked', passage: 'passage_open', secret: 'passage_open' };
 
 const STYLE = `
-.cave-grid { display: grid; gap: 0; background: #070b10; padding: 6px; border: 3px solid #07050d; border-radius: 6px; image-rendering: pixelated; width: max-content; max-width: 100%; overflow-x: auto; }
-.cave-tile { position: relative; width: var(--cell); height: var(--cell); background: #070b10; overflow: hidden; }
+.cave-wrap { container-type: inline-size; width: 100%; }
+/* The map fills the width it is given: square tiles of an equal share, text scaled with them. */
+.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; background: #070b10; padding: 6px; border: 3px solid #07050d; border-radius: 6px; image-rendering: pixelated; box-sizing: border-box; width: 100%; }
+.cave-tile { position: relative; aspect-ratio: 1; background: #070b10; overflow: hidden; }
 .cave-tile img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
 .cave-tile.closed img { filter: brightness(.45) saturate(.6); }
 /* Frames sit above the tile images (a plain inset shadow would be hidden under them). */
@@ -27,10 +29,11 @@ const STYLE = `
 .cave-tile.go::after { box-shadow: inset 0 0 0 2px rgba(99, 242, 255, .75); }
 .cave-tile .mark, .cave-tile .corner { z-index: 3; }
 .cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
-.cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 11px 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
+.cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
 .cave-tile .secret { position: absolute; inset: 2px; border: 2px dashed #ff73b8; pointer-events: none; }
-.cave-probe { width: 100%; height: 100%; min-height: 0 !important; margin: 0; padding: 0 !important; border: 2px dashed #63f2ff; border-radius: 4px; background: rgba(99, 242, 255, .08); color: #63f2ff; font: 700 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
-.cave-probe.locked { border-color: #ff7a7a; color: #ff7a7a; background: rgba(255, 122, 122, .08); cursor: default; }
+/* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
+.cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #07050d; border-radius: 3px; background: #ffd95c; color: #271b00; box-shadow: 2px 2px 0 #07050d; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
+.cave-probe.locked { background: #ff7a7a; cursor: default; }
 `;
 function ensureStyle() {
   if (document.getElementById('cave-style')) return;
@@ -48,13 +51,17 @@ const img = (file, rot) => {
 };
 const span = (cls, text) => { const s = document.createElement('span'); s.className = cls; s.textContent = text; return s; };
 
-export function caveGrid(model, { cell = 40, onRoom = null } = {}) {
+// `maxWidth`: the largest the map may grow (it always fills the width it is given up to that).
+export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
   ensureStyle();
   const { minX, minY, maxX, maxY } = model.bounds;
+  const wrap = document.createElement('div');
+  wrap.className = 'cave-wrap';
+  if (maxWidth) wrap.style.maxWidth = `${maxWidth}px`;
   const grid = document.createElement('div');
   grid.className = 'cave-grid';
-  grid.style.setProperty('--cell', `${cell}px`);
-  grid.style.gridTemplateColumns = `repeat(${maxX - minX + 1}, var(--cell))`;
+  grid.style.setProperty('--cols', String(maxX - minX + 1));
+  wrap.append(grid);
   grid.setAttribute('role', 'img');
   grid.setAttribute('aria-label', 'Kart over hulen');
 
@@ -115,7 +122,7 @@ export function caveGrid(model, { cell = 40, onRoom = null } = {}) {
       grid.append(tile);
     }
   }
-  return grid;
+  return wrap;
 }
 
 // Door tiles for the rooms that are drawn: a door sits on the cell of each drawn room it belongs to.

@@ -188,10 +188,25 @@ function renderBook(v) {
     el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, pic(icon(v, n)), ' ', n)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, pic(icon(v, n)), ' ', n))));
 }
 
+// One button per direction: a door there shows its arrow, a locked door shows a lock, no door is greyed.
+const DIR_LABEL = { n: ['↑', 'NORD'], w: ['←', 'VEST'], e: ['→', 'ØST'], s: ['↓', 'SØR'] };
+function renderPad(v) {
+  for (const b of document.querySelectorAll('.pad .dir')) {
+    const d = b.dataset.dir;
+    const exit = v.exits.find((x) => x.dir === d);
+    const [arrow, word] = DIR_LABEL[d];
+    b.textContent = exit ? `${exit.locked ? '🔒' : arrow} ${word}` : `— ${word}`;
+    b.disabled = !exit || exit.locked;
+    b.classList.toggle('locked', !!exit?.locked);
+    b.onclick = exit && !exit.locked ? () => request('MOVE', { room: exit.room, dir: d }) : null;
+  }
+}
+
 function renderMap(v) {
+  renderPad(v);
   // The cave as in the original: rooms and doors, fog over the unknown (prototype/map-view.mjs).
   const canGo = (id) => v.cave.rooms.some((r) => r.id === id && r.canGo) || v.cave.probes.some((p) => p.room === id && !p.locked);
-  $('#map').replaceChildren(caveGrid(v.cave, { cell: 44, onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));
+  $('#map').replaceChildren(caveGrid(v.cave, { onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));
 }
 
 $('#search').addEventListener('click', () => view && request('SEARCH', { room: view.here }));

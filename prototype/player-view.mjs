@@ -72,6 +72,13 @@ export function playerView(run, state, extra = {}) {
         return { x: cell.x, y: cell.y, room: other, locked: e.gate !== null && !openGates.has(e.gate) };
       }),
     },
+    // The doors of the room she is in, by direction, for the big direction buttons (as in the original).
+    // Secret doors are never listed.
+    exits: map.edges.filter((e) => !e.secret && (e.a === here || e.b === here)).map((e) => ({
+      dir: e.a === here ? e.aDir : { n: 's', e: 'w', s: 'n', w: 'e' }[e.aDir],
+      room: e.a === here ? e.b : e.a,
+      locked: e.gate !== null && !openGates.has(e.gate),
+    })),
     room: { id: here, title: map.rooms[here].name || `Rom ${here}`, place: map.rooms[here].zoneName, things },
     inventory: state.inventory.slice(),
     companions: state.companions.slice(),

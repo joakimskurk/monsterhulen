@@ -62,7 +62,8 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 - Hvor lang var økten, og hvor mange rom?
 
 ## Begrensninger
-- Kartet følger originalen: rom i ulike størrelser, steinflisene fra originalen (`assets/tileset/v3-map/`), og tåke over alt barnet ikke har utforsket. På iPaden står «?» ved dørene ut av rommet hun er i (🔒 hvis døra er låst). Trykk på «?» for å gå dit.
+- Kartet følger originalen: rom i ulike størrelser, steinflisene fra originalen (`assets/tileset/v3-map/`), og tåke over alt barnet ikke har utforsket. På iPaden står «?» ved dørene ut av rommet hun er i (🔒 hvis døra er låst).
+- **Dørene:** Barnet går med store knapper (NORD, VEST, ØST, SØR, med «SE DEG RUNDT» i midten), som i originalen. Gjennom en åpen dør går hun med en gang, og du ser det i loggen. Kryss av for «Barnet går gjennom åpne dører uten å spørre» under «Barnets skjerm» hvis du vil godkjenne hvert steg selv. Låste dører må du løse som før.
 - To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.
 - Åpner du Forteller-siden i flere faner i samme nettleser, er det den nyeste som styrer barnets skjerm. De eldre sier ifra og slutter å sende.

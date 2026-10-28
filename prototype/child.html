@@ -28,7 +28,14 @@
       <p id="place" class="place"></p>
       <p id="news" class="news" hidden></p>
       <div id="things"></div>
-      <div class="actions"><button id="search" class="big">SE DEG RUNDT</button></div>
+      <!-- Doors as in the original: one big button per direction, «SE DEG RUNDT» in the middle. -->
+      <div class="pad">
+        <button class="dir" data-dir="n"></button>
+        <button class="dir" data-dir="w"></button>
+        <button id="search" class="look">SE DEG RUNDT</button>
+        <button class="dir" data-dir="e"></button>
+        <button class="dir" data-dir="s"></button>
+      </div>
     </section>
     <section class="panel">
       <h2>KARTET</h2>
