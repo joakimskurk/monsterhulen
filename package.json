@@ -11,7 +11,7 @@
     "sim": "node tools/runsim/cli.mjs",
     "sim:batch": "node tools/runsim/cli.mjs --batch 1000",
     "sim:selftest": "node tools/runsim/cli.mjs --selftest",
-    "check": "node tools/validate-content.mjs && node tests/v2/map.test.mjs && node tools/runsim/cli.mjs --selftest && node tests/v2/player-view-leak.test.mjs && node tests/v2/table-play.test.mjs && node tests/v2/herobook.test.mjs && node tests/v2/overview.test.mjs && node tests/v2/dice.test.mjs && node tests/v2/doors.test.mjs && node tools/runsim/cli.mjs --batch 200",
+    "check": "node tools/validate-content.mjs && node tests/v2/map.test.mjs && node tools/runsim/cli.mjs --selftest && node tests/v2/player-view-leak.test.mjs && node tests/v2/table-play.test.mjs && node tests/v2/herobook.test.mjs && node tests/v2/overview.test.mjs && node tests/v2/dice.test.mjs && node tests/v2/doors.test.mjs && node tests/v2/matrix.test.mjs && node tools/runsim/cli.mjs --batch 200",
     "prototype": "node tools/server.mjs",
     "prototype:lan": "node tools/server.mjs --lan",
     "test:leak": "node tests/v2/player-view-leak.test.mjs",
@@ -21,6 +21,7 @@
     "test:map": "node tests/v2/map.test.mjs",
     "test:overview": "node tests/v2/overview.test.mjs",
     "test:dice": "node tests/v2/dice.test.mjs",
-    "test:doors": "node tests/v2/doors.test.mjs"
+    "test:doors": "node tests/v2/doors.test.mjs",
+    "test:matrix": "node tests/v2/matrix.test.mjs"
   }
 }

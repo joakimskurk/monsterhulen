@@ -65,12 +65,28 @@ export function markNeed(t, node, i, { improvised = false, handedOver = false } 
   log(t, `${node.card.name}: ${need.specific ? need.name : label(t, need.tag)} er på plass. ${openNeeds(t, node).length} igjen.${improvised ? ' (Forteller bestemte)' : ''}`);
 }
 
+// True if the `name` in the backpack is the planned answer to an open need somewhere other than `id`,
+// and there is no spare one. Giving it where it was planned always uses it up.
+function stillPlanned(t, name, id) {
+  const plannedIn = (n) => openNeeds(t, n).filter((i) => {
+    const p = nodeById(t, n.needs[i].provider);
+    return p?.item?.name === name && isDone(t, p.id); // already in her hands, not one still to come
+  }).length;
+  const here = nodeById(t, id);
+  if (here && plannedIn(here)) return false;
+  const elsewhere = t.run.nodes.filter((n) => n.id !== id && !isDone(t, n.id)).reduce((sum, n) => sum + plannedIn(n), 0);
+  return elsewhere > 0 && elsewhere >= t.state.inventory.filter((x) => x === name).length;
+}
+
 // A request from the iPad the DM said yes to: take a thing, give a thing, or let a friend help.
 export function acceptThing(t, id, { given, friend } = {}) {
   if (isDone(t, id)) return;
   if (given) {
     const i = t.state.inventory.indexOf(given);
-    if (i >= 0 && consumableByName(t, given)) t.state.inventory.splice(i, 1);
+    // Never stranded (owner's playtest, the matrix check): a thing that fits here, but is still
+    // planned for someone else, is lent and given back, so the one it was meant for can still get it.
+    if (i >= 0 && consumableByName(t, given) && stillPlanned(t, given, id)) log(t, `${thingName(t, id)} får låne ${given.toLowerCase()} og gir den tilbake.`);
+    else if (i >= 0 && consumableByName(t, given)) t.state.inventory.splice(i, 1);
   }
   if (id.startsWith('alt:')) {
     const a = t.run.alternatives.find((x) => `alt:${x.room}` === id);
