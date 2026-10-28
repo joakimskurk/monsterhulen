@@ -12,7 +12,9 @@ import * as table from '../../prototype/table.mjs';
 const content = loadContent();
 const SEEDS = Number(process.env.TABLE_SEEDS || 25);
 const GOALS = ['goal', 'exit', 'deliver', 'target'];
-let runs = 0, actions = 0, stepwise = 0, tingRuns = 0, tingGiven = 0;
+let runs = 0, actions = 0, stepwise = 0, tingRuns = 0, tingGiven = 0, altRuns = 0, altUsed = 0, friendRuns = 0, friendHelped = 0;
+// A friend from the hero book: a companion figure with its ability, as recordRun stores it.
+const FRIENDS = content.figures.filter((f) => (f.roles || []).includes('companion')).map((f) => ({ name: f.name, ability: f.gives.ability }));
 const LASTING = content.items.filter((i) => i.persistent).map((i) => ({ id: i.id, name: i.name, tags: i.tags }));
 
 const count = (list) => list.reduce((m, x) => m.set(x, (m.get(x) || 0) + 1), new Map());
@@ -71,6 +73,47 @@ function act(t, node, need, where, { byButton = false, withTing = null } = {}) {
   }
 }
 
+// The extra things a run lays out (run.alternatives) are taken when reachable and given to the blocker
+// they are for as soon as it is reachable, before its planned solution. The planned items stay unused.
+function useExtras(t, rooms, where) {
+  let progress = false;
+  for (const a of t.run.alternatives) {
+    const key = `alt:${a.room}`;
+    if (!table.isDone(t, key) && rooms.has(a.room)) {
+      table.goTo(t, a.room);
+      const before = t.state.inventory.slice();
+      table.acceptThing(t, key);
+      assert.ok(sameBag(t.state.inventory, [...before, a.item]), `${where}: taking the extra ${a.item}`);
+      progress = true;
+    }
+    const blocker = table.nodeById(t, a.for);
+    if (table.isDone(t, key) && !table.isDone(t, blocker.id) && rooms.has(blocker.room) && t.state.inventory.includes(a.item)) {
+      table.goTo(t, blocker.room);
+      const before = t.state.inventory.slice();
+      const expected = before.slice();
+      if (table.consumableByName(t, a.item)) expected.splice(expected.indexOf(a.item), 1);
+      table.acceptThing(t, blocker.id, { given: a.item });
+      actions++; altUsed++;
+      assert.ok(table.isDone(t, blocker.id), `${where}: ${blocker.card.name} not solved by the extra ${a.item}`);
+      assert.ok(sameBag(t.state.inventory, expected), `${where}: backpack after giving the extra ${a.item} is [${t.state.inventory}], expected [${expected}]`);
+      progress = true;
+    }
+  }
+  return progress;
+}
+
+// A brought friend helps with a need that fits its ability. Nothing in the backpack is used up.
+function helpWithFriend(t, node, need, friend, where) {
+  const before = t.state.inventory.slice();
+  const finishes = table.openNeeds(t, node).length === 1;
+  const gained = finishes && node.item && !['target', 'goal', 'exit'].includes(node.kind) ? [node.item.name] : [];
+  table.acceptThing(t, node.id, { friend: friend.name });
+  actions++;
+  const name = node.card.name || node.item?.name;
+  assert.ok(sameBag(t.state.inventory, [...before, ...gained]), `${where}: backpack after ${friend.name} helped ${name} is [${t.state.inventory}], expected [${[...before, ...gained]}]`);
+  assert.ok(table.metOf(t, node).includes(node.needs.indexOf(need)) || table.isDone(t, node.id), `${where}: ${friend.name}'s help with ${name} not recorded`);
+}
+
 // A need is ready when its provider is done and what it gave is still there (or the friend has joined).
 function ready(t, node, need) {
   if (need.local) return true;
@@ -79,13 +122,15 @@ function ready(t, node, need) {
   return p.kind === 'companion' ? t.state.companions.includes(p.card.name) : t.state.inventory.includes(p.item.name);
 }
 
-function playByTheRules(run, where, { byButton, ting = null }) {
+function playByTheRules(run, where, { byButton, ting = null, friend = null, useAlternatives = false }) {
   const t = { content, run, state: table.freshState(run) };
-  if (ting) table.bring(t, { ting });
+  if (ting || friend) table.bring(t, { ting, friend });
   let tingUsed = 0;
   for (let guard = 0; guard < 300; guard++) {
     let progress = false;
     const rooms = table.reach(t);
+    // «Alt annet som passer, virker også»: take the extra things that lie around and use them first.
+    if (useAlternatives) progress = useExtras(t, rooms, where) || progress;
     for (const node of run.nodes) {
       if (table.isDone(t, node.id) || (node.room !== null && !rooms.has(node.room))) continue;
       if (node.room !== null) table.goTo(t, node.room);
@@ -97,6 +142,12 @@ function playByTheRules(run, where, { byButton, ting = null }) {
       for (const need of open) {
         const fits = ting && table.broughtFits(t, need).includes(ting.name) && !['recipe', 'source'].includes(node.kind);
         if (fits) tingUsed++;
+        if (!fits && friend && table.broughtFits(t, need).includes(friend.name) && !['recipe', 'source'].includes(node.kind) && !table.isDone(t, node.id)) {
+          friendHelped++;
+          helpWithFriend(t, node, need, friend, where);
+          continue;
+        }
+        if (table.isDone(t, node.id)) continue;
         act(t, node, need, where, { byButton, withTing: fits ? ting.name : null });
       }
       assert.ok(table.isDone(t, node.id), `${where}: ${node.card.name} not done after all needs were met`);
@@ -120,6 +171,8 @@ function playByTheRules(run, where, { byButton, ting = null }) {
     assert.ok(t.state.inventory.includes(ting.name), `${where}: the lasting TING ${ting.name} was used up`);
     tingRuns++; tingGiven += tingUsed;
   }
+  if (friend) assert.ok(t.state.companions.includes(friend.name), `${where}: the brought friend left`);
+  if (useAlternatives) altRuns++;
   if (goal.kind === 'deliver') assert.ok(t.state.inventory.includes(goal.item.name), `${where}: the thing to deliver is not in the backpack`);
   if (goal.kind === 'target') assert.ok(t.state.companions.includes(goal.card.name), `${where}: the rescued one is not following`);
   assert.ok(table.reach(t).has(run.map.start), `${where}: cannot get back to the entrance`);
@@ -145,6 +198,13 @@ for (const missionId of missionIds(content)) {
       playByTheRules(run, where, { byButton: seed % 2 === 0 });
       // Again with a lasting TING brought along (workshop B4): it may be given where it fits, and stays.
       playByTheRules(run, `${where} +TING`, { byButton: seed % 2 === 1, ting: LASTING[seed % LASTING.length] });
+      // Again using the extra things that lie around (when the run has any).
+      if (run.alternatives.length) playByTheRules(run, `${where} +EKSTRA`, { byButton: false, useAlternatives: true });
+      // Again with a friend from the hero book who fits some need in this run (workshop B4).
+      const needTags = new Set(run.nodes.flatMap((n) => n.needs.map((x) => x.tag)).filter(Boolean));
+      const usedNames = new Set(run.nodes.map((n) => n.card?.name));
+      const friend = FRIENDS.filter((f) => !usedNames.has(f.name) && f.ability.some((a) => needTags.has(a)))[seed % 3];
+      if (friend) { friendRuns++; playByTheRules(run, `${where} +VENN`, { byButton: false, friend }); }
       playByOverride(run, where);
       runs++;
     }
@@ -152,4 +212,6 @@ for (const missionId of missionIds(content)) {
 }
 assert.ok(stepwise > 0, 'no node with several needs was played step by step');
 assert.ok(tingGiven > 0, 'a brought TING was never given where it fits');
-console.log(`table play test: ${runs} runs (+${tingRuns} with a brought TING, given ${tingGiven} times), ${actions} actions (${stepwise} one need at a time), backpack exact, end and summary right, GI LIKEVEL finishes, OK`);
+assert.ok(altUsed > 0, 'no extra thing was ever used');
+assert.ok(friendHelped > 0, 'a brought friend never helped');
+console.log(`table play test: ${runs} runs (+${tingRuns} with a brought TING, given ${tingGiven} times; +${altRuns} using ${altUsed} extra things; +${friendRuns} with a brought friend, helped ${friendHelped} times), ${actions} actions (${stepwise} one need at a time), backpack exact, end and summary right, GI LIKEVEL finishes, OK`);

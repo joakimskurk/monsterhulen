@@ -6,7 +6,7 @@ import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView, layoutMap } from './player-view.mjs';
 import * as table from './table.mjs';
-import { emptyBook, tingOffer, recordRun } from './herobook.mjs';
+import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -281,6 +281,7 @@ function render() {
   $('#template').textContent = dmTemplate(content, run, current.result);
   renderFinish();
   renderPack();
+  renderHeroBook();
   renderRequests();
   publish();
 }
@@ -305,6 +306,34 @@ function renderPack() {
     el('div', { class: 'actions' }, friendSel, tingSel,
       el('button', { onclick: () => { table.bring(T(), { friend: book.friends[friendSel.value] || null, ting: book.ting[tingSel.value] || null }); state.brought.done = true; save(); render(); } }, 'Ta med'),
       el('button', { class: 'ghost', onclick: () => { state.brought = { ...(state.brought || {}), done: true }; save(); render(); } }, 'Ingenting i dag')));
+}
+
+// The book itself, with a backup: it lives in this browser only, so clearing site data would lose it.
+function renderHeroBook() {
+  const book = loadBook();
+  const today = new Date().toISOString().slice(0, 10);
+  const save = () => {
+    const link = el('a', { href: URL.createObjectURL(new Blob([bookFile(book, today)], { type: 'application/json' })), download: `helteboka-${today}.json` });
+    link.click();
+    URL.revokeObjectURL(link.href);
+  };
+  const input = el('input', { type: 'file', accept: 'application/json,.json', hidden: '' });
+  input.addEventListener('change', async () => {
+    const file = input.files[0];
+    if (!file) return;
+    try {
+      const next = parseBook(await file.text(), content);
+      if (!confirm(`Erstatte Helteboka (${book.runs.length} løp) med kopien (${next.runs.length} løp)?`)) return;
+      saveBook(next); render();
+    } catch (e) { alert(e.message); }
+  });
+  $('#herobook').replaceChildren(...[el('h2', {}, `Helteboka · ${book.runs.length} løp`),
+    el('p', {}, el('b', {}, 'Venner: '), book.friends.map((f) => f.name).join(', ') || '–'),
+    el('p', {}, el('b', {}, `TING (${book.ting.length} av 12): `), book.ting.map((x) => x.name).join(', ') || '–'),
+    book.memories.length ? el('p', { class: 'hint' }, `Sist: ${book.memories.slice(-3).reverse().join(' · ')}`) : null,
+    el('p', { class: 'hint' }, 'Helteboka ligger bare i denne nettleseren. Lagre en kopi av og til.'),
+    el('div', { class: 'actions' }, el('button', { class: 'ghost', onclick: save }, 'Lagre kopi'), el('button', { class: 'ghost', onclick: () => input.click() }, 'Hent kopi'), input),
+  ].filter(Boolean));
 }
 
 function renderFinish() {

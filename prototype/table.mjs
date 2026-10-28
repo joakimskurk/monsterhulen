@@ -80,8 +80,9 @@ export function acceptThing(t, id, { given, friend } = {}) {
   const node = nodeById(t, id);
   // What the child gave or which friend helped always counts as one need, already handed over.
   // Resolving straight away would spend the planned item again: two of a kind would both disappear.
+  // When a friend helps, nothing from the backpack is used at all.
   if (openNeeds(t, node).length && (given || friend || openNeeds(t, node).length > 1)) {
-    markNeed(t, node, needFor(t, node, { given, friend }), { handedOver: !!given });
+    markNeed(t, node, needFor(t, node, { given, friend }), { handedOver: !!(given || friend) });
     return;
   }
   resolve(t, node);

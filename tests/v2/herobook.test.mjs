@@ -1,7 +1,7 @@
 // Helteboka (prototype/herobook.mjs): what the child keeps between runs.
 import assert from 'node:assert/strict';
 import { loadContent } from '../../tools/lib/content.mjs';
-import { emptyBook, tingOffer, recordRun } from '../../prototype/herobook.mjs';
+import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from '../../prototype/herobook.mjs';
 
 const content = loadContent();
 const lasting = content.items.filter((i) => i.persistent);
@@ -30,4 +30,9 @@ assert.equal(again, book, 'a run recorded twice must not change the book');
 for (let n = 100; n < 140; n++) book = recordRun(book, run(n));
 assert.equal(book.memories.length, 30);
 assert.equal(book.memories.at(-1), 'Du fant noe nr. 139!');
-console.log(`herobook test: ${lasting.length} TING collected without repeats, friends kept once, double recording ignored, OK`);
+// A backup file round-trips, and broken files are refused with a message instead of half a book.
+assert.deepEqual(parseBook(bookFile(book, '2026-10-28'), content), book, 'backup does not round-trip');
+for (const [bad, why] of [['ikke json', 'JSON'], ['{}', 'runs'], [JSON.stringify({ ...book, ting: [{ id: 'FINNES_IKKE' }] }), 'Ukjent TING'], [JSON.stringify({ ...book, friends: [{ name: 'X' }] }), 'venn']]) {
+  assert.throws(() => parseBook(bad, content), (e) => e.message.includes(why), `broken file not refused: ${why}`);
+}
+console.log(`herobook test: ${lasting.length} TING collected without repeats, friends kept once, double recording ignored, backup round-trips, broken files refused, OK`);
