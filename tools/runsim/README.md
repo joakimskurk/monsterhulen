@@ -9,7 +9,7 @@ Prototypen beviser to ting før noe bygges inn i appen:
 ## Kommandoer
 
 ```bash
-npm run sim -- --mission GLASS_HEART --seed 12 --length VANLIG
+npm run sim -- --mission NY_FINN --seed 12 --length VANLIG
 ```
 
 Ett løp skrevet ut som Forteller-mal: kjeden per hinder, tegn, rom for rom og gjennomspillingen.
@@ -33,6 +33,7 @@ Saboterer godkjente løp og sjekker at automaten oppdager det.
 | `map.mjs` | abstrakt kart: rom, ryggrad fra start til mål, hinderkanter (gates) som deler hulen i soner, greiner, løkker og en hemmelig dør innen samme sone |
 | `generate.mjs` | kjedegenerator: velger hinder per gate, bygger avhengigheter baklengs, plasserer etter soner, legger til alternativer og frie møter |
 | `playthrough.mjs` | gjennomspillingsautomat + snarvei-sjekk |
+| `theme.mjs` | sammensatte oppdrag: bygger tittel, intro, mål og åpner fra `content/themes.json` ut fra koden |
 | `report.mjs` | Forteller-mal og kjedeform (`chainSignature`) |
 | `cli.mjs` | kommandolinje, batch og selvtest |
 
@@ -53,8 +54,8 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 
 ## Resultater 2026-10-28
 
-- **45 000 løp** (15 oppdrag × KORT/VANLIG/STORT × 1000 seeds): alle godkjent, gjennomsnittlig 1,0–3,2 forsøk per løp (SAMLE på KORT trenger flest).
-- **Selvtest:** 12 732 sabotasjer, 0 uoppdaget:
+- **30 000 løp** (5 sammensatte + 5 klassiske oppdrag × KORT/VANLIG/STORT × 1000 seeds; for de sammensatte er hver seed også et nytt tema): alle godkjent, gjennomsnittlig 1,0–3,2 forsøk per løp (SAMLE på KORT trenger flest).
+- **Selvtest:** 8 443 sabotasjer, 0 uoppdaget:
   - en garantert kilde flyttet bak hinderet kjeden er for,
   - en garantert kilde fjernet,
   - en hemmelig dør fra sone 0 inn i siste sone.

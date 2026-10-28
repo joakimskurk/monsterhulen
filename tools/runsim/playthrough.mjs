@@ -83,7 +83,8 @@ export function playthrough(run) {
           break;
         case 'goal':
         case 'exit':
-          done.add(node.id); progress = true; steps.push(`Nådde ${node.card.name}`);
+          // A chest goal has needs (its opener); a plain goal has none.
+          if (takeAll(node)) { done.add(node.id); progress = true; steps.push(`Nådde ${node.card.name}`); }
           break;
         case 'deliver':
           inventory.push({ ...node.item, boundTo: null }); done.add(node.id); progress = true; steps.push(`Fant ${node.item.name}`);

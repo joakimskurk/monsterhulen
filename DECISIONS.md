@@ -4,6 +4,18 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - Missions are composed from parts; classics keep a fixed theme
+Owner concern: fixed mission names feel repetitive; wanted variations such as glass, gold or bone keys, magic objects, or a rhyme ("mellon"). Discussed in a simulated workshop (`docs/v2/workshops/2026-10-28_sammensatte_oppdrag.md`, decisions A1–A8; the participants are roles Claude simulated, not real people).
+
+- A composed mission is *type × goal × what closes × what opens × route*, built from `content/themes.json`. The theme depends only on mission type and code (seed), not on attempt or length, so the same code shows the same title on every device.
+- FINN has four openers with different play: **key** (material weighted towards zones on the route), **magic object** (fits a shape in the door), **rhyme** (three rhyming lines found separately and said aloud at the door; on short runs the first line is over the door), **element** (a carry tag such as music, light, warmth, water).
+- Chests hold the treasure in the goal room and are the goal; the last gate is then a normal blocker.
+- Word forms are written out in data; code only capitalises.
+- The DM device avoids the goal and opener of the last three runs when choosing a new code.
+- The existing five missions stay as classics with fixed themes. The ten fixed missions added earlier on 2026-10-28 were removed; their content became parts.
+
+Rationale: the name is the first thing the child meets, so a fixed name makes every run feel alike even when the chain underneath differs. Composition also changes *what you do* (find one thing, collect lines and speak, bring an element), not only the words. Every composed run is still proven by the playthrough automaton.
+
 ## 2026-10-27 - Direction: Monsterhulen is a systemic kids' roguelike, not an authored-story engine
 Monsterhulen V2 generates each run from a bank of figures, obstacles, items, sources and companions that connect through a shared tag vocabulary. Variety comes from combining good building blocks; coherence comes from the connections being meaningful (water cools lava, food satisfies hunger) and from every run being proven solvable.
 

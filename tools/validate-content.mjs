@@ -102,6 +102,34 @@ for (const m of c.missions) {
   if (!m.intro) err(at, 'missing intro');
 }
 
+// Themes for composed missions (content/themes.json, workshop 2026-10-28).
+{
+  const t = c.themes;
+  const at = 'themes';
+  const routeOk = (r, where) => { if (r.length !== 4) err(where, 'route needs 4 zones'); r.forEach((z) => { if (!zones.has(z)) err(where, `unknown zone ${z}`); }); };
+  (t.routes || []).forEach((r, i) => routeOk(r, `${at} route ${i}`));
+  if (!(t.routes || []).length) err(at, 'no routes');
+  const F = t.FINN;
+  for (const l of F.locks) {
+    if (!l.def || !l.short || !['bak', 'i'].includes(l.prep)) err(`${at} lock ${l.id}`, 'needs def, short and prep bak/i');
+    for (const o of l.openers) if (!['KEY', 'MAGIC', 'RHYME', 'TAG'].includes(o)) err(`${at} lock ${l.id}`, `bad opener ${o}`);
+    if (l.openers.includes('TAG')) { if (!l.tag?.sign || !l.tag?.intro) err(`${at} lock ${l.id}`, 'TAG opener needs tag.sign and tag.intro'); else tagOk(`${at} lock ${l.id}`, l.tag.tag); if (l.tag && !c.tagById.get(l.tag.tag)?.carry) err(`${at} lock ${l.id}`, 'TAG opener must be a carry tag'); }
+  }
+  for (const k of F.keys) { if (!k.hole) err(`${at} key ${k.id}`, 'missing hole sign'); (k.zones || []).forEach((z) => { if (!zones.has(z)) err(`${at} key ${k.id}`, `unknown zone ${z}`); }); }
+  for (const m of F.magic) { if (!m.shape) err(`${at} magic ${m.id}`, 'missing shape'); (m.zones || []).forEach((z) => { if (!zones.has(z)) err(`${at} magic ${m.id}`, `unknown zone ${z}`); }); }
+  for (const r of F.rhymes) if (r.lines?.length !== 3) err(`${at} rhyme ${r.id}`, 'a rhyme has exactly 3 lines');
+  for (const kind of ['KEY', 'MAGIC', 'RHYME', 'TAG']) if (!F.titles[kind]?.length) err(at, `no titles for ${kind}`);
+  for (const cr of t.REDD.creatures) {
+    if (!['den', 'det'].includes(cr.pron)) err(`${at} creature ${cr.id}`, 'pron must be den/det');
+    for (const tag of cr.calm) { tagOk(`${at} creature ${cr.id}`, tag); if (!t.calmSigns[tag]) err(`${at} creature ${cr.id}`, `no calmSign for ${tag}`); }
+  }
+  for (const d of t.SAMLE.devices) { if (d.pool.length < 3) err(`${at} device ${d.id}`, 'pool needs at least 3 tags'); d.pool.forEach((tag) => tagOk(`${at} device ${d.id}`, tag)); if (!d.socket) err(`${at} device ${d.id}`, 'missing socket'); }
+  const things = new Set(t.LEVER.things.map((x) => x.id));
+  for (const o of t.LEVER.owners) for (const id of o.things) if (!things.has(id)) err(`${at} owner ${o.id}`, `unknown thing ${id}`);
+  for (const th of t.LEVER.things) if (!['den', 'det', 'dem'].includes(th.pron)) err(`${at} thing ${th.id}`, 'pron must be den/det/dem');
+  for (const p of t.LEVER.places) if (!p.where) err(`${at} place ${p.id}`, 'missing where');
+}
+
 // Coverage: for each carry tag, count consumers and providers.
 const coverage = new Map(c.vocabulary.tags.filter((t) => t.carry).map((t) => [t.id, { need: 0, items: 0, sources: 0, sells: 0, rewards: 0, ability: 0, recipes: 0 }]));
 const bump = (tag, key) => { if (coverage.has(tag)) coverage.get(tag)[key] += 1; };

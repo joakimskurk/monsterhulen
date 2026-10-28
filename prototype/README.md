@@ -35,7 +35,8 @@ npm run prototype:lan
 Barnet ser aldri tegn, løsninger, gjemte ting eller Forteller-tekst. Det sjekkes automatisk av `npm run test:leak`. Trykk **Vis på iPad** ved et tegn for å vise det som en boble på skjermen hennes. Mens en forespørsel venter, er knappene hennes låst, så dobbeltrykk ikke gir dobbel effekt.
 
 ## Slik spiller du
-1. Velg oppdrag (15, gruppert etter type) og lengde, eller trykk **Overrask meg** for et tilfeldig annet oppdrag. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
+1. Velg oppdrag og lengde. Under **Nytt hver gang** gir hver kode et nytt tema (for eksempel «Beinnøkkelen og dragekrona» eller «Regla ved steindøra»). Under **Klassikere** ligger de faste eventyrene. **Overrask meg** velger en annen oppdragstype og en kode med et tema dere ikke har hatt i de tre siste løpene. Koden (seed) bestemmer løpet. Samme kode gir samme løp, også på en annen enhet.
+   - **Regle:** Ved døra viser kortet hele regla til deg. På kort løp står første linje over døra. Linjene finnes rundt i hulen, og barnet sier regla høyt ved døra, gjerne etter deg. **Vis regla på iPad** viser den som boble.
 2. Trykk på et rom på kartet når barnet går dit. Grå rom ligger bak et hinder som ikke er løst.
 3. Romkortet viser det du leser høyt, hva figuren vil, tegnet og hjelpestigen, og hvor den garanterte løsningen ligger.
 4. Barnet foreslår. Kast terning bare når utfallet er usikkert. Trykk:
@@ -56,3 +57,4 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 - Kartet er abstrakt (rom og streker), ikke appens grafikk.
 - To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.
+- Åpner du Forteller-siden i flere faner i samme nettleser, er det den nyeste som styrer barnets skjerm. De eldre sier ifra og slutter å sende.

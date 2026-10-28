@@ -7,28 +7,23 @@
 import { makeRng } from './rng.mjs';
 import { generateMap, LENGTHS } from './map.mjs';
 import { figureNeeds, isCarryTag } from '../lib/content-core.mjs';
-
-const ROUTES = [
-  ['SOPPSKOGEN', 'GRAVPLASSEN', 'HEKSETÅRNET', 'HEKSETÅRNET'],
-  ['LANTERNEHAGEN', 'TÅKESUMPEN', 'ZOMBIESLOTTET', 'ZOMBIESLOTTET'],
-  ['MÅNESKOGEN', 'KRYSTALLGROTTEN', 'BEINKATAKOMBENE', 'BEINKATAKOMBENE'],
-  ['REGNBUEDALEN', 'SKYGGEGANGENE', 'KLOKKETÅRNET', 'KLOKKETÅRNET'],
-];
+import { resolveMission } from './theme.mjs';
 
 const BASE_WEIGHT = { LIGGER: 1.6, GJEMT: 1.2, HANDEL: 2.2, BELONNING: 2.2, VENN: 2.2, MILJO: 2.2, OPPSKRIFT: 1.6 };
 
 export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
   const rng = makeRng(`${missionId}|${length}|${seed}`);
   const shape = LENGTHS[length];
-  const mission = content.missions.find((m) => m.id === missionId);
+  const mission = resolveMission(content, missionId, seed);
   if (!mission) throw new Error(`unknown mission ${missionId}`);
   const map = generateMap(rng, shape);
-  // A mission may fix its zones (missions.json `route`); otherwise a route is drawn from the seed.
-  const route = mission.route || ROUTES[Math.floor(rng() * ROUTES.length)];
+  // A mission may fix its zones (`route`); otherwise a route is drawn from the seed.
+  const routes = content.themes.routes;
+  const route = mission.route || rng.pick(routes);
   map.rooms.forEach((r) => { r.zoneName = route[Math.min(r.zone, route.length - 1)]; });
 
   const ctx = {
-    content, rng, map, mission,
+    content, rng, map, mission, length,
     budget: shape.budget,
     nodes: [],
     usedFigures: new Set(), usedObstacles: new Set(), usedItems: new Set(),
@@ -43,7 +38,8 @@ export function generateRun(content, { missionId, seed, length = 'VANLIG' }) {
     const room = map.gateRoom[g];
     ctx.occupied.add(room);
     let gateNode;
-    if (g === lastGate && mission.type === 'FINN') gateNode = makeLock(ctx, room, g);
+    // A chest holds the treasure in the innermost room; it is not a gate, so the last gate is a normal blocker.
+    if (g === lastGate && mission.type === 'FINN' && !mission.goal.lock.inGoal) gateNode = makeLock(ctx, room, g);
     else if (g === lastGate && mission.type === 'SAMLE') gateNode = makeMachine(ctx, room, g);
     else gateNode = makeBlocker(ctx, room, g);
     if (!gateNode) return { ok: false, reason: `no blocker for gate ${g}` };
@@ -100,14 +96,42 @@ function makeBlocker(ctx, room, gate) {
   return null;
 }
 
+// The door to the treasure. Four kinds of opener (workshop decision A1):
+// KEY and MAGIC are one specific thing, RHYME is 2–3 lines found separately, TAG is anything with a tag.
 function makeLock(ctx, room, gate) {
   const lock = ctx.mission.goal.lock;
-  const node = addNode(ctx, { kind: 'lock', card: { name: lock.name }, room, zone: zoneOf(ctx, room), gate, needs: [] });
-  const key = { specificId: 'KEY', name: lock.key, tags: [], consumable: true };
-  const provider = provideSpecific(ctx, key, node, 0);
-  if (!provider) return null;
-  node.needs.push({ specific: 'KEY', name: lock.key, provider: provider.id, sign: `${lock.name} har et lite nøkkelhull.` });
-  return node;
+  const opener = lock.opener || { kind: 'KEY', item: lock.key, sign: `${lock.name} har et lite nøkkelhull.` };
+  const node = addNode(ctx, { kind: 'lock', opener: opener.kind, card: { name: lock.name, intro: lock.intro }, room, zone: zoneOf(ctx, room), gate, needs: [] });
+  return addOpenerNeeds(ctx, node, opener) ? node : null;
+}
+
+// Adds what the opener needs to `node` (a door at a gate, or the chest that is the goal). False if it cannot be provided.
+function addOpenerNeeds(ctx, node, opener) {
+  if (opener.kind === 'KEY' || opener.kind === 'MAGIC') {
+    const provider = provideSpecific(ctx, { specificId: 'KEY', name: opener.item, tags: [], consumable: true }, node, 0);
+    if (!provider) return false;
+    node.needs.push({ specific: 'KEY', name: opener.item, provider: provider.id, sign: opener.sign });
+    return true;
+  }
+  if (opener.kind === 'RHYME') {
+    // Short runs show the first line over the door; otherwise all three lines must be found (decision A5).
+    const shown = ctx.length === 'KORT' ? 1 : 0;
+    node.rhyme = { lines: opener.lines, shown };
+    const doorSign = shown
+      ? `Over ${opener.door} står første linje: ${opener.lines[0]} … Resten er visket bort.`
+      : `Over ${opener.door} er det risset tre linjer, men bokstavene er visket bort.`;
+    for (let i = shown; i < opener.lines.length; i++) {
+      const line = { specificId: `RHYME:${i + 1}`, name: `Regle-linje ${i + 1}: «${opener.lines[i]}»`, found: `Noen har risset en linje i veggen: «${opener.lines[i]}»`, tags: [], consumable: true };
+      const provider = provideSpecific(ctx, line, node, 0);
+      if (!provider) return false;
+      node.needs.push({ specific: line.specificId, name: line.name, via: 'rhyme', provider: provider.id, sign: i === shown ? doorSign : `Linje ${i + 1} mangler i innskriften.` });
+    }
+    return true;
+  }
+  const provider = provideTag(ctx, opener.tag, node, 0);
+  if (!provider) return false;
+  node.needs.push({ tag: opener.tag, via: 'element', provider: provider.id, sign: opener.sign });
+  return true;
 }
 
 function makeMachine(ctx, room, gate) {
@@ -117,7 +141,8 @@ function makeMachine(ctx, room, gate) {
   for (const tag of tags) {
     const provider = provideTag(ctx, tag, node, 0);
     if (!provider) return null;
-    node.needs.push({ tag, via: 'socket', provider: provider.id, sign: `Ett av festene lyser og venter på ${ctx.content.tagById.get(tag).label}.` });
+    const socket = mission.goal.socket || 'Ett av festene';
+    node.needs.push({ tag, via: 'socket', provider: provider.id, sign: `${socket} lyser og venter på ${ctx.content.tagById.get(tag).label}.` });
   }
   return node;
 }
@@ -125,7 +150,12 @@ function makeMachine(ctx, room, gate) {
 function makeGoal(ctx, lastGate) {
   const { mission, map, rng } = ctx;
   const endZone = lastGate;
-  if (mission.type === 'FINN') return addNode(ctx, { kind: 'goal', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+  if (mission.type === 'FINN') {
+    const lock = mission.goal.lock;
+    if (!lock.inGoal) return addNode(ctx, { kind: 'goal', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+    const node = addNode(ctx, { kind: 'goal', opener: lock.opener.kind, card: { name: `${mission.goal.name} i ${lock.name.charAt(0).toLowerCase()}${lock.name.slice(1)}`, intro: lock.intro }, room: map.end, zone: endZone, needs: [] });
+    return addOpenerNeeds(ctx, node, lock.opener) ? node : null;
+  }
   if (mission.type === 'KOM_UT') return addNode(ctx, { kind: 'exit', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
   if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}` }, room: map.end, zone: endZone, needs: [] });
   if (mission.type === 'LEVER') {
@@ -138,7 +168,8 @@ function makeGoal(ctx, lastGate) {
     const tag = rng.pick(mission.goal.calm);
     const provider = provideTag(ctx, tag, node, 0);
     if (!provider) return null;
-    node.needs.push({ tag, via: 'calm', provider: provider.id, sign: `${mission.goal.name} slapper av når den kjenner ${ctx.content.tagById.get(tag).label}.` });
+    const sign = mission.goal.calmSigns?.[tag] || `${mission.goal.name} slapper av når den kjenner ${ctx.content.tagById.get(tag).label}.`;
+    node.needs.push({ tag, via: 'calm', provider: provider.id, sign });
     return node;
   }
   return null;

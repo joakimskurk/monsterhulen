@@ -8,10 +8,11 @@ Updated: 2026-10-27
 | Check | Command | Result | Proves | Does not prove |
 |---|---|---|---|---|
 | Content format | `npm run validate:content` | OK | ids, tag references, role consistency, signs on weaknesses, every needed tag has a provider | that the classification is right |
-| Playthrough batch | `npm run sim:batch` | 45 000 / 45 000 accepted (15 missions × 3 lengths × 1000 seeds) | chain-first generation yields solvable runs in correct order on the abstract map | fun, comprehension, real map geometry |
-| Child view leak test | `npm run test:leak` | 21 000 views, OK | the iPad payload never contains signs, providers, DM keys or DM wording, and hidden items never appear as things, in the backpack or in the log | leaks through free text a future field might carry; hidden items named in free text such as a figure intro | leaks through future fields not in the test |
+| Playthrough batch | `npm run sim:batch` | 30 000 / 30 000 accepted (5 composed + 5 classic missions × 3 lengths × 1000 seeds) | chain-first generation yields solvable runs in correct order on the abstract map | fun, comprehension, real map geometry |
+| Child view leak test | `npm run test:leak` | 14 000 views, OK | the iPad payload never contains signs, providers, DM keys or DM wording, and hidden items never appear as things, in the backpack or in the log | leaks through future fields; a hidden item named in free text such as a figure intro |
 | Two-screen browser test | manual, Chromium tabs | full WITCH_CAT KORT run | request/accept loop, filtered view, fog of war, double-tap guard | real iPad Safari, real Wi-Fi |
-| Sabotage selftest | `npm run sim:selftest` | 12 732 sabotages, 0 missed | the automaton rejects runs with a misplaced or missing sole provider, and cross-zone secret doors | robustness to sabotage types not tested |
+| Composed missions, browser | manual, Chromium tabs | NY_FINN KORT seed 8 (rhyme) and seed 2 (chest) played through; iPad gave the key to the chest; «Overrask meg» 8 times with no repeated theme; two DM tabs on one session | rhyme card and lines in backpack, chest as goal, history, newest DM tab takes over | real iPad Safari, a child saying the rhyme |
+| Sabotage selftest | `npm run sim:selftest` | 8 443 sabotages, 0 missed | the automaton rejects runs with a misplaced or missing sole provider, and cross-zone secret doors | robustness to sabotage types not tested |
 
 ## Verification levels
 Never conflate:

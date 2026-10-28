@@ -15,7 +15,8 @@ Bakgrunn for klassifiseringen: `docs/v2/CONTENT_MATRIX_V2.md`.
 | `items.json` | ting som kan ligge i hulen + varige TING fra Helteboka |
 | `sources.json` | steder i rom som gir et merke (brønn, ildsted …) |
 | `recipes.json` | få kombinasjoner (A + B → C) |
-| `missions.json` | oppdragskort (mål for et løp) |
+| `missions.json` | klassikere: oppdrag med fast tema |
+| `themes.json` | deler til sammensatte oppdrag (nytt tema for hver kode) |
 
 Sjekk dataene med:
 
@@ -96,7 +97,10 @@ Merker med `"carry": false` (STILLHET, ROS, MOT, MORKE, SOVN) er handlinger barn
 
 ## Oppdrag
 
-Se `missions.json`. Typene er `FINN`, `REDD`, `SAMLE`, `LEVER` og `KOM_UT`, med tre tema hver (15 oppdrag). De fire gamle eventyrene er tema på disse og har `legacyBlueprint`.
+Typene er `FINN`, `REDD`, `SAMLE`, `LEVER` og `KOM_UT`. Det finnes to slags oppdrag:
+
+- **Sammensatte** (`NY_FINN`, `NY_REDD`, `NY_SAMLE`, `NY_LEVER`, `NY_KOM_UT`): tema settes sammen fra `themes.json` ut fra koden. Se under.
+- **Klassikere** i `missions.json`: de fire fra V1 (med `legacyBlueprint`) og «Ut på andre siden». Fast tema.
 
 | Felt | Betydning |
 |---|---|
@@ -108,6 +112,21 @@ Se `missions.json`. Typene er `FINN`, `REDD`, `SAMLE`, `LEVER` og `KOM_UT`, med 
 | `goal.item` | LEVER: tingen som hentes i siste rom og bæres tilbake til inngangen |
 
 Et nytt oppdrag trenger bare data. `npm run check` beviser det over 200 seeds per lengde, og `npm run sim:batch` over 1000.
+
+## Tema (sammensatte oppdrag)
+
+`themes.json` holder delene. Bakgrunn og avgjørelser: `docs/v2/workshops/2026-10-28_sammensatte_oppdrag.md`.
+
+- **Alle ordformer skrives ferdig** (ubestemt, bestemt, genitiv). Koden setter bare stor forbokstav.
+- **Temaet avhenger bare av oppdragstype og kode.** Det er likt på alle lengder, i alle forsøk og på begge skjermer.
+- `routes`: rutene (fire soner) et løp kan få.
+- `FINN`: `treasures`, `locks` (med `short`, `prep` `bak`/`i` og hvilke `openers` de tar), `keys` og `magic` (med `zones`, vektet ×3 når et sted i ruten passer), `rhymes` (tre rimende linjer) og `titles` per åpner. Kister (`prep: "i"`) står i målrommet.
+- `REDD`: `creatures` med `pron` (den/det), `calm` og `problems`. `calmSigns` gir tegnet per merke.
+- `SAMLE`: `devices` med `socket` (brukes i tegnet) og `pool`.
+- `LEVER`: `owners` (med hvilke `things` de kan eie), `things` (med `pron` den/det/dem) og `places` (med `where`).
+- `KOM_UT`: `exits`.
+
+Validatoren sjekker at hver del har det den trenger.
 
 ## Kobling til `index.html`
 

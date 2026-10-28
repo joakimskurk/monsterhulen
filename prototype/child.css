@@ -6,6 +6,7 @@ body.child button { font-size: 20px; min-height: 56px; padding: 10px 18px; borde
 body.child button.big { width: 100%; }
 #join { max-width: 420px; margin: 40px auto; text-align: center; }
 #join input { font-size: 28px; text-align: center; letter-spacing: .2em; width: 100%; margin: 12px 0; text-transform: uppercase; }
+.mission { margin: 4px 0 8px; font-size: 18px; font-weight: 700; letter-spacing: .04em; color: var(--accent); text-align: center; }
 .place { color: var(--muted); margin: 0 0 8px; text-transform: lowercase; }
 .thing { border: 2px solid var(--line); border-radius: 16px; padding: 12px 14px; margin: 10px 0; }
 .thing h3 { font-size: 22px; margin: 0 0 4px; }

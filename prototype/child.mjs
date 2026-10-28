@@ -25,7 +25,7 @@ async function request(type, payload) {
   const actionId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
   status('Sendt til Forteller …');
   try {
-    await fetch(`/api/${code}/request`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ actionId, type, ...payload }) });
+    await fetch(`/api/${code}/request`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ actionId, runCode: view.runCode, type, ...payload }) });
   } catch {
     status('Fikk ikke kontakt. Prøv igjen.');
     waiting = false;
@@ -51,6 +51,7 @@ function pick(title, options, onPick) {
 
 function render() {
   const v = view;
+  $('#mission').textContent = v.mission.name;
   const say = $('#say');
   say.hidden = !v.say;
   say.textContent = v.say || '';

@@ -5,15 +5,17 @@ import assert from 'node:assert/strict';
 import { loadContent } from '../../tools/lib/content.mjs';
 import { acceptedRun } from '../../tools/runsim/accept.mjs';
 import { playerView } from '../../prototype/player-view.mjs';
+import { missionIds } from '../../tools/runsim/theme.mjs';
 
 const content = loadContent();
 const FORBIDDEN_KEYS = ['needs', 'provider', 'sign', 'consumer', 'sourceType', 'gate', 'zone', 'weakness', 'wants', 'ability', 'gives', 'hidden'];
 let views = 0;
 
-for (const mission of content.missions) {
+for (const missionId of missionIds(content)) {
+  const mission = { id: missionId };
   for (const length of ['KORT', 'VANLIG', 'STORT']) {
     for (let seed = 1; seed <= 40; seed++) {
-      const { run } = acceptedRun(content, mission.id, seed, length);
+      const { run } = acceptedRun(content, missionId, seed, length);
       const signs = run.nodes.flatMap((n) => n.needs.map((need) => need.sign).filter(Boolean));
       const hiddenNames = run.nodes.filter((n) => n.kind === 'item' && n.hidden).map((n) => n.item.name);
       const hiddenIds = run.nodes.filter((n) => n.kind === 'item' && n.hidden).map((n) => n.id);

@@ -17,6 +17,7 @@ export const CONTENT_FILES = {
   sources: ['sources.json', 'sources'],
   recipes: ['recipes.json', 'recipes'],
   missions: ['missions.json', 'missions'],
+  themes: ['themes.json', null],
 };
 
 export const isCarryTag = (content, tag) => content.tagById.get(tag)?.carry === true;

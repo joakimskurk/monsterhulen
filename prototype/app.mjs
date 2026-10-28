@@ -4,6 +4,7 @@ import { buildContent, CONTENT_FILES } from '../tools/lib/content-core.mjs';
 import { acceptedRun } from '../tools/runsim/accept.mjs';
 import { reachable } from '../tools/runsim/map.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
+import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView, layoutMap } from './player-view.mjs';
 
 const $ = (sel) => document.querySelector(sel);
@@ -34,6 +35,22 @@ const SESSION = (() => {
   return code;
 })();
 
+// Tabs in one browser share the session code. The newest DM tab takes over the child's screen;
+// an older tab stops publishing and handling requests, so two tabs never fight over the iPad.
+let active = true;
+(() => {
+  const id = Math.random().toString(36).slice(2);
+  try {
+    const channel = new BroadcastChannel('monsterhulen-bord');
+    channel.onmessage = (e) => {
+      if (e.data?.type !== 'hello' || e.data.id === id || !active) return;
+      active = false;
+      document.body.prepend(el('section', { class: 'panel takeover' }, el('b', {}, 'Barnets skjerm styres nå fra en annen fane. '), 'Last inn denne siden på nytt for å ta over.'));
+    };
+    channel.postMessage({ type: 'hello', id });
+  } catch { /* no BroadcastChannel: single tab assumed */ }
+})();
+
 async function loadContent() {
   const raw = {};
   for (const [key, [file, field]] of Object.entries(CONTENT_FILES)) {
@@ -61,22 +78,23 @@ function log(text) { state.log.push(text); }
 async function start() {
   content = await loadContent();
   const TYPE_NAMES = { FINN: 'Finn skatten', REDD: 'Redd noen', SAMLE: 'Få noe i gang', LEVER: 'Lever noe hjem', KOM_UT: 'Kom deg ut' };
-  for (const [type, title] of Object.entries(TYPE_NAMES)) {
-    const group = el('optgroup', { label: title });
-    for (const m of content.missions.filter((x) => x.type === type)) group.append(el('option', { value: m.id }, m.name));
-    if (group.children.length) $('#mission').append(group);
-  }
+  const fresh = el('optgroup', { label: 'Nytt hver gang' });
+  for (const [id, type] of Object.entries(COMPOSED)) fresh.append(el('option', { value: id }, TYPE_NAMES[type]));
+  const classics = el('optgroup', { label: 'Klassikere' });
+  for (const m of content.missions) classics.append(el('option', { value: m.id }, m.name));
+  $('#mission').append(fresh, classics);
   const params = new URLSearchParams(location.hash.slice(1));
   if (params.get('m')) $('#mission').value = params.get('m');
   if (params.get('l')) $('#length').value = params.get('l');
   $('#seed').value = params.get('s') || String(1 + Math.floor(Math.random() * 9999));
   $('#setup').addEventListener('submit', (e) => { e.preventDefault(); generate(); });
-  $('#newRun').addEventListener('click', () => { $('#seed').value = String(1 + Math.floor(Math.random() * 9999)); generate(); });
-  // A different mission than the current one, so two surprises in a row never repeat.
+  $('#newRun').addEventListener('click', () => { $('#seed').value = freshSeed($('#mission').value); generate(); });
+  // A composed mission of another type than the current one, with a theme not seen recently.
   $('#surprise').addEventListener('click', () => {
-    const others = content.missions.filter((m) => m.id !== $('#mission').value);
-    $('#mission').value = others[Math.floor(Math.random() * others.length)].id;
-    $('#seed').value = String(1 + Math.floor(Math.random() * 9999));
+    const others = Object.keys(COMPOSED).filter((id) => id !== $('#mission').value);
+    const missionId = others[Math.floor(Math.random() * others.length)];
+    $('#mission').value = missionId;
+    $('#seed').value = freshSeed(missionId);
     generate();
   });
   $('#reset').addEventListener('click', () => { if (confirm('Starte dette løpet på nytt?')) { state = freshState(current.run); save(); render(); } });
@@ -101,7 +119,9 @@ async function connectRelay() {
       el('button', { class: 'ghost small', onclick: () => { state.say = null; save(); render(); } }, 'Fjern tekst på iPaden'),
     );
     const source = new EventSource(`/api/${SESSION}/dm-stream`);
-    source.addEventListener('request', (e) => { const r = JSON.parse(e.data); if (!requests.some((x) => x.actionId === r.actionId)) { requests.push(r); renderRequests(); } });
+    // Only requests for the run on this page. Another DM page on the same session code (a second tab, an old
+    // window) must neither show nor settle them, or it would swallow the child's taps.
+    source.addEventListener('request', (e) => { const r = JSON.parse(e.data); if (!active || r.runCode !== current?.code) return; if (!requests.some((x) => x.actionId === r.actionId)) { requests.push(r); renderRequests(); } });
     source.addEventListener('ack', (e) => { const { actionId } = JSON.parse(e.data); requests = requests.filter((x) => x.actionId !== actionId); renderRequests(); });
   } catch {
     relay = false; // served by a plain static server: one screen only
@@ -109,7 +129,7 @@ async function connectRelay() {
 }
 
 function publish() {
-  if (!relay || !current) return;
+  if (!relay || !current || !active) return;
   const view = playerView(current.run, { ...state, runCode: current.code });
   fetch(`/api/${SESSION}/player`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(view) }).catch(() => {});
 }
@@ -179,12 +199,36 @@ function renderRequests() {
   }));
 }
 
+// Themes of recent runs on this DM device (decision A6). The code itself stays fully reproducible;
+// only the choice of a new code skips themes that were just played.
+const HISTORY_KEY = 'monsterhulen-bord:history';
+function history() { try { return JSON.parse(localStorage.getItem(HISTORY_KEY)) || []; } catch { return []; } }
+function remember(code, mission) {
+  const list = history();
+  if (list[list.length - 1]?.code === code) return;
+  list.push({ code, ...themeKey(mission) });
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(list.slice(-10))); } catch { /* ignore */ }
+}
+function freshSeed(missionId) {
+  const recent = history().slice(-3);
+  let seed;
+  for (let tries = 0; tries < 40; tries++) {
+    seed = String(1 + Math.floor(Math.random() * 9999));
+    if (!isComposed(missionId)) break;
+    const t = themeKey(resolveMission(content, missionId, seed));
+    if (!recent.some((r) => r.goal === t.goal || r.opener === t.opener)) break;
+  }
+  return seed;
+}
+
 function generate() {
   const missionId = $('#mission').value, length = $('#length').value, seed = $('#seed').value.trim() || '1';
   const accepted = acceptedRun(content, missionId, seed, length);
   if (!accepted) { $('#intro').replaceChildren(el('p', {}, 'Fant ikke et gyldig løp for denne koden. Prøv en annen.')); return; }
   const code = `${missionId}-${length}-${seed}`;
+  remember(code, accepted.run.mission);
   current = { code, ...accepted };
+  requests = requests.filter((r) => r.runCode === code);
   location.hash = `m=${missionId}&l=${length}&s=${seed}`;
   state = load(accepted.run);
   render();
@@ -311,15 +355,19 @@ function needBlock(need) {
 function ladder(node) {
   const first = node.needs.find((n) => !n.local);
   if (!first) return null;
-  const what = first.specific ? first.name : label(first.tag);
+  const clearer = first.via === 'rhyme'
+    ? '«Resten av regla må finnes et sted. Kanskje noen i hulen kan den, eller den står skrevet på en vegg?»'
+    : first.specific ? `«Har du ${first.name.toLowerCase()}? Kanskje i sekken, eller et annet sted i hulen?»`
+      : `«Har du noe som er ${label(first.tag)}? Kanskje i sekken, eller et annet sted i hulen?»`;
   return el('ol', { class: 'ladder' },
     el('li', {}, first.sign ? `Beskriv tegnet: «${first.sign}»` : 'Beskriv det barnet ser og spør hva hun vil gjøre.'),
-    el('li', {}, `Tydeligere: «Har du noe som er ${what}? Kanskje i sekken, eller et annet sted i hulen?»`),
+    el('li', {}, `Tydeligere: ${clearer}`),
     el('li', {}, 'Fortsatt fast? Bruk LØS eller GI LIKEVEL.'),
   );
 }
 
 const KIND = { blocker: 'Hinder', lock: 'Låst dør', machine: 'Maskin', trader: 'Bytter', quest: 'Trenger hjelp', companion: 'Mulig venn', source: 'Kilde', item: 'Ting', target: 'Den dere skal redde', goal: 'Målet', exit: 'Målet', deliver: 'Det som skal leveres' };
+const OPENED = { KEY: 'Låst opp', MAGIC: 'Satt på plass – den åpnes', RHYME: 'Regla er sagt – den åpnes', TAG: 'Det virker – den åpnes' };
 const ACTION = { item: 'Ta', trader: 'Byttet', quest: 'Hjulpet – fikk takk', companion: 'Ble med', source: 'Hentet', blocker: 'Løst', lock: 'Låst opp', machine: 'Maskinen våkner', target: 'Rolig – følger med', goal: 'Funnet!', exit: 'Kom fram!', deliver: 'Plukket opp' };
 
 function nodeCard(node) {
@@ -331,13 +379,18 @@ function nodeCard(node) {
     el('div', { class: 'kind' }, KIND[node.kind] || node.kind),
     el('h3', {}, node.kind === 'item' ? node.item.name : card.name),
     el('p', { class: 'read' }, intro),
+    node.rhyme ? el('div', { class: 'need' },
+      el('div', {}, el('b', {}, 'Regla: '), node.rhyme.lines.join(' ')),
+      el('p', { class: 'hint' }, node.rhyme.shown ? 'Første linje står over døra. Les den høyt når barnet kommer hit.' : 'Ingen linjer står over døra. Alle tre må finnes.'),
+      el('p', { class: 'hint' }, 'Ved døra sier barnet regla høyt, gjerne etter deg. Det er et ritual, ikke en hukommelsestest.'),
+      relay ? el('button', { class: 'small ghost', onclick: () => { state.say = node.rhyme.lines.join(' '); save(); render(); } }, 'Vis regla på iPad') : null) : null,
     node.hidden ? el('p', { class: 'hint' }, 'Søk: terning bare hvis det er usikkert. 1–2 gir et tydeligere spor, ikke funn ennå. Prøver hun igjen, finner hun det.') : null,
     node.cardKind !== 'obstacle' && card.wants ? el('p', {}, el('b', {}, 'Figuren: '), wantsText(card).join(' · ') || '–') : null,
     ...node.needs.map(needBlock),
     gives ? el('p', {}, el('b', {}, gives)) : null,
     !done ? ladder(node) : null,
     done ? el('p', { class: 'hint' }, 'Ferdig.') : el('div', { class: 'actions' },
-      el('button', { onclick: () => resolve(node) }, ACTION[node.kind] || 'Ferdig'),
+      el('button', { onclick: () => resolve(node) }, (node.kind === 'lock' && OPENED[node.opener]) || ACTION[node.kind] || 'Ferdig'),
       node.needs.some((n) => !n.local) ? el('button', { class: 'ghost', onclick: () => resolve(node, { improvised: true }) }, 'GI LIKEVEL') : null,
     ),
   );

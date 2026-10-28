@@ -1,0 +1,161 @@
+{
+  "status": "draft-1",
+  "updated": "2026-10-28",
+  "note": "Deler som settes sammen til oppdrag. Se docs/v2/workshops/2026-10-28_sammensatte_oppdrag.md. Alle ordformer er skrevet ferdig; koden setter bare stor forbokstav.",
+
+  "routes": [
+    ["SOPPSKOGEN", "GRAVPLASSEN", "HEKSETÅRNET", "HEKSETÅRNET"],
+    ["LANTERNEHAGEN", "TÅKESUMPEN", "ZOMBIESLOTTET", "ZOMBIESLOTTET"],
+    ["MÅNESKOGEN", "KRYSTALLGROTTEN", "BEINKATAKOMBENE", "BEINKATAKOMBENE"],
+    ["REGNBUEDALEN", "SKYGGEGANGENE", "KLOKKETÅRNET", "KLOKKETÅRNET"],
+    ["LANTERNEHAGEN", "SOPPSKOGEN", "GRAVPLASSEN", "GRAVPLASSEN"],
+    ["REGNBUEDALEN", "MÅNESKOGEN", "KLOKKETÅRNET", "KLOKKETÅRNET"],
+    ["MÅNESKOGEN", "TÅKESUMPEN", "KRYSTALLGROTTEN", "KRYSTALLGROTTEN"],
+    ["SOPPSKOGEN", "BEINKATAKOMBENE", "ZOMBIESLOTTET", "ZOMBIESLOTTET"],
+    ["TÅKESUMPEN", "KRYSTALLGROTTEN", "SKYGGEGANGENE", "SKYGGEGANGENE"],
+    ["GRAVPLASSEN", "SKYGGEGANGENE", "HEKSETÅRNET", "HEKSETÅRNET"]
+  ],
+
+  "calmSigns": {
+    "MAT": "{who} snuser sultent i lufta.",
+    "MYK": "{who} skjelver og ser lengselsfullt på alt som er mykt.",
+    "MUSIKK": "{who} vugger med hodet hver gang det kommer en lyd.",
+    "VARME": "{who} fryser og kryper sammen til en liten ball.",
+    "LYS": "{who} skvetter i mørket og ser seg rundt etter lys.",
+    "LY": "{who} ser seg rundt etter et sted å krype under.",
+    "LATTER": "{who} prøver å smile, men får det ikke helt til.",
+    "GLITTER": "{who} følger med øynene alt som glitrer."
+  },
+
+  "FINN": {
+    "treasures": [
+      { "id": "KRYSTALLHJERTET", "def": "krystallhjertet", "about": "et hjerte av krystall som gløder svakt" },
+      { "id": "GULLEGGET", "def": "gullegget", "about": "et egg av gull som er varmt å holde i" },
+      { "id": "DRAGEKRONA", "def": "dragekrona", "about": "en liten krone som en drage har glemt" },
+      { "id": "STJERNEKARTET", "def": "stjernekartet", "about": "et kart over alle stjernene på himmelen" },
+      { "id": "SPILLEDASEN", "def": "spilledåsen", "about": "en gammel spilledåse som spiller en vuggevise" },
+      { "id": "FONIKSFJAERA", "def": "føniksfjæra", "about": "ei fjær som brenner uten å bli varm" },
+      { "id": "MANESPEILET", "def": "månespeilet", "about": "et speil som viser månen, selv midt på dagen" },
+      { "id": "TRYLLESTAVEN", "def": "tryllestaven", "about": "en gammel tryllestav som fortsatt glitrer i tuppen" }
+    ],
+    "locks": [
+      { "id": "GLASSDORA", "def": "glassdøra", "short": "døra", "prep": "bak", "openers": ["KEY", "MAGIC", "RHYME", "TAG"],
+        "tag": { "tag": "LYS", "intro": "åpnes bare når lys skinner gjennom glasset.", "sign": "Glasset er mørkt, men det glimter når lys treffer det." } },
+      { "id": "STEINDORA", "def": "steindøra", "short": "døra", "prep": "bak", "openers": ["KEY", "MAGIC", "RHYME", "TAG"],
+        "tag": { "tag": "MUSIKK", "intro": "åpnes bare for musikk.", "sign": "Det er små hull i steinen, som på en fløyte. Det suser svakt." } },
+      { "id": "ROTDORA", "def": "rotdøra", "short": "døra", "prep": "bak", "openers": ["KEY", "RHYME", "TAG"],
+        "tag": { "tag": "VANN", "intro": "åpnes bare når de tørre røttene får vann.", "sign": "Røttene er tørre og har snurpet seg sammen." } },
+      { "id": "BEINPORTEN", "def": "beinporten", "short": "porten", "prep": "bak", "openers": ["KEY", "MAGIC", "RHYME", "TAG"],
+        "tag": { "tag": "MUSIKK", "intro": "åpnes bare for musikk.", "sign": "Knoklene i porten klirrer svakt, som om de vil danse." } },
+      { "id": "ISPORTEN", "def": "isporten", "short": "porten", "prep": "bak", "openers": ["KEY", "MAGIC", "TAG"],
+        "tag": { "tag": "VARME", "intro": "smelter bare med varme.", "sign": "Isen drypper litt der det er varmt." } },
+      { "id": "KNIRKEKISTA", "def": "den knirkende kista", "short": "kista", "prep": "i", "openers": ["KEY", "MAGIC"] },
+      { "id": "GULLKISTA", "def": "gullkista", "short": "kista", "prep": "i", "openers": ["KEY", "MAGIC"] },
+      { "id": "STJERNEPORTALEN", "def": "stjerneportalen", "short": "portalen", "prep": "bak", "openers": ["MAGIC", "RHYME", "TAG"],
+        "tag": { "tag": "LYS", "intro": "åpnes bare når lys faller på den.", "sign": "Portalen er mørk, men stjernene i den blinker når det kommer lys." } }
+    ],
+    "keys": [
+      { "id": "GLASS", "def": "glassnøkkelen", "hole": "Nøkkelhullet er klart som glass.", "zones": ["KRYSTALLGROTTEN", "MÅNESKOGEN"] },
+      { "id": "GULL", "def": "gullnøkkelen", "hole": "Nøkkelhullet har en kant av gull.", "zones": ["ZOMBIESLOTTET", "KLOKKETÅRNET"] },
+      { "id": "BEIN", "def": "beinnøkkelen", "hole": "Rundt nøkkelhullet er det skåret små knokler.", "zones": ["BEINKATAKOMBENE", "GRAVPLASSEN"] },
+      { "id": "IS", "def": "isnøkkelen", "hole": "Nøkkelhullet er dekket av rim.", "zones": ["KRYSTALLGROTTEN", "SKYGGEGANGENE"] },
+      { "id": "SOLV", "def": "sølvnøkkelen", "hole": "Nøkkelhullet skinner som sølv.", "zones": ["MÅNESKOGEN", "LANTERNEHAGEN"] },
+      { "id": "EIK", "def": "eikenøkkelen", "hole": "Nøkkelhullet lukter skog og bark.", "zones": ["SOPPSKOGEN", "TÅKESUMPEN"] },
+      { "id": "MESSING", "def": "messingnøkkelen", "hole": "Nøkkelhullet er gult og blankt.", "zones": ["KLOKKETÅRNET", "HEKSETÅRNET"] },
+      { "id": "KRYSTALL", "def": "krystallnøkkelen", "hole": "Nøkkelhullet glitrer i alle farger.", "zones": ["KRYSTALLGROTTEN", "REGNBUEDALEN"] }
+    ],
+    "magic": [
+      { "id": "MANESTEINEN", "def": "månesteinen", "shape": "formet som en halvmåne", "zones": ["MÅNESKOGEN", "KRYSTALLGROTTEN"] },
+      { "id": "SOLSTEINEN", "def": "solsteinen", "shape": "formet som en sol med stråler", "zones": ["REGNBUEDALEN", "LANTERNEHAGEN"] },
+      { "id": "STJERNEBITEN", "def": "stjernebiten", "shape": "formet som en liten stjerne", "zones": ["KLOKKETÅRNET", "MÅNESKOGEN"] },
+      { "id": "KRYSTALLKULA", "def": "krystallkula", "shape": "rund som en ball", "zones": ["KRYSTALLGROTTEN", "HEKSETÅRNET"] },
+      { "id": "LYSFJAERA", "def": "den lysende fjæra", "shape": "lang og smal som en fjær", "zones": ["LANTERNEHAGEN", "SOPPSKOGEN"] },
+      { "id": "DRAGESKJELLET", "def": "drageskjellet", "shape": "formet som et stort skjell", "zones": ["ZOMBIESLOTTET", "BEINKATAKOMBENE"] }
+    ],
+    "rhymes": [
+      { "id": "BANKE", "lines": ["Kald og stille, blå og grå,", "her står jeg og banker på,", "lukk deg opp, så vi kan gå!"] },
+      { "id": "MANE", "lines": ["Månen lyser, stjerner skinner,", "hulen sover, natten svinner,", "åpne deg for den som finner!"] },
+      { "id": "VENNER", "lines": ["Vinden suser, vannet renner,", "her står en som veien kjenner,", "åpne deg for gode venner!"] },
+      { "id": "BANG", "lines": ["Tikk og takk og bom og bang,", "hør nå på den lille sang,", "lukk deg opp med kling og klang!"] },
+      { "id": "TUR", "lines": ["Ikke sint og ikke sur,", "jeg er snill og jeg er lur,", "åpne deg, så går vi på tur!"] }
+    ],
+    "titles": {
+      "KEY": ["{Key} og {treasure}", "{Treasure} {prep} {lock}"],
+      "MAGIC": ["{Magic} og {treasure}", "{Treasure} {prep} {lock}"],
+      "RHYME": ["Regla ved {lock}", "{Treasure} og den glemte regla"],
+      "TAG": ["{Treasure} {prep} {lock}"]
+    }
+  },
+
+  "REDD": {
+    "creatures": [
+      { "id": "DRAGEN", "def": "den lille dragen", "pron": "den", "calm": ["LYS", "VARME", "MYK"], "problems": ["som var redd for mørket", "som hadde mistet flammen sin"] },
+      { "id": "UGLEUNGEN", "def": "ugleungen", "pron": "den", "calm": ["MYK", "LY", "MUSIKK"], "problems": ["som falt ut av redet", "som ikke fant mamma"] },
+      { "id": "REVEUNGEN", "def": "reveungen", "pron": "den", "calm": ["MAT", "LATTER", "MYK"], "problems": ["som gikk seg vill", "som ble redd for sitt eget ekko"] },
+      { "id": "SPOKELSESVALPEN", "def": "spøkelsesvalpen", "pron": "den", "calm": ["LATTER", "MUSIKK", "MAT"], "problems": ["som gjemte seg i mørket", "som ikke fant veien hjem"] },
+      { "id": "FLAGGERMUSA", "def": "den lille flaggermusa", "pron": "den", "calm": ["MYK", "MAT", "LY"], "problems": ["som fløy seg vill", "som var redd for å fly"] },
+      { "id": "ENHJORNINGFOLLET", "def": "enhjørningføllet", "pron": "det", "calm": ["MAT", "GLITTER", "MUSIKK"], "problems": ["som hadde gått seg vill", "som hadde mistet glansen sin"] }
+    ]
+  },
+
+  "SAMLE": {
+    "devices": [
+      { "id": "FONTENEN", "def": "regnbuefontenen", "title": "Regnbuefontenen", "socket": "En av de små skålene", "pool": ["VANN", "LYS", "GLITTER", "DUFT", "MUSIKK", "JORD"],
+        "intro": "En gammel fontene har sluttet å sprute. Tre små skåler rundt kanten venter på hver sin ting." },
+      { "id": "GRUVETOGET", "def": "gruvetoget", "title": "Det gamle gruvetoget", "socket": "En av lukene på toget", "pool": ["VARME", "METALL", "REPARASJON", "LUFT", "LYS", "MUSIKK"],
+        "intro": "Et lite gruvetog står stille på skinnene. Det trenger tre ting for å komme i gang igjen." },
+      { "id": "HEKSEGRYTA", "def": "heksegryta", "title": "Den tomme heksegryta", "socket": "En av boblene på kanten av gryta", "pool": ["DUFT", "MAT", "VARME", "VANN", "GLITTER", "JORD"],
+        "intro": "Heksegryta er kald og tom. Det trengs tre ting for at trylledrikken skal boble igjen." },
+      { "id": "KIKKERTEN", "def": "stjernekikkerten", "title": "Stjernekikkerten som ikke virker", "socket": "Et av glassene i kikkerten", "pool": ["LYS", "GLITTER", "REPARASJON", "LUFT", "METALL", "KULDE"],
+        "intro": "En stor kikkert peker opp mot taket i hulen. Tre glass er tomme, og ingen kan se stjernene." },
+      { "id": "LYSFYRET", "def": "lysfyret", "title": "Lysfyret under jorda", "socket": "En av lampene i fyret", "pool": ["LYS", "ILD", "VARME", "GLITTER", "LUFT", "METALL"],
+        "intro": "Dypt nede står et lite fyr som skal lyse for alle i hulen. Tre lamper er slukket." },
+      { "id": "VINDHJULET", "def": "vindhjulet", "title": "Vindhjulet som stoppet", "socket": "Et av bladene på hjulet", "pool": ["LUFT", "VANN", "REPARASJON", "MUSIKK", "METALL", "JORD"],
+        "intro": "Et stort hjul pleide å blåse frisk luft gjennom hulen. Nå står det stille." }
+    ]
+  },
+
+  "LEVER": {
+    "owners": [
+      { "id": "TROLLUNGEN", "def": "trollungen", "gen": "trollungens", "things": ["BAMSE", "HATT", "FLOYTE"] },
+      { "id": "POSTSNEGLA", "def": "postsnegla", "gen": "postsneglas", "things": ["BREV", "KART"] },
+      { "id": "BESTEMOR_UGLE", "def": "bestemor ugle", "gen": "bestemor ugles", "things": ["BRILLER", "BOK", "STRIKKETOY"] },
+      { "id": "MULDVARPEN", "def": "den gamle muldvarpen", "gen": "den gamle muldvarpens", "things": ["BRILLER", "LYKT", "KART"] },
+      { "id": "DRAGEMAMMAEN", "def": "dragemammaen", "gen": "dragemammaens", "things": ["TEPPE", "BOK", "HATT"] },
+      { "id": "SPOKELSET", "def": "det lille spøkelset", "gen": "det lille spøkelsets", "things": ["LAKEN", "FLOYTE", "BAMSE"] }
+    ],
+    "things": [
+      { "id": "BAMSE", "base": "bamse", "def": "bamsen", "pron": "den" },
+      { "id": "HATT", "base": "hatt", "def": "hatten", "pron": "den" },
+      { "id": "FLOYTE", "base": "fløyte", "def": "fløyta", "pron": "den" },
+      { "id": "BREV", "base": "brev", "def": "brevet", "pron": "det" },
+      { "id": "KART", "base": "kart", "def": "kartet", "pron": "det" },
+      { "id": "BRILLER", "base": "briller", "def": "brillene", "pron": "dem" },
+      { "id": "BOK", "base": "bok", "def": "boka", "pron": "den" },
+      { "id": "STRIKKETOY", "base": "strikketøy", "def": "strikketøyet", "pron": "det" },
+      { "id": "LYKT", "base": "lykt", "def": "lykta", "pron": "den" },
+      { "id": "TEPPE", "base": "teppe", "def": "teppet", "pron": "det" },
+      { "id": "LAKEN", "base": "laken", "def": "lakenet", "pron": "det" }
+    ],
+    "places": [
+      { "id": "KROKEN", "def": "den mørke kroken", "where": "i den mørke kroken" },
+      { "id": "REDET", "def": "det store fuglereiret", "where": "i det store fuglereiret" },
+      { "id": "BRONNEN", "def": "den gamle brønnen", "where": "på bunnen av den gamle brønnen" },
+      { "id": "SOPPHAUGEN", "def": "sopphaugen", "where": "under sopphaugen" },
+      { "id": "STAMMEN", "def": "den hule trestammen", "where": "inni den hule trestammen" },
+      { "id": "SKJAERA", "def": "skjæras skattekammer", "where": "i skjæras skattekammer" }
+    ],
+    "titles": ["{OwnerGen} {base}", "{Def} som ble borte"]
+  },
+
+  "KOM_UT": {
+    "exits": [
+      { "id": "TRAPPA", "def": "trappa opp til slottet", "title": "Den hemmelige trappa", "intro": "Dypt inne i hulen går en hemmelig trapp opp til et slott. Finn den!" },
+      { "id": "BATEN", "def": "båten ved sjøen", "title": "Båten på den underjordiske sjøen", "intro": "Langt inne ligger en stille sjø med en liten båt. Kommer dere dit, kan dere ro hjem." },
+      { "id": "BALLONGEN", "def": "ballongen i tårnet", "title": "Ballongen i det høye tårnet", "intro": "Øverst i et tårn inne i hulen står en luftballong. Med den kan dere fly hjem." },
+      { "id": "TUNNELEN", "def": "tunnelen til enga", "title": "Tunnelen til blomsterenga", "intro": "En smal tunnel fører ut til en eng full av blomster. Finn veien dit!" },
+      { "id": "REGNBUEBRUA", "def": "regnbuebrua", "title": "Regnbuebrua", "intro": "Innerst i hulen begynner en bro av regnbue som går helt hjem." },
+      { "id": "HEISEN", "def": "gruveheisen", "title": "Den knirkende gruveheisen", "intro": "En gammel heis kan ta dere rett opp til lyset. Den står langt inne i gruvegangene." }
+    ]
+  }
+}

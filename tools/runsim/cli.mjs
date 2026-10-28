@@ -9,6 +9,7 @@ import { acceptedRun as acceptFor } from './accept.mjs';
 import { playthrough, bypassCheck } from './playthrough.mjs';
 import { dmTemplate, chainSignature } from './report.mjs';
 import { LENGTHS } from './map.mjs';
+import { missionIds } from './theme.mjs';
 
 const args = Object.fromEntries(process.argv.slice(2).map((a, i, all) => (a.startsWith('--') ? [a.slice(2), all[i + 1]?.startsWith('--') || all[i + 1] === undefined ? true : all[i + 1]] : null)).filter(Boolean));
 const content = loadContent();
@@ -29,7 +30,7 @@ if (args.selftest) {
 
 function batch(n) {
   let allOk = true;
-  for (const mission of content.missions) {
+  for (const missionId of missionIds(content)) {
     for (const length of Object.keys(LENGTHS)) {
       const shapes = new Map();
       const figures = new Map();
@@ -37,7 +38,7 @@ function batch(n) {
       let failed = 0;
       let attempts = 0;
       for (let seed = 1; seed <= n; seed++) {
-        const a = acceptedRun(mission.id, seed, length);
+        const a = acceptedRun(missionId, seed, length);
         if (!a) { failed++; continue; }
         attempts += a.attempts;
         const sig = chainSignature(a.run);
@@ -51,7 +52,7 @@ function batch(n) {
       if (failed) allOk = false;
       const topShare = okRuns ? Math.max(...shapes.values()) / okRuns : 0;
       const totalTypes = [...types.values()].reduce((a, b) => a + b, 0) || 1;
-      console.log(`${mission.id.padEnd(16)} ${length.padEnd(6)} ok ${String(okRuns).padStart(4)}/${n}  forsøk/run ${(attempts / Math.max(1, okRuns)).toFixed(2)}  kjedeformer ${String(shapes.size).padStart(4)}  vanligste ${(topShare * 100).toFixed(1)}%  figurer brukt ${figures.size}`);
+      console.log(`${missionId.padEnd(16)} ${length.padEnd(6)} ok ${String(okRuns).padStart(4)}/${n}  forsøk/run ${(attempts / Math.max(1, okRuns)).toFixed(2)}  kjedeformer ${String(shapes.size).padStart(4)}  vanligste ${(topShare * 100).toFixed(1)}%  figurer brukt ${figures.size}`);
       console.log(`${''.padEnd(24)} kildetyper: ${[...types.entries()].sort((a, b) => b[1] - a[1]).map(([t, c]) => `${t} ${Math.round((100 * c) / totalTypes)}%`).join(', ')}`);
     }
   }
@@ -63,8 +64,9 @@ function selftest() {
   let checked = 0;
   const misses = [];
   for (let seed = 1; seed <= 300; seed++) {
-    for (const mission of content.missions) {
-      const a = acceptedRun(mission.id, seed, 'VANLIG');
+    for (const missionId of missionIds(content)) {
+      const mission = { id: missionId };
+      const a = acceptedRun(missionId, seed, 'VANLIG');
       if (!a) continue;
       const run = a.run;
 

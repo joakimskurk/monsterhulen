@@ -26,6 +26,7 @@ export function dmTemplate(content, run, result) {
     if (depth === 0) {
       const gate = node.gate ? ` – sperrer veien inn til sone ${node.gate}` : '';
       lines.push(`${pad}• ${node.card.name}${room}${gate}`);
+      if (node.rhyme) lines.push(`${pad}   REGLA: ${node.rhyme.lines.join(' ')}${node.rhyme.shown ? ' (første linje står over døra)' : ''}`);
     } else {
       const how = TYPE_TEXT[node.sourceType] || '';
       const what = node.kind === 'companion' ? `${node.card.name} (kan: ${node.ability.map(tag).join(', ')})` : node.item?.name;

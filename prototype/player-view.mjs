@@ -35,7 +35,7 @@ export function playerView(run, state) {
   const things = [];
   for (const n of run.nodes) {
     if (n.room !== here || done.has(n.id)) continue;
-    if (n.kind === 'item') { if (!n.hidden) things.push({ id: n.id, kind: 'item', name: n.item.name, text: `Her ligger ${n.item.name.toLowerCase()}.` }); continue; }
+    if (n.kind === 'item') { if (!n.hidden) things.push({ id: n.id, kind: 'item', name: n.item.name, text: n.item.found || `Her ligger ${n.item.name.toLowerCase()}.` }); continue; }
     if (FIGURE_KINDS.has(n.kind)) things.push({ id: n.id, kind: 'figure', name: n.card.name, text: n.card.intro || '' });
   }
   for (const a of run.alternatives) if (a.room === here && !done.has(`alt:${a.room}`)) things.push({ id: `alt:${a.room}`, kind: 'item', name: a.item, text: `Her ligger ${a.item.toLowerCase()}.` });

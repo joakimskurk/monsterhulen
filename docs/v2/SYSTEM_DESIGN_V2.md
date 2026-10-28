@@ -58,7 +58,9 @@ OPPDRAG  →  HULEN  →  ROM FOR ROM  →  MÅLET  →  HJEM  →  HELTEBOKA
 | SAMLE | 3 ting med ulike merker til en maskin eller gryte |
 | KOM UT | finn veien gjennom til den andre utgangen |
 
-Dagens fire eventyr (GLASS_HEART, WITCH_CAT, CRYSTAL_MACHINE, ZOMBIE_DELIVERY) blir oppdragskort med fast tema. Premiss og tekst beholdes. Hver type har nå tre tema (15 oppdrag, `content/missions.json`). Et nytt tema er bare data; kjeden bygges uansett fra matrisen.
+**Sammensatte oppdrag (2026-10-28).** Oppdraget settes sammen av deler ut fra koden, akkurat som kjeden: *type × mål × det som stenger × det som åpner × rute* (`content/themes.json`, `tools/runsim/theme.mjs`). FINN har fire åpnere med ulik spillopplevelse: **nøkkel** av et materiale som passer stedet, **magisk gjenstand** som passer i en form i døra, **regle** i tre linjer som samles fra ulike kilder og sies høyt ved døra, og **element** (musikk, lys, varme eller vann). Kister står i målrommet med skatten i seg. Tittelen lages av delene, for eksempel «Beinnøkkelen og dragekrona» eller «Regla ved steindøra». Forteller-enheten unngår mål og åpnere fra de siste løpene. Avgjørelsene ble drøftet i en simulert workshop: `docs/v2/workshops/2026-10-28_sammensatte_oppdrag.md`.
+
+Dagens fire eventyr (GLASS_HEART, WITCH_CAT, CRYSTAL_MACHINE, ZOMBIE_DELIVERY) og «Ut på andre siden» er **klassikere** med fast tema (`content/missions.json`).
 
 **Lengde:** KORT (5–7 rom, kjede 1–2 ledd), VANLIG (9–13 rom, 2–3 ledd), STORT (15–17 rom, 3–4 ledd). Kjedens dybde styres også av barnets alder.
 
