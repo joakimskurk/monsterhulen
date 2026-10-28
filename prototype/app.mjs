@@ -2,10 +2,10 @@
 // generator and playthrough automaton as tools/runsim. State lives in localStorage per run code.
 import { buildContent, CONTENT_FILES } from '../tools/lib/content-core.mjs';
 import { acceptedRun } from '../tools/runsim/accept.mjs';
-import { reachable } from '../tools/runsim/map.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView, layoutMap } from './player-view.mjs';
+import * as table from './table.mjs';
 
 const $ = (sel) => document.querySelector(sel);
 const el = (tag, attrs = {}, ...kids) => {
@@ -63,9 +63,6 @@ async function loadContent() {
 const label = (tag) => content.tagById.get(tag)?.label || tag;
 const storageKey = (code) => `monsterhulen-bord:${code}`;
 
-function freshState(run) {
-  return { here: run.map.start, visited: [run.map.start], done: [], openGates: [], inventory: [], companions: [], log: ['Eventyret begynner ved inngangen.'] };
-}
 function save() { try { localStorage.setItem(storageKey(current.code), JSON.stringify(state)); } catch { /* private mode: play without saving */ } }
 function load(run) {
   try { const s = JSON.parse(localStorage.getItem(storageKey(current.code))); if (s) return s; } catch { /* ignore */ }
@@ -140,70 +137,17 @@ function ack(r) {
   if (relay) fetch(`/api/${SESSION}/ack`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ actionId: r.actionId }) }).catch(() => {});
 }
 
-function consumableByName(name) {
-  const card = content.items.find((i) => i.name === name);
-  return card ? card.consumable !== false : true;
-}
-
-function thingName(id) {
-  if (id.startsWith('alt:')) return current.run.alternatives.find((a) => `alt:${a.room}` === id)?.item;
-  if (id.startsWith('amb:')) return current.run.ambient.find((a) => `amb:${a.room}` === id)?.figure.name;
-  const n = nodeById(id);
-  return n?.kind === 'item' ? n.item.name : n?.card.name;
-}
-
-// ---------- needs one at a time ----------
-// A goal or machine with several needs (free the dragon, then calm it; three sockets) can be met
-// step by step. Met needs are stored per node; the node resolves when the last one is met.
-const metOf = (node) => state.needsMet?.[node.id] || [];
-const openNeeds = (node) => node.needs.map((n, i) => i).filter((i) => !node.needs[i].local && !metOf(node).includes(i));
-
-// Tags of something in the backpack, looked up by name in this run and in the item cards.
-function tagsOfName(name) {
-  const fromRun = current.run.nodes.find((n) => n.item?.name === name)?.item?.tags;
-  return fromRun || content.items.find((i) => i.name === name)?.tags || [];
-}
-
-// Which open need a given thing or friend answers. Falls back to the first open need: the DM already said it works.
-function needFor(node, { given, friend }) {
-  const open = openNeeds(node);
-  const fits = (i) => {
-    const need = node.needs[i];
-    const p = need.provider && nodeById(need.provider);
-    if (given) return p?.item?.name === given || (need.tag && tagsOfName(given).includes(need.tag));
-    if (friend) { const f = current.run.nodes.find((n) => n.kind === 'companion' && n.card.name === friend); return !!(need.tag && f?.ability.includes(need.tag)); }
-    return false;
-  };
-  return open.find(fits) ?? open[0];
-}
-
-// `handedOver`: the child already gave the thing from the iPad (acceptThing removed it).
-function markNeed(node, i, { improvised = false, handedOver = false } = {}) {
-  if (isDone(node.id) || metOf(node).includes(i)) return;
-  if (!handedOver) spendNeed(node.needs[i]);
-  state.needsMet = { ...(state.needsMet || {}), [node.id]: [...metOf(node), i] };
-  if (!openNeeds(node).length) { resolve(node, { improvised }); return; }
-  const need = node.needs[i];
-  const left = openNeeds(node).length;
-  log(`${node.card.name}: ${need.specific ? need.name : label(need.tag)} er på plass. ${left} igjen.${improvised ? ' (Forteller bestemte)' : ''}`);
-  save(); render();
-}
-
-function acceptThing(id, { given, friend } = {}) {
-  if (isDone(id)) { render(); return; }
-  if (given) {
-    const i = state.inventory.indexOf(given);
-    if (i >= 0 && consumableByName(given)) state.inventory.splice(i, 1);
-  }
-  if (id.startsWith('alt:')) {
-    const a = current.run.alternatives.find((x) => `alt:${x.room}` === id);
-    state.inventory.push(a.item); state.done.push(id); log(`Tok ${a.item}.`); save(); render(); return;
-  }
-  if (id.startsWith('amb:')) { state.done.push(id); log(`${thingName(id)} er fornøyd.`); save(); render(); return; }
-  const node = nodeById(id);
-  if (openNeeds(node).length > 1) { markNeed(node, needFor(node, { given, friend }), { handedOver: !!given }); return; }
-  resolve(node);
-}
+// ---------- table rules (prototype/table.mjs, shared with tests/v2/table-play.test.mjs) ----------
+// Every action changes the state through table.mjs, then this page saves and redraws.
+const T = () => ({ content, run: current.run, state });
+const act = (fn) => (...args) => { fn(T(), ...args); save(); render(); };
+const freshState = table.freshState;
+const metOf = (node) => table.metOf(T(), node);
+const openNeeds = (node) => table.openNeeds(T(), node);
+const markNeed = act(table.markNeed);
+const acceptThing = act(table.acceptThing);
+const resolve = act(table.resolve);
+const goTo = act(table.goTo);
 
 function renderRequests() {
   // Requests about something already handled (double taps) are settled silently.
@@ -275,9 +219,9 @@ function generate() {
 
 // ---------- derived ----------
 
-const nodeById = (id) => current.run.nodes.find((n) => n.id === id);
-const isDone = (key) => state.done.includes(key);
-const reach = () => reachable(current.run.map, { openGates: new Set(state.openGates) });
+const nodeById = (id) => table.nodeById(T(), id);
+const isDone = (key) => table.isDone(T(), key);
+const reach = () => table.reach(T());
 
 function providerText(id) {
   const p = nodeById(id);
@@ -295,43 +239,6 @@ function wantsText(card) {
     if (w.type === 'MISTET') return `har mistet ${w.what}`;
     return w.task;
   }).filter(Boolean);
-}
-
-// ---------- actions ----------
-
-function spendFor(node) {
-  node.needs.forEach((need, index) => { if (!metOf(node).includes(index)) spendNeed(need); }); // met earlier: already handed over
-}
-
-// Removes what one need used up. Ingredients always go into what is made; a filled container is emptied.
-function spendNeed(need) {
-  if (!need.provider) return;
-  const p = nodeById(need.provider);
-  if (p?.kind === 'companion' || need.via === 'tool') return;
-  const i = state.inventory.indexOf(p?.item?.name);
-  if (i >= 0 && (p.item.consumable || need.via === 'fill' || need.via === 'ingredient')) state.inventory.splice(i, 1);
-}
-
-function resolve(node, { improvised = false } = {}) {
-  if (!node || isDone(node.id)) return; // a second tap on the iPad must not give twice
-  const note = improvised ? ' (Forteller bestemte)' : '';
-  spendFor(node);
-  if (['blocker', 'lock', 'machine'].includes(node.kind)) { state.openGates.push(node.gate); log(`${node.card.name} er løst – veien videre er åpen.${note}`); }
-  else if (node.kind === 'companion') { state.companions.push(node.card.name); log(`${node.card.name} ble med!${note}`); }
-  else if (node.kind === 'target') { state.companions.push(node.card.name); state.say = `${node.card.name} følger med deg. Ta den trygt med hjem!`; log(`${node.card.name} er rolig og følger med hjem.${note}`); }
-  else if (['goal', 'exit'].includes(node.kind)) { state.say = `Du klarte det! ${node.card.name}! 🎉`; log(`Dere nådde ${node.card.name}! 🎉${note}`); }
-  else if (node.kind === 'deliver') { state.inventory.push(node.item.name); log(`Fant ${node.item.name}.${note}`); }
-  else if (node.item) { state.inventory.push(node.item.name); log(`${node.kind === 'item' ? 'Tok' : 'Fikk'} ${node.item.name}${node.kind === 'item' ? '' : ` (${node.card.name})`}.${note}`); }
-  state.done.push(node.id);
-  save(); render();
-}
-
-function goTo(roomId) {
-  if (!reach().has(roomId)) { state.selected = roomId; render(); return; }
-  state.here = roomId;
-  state.selected = roomId;
-  if (!state.visited.includes(roomId)) { state.visited.push(roomId); log(`Gikk inn i rom ${roomId}.`); }
-  save(); render();
 }
 
 // ---------- render ----------
