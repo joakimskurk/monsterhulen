@@ -47,8 +47,9 @@ const icon = (v, name) => v.icons?.[name] || '❔';
 const pic = (value) => (String(value).startsWith('assets/') ? el('img', { class: 'thumb', src: `/${value}`, alt: '' }) : el('span', { class: 'icon' }, value));
 const chip = (v, name, onclick) => el('button', { class: 'ghost chipbtn', ...(onclick ? { onclick } : {}) }, pic(icon(v, name)), ' ', name);
 
+let queued = null; // a magnifier tap while waiting: sent when the answer comes, never lost
 async function request(type, payload) {
-  if (waiting) return;
+  if (waiting) { if (type === 'SEARCH') queued = { type, payload }; return; }
   waiting = true;
   document.body.classList.add('waiting');
   const actionId = crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random()}`;
@@ -67,7 +68,10 @@ function connect() {
   $('#game').hidden = false;
   status('Kobler til …');
   const source = new EventSource(`/api/${code}/player-stream`);
-  source.addEventListener('view', (e) => { view = JSON.parse(e.data); waiting = false; document.body.classList.remove('waiting'); status(''); render(); });
+  source.addEventListener('view', (e) => {
+    view = JSON.parse(e.data); waiting = false; document.body.classList.remove('waiting'); status(''); render();
+    if (queued && !view.roll) { const q = queued; queued = null; request(q.type, { ...q.payload, room: view.here }); } else queued = null;
+  });
   source.onerror = () => status('Mistet kontakten. Prøver igjen …');
   // An old code from last time that no DM is using any more: ask for the new one.
   if (fromStore) setTimeout(() => { if (!view) { source.close(); $('#game').hidden = true; $('#join').hidden = false; $('#code').value = code; } }, 6000);

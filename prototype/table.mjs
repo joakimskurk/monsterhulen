@@ -250,15 +250,20 @@ export const DICE_HINTS = {
 const nextRollId = (t) => (t.state.rollCount = (t.state.rollCount || 0) + 1);
 const hiddenHere = (t, room) => t.run.nodes.filter((n) => n.kind === 'item' && n.hidden && n.room === room && !isDone(t, n.id));
 
+// ✓ on the child's map: she is done looking here, because she found what was hidden or there was
+// nothing. Not after a low roll, which says «noe er gjemt her, prøv igjen» (owner: the ✓ came too early
+// or too late); the 🔍 stays until she has found it.
+export function markLooked(t, room) { t.state.looked = [...new Set([...(t.state.looked || []), room])]; }
+
 // «SE DEG RUNDT»: if something is hidden here, the iPad asks for the die; otherwise she just looks.
 export function search(t, room = t.state.here) {
-  t.state.looked = [...new Set([...(t.state.looked || []), room])]; // the 🔍 on the map goes away
   if (hiddenHere(t, room).length) {
     t.state.roll = { id: nextRollId(t), kind: 'search', room, text: 'Kast terningen for å lete!' };
     log(t, `Du leter i ${t.run.map.rooms[room].name}. Kast terningen!`);
     return true;
   }
   log(t, 'Du ser deg rundt, men finner ingenting.');
+  markLooked(t, room);
   return false;
 }
 
@@ -278,7 +283,7 @@ export function rolled(t, value) {
   if (roll.kind === 'search') {
     t.state.searchTries = { ...(t.state.searchTries || {}), [roll.room]: ((t.state.searchTries || {})[roll.room] || 0) + 1 };
     const found = band !== 'low' || t.state.searchTries[roll.room] >= 2;
-    if (found) { const n = hiddenHere(t, roll.room)[0]; t.state.say = null; if (n) resolve(t, n); return { band, found: true }; }
+    if (found) { const n = hiddenHere(t, roll.room)[0]; t.state.say = null; if (n) resolve(t, n); if (!hiddenHere(t, roll.room).length) markLooked(t, roll.room); return { band, found: true }; }
     log(t, `Terningen viste ${value}. Du finner ingenting ennå, men noe er gjemt her. Prøv igjen!`);
     t.state.say = 'Noe er gjemt her … Prøv å se deg rundt én gang til!';
     return { band, found: false };

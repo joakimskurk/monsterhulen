@@ -59,3 +59,27 @@ for (const missionId of missionIds(content)) {
 }
 assert.ok(searches > 0 && fitChecks > 0);
 console.log(`dice test: ${searches} searches (fail-forward on 1–2), empty rooms ask no die, ${fitChecks} «obviously fits» checks, OK`);
+
+// The ✓ on the child's map (owner: «noen ganger trykke to ganger for at det skal gå i V»): it comes when
+// she is done looking: at once in a room with nothing hidden, after the find in a room with something
+// hidden, and never after a low roll that says «prøv igjen».
+{
+  let checked = 0;
+  for (const missionId of missionIds(content)) for (let seed = 1; seed <= 10; seed++) {
+    const { run } = acceptedRun(content, missionId, seed, 'VANLIG');
+    const hiddenRoom = run.nodes.find((n) => n.kind === 'item' && n.hidden)?.room;
+    const emptyRoom = run.map.rooms.find((r) => !run.nodes.some((n) => n.kind === 'item' && n.hidden && n.room === r.id)).id;
+    const t = { content, run, state: table.freshState(run) };
+    table.search(t, emptyRoom);
+    assert.ok(t.state.looked.includes(emptyRoom), `${missionId}/${seed}: no ✓ after looking in an empty room`);
+    if (hiddenRoom === undefined) continue;
+    table.search(t, hiddenRoom);
+    table.rolled(t, 1);
+    assert.ok(!t.state.looked.includes(hiddenRoom), `${missionId}/${seed}: ✓ after a low roll that says «prøv igjen»`);
+    table.search(t, hiddenRoom);
+    table.rolled(t, 1);
+    assert.ok(t.state.looked.includes(hiddenRoom), `${missionId}/${seed}: no ✓ after the second try found it`);
+    checked++;
+  }
+  console.log(`looked-around ✓: ${checked} rooms with something hidden get ✓ only after the find, empty rooms at once, OK`);
+}

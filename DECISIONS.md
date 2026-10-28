@@ -4,6 +4,13 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - ✓ when she is done looking, and no lost taps on the magnifier
+
+The owner sometimes had to press «se deg rundt» twice before the room got its ✓.
+
+- **✓ means she is done looking:** at once in a room with nothing hidden, or when what was hidden is found. After a low roll the game says «noe er gjemt her, prøv igjen». The map used to show ✓ anyway, so the two contradicted each other. Now the 🔍 stays until she has found it. The DM's own buttons follow the same rule. This is tested in `tests/v2/dice.test.mjs`.
+- **A tap on the magnifier while the iPad waits** for an answer is no longer dropped. It is sent as soon as the answer comes. Before, a tap right after another one did nothing, and she had to tap again.
+
 ## 2026-10-28 - Walking far: tap a room, and the avatar walks the way
 
 Owner: tapping through every room is clumsy when the way is long. «Kanskje vi kan trykke på rom langt vekk, og avataren vår vandrer da veien … Da skjer det noe visuelt samtidig som DM har tid til å forberede seg på neste replikk.»
