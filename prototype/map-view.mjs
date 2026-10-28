@@ -6,7 +6,7 @@
 // model = {
 //   bounds: { minX, minY, maxX, maxY },                     the grid to draw; outside rooms is fog
 //   rooms:  [{ id, x, y, w, h, look: 'here' | 'visited' | 'unexplored', canGo, label, corner }],
-//   doors:  [{ x, y, dir: 'n'|'e'|'s'|'w', kind: 'open' | 'locked' | 'loop' | 'secret', draw }],   see doorsFor
+//   doors:  [{ x, y, dir: 'n'|'e'|'s'|'w', kind: 'open' | 'closed' | 'locked' | 'loop' | 'secret', draw }],   see doorsFor
 //   probes: [{ x, y, room, locked }],                        «?» or 🔒 in the fog beyond an exit
 // }
 const ROOT = '/assets/tileset/v3-map/';
@@ -33,7 +33,8 @@ const STYLE = `
 /* A door is an opening through the wall: the walls stay, and floor stones are laid across both walls
    (each wall is 6 of 32 pixels) where the door is, so you see a passage of the same stones as the floor.
    Drawn once, centred on the boundary. Open: just the opening with dark edges; locked: a wooden door in
-   the opening with a lock; extra passage: the opening with stone edges; secret (DM only): dashed pink. */
+   the opening with a lock; closed (not walked through yet): the same wooden door without the lock;
+   extra passage: the opening with stone edges; secret (DM only): dashed pink. */
 .cave-tile .door { position: absolute; z-index: 4; pointer-events: none; box-sizing: border-box; --t: calc(var(--cell) * .42); --edge: max(2px, calc(var(--cell) * .05));
   background: url('/assets/tileset/v3-map/floors-1.png') center / var(--cell) var(--cell); image-rendering: pixelated; }
 .cave-tile .door.dir-e, .cave-tile .door.dir-w { top: 25%; height: 50%; width: var(--t); }
@@ -52,7 +53,7 @@ const STYLE = `
 .cave-tile .door.dir-e .leaf.in, .cave-tile .door.dir-w .leaf.out { right: 50%; }
 .cave-tile .door.dir-s .leaf.out, .cave-tile .door.dir-n .leaf.in { top: 50%; }
 .cave-tile .door.dir-s .leaf.in, .cave-tile .door.dir-n .leaf.out { bottom: 50%; }
-.cave-tile .door.locked { background: #8a5a2b; border: 2px solid #3b2210 !important; box-shadow: inset 0 0 0 2px #a8743d; }
+.cave-tile .door.locked, .cave-tile .door.closed { background: #8a5a2b; border: 2px solid #3b2210 !important; box-shadow: inset 0 0 0 2px #a8743d; }
 .cave-tile .door.locked::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; min-width: 5px; min-height: 5px; transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; }
 .cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
 /* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
@@ -165,7 +166,16 @@ export function caveGrid(model, { maxWidth = null, onRoom = null } = {}) {
 // Doors for the rooms that are drawn: one entry per drawn room side, and the door itself is drawn once
 // (`draw`), as an opening across the boundary between the two rooms. An open door's leaf turns into the
 // room farther from the entrance (`into`: 'out' across the boundary, 'in' into the room it is drawn from).
-// kindOf(edge) -> 'open' | 'locked' | 'loop' | 'secret' | null (not drawn); depth = distance from the entrance.
+// What a door looks like now: locked until its gate is open, closed until the child has walked through
+// it, then open (a leaf swung into the room farther in). Secret doors: `secret` (DM) or null (child).
+export function doorKind(state, edges, { secret = null } = {}) {
+  const openGates = new Set(state.openGates);
+  const passed = new Set(state.passed || []);
+  return (e) => (e.secret ? secret : e.gate !== null && !openGates.has(e.gate) ? 'locked'
+    : !passed.has(edges.indexOf(e)) ? 'closed' : e.loop ? 'loop' : 'open');
+}
+
+// kindOf(edge) -> 'open' | 'closed' | 'locked' | 'loop' | 'secret' | null (not drawn); depth = distance from the entrance.
 export function doorsFor(edges, drawn, kindOf, depth = {}) {
   const opp = { n: 's', e: 'w', s: 'n', w: 'e' };
   const out = [];

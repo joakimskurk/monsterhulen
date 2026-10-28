@@ -4,7 +4,7 @@
 import { reachable } from '../tools/runsim/map.mjs';
 
 export function freshState(run) {
-  return { here: run.map.start, visited: [run.map.start], done: [], openGates: [], inventory: [], companions: [], log: ['Eventyret begynner ved inngangen.'] };
+  return { here: run.map.start, visited: [run.map.start], done: [], openGates: [], passed: [], inventory: [], companions: [], log: ['Eventyret begynner ved inngangen.'] };
 }
 
 const log = (t, text) => t.state.log.push(text);
@@ -122,6 +122,10 @@ export function goTo(t, roomId) {
   const { state } = t;
   state.selected = roomId;
   if (!reach(t).has(roomId)) return;
+  // The door she walks through opens and stays open (owner: «dører åpner ikke før man går inn»).
+  const from = state.here;
+  const door = t.run.map.edges.findIndex((e) => (e.a === from && e.b === roomId) || (e.b === from && e.a === roomId));
+  if (door >= 0) { state.passed = state.passed || []; if (!state.passed.includes(door)) state.passed.push(door); }
   state.here = roomId;
   if (!state.visited.includes(roomId)) { state.visited.push(roomId); log(t, `Gikk inn i rom ${roomId}.`); }
 }

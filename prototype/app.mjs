@@ -5,7 +5,7 @@ import { acceptedRun } from '../tools/runsim/accept.mjs';
 import { dmTemplate } from '../tools/runsim/report.mjs';
 import { COMPOSED, isComposed, resolveMission, themeKey } from '../tools/runsim/theme.mjs';
 import { playerView } from './player-view.mjs';
-import { caveGrid, doorsFor, caveBounds } from './map-view.mjs';
+import { caveGrid, doorsFor, doorKind, caveBounds } from './map-view.mjs';
 import * as table from './table.mjs';
 import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
 import { caveOverview } from './overview.mjs';
@@ -68,7 +68,12 @@ const storageKey = (code) => `monsterhulen-bord:${code}`;
 
 function save() { try { localStorage.setItem(storageKey(current.code), JSON.stringify(state)); } catch { /* private mode: play without saving */ } }
 function load(run) {
-  try { const s = JSON.parse(localStorage.getItem(storageKey(current.code))); if (s) return s; } catch { /* ignore */ }
+  try {
+    const s = JSON.parse(localStorage.getItem(storageKey(current.code)));
+    // Saved before doors were remembered: count a door between two visited rooms as walked through.
+    if (s && !s.passed) s.passed = run.map.edges.flatMap((e, i) => (!e.secret && s.visited.includes(e.a) && s.visited.includes(e.b) ? [i] : []));
+    if (s) return s;
+  } catch { /* ignore */ }
   return freshState(run);
 }
 function log(text) { state.log.push(text); }
@@ -445,7 +450,6 @@ function renderMap() {
   // door including secret ones, and the rooms behind a closed gate darker (prototype/map-view.mjs).
   const { map } = current.run;
   const open = reach();
-  const openGates = new Set(state.openGates);
   $('#map').replaceChildren(caveGrid({
     bounds: caveBounds(map.rooms),
     // Rooms she has not been in are faint: the DM sees what can be explored, the child sees fog.
@@ -454,7 +458,7 @@ function renderMap() {
       look: r.id === state.here ? 'here' : state.visited.includes(r.id) ? 'visited' : 'unexplored',
       canGo: throughOpenDoor(r.id),
     })),
-    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open'), map.distance[map.start]),
+    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), doorKind(state, map.edges, { secret: 'secret' }), map.distance[map.start]),
     probes: [],
   }, { maxWidth: 760, onRoom: clickRoom }));
 }
