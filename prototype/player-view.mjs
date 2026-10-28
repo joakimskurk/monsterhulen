@@ -33,9 +33,11 @@ export function playerView(run, state, extra = {}) {
   for (const a of run.alternatives) icons.set(a.item, a.icon);
   for (const a of run.ambient) icons.set(a.figure.name, a.figure.icon);
   const iconOf = (name) => icons.get(name) || extra.icons?.[name] || '❔';
+  // What she sees in a room: the room she is in, and (for the map symbols) the rooms she has been in.
+  const thingsIn = (room) => {
   const things = [];
   for (const n of run.nodes) {
-    if (n.room !== here || done.has(n.id)) continue;
+    if (n.room !== room || done.has(n.id)) continue;
     if (n.kind === 'item') { if (!n.hidden) things.push({ id: n.id, kind: 'item', name: n.item.name, icon: iconOf(n.item.name), text: n.item.found || `Her ligger ${n.item.name.toLowerCase()}.` }); continue; }
     // A source (a well, a flower meadow): fill something there, or just take from it (owner's playtest:
     // the well was on the DM's screen only, so the water could not be found).
@@ -52,8 +54,27 @@ export function playerView(run, state, extra = {}) {
       things.push({ id: n.id, kind: 'figure', name: n.card.name, icon: iconOf(n.card.name), text: `${n.card.intro || ''}${progress}`.trim() });
     }
   }
-  for (const a of run.alternatives) if (a.room === here && !done.has(`alt:${a.room}`)) things.push({ id: `alt:${a.room}`, kind: 'item', name: a.item, icon: iconOf(a.item), text: `Her ligger ${a.item.toLowerCase()}.` });
-  for (const a of run.ambient) if (a.room === here && !done.has(`amb:${a.room}`)) things.push({ id: `amb:${a.room}`, kind: 'figure', name: a.figure.name, icon: iconOf(a.figure.name), text: a.figure.intro || '' });
+  for (const a of run.alternatives) if (a.room === room && !done.has(`alt:${a.room}`)) things.push({ id: `alt:${a.room}`, kind: 'item', name: a.item, icon: iconOf(a.item), text: `Her ligger ${a.item.toLowerCase()}.` });
+  for (const a of run.ambient) if (a.room === room && !done.has(`amb:${a.room}`)) things.push({ id: `amb:${a.room}`, kind: 'figure', name: a.figure.name, icon: iconOf(a.figure.name), text: a.figure.intro || '' });
+  return things;
+  };
+  const things = thingsIn(here);
+  // Symbols on the rooms she has been in (workshop 2026-10-28, K2), at most two: who still needs
+  // something (their own picture), something to take (✨), not looked around yet (🔍), or done (✓).
+  // Built only from what she sees there, so nothing hidden shows: a room with something hidden looks
+  // like an empty one until she has looked around.
+  const ui = { 'room-thing': '✨', 'room-look': '🔍', 'room-done': '✓', ...extra.ui };
+  const looked = new Set(state.looked || []);
+  const marksFor = (room) => {
+    const seen = thingsIn(room);
+    const marks = [];
+    const figure = seen.find((x) => x.kind === 'figure');
+    if (figure) marks.push({ kind: 'figure', icon: figure.icon, label: figure.name });
+    if (seen.some((x) => x.kind !== 'figure')) marks.push({ kind: 'thing', icon: ui['room-thing'], label: 'Noe å ta' });
+    if (marks.length < 2 && !looked.has(room)) marks.push({ kind: 'look', icon: ui['room-look'], label: 'Ikke sett deg rundt' });
+    if (!marks.length) marks.push({ kind: 'done', icon: ui['room-done'], label: 'Ferdig' });
+    return marks;
+  };
 
   return {
     v: 1,
@@ -68,6 +89,7 @@ export function playerView(run, state, extra = {}) {
       rooms: map.rooms.filter((r) => visited.has(r.id)).map((r) => ({
         id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, label: r.name,
         look: r.id === here ? 'here' : 'visited',
+        marks: marksFor(r.id),
         // Only a neighbour behind an open door: no jumping across the cave.
         canGo: map.edges.some((e) => !e.secret && (e.gate === null || openGates.has(e.gate)) && ((e.a === here && e.b === r.id) || (e.b === here && e.a === r.id))),
       })),
@@ -100,6 +122,7 @@ export function playerView(run, state, extra = {}) {
       ...(extra.end ? [...extra.end.helped, ...extra.end.found, ...extra.end.friends.map((f) => f.name), ...extra.end.offer.map((o) => o.name)] : [])].map((n) => [n, iconOf(n)])),
     book: extra.book || null,
     pack: extra.pack || null,
+    ui: { backpack: '🎒', magnifier: '🔍', ...extra.ui },
     log: state.log.slice(-3).map((l) => l.replace(' (Forteller bestemte)', '')),
     news: latestNews(state.log),
   };

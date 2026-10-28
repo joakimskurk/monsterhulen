@@ -146,3 +146,32 @@ body.child .things-box.many .thing p { -webkit-line-clamp: 1; }
 body.child .thing .speak { min-height: 36px; margin-left: 4px; padding: 0 8px; }
 /* A full backpack wraps to a second row (the map gives way), never off the screen. */
 .bag-part .chips { flex-wrap: wrap; max-height: calc(2 * 40px + 6px); }
+
+/* ---------- No direction buttons; the magnifier (workshop K1) ---------- */
+body.child main.app { grid-template-columns: minmax(0, 1.65fr) minmax(300px, 1fr); }
+.look-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; flex: 0 0 auto; }
+.walk-hint { margin: 0; color: var(--muted); font-size: calc(var(--u) * .8); }
+body.child .lupe { width: clamp(96px, 17vh, 140px); height: clamp(96px, 17vh, 140px); min-height: 0; padding: 0; border-radius: 50%; background: #ffd95c; color: #271b00; border: 4px solid #07050d; box-shadow: 4px 4px 0 #07050d; display: grid; place-content: center; justify-items: center; gap: 2px; }
+body.child .lupe:active { transform: translate(2px, 2px); box-shadow: 2px 2px 0 #07050d; }
+.lupe-icon { font-size: clamp(40px, 8vh, 64px); line-height: 1; }
+.lupe-icon img { width: clamp(44px, 8vh, 68px); height: auto; }
+.lupe-text { font-size: calc(var(--u) * .62); font-weight: 800; letter-spacing: .02em; }
+/* The whole room is the place to tap. */
+body.child .cave-tile.room { cursor: pointer; }
+
+/* ---------- Found: the thing and the backpack side by side, the same size (workshop K3) ---------- */
+body.child .found-card { width: min(720px, 92vw); padding: 18px 22px 14px; }
+.found-row { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: center; }
+.found-slot { display: grid; justify-items: center; gap: 4px; position: relative; }
+body.child .found-thing, body.child .found-bag { width: min(34vh, 260px); height: min(34vh, 260px); margin: 0; }
+body.child .found-thing { position: relative; z-index: 1; font-size: min(24vh, 180px); }
+body.child .found-thing img { width: 100%; height: 100%; }
+body.child .found-bag { position: relative; z-index: 2; display: grid; place-items: center; min-height: 0; padding: 0; font-size: min(24vh, 180px); line-height: 1; background: transparent; border: 4px dashed rgba(255, 217, 92, .55); border-radius: 28px; }
+body.child .found-bag img { width: 90%; height: 90%; object-fit: contain; }
+body.child .found-bag.hot { border-color: #ffd95c; background: rgba(255, 217, 92, .12); }
+body.child .found-name { margin: 0; }
+/* Dropped on the backpack: the thing slides down behind it and gets smaller; the backpack hops. */
+.found-thing.into { transition: transform .6s cubic-bezier(.5, 0, .7, 1), opacity .6s ease-in; opacity: 0; }
+.found-bag.gulp { animation: gulp .45s ease-out; }
+@keyframes gulp { 0% { transform: scale(1); } 40% { transform: scale(1.08, .94); } 100% { transform: scale(1); } }
+body.child .found-thing.dragging { z-index: 3; }

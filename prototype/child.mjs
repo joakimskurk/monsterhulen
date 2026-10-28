@@ -160,6 +160,7 @@ function openFound() {
   const thing = $('#foundThing');
   thing.replaceChildren(String(f.icon).startsWith('assets/') ? el('img', { src: `/${f.icon}`, alt: '' }) : el('span', {}, f.icon));
   thing.style.transform = '';
+  thing.classList.remove('into');
   $('#found').hidden = false;
 }
 function closeFound() {
@@ -173,16 +174,30 @@ function closeFound() {
   const thing = $('#foundThing'), bag = $('#foundBag');
   let start = null;
   thing.addEventListener('pointerdown', (e) => { start = { x: e.clientX, y: e.clientY }; thing.setPointerCapture(e.pointerId); thing.classList.add('dragging'); });
-  thing.addEventListener('pointermove', (e) => { if (start) thing.style.transform = `translate(${e.clientX - start.x}px, ${e.clientY - start.y}px)`; });
+  const overBag = (e) => { const b = bag.getBoundingClientRect(); return e.clientX >= b.left - 20 && e.clientX <= b.right + 20 && e.clientY >= b.top - 20 && e.clientY <= b.bottom + 20; };
+  // Into the backpack: the thing slides to the middle of it and a little down, behind it, getting
+  // smaller as it goes (workshop K3); then the backpack hops and the popup closes.
+  let going = false;
+  const intoBag = () => {
+    if (going) return;
+    going = true;
+    const t = thing.getBoundingClientRect(), b = bag.getBoundingClientRect();
+    const now = new DOMMatrix(getComputedStyle(thing).transform === 'none' ? undefined : getComputedStyle(thing).transform);
+    const dx = now.m41 + (b.left + b.width / 2) - (t.left + t.width / 2), dy = now.m42 + (b.top + b.height * 0.62) - (t.top + t.height / 2);
+    thing.classList.add('into');
+    thing.style.transform = `translate(${dx}px, ${dy}px) scale(.35)`;
+    setTimeout(() => { bag.classList.add('gulp'); }, 420);
+    setTimeout(() => { bag.classList.remove('gulp', 'hot'); going = false; closeFound(); }, 900);
+  };
+  thing.addEventListener('pointermove', (e) => { if (start) { thing.style.transform = `translate(${e.clientX - start.x}px, ${e.clientY - start.y}px)`; bag.classList.toggle('hot', overBag(e)); } });
   thing.addEventListener('pointerup', (e) => {
     if (!start) return;
     start = null;
     thing.classList.remove('dragging');
-    const b = bag.getBoundingClientRect();
-    const overBag = e.clientX >= b.left - 20 && e.clientX <= b.right + 20 && e.clientY >= b.top - 20 && e.clientY <= b.bottom + 20;
-    if (overBag) closeFound(); else thing.style.transform = '';
+    if (overBag(e)) intoBag();
+    else { bag.classList.remove('hot'); thing.style.transition = 'transform .3s ease-out'; thing.style.transform = ''; setTimeout(() => { thing.style.transition = ''; }, 320); }
   });
-  bag.addEventListener('click', closeFound);
+  bag.addEventListener('click', intoBag);
 })();
 
 // The end of the run: what she did, and one of two lasting TING to choose (workshop B1, B3).
@@ -219,22 +234,11 @@ function renderBook(v) {
     el('div', { class: 'chips' }, ...v.book.friends.map((n) => el('span', { class: 'sticker' }, pic(icon(v, n)), ' ', n)), ...v.book.ting.map((n) => el('span', { class: 'sticker ting' }, pic(icon(v, n)), ' ', n))));
 }
 
-// One button per direction: a door there shows its arrow, a locked door shows a lock, no door is greyed.
-const DIR_LABEL = { n: ['↑', 'NORD'], w: ['←', 'VEST'], e: ['→', 'ØST'], s: ['↓', 'SØR'] };
-function renderPad(v) {
-  for (const b of document.querySelectorAll('.pad .dir')) {
-    const d = b.dataset.dir;
-    const exit = v.exits.find((x) => x.dir === d);
-    const [arrow, word] = DIR_LABEL[d];
-    b.textContent = exit ? `${exit.locked ? '🔒' : arrow} ${word}` : `— ${word}`;
-    b.disabled = !exit || exit.locked;
-    b.classList.toggle('locked', !!exit?.locked);
-    b.onclick = exit && !exit.locked ? () => request('MOVE', { room: exit.room, dir: d }) : null;
-  }
-}
-
 function renderMap(v) {
-  renderPad(v);
+  // The iPad's own symbols: pictures once they are made (content/assets.json, ui:*).
+  const uiPic = (value) => (String(value).startsWith('assets/') ? el('img', { src: `/${value}`, alt: '' }) : value);
+  $('#lupeIcon').replaceChildren(uiPic(v.ui?.magnifier || '🔍'));
+  $('#bagIcon').replaceChildren(uiPic(v.ui?.backpack || '🎒'));
   // The cave as in the original: rooms and doors, fog over the unknown (prototype/map-view.mjs).
   const canGo = (id) => v.cave.rooms.some((r) => r.id === id && r.canGo) || v.cave.probes.some((p) => p.room === id && !p.locked);
   $('#map').replaceChildren(caveGrid(v.cave, { memo: `child:${v.runCode}`, onRoom: (id) => { if (canGo(id)) request('MOVE', { room: id }); } }));

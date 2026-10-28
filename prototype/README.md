@@ -30,7 +30,7 @@ npm run prototype:lan
 iPaden viser tekst. Et lite bilde foran navnet er en plassholder til tegningene er laget (`content/assets.json`). 🔊 på et kort leser det høyt med iPadens norske stemme, bare når barnet trykker. Fortellingen er din.
 
 - trykke på et rom på kartet for å gå dit (hun ser bare rom hun har vært i og naborommene),
-- **SE DEG RUNDT** (du ser om noe er gjemt og kaster terning ved behov),
+- **Lupa 🔍** («se deg rundt»: du ser om noe er gjemt og kaster terning ved behov),
 - **TA** en ting som ligger synlig,
 - **GI NOE** til en figur, eller **BE EN VENN HJELPE**.
 
@@ -73,7 +73,9 @@ Noter etter økten (gjerne i `docs/v2/PLAYTEST_V2.md`):
 
 ## Begrensninger
 - Kartet følger originalen: rom i ulike størrelser, steinflisene fra originalen (`assets/tileset/v3-map/`), og tåke over alt barnet ikke har utforsket. På iPaden står «?» ved dørene ut av rommet hun er i (🔒 hvis døra er låst).
-- **Dørene:** Barnet går med store knapper (NORD, VEST, ØST, SØR, med «SE DEG RUNDT» i midten), som i originalen. Gjennom en åpen dør går hun med en gang, og du ser det i loggen. Kryss av for «Barnet går gjennom åpne dører uten å spørre» under «Barnets skjerm» hvis du vil godkjenne hvert steg selv. Låste dører må du løse som før.
+- **Dørene:** Barnet går ved å trykke på et rom på kartet: et naborom bak en åpen dør, eller «?» i tåka (workshop 2026-10-28, iPad-kart og romsymboler). Retningsknappene er borte. Gjennom en åpen dør går hun med en gang, og du ser det i loggen. Låste dører må du løse som før.
+- **Symboler på kartet:** På rom hun har vært i, viser kartet figurens bilde (noen trenger noe), ✨ (noe å ta), 🔍 (ikke sett seg rundt ennå) eller ✓ (ferdig). Noe gjemt røpes aldri.
+- **Funnet:** Tingen vises stor, med en like stor sekk ved siden av. Hun drar tingen over sekken, eller trykker på sekken, og tingen glir ned bak den.
 - To skjermer går over hjemmenettet via en lokal relé i `tools/server.mjs`. Appen skal bruke et internett-relé (Firebase, se `DECISIONS.md`), men protokollen er den samme: filtrert spillervisning, forespørsler med unik ID, og Forteller godtar.
 - Teksten på kortene er utkast fra `content/`.
 - Åpner du Forteller-siden i flere faner i samme nettleser, er det den nyeste som styrer barnets skjerm. De eldre sier ifra og slutter å sende.

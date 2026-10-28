@@ -285,6 +285,11 @@
     { "key": "generic:part", "name": "En del som mangler", "describe": "En del som mangler.", "placeholder": "⚙️", "file": "assets/generic/part.png", "status": "placeholder" },
     { "key": "generic:key", "name": "En nøkkel", "describe": "En nøkkel.", "placeholder": "🗝️", "file": "assets/generic/key.png", "status": "placeholder" },
     { "key": "generic:door", "name": "En dør videre", "describe": "En dør videre.", "placeholder": "🚪", "file": "assets/generic/door.png", "status": "placeholder" },
-    { "key": "generic:unknown", "name": "Ukjent (reserve)", "describe": "Ukjent (reserve).", "placeholder": "❔", "file": "assets/generic/unknown.png", "status": "placeholder" }
+    { "key": "generic:unknown", "name": "Ukjent (reserve)", "describe": "Ukjent (reserve).", "placeholder": "❔", "file": "assets/generic/unknown.png", "status": "placeholder" },
+    { "key": "ui:backpack", "name": "Sekken", "describe": "Barnets sekk, stor og åpen, som ting slippes ned i.", "placeholder": "🎒", "file": "assets/ui/backpack.png", "status": "placeholder" },
+    { "key": "ui:magnifier", "name": "Lupa", "describe": "Et stort forstørrelsesglass: se deg rundt i rommet.", "placeholder": "🔍", "file": "assets/ui/magnifier.png", "status": "placeholder" },
+    { "key": "ui:room-thing", "name": "Noe å ta", "describe": "Merke på kartet: her ligger noe du kan ta.", "placeholder": "✨", "file": "assets/ui/room-thing.png", "status": "placeholder" },
+    { "key": "ui:room-look", "name": "Ikke sett deg rundt", "describe": "Merke på kartet: du har ikke sett deg rundt her ennå.", "placeholder": "🔍", "file": "assets/ui/room-look.png", "status": "placeholder" },
+    { "key": "ui:room-done", "name": "Ferdig", "describe": "Merke på kartet: dette rommet er ferdig.", "placeholder": "✓", "file": "assets/ui/room-done.png", "status": "placeholder" }
   ]
 }

@@ -4,6 +4,15 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - The iPad without direction buttons, with room symbols and a big backpack
+
+The owner decided this (E1–E3). How it is done comes from the simulated workshop `docs/v2/workshops/2026-10-28_ipad_kart_og_romsymboler.md`:
+
+- **K1:** No direction buttons. She walks by tapping the room on the map (the whole room, or «?» in the fog), and the map gets the space. «SE DEG RUNDT» is a big round magnifier button 🔍.
+- **K2:** Rooms she has been in get at most two symbols: the figure's own picture (someone needs something), ✨ (something to take), 🔍 (not looked around yet) or ✓ (done). They are built only from what she sees there, so nothing hidden shows. This is tested in the leak test. `state.looked` remembers where she has used the magnifier.
+- **K3:** The found popup shows the thing big, with a backpack of the same size beside it. Dropped on the backpack, or with the backpack tapped, the thing slides down behind it and shrinks, the backpack hops, and the popup closes.
+- **Pictures:** every new symbol has its own entry in `content/assets.json` (`ui:backpack`, `ui:magnifier`, `ui:room-thing`, `ui:room-look`, `ui:room-done`), with emoji as placeholders until the pictures come.
+
 ## 2026-10-28 - The iPad plays in landscape, on one screen, like an app
 
 Owner: «horisontal modus på ipad … tilgjengelig som om det var en app. INGEN scrolling.»

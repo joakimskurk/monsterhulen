@@ -212,6 +212,8 @@ function publish() {
       ...book.friends.map((f) => [f.name, content.figures.find((x) => x.name === f.name)?.icon]),
       ...book.ting.map((x) => [x.name, content.items.find((i) => i.id === x.id)?.icon]),
     ].filter(([, icon]) => icon)),
+    // The iPad's own symbols (content/assets.json, ui:*): placeholders until the pictures come.
+    ui: Object.fromEntries(['backpack', 'magnifier', 'room-thing', 'room-look', 'room-done'].map((k) => [k, content.ui(k)])),
   });
   fetch(`/api/${SESSION}/player`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(view) }).catch(() => {});
 }
@@ -260,7 +262,7 @@ function renderRequests() {
         el('p', { class: 'hint' }, hidden.length ? 'Noe er gjemt her. Kast terning hvis det er usikkert: 1–2 gir et tydeligere spor, prøver hun igjen finner hun det.' : 'Ingenting gjemt her. Beskriv noe fint eller rart hun legger merke til.'),
         el('div', { class: 'actions' }, hidden.length ? el('button', { onclick: () => { table.search(T(), r.room); save(); render(); ack(r); } }, 'La henne kaste terningen') : null,
           ...hidden.map((n) => el('button', { class: 'ghost', onclick: () => { resolve(n); ack(r); } }, `Fant: ${n.item.name}`)),
-          el('button', { class: 'ghost', onclick: () => { log('Du ser deg rundt.'); save(); render(); ack(r); } }, hidden.length ? 'Ikke ennå' : 'OK')));
+          el('button', { class: 'ghost', onclick: () => { log('Du ser deg rundt.'); state.looked = [...new Set([...(state.looked || []), r.room])]; save(); render(); ack(r); } }, hidden.length ? 'Ikke ennå' : 'OK')));
     }
     if (r.type === 'GIVE' || r.type === 'FRIEND') {
       const text = r.type === 'GIVE' ? `Hun vil gi ${r.item} til ${r.name}.` : `Hun vil at ${r.friend} skal hjelpe med ${r.name}.`;

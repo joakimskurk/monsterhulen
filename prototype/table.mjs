@@ -240,6 +240,7 @@ const hiddenHere = (t, room) => t.run.nodes.filter((n) => n.kind === 'item' && n
 
 // «SE DEG RUNDT»: if something is hidden here, the iPad asks for the die; otherwise she just looks.
 export function search(t, room = t.state.here) {
+  t.state.looked = [...new Set([...(t.state.looked || []), room])]; // the 🔍 on the map goes away
   if (hiddenHere(t, room).length) {
     t.state.roll = { id: nextRollId(t), kind: 'search', room, text: 'Kast terningen for å lete!' };
     log(t, `Du leter i ${t.run.map.rooms[room].name}. Kast terningen!`);

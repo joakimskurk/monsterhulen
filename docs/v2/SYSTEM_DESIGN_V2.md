@@ -292,7 +292,7 @@ Besluttet 2026-10-27. Se `DECISIONS.md`.
 |---|---|
 | kart: trykk for å gå | alt barnet ser + Forteller-kort og løpsoversikt |
 | rom: bilde, navn, én setning | terning (Forteller taster inn barnets fysiske kast) |
-| SE DEG RUNDT, TA | LØS, GI LIKEVEL, KORT NED, LEGG TIL, ANGRE |
+| Lupa 🔍 (se deg rundt), TA | LØS, GI LIKEVEL, KORT NED, LEGG TIL, ANGRE |
 | sekk: velg ting → GI / BRUK på figur, slot eller kilde | kamp: start, hjerter |
 | venner: be om hjelp (evne) | |
 | aldri Forteller-tekst, fasit eller kjede | |

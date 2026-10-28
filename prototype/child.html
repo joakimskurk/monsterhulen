@@ -43,13 +43,10 @@
       <div id="say" class="say" hidden></div>
       <p id="news" class="news" hidden></p>
       <div id="things" class="things-box"></div>
-      <!-- Doors as in the original: one big button per direction, «SE DEG RUNDT» in the middle. -->
-      <div class="pad">
-        <button class="dir" data-dir="n"></button>
-        <button class="dir" data-dir="w"></button>
-        <button id="search" class="look">SE DEG RUNDT</button>
-        <button class="dir" data-dir="e"></button>
-        <button class="dir" data-dir="s"></button>
+      <!-- She walks by tapping rooms on the map (workshop K1); the magnifier is «se deg rundt». -->
+      <div class="look-row">
+        <p class="walk-hint">Trykk på et rom på kartet for å gå dit.</p>
+        <button id="search" class="lupe" type="button" aria-label="Se deg rundt"><span id="lupeIcon" class="lupe-icon">🔍</span><span class="lupe-text">SE DEG RUNDT</span></button>
       </div>
     </section>
     <section class="panel bag-panel">
@@ -80,9 +77,11 @@
   <div id="found" class="found" hidden>
     <div class="found-card">
       <p id="foundText" class="found-text"></p>
-      <div id="foundThing" class="found-thing" aria-label="Dra meg ned i sekken"></div>
-      <p id="foundName" class="found-name"></p>
-      <button id="foundBag" class="found-bag" type="button">🎒 SEKKEN</button>
+      <!-- The thing and the backpack, the same size, side by side (workshop K3). -->
+      <div class="found-row">
+        <div class="found-slot"><div id="foundThing" class="found-thing" aria-label="Dra meg ned i sekken"></div><p id="foundName" class="found-name"></p></div>
+        <div class="found-slot"><button id="foundBag" class="found-bag" type="button" aria-label="Sekken"><span id="bagIcon">🎒</span></button><p class="found-name">SEKKEN</p></div>
+      </div>
       <p class="found-hint">DRA TINGEN NED I SEKKEN</p>
     </div>
   </div>

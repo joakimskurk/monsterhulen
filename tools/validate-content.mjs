@@ -130,6 +130,8 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
   th.SAMLE.devices.filter((d) => d.part).forEach((d) => want(`theme:device-part:${d.id}`));
   th.KOM_UT.exits.filter((e) => e.need?.part).forEach((e) => want(`theme:exit-part:${e.id}`));
   ['rhyme-line', 'lost-thing', 'part', 'key', 'door', 'unknown'].forEach((g) => want(`generic:${g}`));
+  // The iPad's own symbols (workshop 2026-10-28, iPad map and room symbols).
+  ['backpack', 'magnifier', 'room-thing', 'room-look', 'room-done'].forEach((g) => want(`ui:${g}`));
 
   const files = new Set();
   for (const a of c.assets) {

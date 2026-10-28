@@ -17,6 +17,7 @@ function attachPlaceholders(content) {
   content.assetByKey = new Map((content.assets || []).map((a) => [a.key, a]));
   const ph = (key) => { const a = content.assetByKey.get(key); return a?.status === 'approved' ? a.file : a?.placeholder; };
   content.generic = (name) => ph(`generic:${name}`);
+  content.ui = (name) => ph(`ui:${name}`);
   for (const [list, kind] of [[content.items, 'item'], [content.figures, 'figure'], [content.obstacles, 'obstacle'], [content.sources, 'source'], [content.vocabulary.tags, 'tag']]) {
     for (const card of list) card.icon = ph(`${kind}:${card.id}`);
   }

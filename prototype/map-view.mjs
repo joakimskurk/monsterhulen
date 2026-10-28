@@ -60,6 +60,12 @@ const STYLE = `
 .cave-tile.fresh > img { animation: cave-fade .8s ease-out var(--delay, .35s) both; }
 @keyframes cave-fade { from { opacity: var(--from, 0); } to { opacity: 1; } }
 .cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
+/* Room symbols on the child's map (workshop K2): small round badges in the room's top-right corner. */
+.cave-tile .marks { position: absolute; top: 4%; right: 4%; z-index: 5; display: flex; gap: 2px; pointer-events: none; }
+.cave-tile .mk { width: calc(var(--cell) * .42); height: calc(var(--cell) * .42); display: grid; place-items: center; border-radius: 50%; background: rgba(7, 5, 13, .78); border: 1px solid #ffd95c; font-size: calc(var(--cell) * .27); line-height: 1; }
+.cave-tile .mk img { width: 80%; height: 80%; object-fit: contain; }
+.cave-tile .mk-done { border-color: #7fe0a0; color: #7fe0a0; font-weight: 800; }
+.cave-tile .mk-look { border-color: #8fa0c0; }
 /* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
 .cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #07050d; border-radius: 3px; background: #ffd95c; color: #271b00; box-shadow: 2px 2px 0 #07050d; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
 .cave-probe.locked { background: #ff7a7a; cursor: default; }
@@ -190,6 +196,17 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
       const midX = r.x + Math.floor((r.w - 1) / 2), midY = r.y + Math.floor((r.h - 1) / 2);
       if (x === midX && y === midY && r.look === 'here') tile.append(span('mark', '★'));
       if (x === r.x && y === r.y && r.corner) tile.append(span('corner', r.corner));
+      // Symbols (child's map only): in the top-right tile of the room.
+      if (r.marks?.length && x === r.x + r.w - 1 && y === r.y) {
+        const box = span('marks', '');
+        for (const m of r.marks) {
+          const b = span(`mk mk-${m.kind}`, '');
+          b.title = m.label || '';
+          if (String(m.icon).startsWith('assets/')) b.append(Object.assign(document.createElement('img'), { src: `/${m.icon}`, alt: '' })); else b.textContent = m.icon;
+          box.append(b);
+        }
+        tile.append(box);
+      }
       if (onRoom) tile.addEventListener('click', () => onRoom(r.id));
       grid.append(tile);
     }

@@ -82,3 +82,24 @@ for (const missionId of missionIds(content)) {
   }
 }
 console.log(`player-view leak test: ${views} views checked, OK; ${pictured} views with a picture for everything; fog of war holds in ${fogged} views`);
+
+// Map symbols (workshop 2026-10-28, K2): a room with something hidden looks exactly like a room with
+// nothing, until she has looked around there. Only rooms she has been in get symbols.
+{
+  let rooms = 0;
+  for (const missionId of missionIds(content)) for (let seed = 1; seed <= 15; seed++) {
+    const { run } = acceptedRun(content, missionId, seed, 'VANLIG');
+    const hiddenRooms = new Set(run.nodes.filter((n) => n.kind === 'item' && n.hidden).map((n) => n.room));
+    const all = run.map.rooms.map((r) => r.id);
+    const state = { here: run.map.start, visited: all, done: [], openGates: [], inventory: [], companions: [], log: [], looked: [] };
+    const view = playerView(run, state);
+    for (const r of view.cave.rooms) {
+      const own = playerView(run, { ...state, here: r.id }).room.things;
+      const expected = [...(own.some((x) => x.kind === 'figure') ? ['figure'] : []), ...(own.some((x) => x.kind !== 'figure') ? ['thing'] : [])];
+      if (expected.length < 2) expected.push('look');
+      assert.deepEqual(r.marks.map((m) => m.kind), expected, `${missionId}/${seed} room ${r.id}${hiddenRooms.has(r.id) ? ' (something hidden)' : ''}: symbols ${r.marks.map((m) => m.kind)} give away more than she sees`);
+      rooms++;
+    }
+  }
+  console.log(`map symbols: ${rooms} rooms, built only from what she sees there; hidden things never show, OK`);
+}
