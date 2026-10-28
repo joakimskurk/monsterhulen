@@ -97,11 +97,13 @@ console.log(`player-view leak test: ${views} views checked, OK; ${pictured} view
     for (const r of view.cave.rooms) {
       const own = playerView(run, { ...state, here: r.id }).room.things;
       const expected = [...(own.some((x) => x.kind === 'figure' || x.kind === 'giver') ? ['figure'] : []), ...(own.some((x) => x.kind !== 'figure' && x.kind !== 'giver') ? ['thing'] : [])];
-      expected.push(looked.length ? 'looked' : 'look'); // always there, whatever else is in the room
+      // Always there. ✓ after looking around, or at once where someone or something is and nothing is
+      // hidden (owner's rule); an empty room looks the same whether something is hidden or not.
+      expected.push(looked.length || (own.length && !hiddenRooms.has(r.id)) ? 'looked' : 'look');
       assert.deepEqual(r.marks.map((m) => m.kind), expected, `${missionId}/${seed} room ${r.id}${hiddenRooms.has(r.id) ? ' (something hidden)' : ''}: symbols ${r.marks.map((m) => m.kind)} give away more than she sees`);
       rooms++;
     }
     }
   }
-  console.log(`map symbols: ${rooms} rooms, built only from what she sees there; hidden things never show, OK`);
+  console.log(`map symbols: ${rooms} rooms, built only from what she sees there; an empty room never shows whether something is hidden, OK`);
 }

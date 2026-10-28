@@ -71,7 +71,8 @@ function play(content, run, where) {
       assert.ok(playerView(run, t.state, { nudge: hint.child }).nudge, `${where}: stuck with something hidden, but no nudge on the iPad`);
       nudges++;
       let found = false;
-      for (const room of reachable().filter((r) => !(t.state.looked || []).includes(r))) {
+      const marked = playerView(run, t.state).cave.rooms.filter((r) => r.marks.some((m) => m.kind === 'look')).map((r) => r.id);
+      for (const room of reachable().filter((r) => marked.includes(r))) {
         walkTo(room);
         if (table.search(t)) { table.rolled(t, 1); table.search(t); table.rolled(t, 1); found = true; break; } // even two low rolls find it
       }

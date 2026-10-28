@@ -4,6 +4,13 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-28 - ✓ at once where someone is and nothing is hidden
+
+Owner: «hvis et rom har en npc/hendelse, og det da ikke er noe å finne der, så skal vi heller ikke trenge å utforske rommet for å få grønn V».
+
+- A room with a figure, a thing, a source or another happening, and nothing hidden, gets ✓ as soon as she has been there, without the magnifier. An empty room still needs the magnifier, and it looks the same whether something is hidden or not.
+- **Consequence, accepted:** in a room where someone or something is, a 🔍 now means «something may be hidden here». That is a deliberate hint, and it works with the stuck nudge («se deg rundt i rommene med 🔍»). The leak test checks exactly this rule. The automaton searches only rooms that show 🔍 on the map.
+
 ## 2026-10-28 - When she is stuck, the iPad nudges and the DM gets the answer
 
 Owner's run NY_KOM_UT-VANLIG-6747 («Ønskebrønnen»): the chain began with a troll coin hidden in Kjeksgrotta. Sovesoppen wants music, from the friend Skjelettmusikeren. He needs gold thread, traded from Dvergsmeden, who wants the coin. Nothing on the iPad said to look there, so three figures asked for things and the way on looked locked.

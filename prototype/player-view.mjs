@@ -80,7 +80,10 @@ export function playerView(run, state, extra = {}) {
     const figure = seen.find((x) => x.kind === 'figure') || seen.find((x) => x.kind === 'giver');
     if (figure) marks.push({ kind: 'figure', icon: figure.icon, label: figure.name });
     if (seen.some((x) => x.kind !== 'figure' && x.kind !== 'giver')) marks.push({ kind: 'thing', icon: ui['room-thing'], label: 'Noe å ta' });
-    marks.push(looked.has(room) ? { kind: 'looked', icon: ui['room-looked'], label: 'Du har sett deg rundt her' } : { kind: 'look', icon: ui['room-look'], label: 'Ikke sett deg rundt ennå' });
+    // Owner, 2026-10-28: a room with someone or something in it, and nothing to find there, needs no
+    // looking around to be ✓. So there, a 🔍 means «something may be hidden here» (a deliberate hint).
+    const nothingHidden = !run.nodes.some((n) => n.kind === 'item' && n.hidden && n.room === room && !done.has(n.id));
+    marks.push(looked.has(room) || (seen.length && nothingHidden) ? { kind: 'looked', icon: ui['room-looked'], label: 'Du har sett deg rundt her' } : { kind: 'look', icon: ui['room-look'], label: 'Ikke sett deg rundt ennå' });
     return marks;
   };
 
