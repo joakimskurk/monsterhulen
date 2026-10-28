@@ -152,7 +152,44 @@ function thingName(id) {
   return n?.kind === 'item' ? n.item.name : n?.card.name;
 }
 
-function acceptThing(id, { given } = {}) {
+// ---------- needs one at a time ----------
+// A goal or machine with several needs (free the dragon, then calm it; three sockets) can be met
+// step by step. Met needs are stored per node; the node resolves when the last one is met.
+const metOf = (node) => state.needsMet?.[node.id] || [];
+const openNeeds = (node) => node.needs.map((n, i) => i).filter((i) => !node.needs[i].local && !metOf(node).includes(i));
+
+// Tags of something in the backpack, looked up by name in this run and in the item cards.
+function tagsOfName(name) {
+  const fromRun = current.run.nodes.find((n) => n.item?.name === name)?.item?.tags;
+  return fromRun || content.items.find((i) => i.name === name)?.tags || [];
+}
+
+// Which open need a given thing or friend answers. Falls back to the first open need: the DM already said it works.
+function needFor(node, { given, friend }) {
+  const open = openNeeds(node);
+  const fits = (i) => {
+    const need = node.needs[i];
+    const p = need.provider && nodeById(need.provider);
+    if (given) return p?.item?.name === given || (need.tag && tagsOfName(given).includes(need.tag));
+    if (friend) { const f = current.run.nodes.find((n) => n.kind === 'companion' && n.card.name === friend); return !!(need.tag && f?.ability.includes(need.tag)); }
+    return false;
+  };
+  return open.find(fits) ?? open[0];
+}
+
+// `handedOver`: the child already gave the thing from the iPad (acceptThing removed it).
+function markNeed(node, i, { improvised = false, handedOver = false } = {}) {
+  if (isDone(node.id) || metOf(node).includes(i)) return;
+  if (!handedOver) spendNeed(node.needs[i]);
+  state.needsMet = { ...(state.needsMet || {}), [node.id]: [...metOf(node), i] };
+  if (!openNeeds(node).length) { resolve(node, { improvised }); return; }
+  const need = node.needs[i];
+  const left = openNeeds(node).length;
+  log(`${node.card.name}: ${need.specific ? need.name : label(need.tag)} er på plass. ${left} igjen.${improvised ? ' (Forteller bestemte)' : ''}`);
+  save(); render();
+}
+
+function acceptThing(id, { given, friend } = {}) {
   if (isDone(id)) { render(); return; }
   if (given) {
     const i = state.inventory.indexOf(given);
@@ -163,7 +200,9 @@ function acceptThing(id, { given } = {}) {
     state.inventory.push(a.item); state.done.push(id); log(`Tok ${a.item}.`); save(); render(); return;
   }
   if (id.startsWith('amb:')) { state.done.push(id); log(`${thingName(id)} er fornøyd.`); save(); render(); return; }
-  resolve(nodeById(id));
+  const node = nodeById(id);
+  if (openNeeds(node).length > 1) { markNeed(node, needFor(node, { given, friend }), { handedOver: !!given }); return; }
+  resolve(node);
 }
 
 function renderRequests() {
@@ -193,7 +232,7 @@ function renderRequests() {
       const text = r.type === 'GIVE' ? `Hun vil gi ${r.item} til ${r.name}.` : `Hun vil at ${r.friend} skal hjelpe med ${r.name}.`;
       return el('div', { class: 'card' }, el('p', {}, text),
         el('p', { class: 'hint' }, 'Passer det med det figuren vil ha eller er svak mot? Kast terning bare hvis det er usikkert.'),
-        el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing, { given: r.type === 'GIVE' ? r.item : null }); ack(r); } }, 'Det virker!'), no));
+        el('div', { class: 'actions' }, el('button', { onclick: () => { acceptThing(r.thing, r.type === 'GIVE' ? { given: r.item } : { friend: r.friend }); ack(r); } }, 'Det virker!'), no));
     }
     return el('div', { class: 'card' }, el('p', {}, JSON.stringify(r)), el('div', { class: 'actions' }, no));
   }));
@@ -261,14 +300,16 @@ function wantsText(card) {
 // ---------- actions ----------
 
 function spendFor(node) {
-  for (const need of node.needs) {
-    if (!need.provider) continue;
-    const p = nodeById(need.provider);
-    if (p?.kind === 'companion' || need.via === 'tool') continue;
-    const name = p?.item?.name;
-    const i = state.inventory.indexOf(name);
-    if (i >= 0 && (p.item.consumable || need.via === 'fill')) state.inventory.splice(i, 1);
-  }
+  node.needs.forEach((need, index) => { if (!metOf(node).includes(index)) spendNeed(need); }); // met earlier: already handed over
+}
+
+// Removes what one need used up. Ingredients always go into what is made; a filled container is emptied.
+function spendNeed(need) {
+  if (!need.provider) return;
+  const p = nodeById(need.provider);
+  if (p?.kind === 'companion' || need.via === 'tool') return;
+  const i = state.inventory.indexOf(p?.item?.name);
+  if (i >= 0 && (p.item.consumable || need.via === 'fill' || need.via === 'ingredient')) state.inventory.splice(i, 1);
 }
 
 function resolve(node, { improvised = false } = {}) {
@@ -342,18 +383,21 @@ function renderMap() {
   $('#map').replaceChildren(svg);
 }
 
-function needBlock(need) {
+function needBlock(node, need, i) {
   const what = need.local ? need.task : need.specific ? need.name : label(need.tag);
-  const via = { weakness: ' (svakhet)', trade: ' (som betaling)', fill: ' (å fylle i)', tool: ' (verktøy)' }[need.via] || '';
-  return el('div', { class: 'need' },
-    el('div', {}, el('b', {}, need.local ? 'Vil: ' : 'Trenger: '), what + via),
+  const via = { weakness: ' (svakhet)', trade: ' (som betaling)', fill: ' (å fylle i)', tool: ' (verktøy)', free: ' (for å få den løs)', guard: ' (for å komme til)', part: ' (del som mangler)' }[need.via] || '';
+  const met = metOf(node).includes(i);
+  const several = node.needs.filter((n) => !n.local).length > 1;
+  return el('div', { class: `need${met ? ' met' : ''}` },
+    el('div', {}, el('b', {}, need.local ? 'Vil: ' : 'Trenger: '), what + via,
+      met ? el('b', {}, ' · på plass ✓') : several && !isDone(node.id) && !need.local ? el('button', { class: 'small ghost', onclick: () => markNeed(node, i) }, 'Denne er på plass') : null),
     need.sign ? el('div', {}, el('b', {}, 'Tegn: '), `«${need.sign}»`, relay ? el('button', { class: 'small ghost', onclick: () => { state.say = need.sign; save(); render(); } }, 'Vis på iPad') : null) : null,
     need.provider ? el('div', { class: 'sure' }, `Garantert: ${providerText(need.provider)}`) : null,
   );
 }
 
 function ladder(node) {
-  const first = node.needs.find((n) => !n.local);
+  const first = node.needs[openNeeds(node)[0]];
   if (!first) return null;
   const clearer = first.via === 'rhyme'
     ? '«Resten av regla må finnes et sted. Kanskje noen i hulen kan den, eller den står skrevet på en vegg?»'
@@ -386,7 +430,7 @@ function nodeCard(node) {
       relay ? el('button', { class: 'small ghost', onclick: () => { state.say = node.rhyme.lines.join(' '); save(); render(); } }, 'Vis regla på iPad') : null) : null,
     node.hidden ? el('p', { class: 'hint' }, 'Søk: terning bare hvis det er usikkert. 1–2 gir et tydeligere spor, ikke funn ennå. Prøver hun igjen, finner hun det.') : null,
     node.cardKind !== 'obstacle' && card.wants ? el('p', {}, el('b', {}, 'Figuren: '), wantsText(card).join(' · ') || '–') : null,
-    ...node.needs.map(needBlock),
+    ...node.needs.map((need, i) => needBlock(node, need, i)),
     gives ? el('p', {}, el('b', {}, gives)) : null,
     !done ? ladder(node) : null,
     done ? el('p', { class: 'hint' }, 'Ferdig.') : el('div', { class: 'actions' },

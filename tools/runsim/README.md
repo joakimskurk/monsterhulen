@@ -55,7 +55,7 @@ Den spiller som et fornuftig barn: går til alle rom den når, tar ting, finner 
 ## Resultater 2026-10-28
 
 - **30 000 løp** (5 sammensatte + 5 klassiske oppdrag × KORT/VANLIG/STORT × 1000 seeds; for de sammensatte er hver seed også et nytt tema): alle godkjent, gjennomsnittlig 1,0–3,2 forsøk per løp (SAMLE på KORT trenger flest).
-- **Selvtest:** 8 443 sabotasjer, 0 uoppdaget:
+- **Selvtest:** 8 457 sabotasjer, 0 uoppdaget:
   - en garantert kilde flyttet bak hinderet kjeden er for,
   - en garantert kilde fjernet,
   - en hemmelig dør fra sone 0 inn i siste sone.

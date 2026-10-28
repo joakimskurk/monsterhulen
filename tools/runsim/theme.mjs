@@ -91,10 +91,11 @@ function composeRedd(rng, t, base) {
   const who = cap(c.def);
   return {
     ...base,
-    name: `${who} ${problem}`,
-    intro: `${who} ${problem}, er langt inne i hulen. Finn ${c.pron} og få ${c.pron} trygt hjem.`,
-    goal: { name: who, calm: c.calm, calmSigns: Object.fromEntries(c.calm.map((tag) => [tag, t.calmSigns[tag].replace('{who}', who)])) },
-    theme: { goal: c.id, opener: problem },
+    name: `${who} ${problem.text}`,
+    intro: `${who} ${problem.text}, er langt inne i hulen. Finn ${c.pron} og få ${c.pron} trygt hjem.`,
+    // `free`: what gets it loose before it can be calmed (decision A9). Never the same tag as a calm tag.
+    goal: { name: who, free: problem.free || null, calm: c.calm, calmSigns: Object.fromEntries(c.calm.map((tag) => [tag, t.calmSigns[tag].replace('{who}', who)])) },
+    theme: { goal: c.id, opener: problem.text },
   };
 }
 
@@ -102,9 +103,10 @@ function composeSamle(rng, s, base) {
   const d = rng.pick(s.devices);
   return {
     ...base,
-    name: d.title,
+    name: rng.pick(d.titles),
     intro: d.intro,
-    goal: { name: cap(d.def), count: 3, pool: d.pool, socket: d.socket },
+    // A missing part replaces one of the three sockets.
+    goal: { name: cap(d.def), count: 3, pool: d.pool, socket: d.socket, part: d.part || null },
     theme: { goal: d.id, opener: d.id },
   };
 }
@@ -119,14 +121,14 @@ function composeLever(rng, l, base) {
     ...base,
     name: fill(rng.pick(l.titles), values),
     intro: `${cap(owner.def)} venter ved inngangen. ${cap(owner.gen)} ${thing.base} ligger ${place.where} langt inne i hulen. Hent ${thing.pron} og bring ${thing.pron} hjem.`,
-    goal: { name: cap(place.def), item: `${thing.def} til ${owner.def}`, deliver: `${thing.def} til ${owner.def} ved inngangen` },
+    goal: { name: cap(place.def), item: `${thing.def} til ${owner.def}`, deliver: `${thing.def} til ${owner.def} ved inngangen`, need: place.guard || null },
     theme: { goal: `${owner.id}:${thing.id}`, opener: place.id },
   };
 }
 
 function composeKomUt(rng, k, base) {
   const exit = rng.pick(k.exits);
-  return { ...base, name: exit.title, intro: exit.intro, goal: { name: cap(exit.def) }, theme: { goal: exit.id, opener: exit.id } };
+  return { ...base, name: rng.pick(exit.titles), intro: exit.intro, goal: { name: cap(exit.def), need: exit.need || null }, theme: { goal: exit.id, opener: exit.id } };
 }
 
 // What "Overrask meg" should avoid repeating: the goal and the opener of a mission.

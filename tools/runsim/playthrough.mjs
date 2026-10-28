@@ -87,7 +87,8 @@ export function playthrough(run) {
           if (takeAll(node)) { done.add(node.id); progress = true; steps.push(`Nådde ${node.card.name}`); }
           break;
         case 'deliver':
-          inventory.push({ ...node.item, boundTo: null }); done.add(node.id); progress = true; steps.push(`Fant ${node.item.name}`);
+          // The place may need something first (a high nest, a deep well).
+          if (takeAll(node)) { inventory.push({ ...node.item, boundTo: null }); done.add(node.id); progress = true; steps.push(`Fant ${node.item.name}`); }
           break;
         default:
           throw new Error(`unknown node kind ${node.kind}`);

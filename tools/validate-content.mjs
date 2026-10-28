@@ -102,6 +102,8 @@ for (const m of c.missions) {
   if (!m.intro) err(at, 'missing intro');
 }
 
+for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${tag.id}`, 'carry tag needs a phrase for signs');
+
 // Themes for composed missions (content/themes.json, workshop 2026-10-28).
 {
   const t = c.themes;
@@ -119,11 +121,32 @@ for (const m of c.missions) {
   for (const m of F.magic) { if (!m.shape) err(`${at} magic ${m.id}`, 'missing shape'); (m.zones || []).forEach((z) => { if (!zones.has(z)) err(`${at} magic ${m.id}`, `unknown zone ${z}`); }); }
   for (const r of F.rhymes) if (r.lines?.length !== 3) err(`${at} rhyme ${r.id}`, 'a rhyme has exactly 3 lines');
   for (const kind of ['KEY', 'MAGIC', 'RHYME', 'TAG']) if (!F.titles[kind]?.length) err(at, `no titles for ${kind}`);
+  // A goal need from a part (decision A9): a carry tag or one named part, always with a sign.
+  const needOk = (where, need) => {
+    if (!need.sign) err(where, 'need without sign');
+    if (need.part) return;
+    tagOk(where, need.tag);
+    if (!c.tagById.get(need.tag)?.carry) err(where, `need ${need.tag} must be a carry tag`);
+  };
   for (const cr of t.REDD.creatures) {
-    if (!['den', 'det'].includes(cr.pron)) err(`${at} creature ${cr.id}`, 'pron must be den/det');
-    for (const tag of cr.calm) { tagOk(`${at} creature ${cr.id}`, tag); if (!t.calmSigns[tag]) err(`${at} creature ${cr.id}`, `no calmSign for ${tag}`); }
+    const where = `${at} creature ${cr.id}`;
+    if (!['den', 'det'].includes(cr.pron)) err(where, 'pron must be den/det');
+    for (const tag of cr.calm) { tagOk(where, tag); if (!t.calmSigns[tag]) err(where, `no calmSign for ${tag}`); }
+    for (const p of cr.problems) {
+      if (!p.text) err(where, 'problem without text');
+      if (p.free) { needOk(`${where} "${p.text}"`, p.free); if (cr.calm.includes(p.free.tag)) err(where, `free tag ${p.free.tag} is also a calm tag`); }
+    }
   }
-  for (const d of t.SAMLE.devices) { if (d.pool.length < 3) err(`${at} device ${d.id}`, 'pool needs at least 3 tags'); d.pool.forEach((tag) => tagOk(`${at} device ${d.id}`, tag)); if (!d.socket) err(`${at} device ${d.id}`, 'missing socket'); }
+  for (const d of t.SAMLE.devices) {
+    const where = `${at} device ${d.id}`;
+    if (d.pool.length < 3) err(where, 'pool needs at least 3 tags');
+    d.pool.forEach((tag) => tagOk(where, tag));
+    if (!d.socket) err(where, 'missing socket');
+    if (!d.titles?.length) err(where, 'missing titles');
+    if (d.part && !(d.part.name && d.part.sign)) err(where, 'part needs name and sign');
+  }
+  for (const p of t.LEVER.places) if (p.guard) needOk(`${at} place ${p.id}`, p.guard);
+  for (const e of t.KOM_UT.exits) { if (!e.titles?.length) err(`${at} exit ${e.id}`, 'missing titles'); if (e.need) needOk(`${at} exit ${e.id}`, e.need); }
   const things = new Set(t.LEVER.things.map((x) => x.id));
   for (const o of t.LEVER.owners) for (const id of o.things) if (!things.has(id)) err(`${at} owner ${o.id}`, `unknown thing ${id}`);
   for (const th of t.LEVER.things) if (!['den', 'det', 'dem'].includes(th.pron)) err(`${at} thing ${th.id}`, 'pron must be den/det/dem');

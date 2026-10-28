@@ -137,12 +137,14 @@ function addOpenerNeeds(ctx, node, opener) {
 function makeMachine(ctx, room, gate) {
   const { rng, mission } = ctx;
   const node = addNode(ctx, { kind: 'machine', card: { name: mission.goal.name }, room, zone: zoneOf(ctx, room), gate, needs: [] });
-  const tags = rng.shuffle(mission.goal.pool).slice(0, mission.goal.count);
+  const part = mission.goal.part;
+  if (part && !addThemeNeed(ctx, node, { part: part.name, sign: part.sign }, 'part')) return null;
+  const tags = rng.shuffle(mission.goal.pool).slice(0, mission.goal.count - (part ? 1 : 0));
   for (const tag of tags) {
     const provider = provideTag(ctx, tag, node, 0);
     if (!provider) return null;
     const socket = mission.goal.socket || 'Ett av festene';
-    node.needs.push({ tag, via: 'socket', provider: provider.id, sign: `${socket} lyser og venter på ${ctx.content.tagById.get(tag).label}.` });
+    node.needs.push({ tag, via: 'socket', provider: provider.id, sign: `${socket} lyser og venter på ${phraseOf(ctx, tag)}.` });
   }
   return node;
 }
@@ -156,23 +158,46 @@ function makeGoal(ctx, lastGate) {
     const node = addNode(ctx, { kind: 'goal', opener: lock.opener.kind, card: { name: `${mission.goal.name} i ${lock.name.charAt(0).toLowerCase()}${lock.name.slice(1)}`, intro: lock.intro }, room: map.end, zone: endZone, needs: [] });
     return addOpenerNeeds(ctx, node, lock.opener) ? node : null;
   }
-  if (mission.type === 'KOM_UT') return addNode(ctx, { kind: 'exit', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+  if (mission.type === 'KOM_UT') {
+    const node = addNode(ctx, { kind: 'exit', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+    return !mission.goal.need || addThemeNeed(ctx, node, mission.goal.need, 'exit') ? node : null;
+  }
   if (mission.type === 'SAMLE') return addNode(ctx, { kind: 'exit', card: { name: `Rommet bak ${mission.goal.name.toLowerCase()}` }, room: map.end, zone: endZone, needs: [] });
   if (mission.type === 'LEVER') {
     const node = addNode(ctx, { kind: 'deliver', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [], deliverTo: map.start });
     node.item = { specificId: 'DELIVERY', name: mission.goal.item, tags: [], consumable: true };
+    if (mission.goal.need && !addThemeNeed(ctx, node, mission.goal.need, 'guard')) return null;
     return node;
   }
   if (mission.type === 'REDD') {
     const node = addNode(ctx, { kind: 'target', card: { name: mission.goal.name }, room: map.end, zone: endZone, needs: [] });
+    // First get it loose (if its problem says so), then calm it.
+    if (mission.goal.free && !addThemeNeed(ctx, node, mission.goal.free, 'free')) return null;
     const tag = rng.pick(mission.goal.calm);
     const provider = provideTag(ctx, tag, node, 0);
     if (!provider) return null;
-    const sign = mission.goal.calmSigns?.[tag] || `${mission.goal.name} slapper av når den kjenner ${ctx.content.tagById.get(tag).label}.`;
+    const sign = mission.goal.calmSigns?.[tag] || `${mission.goal.name} slapper av når den kjenner ${phraseOf(ctx, tag)}.`;
     node.needs.push({ tag, via: 'calm', provider: provider.id, sign });
     return node;
   }
   return null;
+}
+
+// Ready-written phrase for a tag in running text («venter på å bli reparert»), from vocabulary.json.
+const phraseOf = (ctx, tag) => ctx.content.tagById.get(tag).phrase || ctx.content.tagById.get(tag).label;
+
+// A need that comes from a theme part (decision A9): a tag ({ tag, sign }) or one specific part ({ part, sign }).
+function addThemeNeed(ctx, node, need, via) {
+  if (need.part) {
+    const provider = provideSpecific(ctx, { specificId: 'PART', name: need.part, tags: [], consumable: true }, node, 0);
+    if (!provider) return false;
+    node.needs.push({ specific: 'PART', name: need.part, via, provider: provider.id, sign: need.sign });
+    return true;
+  }
+  const provider = provideTag(ctx, need.tag, node, 0);
+  if (!provider) return false;
+  node.needs.push({ tag: need.tag, via, provider: provider.id, sign: need.sign });
+  return true;
 }
 
 function signFor(card, tag) {

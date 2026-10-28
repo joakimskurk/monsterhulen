@@ -12,7 +12,8 @@ Updated: 2026-10-27
 | Child view leak test | `npm run test:leak` | 14 000 views, OK | the iPad payload never contains signs, providers, DM keys or DM wording, and hidden items never appear as things, in the backpack or in the log | leaks through future fields; a hidden item named in free text such as a figure intro |
 | Two-screen browser test | manual, Chromium tabs | full WITCH_CAT KORT run | request/accept loop, filtered view, fog of war, double-tap guard | real iPad Safari, real Wi-Fi |
 | Composed missions, browser | manual, Chromium tabs | NY_FINN KORT seed 8 (rhyme) and seed 2 (chest) played through; iPad gave the key to the chest; «Overrask meg» 8 times with no repeated theme; two DM tabs on one session | rhyme card and lines in backpack, chest as goal, history, newest DM tab takes over | real iPad Safari, a child saying the rhyme |
-| Sabotage selftest | `npm run sim:selftest` | 8 443 sabotages, 0 missed | the automaton rejects runs with a misplaced or missing sole provider, and cross-zone secret doors | robustness to sabotage types not tested |
+| Goal needs, browser | manual, Chromium tabs | NY_REDD KORT seed 1 on two screens (free the dragon, then calm it; iPad showed «1 av 2»); NY_SAMLE KORT seed 1 on DM (missing part, then sockets one at a time) | needs met one at a time, items spent per need, recipe ingredients used up | real iPad Safari; not every combination clicked |
+| Sabotage selftest | `npm run sim:selftest` | 8 457 sabotages, 0 missed | the automaton rejects runs with a misplaced or missing sole provider, and cross-zone secret doors | robustness to sabotage types not tested |
 
 ## Verification levels
 Never conflate:

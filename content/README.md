@@ -121,10 +121,13 @@ Et nytt oppdrag trenger bare data. `npm run check` beviser det over 200 seeds pe
 - **Temaet avhenger bare av oppdragstype og kode.** Det er likt på alle lengder, i alle forsøk og på begge skjermer.
 - `routes`: rutene (fire soner) et løp kan få.
 - `FINN`: `treasures`, `locks` (med `short`, `prep` `bak`/`i` og hvilke `openers` de tar), `keys` og `magic` (med `zones`, vektet ×3 når et sted i ruten passer), `rhymes` (tre rimende linjer) og `titles` per åpner. Kister (`prep: "i"`) står i målrommet.
-- `REDD`: `creatures` med `pron` (den/det), `calm` og `problems`. `calmSigns` gir tegnet per merke.
-- `SAMLE`: `devices` med `socket` (brukes i tegnet) og `pool`.
-- `LEVER`: `owners` (med hvilke `things` de kan eie), `things` (med `pron` den/det/dem) og `places` (med `where`).
-- `KOM_UT`: `exits`.
+- `REDD`: `creatures` med `pron` (den/det), `calm` og `problems` (`text`, valgfri `free`: det som får figuren løs før den kan roes). `calmSigns` gir tegnet per merke.
+- `SAMLE`: `devices` med `titles`, `socket` (brukes i tegnet), `pool` og valgfri `part` (en bestemt del som mangler; da trengs én del og to merker).
+- `LEVER`: `owners` (med hvilke `things` de kan eie), `things` (med `pron` den/det/dem) og `places` (med `where` og valgfri `guard`: det som trengs for å komme til tingen).
+- `KOM_UT`: `exits` med `titles` og valgfri `need`: et merke (`tag`) eller en bestemt del (`part`), alltid med `sign`.
+- Omtrent halvparten av delene skal ha et slikt behov (workshop A9).
+
+Merkene i `vocabulary.json` har en ferdig `phrase` for løpende tekst i tegn («venter på å bli reparert»).
 
 Validatoren sjekker at hver del har det den trenger.
 

@@ -112,10 +112,50 @@ Denne økten kom etter at de første sammensatte løpene var generert og spilt g
 
 **Systemutvikler (funn under testen):** Når to Forteller-faner er åpne i samme nettleser, deler de øktkode. Den gamle fanen fjernet barnets trykk fordi den trodde de gjaldt noe som allerede var gjort i dens eget løp. Rettet slik: hver forespørsel bærer koden for løpet, og den nyeste fanen tar over barnets skjerm. Den eldre fanen sier ifra og slutter å sende.
 
+## Økt 8: De andre oppdragstypene
+
+Eieren ba om å utvide REDD, SAMLE, LEVER og KOM UT, som etter første runde hadde 6–28 titler mot 188 for FINN.
+
+**Spilldesigner:** Samme regel som for FINN: flere navn alene hjelper lite. Hver type trenger deler som av og til krever noe annet av barnet. Akkurat nå er målet på disse typene enten «gå dit» (KOM UT, LEVER) eller «gi én ting» (REDD). Det er der variasjonen mangler.
+
+**Systemutvikler:** Vi har allerede mekanikken. En kiste er et mål som trenger noe. Den samme ideen kan brukes på alle mål: utgangen, stedet tingen ligger, figuren som skal reddes. Et behov kan være et merke (lys, høyde, grave) eller en bestemt del (et tannhjul, en åre). Automaten beviser det som før.
+
+**Barnehagelærer:** Da må det henge sammen med det barnet ser. Sitter ugleungen høyt oppe, trenger vi å nå høyt. Har kattungen krøpet inn i et rør, trenger vi å gripe langt. Barnet skjønner det fordi det er det samme det selv ville tenkt.
+
+**Eier:** Kan vi gjøre det for mye? Hun er fem.
+
+**Barnehagelærer:** Ja. Ikke alle deler skal ha et ekstra behov. Halvparten bør være «bare» det gamle: finn den, gi den noe godt, ta den med hjem. Variasjonen er at det *noen ganger* er mer.
+
+**Spilldesigner:** For REDD: først løs figuren, så ro den. To steg i fast rekkefølge er lett å forklare: «Den sitter fast. Hva trenger vi for å få den løs?»
+
+**Forfatter:** For SAMLE: en maskin som mangler en del, er en god historie. «Gruvetoget mangler det lille tannhjulet.» Det er noe annet å lete etter enn «noe med varme».
+
+**Forfatter:** For KOM UT: ballongen er tom og trenger luft. Ønskebrønnen tar én mynt. Ørnen er sulten. Hver utgang får en grunn.
+
+**Spilldesigner:** For LEVER: stedet tingen ligger på kan by på noe. Reiret er høyt oppe, skjæra holder fast på tingen og vil ha noe som glitrer, brønnen er dyp.
+
+**Systemutvikler:** Et merke kan ikke trengs i sin egen kjede. For REDD betyr det at det som løser figuren, ikke kan være det samme som det som roer den. Det sjekker validatoren.
+
+**Uenighet:** Spilldesigneren ville ha et ekstra behov på alle mål ved stort løp. Barnehagelæreren mente det gjør lengre løp tyngre, ikke bedre, og at lengden allerede gir flere hindre. **Avgjort:** behovet hører til delen, ikke til lengden. Hvis korte løp blir for tunge i automaten (flere forsøk enn i dag), tas spørsmålet opp igjen.
+
+> **Avgjørelse A9:** Alle målene kan ha et behov som kommer fra delen som er trukket:
+> - REDD: figurens problem kan kreve at den løses først (høyde, gripe, grave, lys, varme), deretter ro den.
+> - SAMLE: maskinen kan mangle en bestemt del. Da trengs én del og to merker i stedet for tre merker.
+> - LEVER: stedet kan kreve noe (lys, høyde, gripe, grave, noe som glitrer til skjæra).
+> - KOM UT: utgangen kan kreve noe (luft, en mynt, mat, reparasjon, lys, glitter, en åre).
+>
+> Omtrent halvparten av delene har ikke noe slikt behov. Det som løser, kan aldri være det samme som det som roer.
+
+**Etter bygging (målt, ikke simulert):**
+- **Korte løp ble ikke for tunge.** Med et ekstra behov tar et kort løp i snitt 0,5–1,5 flere steg, og det lengste korte løpet er like langt som før (7–8 steg).
+- **Andelen deler med ekstra behov ble for høy i første utkast** (64 % for LEVER, 78 % for KOM UT). Rettet til 45–60 % med flere deler uten behov.
+- **Forteller må kunne godta ett behov om gangen.** Ellers kan Forteller bare velge mellom «Det virker!», som løser alt, og «Ikke ennå», som avviser noe som virket. Nå markeres hvert behov for seg, og iPaden viser «1 av 2 er på plass», men ikke hvilke som gjenstår.
+- **Tegnene bruker en ferdig frase per merke** («venter på å bli reparert», ikke «venter på reparere»). Det følger av A2.
+
 ## Ikke avgjort (tas med til eieren)
 
 - Om regla skal kunne brukes i andre oppdrag enn FINN, for eksempel som det som roer en figur.
 - Om barnet skal få se hele regla på iPaden når den er samlet (en «reglebok» i Helteboka).
 - Hvor mange linjer en regle har på stort løp for eldre barn.
 - Regla kommer i omtrent hvert sjette sammensatte FINN-løp (bare noen dører tar regle). Skal den vektes opp?
-- REDD, SAMLE og KOM UT har færre deler enn FINN (6–12 titler mot 188). Flere deler der er neste naturlige utvidelse.
+- Titler etter økt 8: FINN 189, LEVER 35, REDD 22, KOM UT 22, SAMLE 20. Til gjengjeld har de andre typene fått deler som av og til krever noe nytt. Om flere navn trengs, avgjøres etter spilletest.

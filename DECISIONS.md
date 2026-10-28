@@ -10,6 +10,7 @@ Owner concern: fixed mission names feel repetitive; wanted variations such as gl
 - A composed mission is *type × goal × what closes × what opens × route*, built from `content/themes.json`. The theme depends only on mission type and code (seed), not on attempt or length, so the same code shows the same title on every device.
 - FINN has four openers with different play: **key** (material weighted towards zones on the route), **magic object** (fits a shape in the door), **rhyme** (three rhyming lines found separately and said aloud at the door; on short runs the first line is over the door), **element** (a carry tag such as music, light, warmth, water).
 - Chests hold the treasure in the goal room and are the goal; the last gate is then a normal blocker.
+- Every goal may get a need from its part (A9): a creature may need freeing before calming (never with a calm tag), a machine may lack a named part, a delivery place may need something to reach, an exit may need something to work. About half of the parts have no such need. The DM can accept needs one at a time; the iPad shows only how many are met.
 - Word forms are written out in data; code only capitalises.
 - The DM device avoids the goal and opener of the last three runs when choosing a new code.
 - The existing five missions stay as classics with fixed themes. The ten fixed missions added earlier on 2026-10-28 were removed; their content became parts.

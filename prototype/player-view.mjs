@@ -36,7 +36,13 @@ export function playerView(run, state) {
   for (const n of run.nodes) {
     if (n.room !== here || done.has(n.id)) continue;
     if (n.kind === 'item') { if (!n.hidden) things.push({ id: n.id, kind: 'item', name: n.item.name, text: n.item.found || `Her ligger ${n.item.name.toLowerCase()}.` }); continue; }
-    if (FIGURE_KINDS.has(n.kind)) things.push({ id: n.id, kind: 'figure', name: n.card.name, text: n.card.intro || '' });
+    if (FIGURE_KINDS.has(n.kind)) {
+      // Progress on several needs, as a count only (never which ones are left).
+      const total = n.needs.filter((x) => !x.local).length;
+      const met = (state.needsMet?.[n.id] || []).length;
+      const progress = total > 1 && met > 0 ? ` (${met} av ${total} er på plass)` : '';
+      things.push({ id: n.id, kind: 'figure', name: n.card.name, text: `${n.card.intro || ''}${progress}`.trim() });
+    }
   }
   for (const a of run.alternatives) if (a.room === here && !done.has(`alt:${a.room}`)) things.push({ id: `alt:${a.room}`, kind: 'item', name: a.item, text: `Her ligger ${a.item.toLowerCase()}.` });
   for (const a of run.ambient) if (a.room === here && !done.has(`amb:${a.room}`)) things.push({ id: `amb:${a.room}`, kind: 'figure', name: a.figure.name, text: a.figure.intro || '' });

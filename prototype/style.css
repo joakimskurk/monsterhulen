@@ -69,3 +69,4 @@ pre { white-space: pre-wrap; font-size: 13px; }
 #requests { border: 2px solid var(--here); }
 #pair a { word-break: break-all; margin-right: 8px; }
 .takeover { border: 2px solid var(--gate); }
+.need.met { opacity: .6; }
