@@ -387,6 +387,14 @@ function renderFinish() {
         } }, 'Skriv i Helteboka')))].filter(Boolean));
 }
 
+// A click on a neighbouring room behind an open door walks there; any other room is only selected, so
+// the DM can read about it without the child jumping across the cave.
+function clickRoom(id) {
+  if (throughOpenDoor(id)) { goTo(id); return; }
+  state.selected = id;
+  save(); render();
+}
+
 function renderMap() {
   // The whole cave for the DM, drawn with the original's tiles: every room with its number, every
   // door including secret ones, and the rooms behind a closed gate darker (prototype/map-view.mjs).
@@ -395,14 +403,15 @@ function renderMap() {
   const openGates = new Set(state.openGates);
   $('#map').replaceChildren(caveGrid({
     bounds: caveBounds(map.rooms),
+    // Rooms she has not been in are faint: the DM sees what can be explored, the child sees fog.
     rooms: map.rooms.map((r) => ({
       id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, label: `${r.id} · ${r.name}`, corner: String(r.id),
-      look: r.id === state.here ? 'here' : !open.has(r.id) ? 'closed' : state.visited.includes(r.id) ? 'visited' : 'open',
-      canGo: r.id === state.selected && r.id !== state.here,
+      look: r.id === state.here ? 'here' : state.visited.includes(r.id) ? 'visited' : 'unexplored',
+      canGo: throughOpenDoor(r.id),
     })),
-    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'door'), map.distance[map.start]),
+    doors: doorsFor(map.edges, new Set(map.rooms.map((r) => r.id)), (e) => (e.secret ? 'secret' : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open')),
     probes: [],
-  }, { maxWidth: 760, onRoom: (id) => goTo(id) }));
+  }, { maxWidth: 760, onRoom: clickRoom }));
 }
 
 function needBlock(node, need, i) {
@@ -474,6 +483,9 @@ function renderRoom(roomId) {
   const parts = [
     el('h2', {}, `${title} · ${room.zoneName.toLowerCase()}`),
     !reachableNow ? el('p', { class: 'hint' }, 'Dette rommet ligger bak et hinder som ikke er løst ennå. (Du ser det fordi du er Forteller.)') : null,
+    roomId !== state.here && reachableNow && !throughOpenDoor(roomId)
+      ? el('p', { class: 'hint' }, 'Ikke rett ved siden av der barnet er. ', el('button', { class: 'small ghost', onclick: () => goTo(roomId) }, 'Flytt barnet hit likevel'))
+      : null,
     ...nodes.map(nodeCard),
     ...alts.map((a) => {
       const key = `alt:${a.room}`;

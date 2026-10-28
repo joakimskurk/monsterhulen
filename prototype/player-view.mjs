@@ -1,6 +1,5 @@
 // What the child's iPad may see. Built only from an allow-list of fields:
 // never needs, signs, providers, solutions, hidden items, zones ahead or the DM template.
-import { reachable } from '../tools/runsim/map.mjs';
 import { doorsFor, caveBounds } from './map-view.mjs';
 
 const FIGURE_KINDS = new Set(['blocker', 'trader', 'quest', 'companion', 'target', 'lock', 'machine', 'goal', 'exit', 'deliver']);
@@ -23,7 +22,6 @@ function latestNews(log) {
 export function playerView(run, state, extra = {}) {
   const { map } = run;
   const openGates = new Set(state.openGates);
-  const reach = reachable(map, { openGates });
   const visited = new Set(state.visited);
   const done = new Set(state.done);
 
@@ -63,9 +61,10 @@ export function playerView(run, state, extra = {}) {
       rooms: map.rooms.filter((r) => visited.has(r.id)).map((r) => ({
         id: r.id, x: r.x, y: r.y, w: r.w, h: r.h, label: r.name,
         look: r.id === here ? 'here' : 'visited',
-        canGo: reach.has(r.id) && r.id !== here,
+        // Only a neighbour behind an open door: no jumping across the cave.
+        canGo: map.edges.some((e) => !e.secret && (e.gate === null || openGates.has(e.gate)) && ((e.a === here && e.b === r.id) || (e.b === here && e.a === r.id))),
       })),
-      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'door'), map.distance[map.start]),
+      doors: doorsFor(map.edges, visited, (e) => (e.secret ? null : e.gate !== null && !openGates.has(e.gate) ? 'locked' : e.loop ? 'loop' : 'open')),
       probes: map.edges.filter((e) => !e.secret && (e.a === here || e.b === here) && !visited.has(e.a === here ? e.b : e.a)).map((e) => {
         const other = e.a === here ? e.b : e.a;
         const cell = e.a === here ? e.bCell : e.aCell;
