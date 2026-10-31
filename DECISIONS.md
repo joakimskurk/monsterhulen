@@ -4,6 +4,17 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-31 - The iPad looks like a dungeon crawler (warm, never scary)
+
+Owner: «Vi må forbedre designet, så det ser ut som en skikkelig dungeon crawler.» Workshop: `docs/v2/workshops/2026-10-31_dungeon_crawler_stil.md`.
+
+- **A warm, dark cave:** stone, wood, brass, leather and parchment, with gold and amber as the accent. Torchlight is amber, never white or blue. It matches the picture-book style in `content/art-style.json`: cosy, not «Diablo».
+- **The look is its own file.** `prototype/dungeon.css` (loaded after `child.css`) owns only how things look; `child.css` owns the layout and is unchanged. The panels are stone slabs with a brass edge, the cards for what is in the room are parchment with dark ink, the buttons are wood, the magnifier is brass, the backpack bar is leather, and popups are wooden chests. Rock is noise the browser draws itself (an SVG `feTurbulence` data URI), so no image file is needed.
+- **The map:** the fog is rock, not black. The room she is in is lit like a torch (a warm glow in `map-view.mjs`, so the DM's map has it too). Rooms she has been in lie in half-dark, a little warmer than the original's blue-grey tiles. The frame around a room she can walk to is a warm light, not cyan. «?» and 🔒 are as before.
+- **Font:** «MedievalSharp» from Google Fonts for headlines and buttons, a serif without net. Running text keeps the system font, so it stays easy to read.
+- **To be drawn later:** six `ui:` entries in `content/assets.json` (`frame-stone`, `parchment`, `rock`, `leather`, `button-wood`, `torch`). CSS is the placeholder until they exist, and they are swapped in piece by piece.
+- The DM page is a tool for the adult and keeps its look, apart from the shared map.
+
 ## 2026-10-28 - ✓ at once where someone is and nothing is hidden
 
 Owner: «hvis et rom har en npc/hendelse, og det da ikke er noe å finne der, så skal vi heller ikke trenge å utforske rommet for å få grønn V».

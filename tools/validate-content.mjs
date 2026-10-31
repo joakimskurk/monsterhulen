@@ -151,6 +151,8 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
   ['rhyme-line', 'lost-thing', 'part', 'key', 'door', 'unknown'].forEach((g) => want(`generic:${g}`));
   // The iPad's own symbols (workshop 2026-10-28, iPad map and room symbols).
   ['backpack', 'magnifier', 'player', 'room-thing', 'room-look', 'room-looked'].forEach((g) => want(`ui:${g}`));
+  // The look of the cave (workshop 2026-10-31): CSS until these are drawn.
+  ['frame-stone', 'parchment', 'rock', 'leather', 'button-wood', 'torch'].forEach((g) => want(`ui:${g}`));
 
   const files = new Set();
   for (const a of c.assets) {

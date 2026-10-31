@@ -27,7 +27,7 @@ npm run prototype:lan
 `prototype:lan` gjør prototypen synlig for andre enheter på hjemmenettet. Bruk den bare på et nett du stoler på.
 
 ### Hva barnet kan gjøre på iPaden
-iPaden viser tekst. Et lite bilde foran navnet er en plassholder til tegningene er laget (`content/assets.json`). 🔊 på et kort leser det høyt med iPadens norske stemme, bare når barnet trykker. Fortellingen er din.
+iPaden viser tekst. Et lite bilde foran navnet er en plassholder til tegningene er laget (`content/assets.json`). Utseendet (en varm, mørk hule med stein, tre, messing og pergament) ligger i `dungeon.css`; oppsettet i `child.css`. 🔊 på et kort leser det høyt med iPadens norske stemme, bare når barnet trykker. Fortellingen er din.
 
 - trykke på et rom på kartet for å gå dit (hun ser bare rom hun har vært i og naborommene),
 - **Lupa 🔍** («se deg rundt»: du ser om noe er gjemt og kaster terning ved behov),

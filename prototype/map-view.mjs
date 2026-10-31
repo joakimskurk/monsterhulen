@@ -15,18 +15,29 @@ const SIDE = { n: 'N', e: 'E', s: 'S', w: 'W' };
 
 const STYLE = `
 .cave-wrap { container-type: inline-size; width: 100%; }
-/* The map fills the width it is given: square tiles of an equal share, text scaled with them. */
-.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; background: #070b10; padding: 6px; border: 3px solid #07050d; border-radius: 6px; image-rendering: pixelated; box-sizing: border-box; width: 100%; }
-.cave-tile { position: relative; aspect-ratio: 1; background: #070b10; }
+/* The map fills the width it is given: square tiles of an equal share, text scaled with them.
+   The fog is rock (workshop 2026-10-31, S3): noise drawn by the browser, no file, darkened. */
+.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; padding: 6px; border: 3px solid #3a2a18; border-radius: 8px; image-rendering: pixelated; box-sizing: border-box; width: 100%; overflow: hidden;
+  background: linear-gradient(rgba(4, 2, 1, .62), rgba(4, 2, 1, .62)), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.34 0 0 0 0.06  0.27 0 0 0 0.045  0.20 0 0 0 0.035  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23r)'/%3E%3C/svg%3E") #15100c;
+  box-shadow: inset 0 0 0 2px rgba(201, 162, 76, .35), inset 0 0 60px rgba(0, 0, 0, .8); }
+.cave-tile { position: relative; aspect-ratio: 1; }
 .cave-tile img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
+/* Cave stone: the original's blue-grey tiles warmed up. The room she is in is lit; the rooms she has been
+   in lie in half-dark. */
+.cave-tile.room img { filter: sepia(.25) brightness(.6); }
+.cave-tile.here img { filter: sepia(.12) brightness(1); }
+/* Torchlight (workshop 2026-10-31, S3): a warm glow over the room she is in, reaching into the rock. */
+.cave-tile .torch { position: absolute; z-index: 1; pointer-events: none; left: calc(var(--cell) * var(--rw) / 2); top: calc(var(--cell) * var(--rh) / 2); width: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); height: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; opacity: .9;
+  background: radial-gradient(circle, rgba(255, 180, 80, .55) 0%, rgba(255, 140, 50, .3) 32%, rgba(255, 110, 40, .1) 52%, transparent 68%); animation: cave-flicker 2.8s ease-in-out infinite alternate; }
+@keyframes cave-flicker { from { opacity: .8; } to { opacity: 1; } }
 /* DM only: rooms she has not been in are faint (what can be explored); the child gets fog instead. */
 .cave-tile.unexplored img, .cave-tile.unexplored .door { opacity: .3; }
-/* One frame around the whole room (not one per tile): yellow where she is, light blue where she can go
+/* One frame around the whole room (not one per tile): gold where she is, a warm light where she can go
    back to. The frame sits above the tile images. */
 .cave-tile .frame { position: absolute; inset: 0; pointer-events: none; z-index: 2; border: 0 solid transparent; }
-.cave-tile.here .frame { border-color: #ffd95c; }
+.cave-tile.here .frame { border-color: #f0c75e; }
 .cave-tile.go { cursor: pointer; }
-.cave-tile.go .frame { border-color: rgba(99, 242, 255, .8); }
+.cave-tile.go .frame { border-color: rgba(255, 225, 160, .7); }
 .cave-tile .mark, .cave-tile .corner { z-index: 3; }
 .cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
 .cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
@@ -69,8 +80,8 @@ const STYLE = `
 .cave-tile .mk-looked { border-color: #7fe0a0; color: #7fe0a0; font-weight: 800; }
 .cave-tile .mk-look { border-color: #8fa0c0; }
 /* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
-.cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #07050d; border-radius: 3px; background: #ffd95c; color: #271b00; box-shadow: 2px 2px 0 #07050d; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; }
-.cave-probe.locked { background: #ff7a7a; cursor: default; }
+.cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #3b2210 !important; border-radius: 3px; background: linear-gradient(#ffefb8, #f0c75e) !important; color: #271b00 !important; box-shadow: 2px 2px 0 #1a0f06 !important; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; text-shadow: none !important; }
+.cave-probe.locked { background: linear-gradient(#ffb0a0, #e06a5a) !important; cursor: default; }
 `;
 function ensureStyle() {
   if (document.getElementById('cave-style')) return;
@@ -194,6 +205,12 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
         if (!join.S) f.style.borderBottomWidth = w;
         if (!join.W) f.style.borderLeftWidth = w;
         tile.append(f);
+      }
+      // Torchlight over the room she is in: one glow, centred on the room, from its first cell.
+      if (r.look === 'here' && x === r.x && y === r.y) {
+        const t = span('torch', '');
+        t.style.setProperty('--rw', r.w); t.style.setProperty('--rh', r.h);
+        tile.append(t);
       }
       // A star in the middle cell where the child is; the room number in the corner for the DM.
       const midX = r.x + Math.floor((r.w - 1) / 2), midY = r.y + Math.floor((r.h - 1) / 2);
