@@ -1,0 +1,146 @@
+/* The look of the child's screen: a 16-bit SNES-RPG dungeon (owner's concept art, docs/v2/concept/,
+   2026-10-31; workshop 2026-10-31). Slate-blue stone blocks, brown dirt floors, torches, gold-framed
+   boxes, parchment for what is to be read. child.css owns the layout (what goes where, how big); this
+   file owns only how it looks, so it can be swapped for real graphics piece by piece (content/assets.json,
+   the ui:* entries). Nothing here is scary: warm amber light, never white or blue. */
+:root {
+  --display: 'Cinzel', 'Georgia', 'Times New Roman', serif;
+  --gold: #e8b93a;
+  --gold-light: #ffe08a;
+  --gold-dark: #8a6414;
+  --ember: #ffa23a;
+  --slate: #2b303b;
+  --slate-light: #3a4150;
+  --slate-dark: #171a21;
+  --slate-edge: #4a5263;
+  --black: #0e1014;
+  --parchment: #f3e6c8;
+  --parchment-dark: #e3cfa3;
+  --ink: #2b1d12;
+  --ink-soft: #4a3522;
+  --muted: #b9b2a0;
+  --line: var(--slate-edge);
+  --accent: var(--gold);
+  /* Rock: noise drawn by the browser (no file). Slate blue-grey, the same channel for every colour so it stays stone. */
+  --rock: url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.22 0 0 0 0.05  0.24 0 0 0 0.055  0.30 0 0 0 0.075  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23r)'/%3E%3C/svg%3E");
+  /* The gold pixel frame on every box (like the icon tiles in the concept art): black, gold, dark gold, black. */
+  --frame: inset 0 0 0 3px var(--gold), inset 0 0 0 5px var(--gold-dark), inset 0 0 0 6px var(--black);
+  background: var(--slate-dark);
+}
+body.child {
+  color: #f1e6cc;
+  background:
+    radial-gradient(ellipse at 50% 35%, rgba(255, 160, 60, .10), transparent 55%),
+    radial-gradient(ellipse at center, transparent 45%, rgba(0, 0, 0, .8) 100%),
+    var(--rock) #11141a;
+}
+body.child h1, body.child h2, body.child h3, body.child button, .found-text, .found-name, .mission, .lupe-text, .end .headline {
+  font-family: var(--display); font-weight: 700;
+}
+/* Pixel art stays crisp however large it is shown. */
+.thumb, .icon img, .found-thing img, .found-bag img, .drag-ghost img, .lupe-icon img { image-rendering: pixelated; }
+
+/* ---------- Stone boxes with a gold frame and corner ornaments (the concept banner): the panels ---------- */
+.app .panel, #join.panel, .found-card, .layer-card { position: relative; }
+.app .panel::before, .app .panel::after, #join.panel::before, #join.panel::after, .found-card::before, .found-card::after, .layer-card::before, .layer-card::after {
+  content: ''; position: absolute; width: 10px; height: 10px; background: var(--gold); box-shadow: 0 0 0 2px var(--black); pointer-events: none; z-index: 1; transform: rotate(45deg);
+}
+.app .panel::before, #join.panel::before, .found-card::before, .layer-card::before { left: -2px; top: -2px; }
+.app .panel::after, #join.panel::after, .found-card::after, .layer-card::after { right: -2px; bottom: -2px; }
+.app .panel, #join.panel {
+  background: linear-gradient(rgba(0, 0, 0, .45), rgba(0, 0, 0, .6)), var(--rock) var(--slate);
+  border: 4px solid var(--black);
+  border-radius: 4px;
+  box-shadow: var(--frame), inset 0 0 50px rgba(0, 0, 0, .5), 0 8px 22px rgba(0, 0, 0, .7);
+}
+.app .panel { padding: 12px 14px; }
+.top .mission { color: var(--gold); font-size: calc(var(--u) * 1.15); letter-spacing: .05em; text-shadow: 2px 2px 0 var(--black), 0 0 14px rgba(255, 170, 60, .35); }
+.top .mission::before { content: '🔥 '; font-size: .9em; }
+.top .status { color: var(--muted); }
+body.child .room-head h1 { color: var(--gold); letter-spacing: .05em; text-shadow: 2px 2px 0 var(--black), 0 0 12px rgba(255, 170, 60, .3); }
+.room-head .place { color: var(--muted); font-style: italic; }
+.walk-hint { color: var(--muted); }
+body.child .things-box > p { color: var(--muted); font-style: italic; }
+
+/* ---------- Gold-framed tiles: the buttons ---------- */
+body.child button {
+  background: linear-gradient(var(--slate-light), var(--slate));
+  color: var(--gold-light);
+  border: 3px solid var(--black);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 0 3px 0 var(--black);
+  text-shadow: 1px 1px 0 var(--black);
+  letter-spacing: .04em;
+}
+body.child button:active { transform: translateY(2px); box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 0 1px 0 var(--black); }
+body.child button.ghost { color: #d8d2c0; box-shadow: inset 0 0 0 2px var(--slate-edge), 0 3px 0 var(--black); }
+body.child .lupe {
+  background: radial-gradient(circle at 35% 30%, #fff1b8, var(--gold) 40%, #b8862a 75%, #7a5612);
+  color: var(--ink);
+  border: 4px solid var(--black);
+  box-shadow: 0 0 0 3px var(--gold-dark), 0 0 0 5px var(--black), 0 5px 0 var(--black), 0 0 24px rgba(255, 180, 60, .35);
+  text-shadow: none;
+}
+body.child .lupe:active { transform: translateY(3px); box-shadow: 0 0 0 3px var(--gold-dark), 0 0 0 5px var(--black), 0 2px 0 var(--black); }
+.lupe-text { font-weight: 700; }
+
+/* ---------- Gold-framed stone cards: what is in the room, and what the DM says (as the icon tiles and
+   hero portraits in the concept art: dark, with a gold frame) ---------- */
+body.child .thing {
+  background: linear-gradient(var(--slate-light), var(--slate));
+  color: #f1e6cc;
+  border: 3px solid var(--black);
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 3px 3px 0 rgba(0, 0, 0, .55);
+}
+body.child .thing h3 { color: var(--gold-light); text-shadow: 1px 1px 0 var(--black); }
+body.child .thing p { color: #e2d8c0; }
+body.child .thing .task { color: var(--ember); font-weight: 700; }
+body.child .thing .done-task { background: linear-gradient(#fff1b8, var(--gold)); color: var(--ink); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 3px 0 var(--black); text-shadow: none; }
+body.child .thing .speak { background: transparent; color: var(--gold-light); box-shadow: inset 0 0 0 2px var(--slate-edge); text-shadow: none; }
+body.dragging .thing.drop-ok { box-shadow: inset 0 0 0 2px var(--gold-light), inset 0 0 0 4px var(--gold); }
+body.dragging .thing.drop-hot { background: linear-gradient(#5a4a1a, #3a2f12); box-shadow: inset 0 0 0 3px var(--gold-light), 0 0 18px rgba(255, 200, 80, .55); }
+body.dragging .thing:not(.drop-ok) { opacity: .4; }
+body.child .say { background: linear-gradient(var(--slate-light), var(--slate)); color: #f1e6cc; border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 3px 3px 0 rgba(0, 0, 0, .55); font-style: italic; }
+body.child .say.nudge { color: var(--gold-light); box-shadow: inset 0 0 0 2px var(--gold); border-style: dashed; border-color: var(--gold); font-style: normal; }
+body.child .news { background: linear-gradient(var(--slate-light), var(--slate)); color: var(--gold-light); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark); }
+
+/* ---------- The backpack along the bottom: gold-framed icon tiles ---------- */
+body.child .bag-part h2 { color: var(--gold); letter-spacing: .08em; text-shadow: 1px 1px 0 var(--black); }
+body.child .bag-part .chipbtn, .sticker { background: linear-gradient(var(--slate-light), var(--slate)); color: var(--gold-light); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 0 2px 0 var(--black); text-shadow: none; }
+.sticker.ting { background: linear-gradient(var(--slate-light), var(--slate)); color: var(--gold-light); }
+.chipbtn.new { outline-color: var(--gold-light); }
+.bag-part .chips .empty { color: var(--muted); font-style: italic; }
+
+/* ---------- Popups, dialogs and the layers on top: the same stone box, bigger frame ---------- */
+.found-card, .layer-card, dialog, body.child .info-card {
+  background: linear-gradient(rgba(0, 0, 0, .35), rgba(0, 0, 0, .55)), var(--rock) var(--slate);
+  color: #f1e6cc;
+  border: 4px solid var(--black);
+  border-radius: 4px;
+  box-shadow: var(--frame), 0 14px 40px rgba(0, 0, 0, .85);
+}
+.found, .layer { background: rgba(6, 7, 10, .8); }
+.found-text { color: var(--gold); text-shadow: 2px 2px 0 var(--black); }
+.found-name { color: var(--gold-light); }
+.found-hint { color: var(--muted); }
+.end { border-color: var(--black); }
+body.child .found-bag { border: 4px dashed rgba(232, 185, 58, .55); border-radius: 8px; }
+body.child .found-bag.hot { border-color: var(--gold); background: rgba(232, 185, 58, .12); }
+body.child .info-close { background: linear-gradient(#fff1b8, var(--gold)); color: var(--ink); border: 3px solid var(--black); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 3px 0 var(--black); text-shadow: none; }
+.die-face { border-color: var(--black) !important; box-shadow: 4px 4px 0 var(--black); }
+dialog::backdrop { background: rgba(6, 7, 10, .65); }
+
+/* ---------- The hero: a card lights up when tapped ---------- */
+.hero-card-box h1, .hero-card-box h2 { color: var(--gold); text-shadow: 2px 2px 0 var(--black); }
+body.child .hero-card.selected { background: linear-gradient(#5a4a1a, #3a2f12); box-shadow: inset 0 0 0 2px var(--gold-light), inset 0 0 0 4px var(--gold), 0 0 18px rgba(255, 200, 80, .55); }
+
+/* ---------- The door in: the code screen ---------- */
+#join h1 { color: var(--gold); font-size: 42px; letter-spacing: .1em; text-shadow: 3px 3px 0 var(--black), 0 0 18px rgba(255, 170, 60, .4); }
+#join h1::before { content: '🏰'; display: block; font-size: 72px; margin-bottom: 8px; text-shadow: none; }
+#join p { color: var(--muted); }
+#join input { background: var(--slate-dark); color: var(--gold-light); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark); font-family: var(--display); font-weight: 700; }
+
+/* Turn the iPad */
+.turn { background: var(--rock) #11141a; color: var(--gold); }
+.turn p { font-family: var(--display); }

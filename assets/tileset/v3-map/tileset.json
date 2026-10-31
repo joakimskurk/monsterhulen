@@ -1,0 +1,61 @@
+{
+  "format": "monsterhulen-tileset",
+  "version": 1,
+  "source": "docs/reference/original-v0.12.3/Monsterhulen_CONNECTIONS_V2_IMPLEMENTED.html (const A in the tileset script, ROOT assets/v3/map/)",
+  "tile": 32,
+  "floors": [
+    "floors-1.png",
+    "floors-2.png",
+    "floors-3.png",
+    "floors-4.png",
+    "floors-5.png",
+    "floors-6.png",
+    "floors-7.png",
+    "floors-8.png",
+    "floors-9.png"
+  ],
+  "wall": {
+    "N": "wall-N.png",
+    "E": "wall-E.png",
+    "S": "wall-S.png",
+    "W": "wall-W.png"
+  },
+  "outer": {
+    "NW": "outer-NW.png",
+    "NE": "outer-NE.png",
+    "SE": "outer-SE.png",
+    "SW": "outer-SW.png"
+  },
+  "inner": {
+    "NW": "inner-NW.png",
+    "NE": "inner-NE.png",
+    "SE": "inner-SE.png",
+    "SW": "inner-SW.png"
+  },
+  "connection": {
+    "door_open": {
+      "N": "connection-door_open-N.png",
+      "E": "connection-door_open-E.png",
+      "S": "connection-door_open-S.png",
+      "W": "connection-door_open-W.png"
+    },
+    "door_locked": {
+      "N": "connection-door_locked-N.png",
+      "E": "connection-door_locked-E.png",
+      "S": "connection-door_locked-S.png",
+      "W": "connection-door_locked-W.png"
+    },
+    "passage_open": {
+      "N": "connection-passage_open-N.png",
+      "E": "connection-passage_open-E.png",
+      "S": "connection-passage_open-S.png",
+      "W": "connection-passage_open-W.png"
+    },
+    "route_blocked": {
+      "N": "connection-route_blocked-N.png",
+      "E": "connection-route_blocked-E.png",
+      "S": "connection-route_blocked-S.png",
+      "W": "connection-route_blocked-W.png"
+    }
+  }
+}

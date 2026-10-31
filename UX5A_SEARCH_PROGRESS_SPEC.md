@@ -1,3 +1,5 @@
+> **SUPERSEDED.** Generic 3/4 progress tracks were removed by patch 13. The test and patch referenced below do not exist in this repository. Current UX5A state: `PROJECT_STATE.md`.
+
 # UX5A - SEARCHABLE ROOMS + ENCOUNTER STATE
 
 Status: candidate authored 2026-10-26. Runtime QA pending.

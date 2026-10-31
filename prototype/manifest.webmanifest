@@ -1,0 +1,10 @@
+{
+  "name": "Monsterhulen",
+  "short_name": "Monsterhulen",
+  "start_url": "child.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#17141f",
+  "theme_color": "#17141f"
+}

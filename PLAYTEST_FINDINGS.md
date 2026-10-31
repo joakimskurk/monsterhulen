@@ -169,4 +169,4 @@ The test has now been restored and passes **5136/0**, covering all six current m
 
 Do not expand Adventure Blueprint bank. Do not start full DM Control Surface, UX5B or Multiscreen first.
 
-Content review may continue as documentation; reviewed through `BROTROLLET`, next subject **DEN LEVENDE RUSTNINGEN**.
+The full content bank has been reviewed (prep branch). V2 direction and priorities: `PROJECT_STATE.md`, `docs/v2/SYSTEM_DESIGN_V2.md`.

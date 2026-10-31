@@ -1,0 +1,26 @@
+{
+  "status": "from-original",
+  "updated": "2026-10-28",
+  "note": "Romnavn og stemning per sone, hentet fra eierens originale versjon (Monsterhulen V0.12.3, EVENTYRKRYPER V0.4 WORLD PLANNER). Rommene i en sone får navnene i rekkefølge; går navnene tom, får de et tall bak («SOPPSTIEN 2»), som i originalen.",
+  "start": "STARTPORTEN",
+  "tones": {
+    "LYS": "Her er det lyst, rart og eventyrlig.",
+    "MØRK": "Her er det mørkere og litt skummelt, men alt kan fortsatt løses på mange måter.",
+    "RAR": "Her oppfører verden seg litt merkeligere enn vanlig.",
+    "BLANDET": "Her blandes lyst og mørkt."
+  },
+  "zones": {
+    "SOPPSKOGEN":      { "tone": "LYS",     "rooms": ["SOPPSTIEN", "LYSGLØTTEN", "MÅNEENGEN", "KJEKSGROTTA", "MOSSEPORTEN", "FIREFLYSALEN"] },
+    "GRAVPLASSEN":     { "tone": "MØRK",    "rooms": ["GAMLE GRAVER", "TÅKEGANGEN", "BEINHAGEN", "SPØKELSESSTIEN", "MINNEKAMMERET", "KLOKKERUINEN"] },
+    "HEKSETÅRNET":     { "tone": "RAR",     "rooms": ["GRYTEROMMET", "KOSTELOFTET", "TANN-DØREN", "KATTEGANGEN", "BOBLEKAMMERET", "MÅNESALEN"] },
+    "LANTERNEHAGEN":   { "tone": "LYS",     "rooms": ["LYKTESTIEN", "SOLBRØNNEN", "BLOMSTERPORTEN", "GLITTERBROEN", "LYSSALEN", "KANINHAGEN"] },
+    "TÅKESUMPEN":      { "tone": "BLANDET", "rooms": ["TÅKEBRYGGA", "SIVGANGEN", "FROSKEDAMMEN", "MUDDERSALEN", "SUMPPORTEN", "MOSSEBROEN"] },
+    "ZOMBIESLOTTET":   { "tone": "MØRK",    "rooms": ["ZOMBIEKJØKKENET", "SKRANGLEHALLEN", "RUSTNINGSROMMET", "FLAGGERMUSLOFTET", "KRYPTTRAPPEN", "MØRKESALEN"] },
+    "MÅNESKOGEN":      { "tone": "BLANDET", "rooms": ["MÅNESTIEN", "ULVEGLØTTEN", "SØLVBEKKEN", "UGLETREET", "STJERNEMOSEN", "SKYGGEPORTEN"] },
+    "KRYSTALLGROTTEN": { "tone": "LYS",     "rooms": ["BLÅKRYSTALLEN", "EKKOHALLEN", "GLIMMERGANGEN", "LYSKULEN", "STEINBROEN", "SPEILSALEN"] },
+    "BEINKATAKOMBENE": { "tone": "MØRK",    "rooms": ["BEINGANGEN", "GRAVSALEN", "SKALLEHYLLEN", "KALDGANGEN", "KISTEKAMMERET", "SVARTPORTEN"] },
+    "REGNBUEDALEN":    { "tone": "LYS",     "rooms": ["FARGESTIEN", "SKYBROEN", "SOLENGEN", "REGNROMMET", "FJÆRHAGEN", "GLITTERPORTEN"] },
+    "SKYGGEGANGENE":   { "tone": "MØRK",    "rooms": ["SKYGGEROMMET", "SVARTGANGEN", "LYDLØS SAL", "TÅKETRAPPEN", "KALDPORTEN", "NATTHALLEN"] },
+    "KLOKKETÅRNET":    { "tone": "RAR",     "rooms": ["TIKKTAKKROMMET", "TANNHJULSALEN", "SNUROMMET", "PENDELGANGEN", "KLOKKELOFTET", "TIDSPORTEN"] }
+  }
+}

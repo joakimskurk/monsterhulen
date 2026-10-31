@@ -1,0 +1,45 @@
+{
+  "status": "draft-2",
+  "version": 2,
+  "updated": "2026-10-31",
+  "note": "Felles stil for alt som genereres (content/assets.json). Hvert bilde bestilles som: style.prompt + framing for sin type + beskrivelsen av motivet. Endres stilen, øk version: bilder laget med en eldre versjon kan da finnes og lages på nytt. Se content/README.md. Versjon 2 (eieren, 2026-10-31): 16-bit SNES-RPG pixel art, magi/fantasy/D&D, som konseptbildene i `references`.",
+  "references": [
+    "docs/v2/concept/2026-10-31_tileset_skifer.webp",
+    "docs/v2/concept/2026-10-31_tileset_brun.webp",
+    "docs/v2/concept/2026-10-31_helter_og_tittel.webp",
+    "docs/v2/concept/2026-10-31_helter_helfigur.webp",
+    "docs/v2/concept/2026-10-31_heks.webp",
+    "docs/v2/concept/2026-10-31_figurer.webp"
+  ],
+  "style": {
+    "about": "16-bit SNES-RPG pixel art, magi/fantasy/D&D, varm og vennlig, for barn 5–7 år. Figurene er søte (chibi) med store, vennlige øyne og detaljerte eventyrklær: kapper, belter, vesker, staver, lykter. Monstrene er rare og litt tøysete, aldri skumle. Alt skal kunne kjennes igjen i liten størrelse på en iPad.",
+    "prompt": "16-bit SNES-era JRPG pixel art, crisp chunky pixels with a clean dark outline, dithered shading and a small highlight, drawn at about 128 by 128 pixels and scaled up with hard pixel edges. Rich warm saturated palette: gold, amber, forest green, royal purple, slate blue, warm brown. Cute chibi proportions, big friendly expressive eyes, detailed fantasy adventure costume (cloaks, belts, pouches, staffs, lanterns). Whimsical, cosy Nordic fairy-tale mood, curious, never scary. Single subject, centred, fully visible, plain transparent background, no text, no letters, no frame, no border.",
+    "avoid": "scary, gore, blood, sharp teeth close-up, horror, realistic photo, 3D render, smooth airbrushed gradients, blurry, anti-aliased, painterly, text, letters, watermark, signature, frame, busy background, multiple subjects, cropped subject"
+  },
+  "output": {
+    "format": "png",
+    "width": 1024,
+    "height": 1024,
+    "background": "transparent"
+  },
+  "framing": {
+    "figure": "A full-body character, standing or sitting, facing the viewer slightly turned, like a JRPG character sprite drawn large.",
+    "item": "A single object, slightly from above, like a JRPG inventory icon drawn large.",
+    "obstacle": "A small scene of the obstacle in a dungeon passage of slate-blue stone blocks, seen from the front.",
+    "source": "A small scene of the place in a dungeon of slate-blue stone blocks, the source clearly visible.",
+    "recipe": "A single crafted object, slightly from above, like a JRPG inventory icon drawn large.",
+    "tag": "A very simple pixel icon for the idea, bold and flat, like a 16 by 16 game icon, readable at 32 pixels.",
+    "mission": "The goal of an adventure, shown as a single important thing or character.",
+    "theme": "A single thing or character, like a JRPG sprite drawn large.",
+    "generic": "A very simple pixel icon, bold and flat, like a 16 by 16 game icon, readable at 32 pixels.",
+    "ui": "A simple, friendly pixel icon for a child's game screen, bold and flat, with a dark outline, readable at 32 pixels, on a transparent background.",
+    "hero": "A hero portrait, head and shoulders, facing the viewer with a friendly smile, like a JRPG character portrait; also readable small as a marker on a map.",
+    "trait": "A very simple pixel icon for the idea, bold and flat, like a 16 by 16 game icon, readable at 32 pixels."
+  },
+  "review": [
+    "Passer stilen med konseptbildene og de andre godkjente bildene (ekte pixel art: harde piksler, ingen utvisking)?",
+    "Er det tydelig hva det er, også lite på iPaden?",
+    "Er det vennlig nok for en femåring?",
+    "Ingen tekst, vannmerke eller signatur i bildet?"
+  ]
+}
