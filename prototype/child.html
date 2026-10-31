@@ -33,6 +33,8 @@
        room and the doors on the right, the backpack along the bottom; everything else opens on top. -->
   <main id="game" class="app" hidden>
     <header class="top">
+      <!-- Her hero (workshop 2026-10-31, heltevalg): picture and name; a tap shows what she is good at. -->
+      <button id="heroChip" class="ghost top-btn hero-chip" type="button" hidden></button>
       <p id="mission" class="mission"></p>
       <p id="status" class="status"></p>
       <button id="bookBtn" class="ghost top-btn" type="button" hidden>📖 HELTEBOKA</button>
@@ -60,7 +62,8 @@
     </section>
   </main>
 
-  <!-- On top of the game: before the run, at the end, and the hero book. -->
+  <!-- On top of the game: who she is (the first time), before the run, at the end, and the hero book. -->
+  <div id="heroLayer" class="layer hero-layer" hidden><section id="heroPick" class="panel layer-card hero-card-box"></section></div>
   <div id="packLayer" class="layer" hidden><section id="pack" class="panel layer-card"></section></div>
   <div id="endLayer" class="layer" hidden><section id="end" class="panel end layer-card"></section></div>
   <div id="bookLayer" class="layer" hidden>

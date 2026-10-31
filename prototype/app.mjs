@@ -8,7 +8,7 @@ import { playerView } from './player-view.mjs';
 import { stuckHint } from './stuck.mjs';
 import { caveGrid, doorsFor, doorKind, caveBounds } from './map-view.mjs';
 import * as table from './table.mjs';
-import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from './herobook.mjs';
+import { emptyBook, tingOffer, recordRun, parseBook, bookFile, setHero, heroView, heroChoices } from './herobook.mjs';
 import { caveOverview } from './overview.mjs';
 
 const $ = (sel) => document.querySelector(sel);
@@ -159,6 +159,11 @@ function handleBySelf(r) {
     save(); render(); return true;
   }
   if (r.type === 'PICK_TING' && !state.chosenTing) { const pick = offer().find((c) => c.id === r.id); if (pick) { chooseTing(pick); return true; } }
+  // The hero (workshop 2026-10-31, heltevalg): the child's own choice, while the book has none.
+  if (r.type === 'HERO' && !loadBook().hero) {
+    const next = setHero(loadBook(), { kind: r.kind, trait: r.trait }, content);
+    if (next) { saveBook(next); const h = heroView(next, content); log(`Du er ${h.look}, og du er ekstra god på: ${h.trait.label.toLowerCase()}.`); save(); render(); return true; }
+  }
   return false;
 }
 
@@ -208,6 +213,8 @@ function publish() {
     end: finished ? { ...table.summary(T()), offer: book.runs.some((r) => r.code === current.code) ? [] : offer(), chosen: state.chosenTing?.name || null } : null,
     book: { friends: book.friends.map((f) => f.name), ting: book.ting.map((x) => x.name), runs: book.runs.length },
     pack: canPack() ? { friends: book.friends.map((f) => f.name), ting: book.ting.map((x) => x.name) } : null,
+    hero: heroView(book, content),
+    heroChoices: heroChoices(content),
     // Pictures for what comes from the hero book (not part of this run).
     icons: Object.fromEntries([
       ...book.friends.map((f) => [f.name, content.figures.find((x) => x.name === f.name)?.icon]),
@@ -424,7 +431,19 @@ function renderHeroBook() {
       saveBook(next); render();
     } catch (e) { alert(e.message); }
   });
+  // The hero (workshop 2026-10-31, heltevalg): chosen on the iPad; the DM may name her or let her choose again.
+  const hero = heroView(book, content);
+  const nameInput = el('input', { placeholder: hero?.look || 'Navn', value: book.hero?.name || '' });
+  nameInput.addEventListener('change', () => { const next = setHero(book, { ...book.hero, name: nameInput.value }, content); if (next) { saveBook(next); render(); } });
+  const heroBox = hero
+    ? el('div', { class: 'hero-row' }, el('span', { class: 'hero-pic' }, String(hero.icon).startsWith('assets/') ? el('img', { src: `/${hero.icon}`, alt: '' }) : hero.icon),
+      el('div', {}, el('b', {}, hero.name), ` · ${hero.look} · ekstra god på ${hero.trait.label.toLowerCase()}`,
+        el('p', { class: 'hint' }, `${hero.trait.dm} Passer det til det hun prøver: kast to terninger og bruk den høyeste.`),
+        el('div', { class: 'actions' }, el('label', {}, 'Heltens navn', nameInput),
+          el('button', { class: 'small ghost', onclick: () => { if (confirm('La barnet velge helt på nytt? Venner og TING beholdes.')) { saveBook({ ...book, hero: null }); render(); } } }, 'Bytt helt'))))
+    : el('p', { class: 'hint' }, 'Ingen helt ennå: iPaden spør barnet «HVEM ER DU?» når den kobler seg til.');
   $('#herobook').replaceChildren(...[el('h2', {}, `Helteboka · ${book.runs.length} løp`),
+    heroBox,
     el('p', {}, el('b', {}, 'Venner: '), book.friends.map((f) => f.name).join(', ') || '–'),
     el('p', {}, el('b', {}, `TING (${book.ting.length} av 12): `), book.ting.map((x) => x.name).join(', ') || '–'),
     book.memories.length ? el('p', { class: 'hint' }, `Sist: ${book.memories.slice(-3).reverse().join(' · ')}`) : null,
@@ -617,9 +636,12 @@ function renderDice() {
     if (!state.roll) table.askRoll(T(), 'Forteller');
     table.rolled(T(), v); save(); render();
   } }, FACE[v])));
+  const hero = heroView(loadBook(), content);
   $('#dice').replaceChildren(...[
     el('h2', {}, 'Terning'),
     roll ? el('p', { class: 'hint' }, roll.kind === 'search' ? 'Venter på at hun kaster for å lete …' : `Venter på at hun kaster${roll.reason ? ` (${roll.reason})` : ''} …`) : null,
+    // The hero's trait (workshop 2026-10-31, H2): the DM's rule, not the app's.
+    roll && roll.kind !== 'search' && hero ? el('p', { class: 'hint' }, el('b', {}, `${hero.name} er ekstra god på ${hero.trait.label.toLowerCase()}: `), 'passer det, kast to terninger og bruk den høyeste.') : null,
     roll ? el('button', { class: 'small ghost', onclick: () => { state.roll = null; save(); render(); } }, 'Avbryt kastet') : null,
     !roll ? el('div', { class: 'actions' },
       el('button', { class: 'small', onclick: () => { table.askRoll(T(), 'usikkert'); save(); render(); } }, 'Be henne kaste'),

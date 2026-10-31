@@ -32,7 +32,9 @@
     "mission": "The goal of an adventure, shown as a single important thing or character.",
     "theme": "A single thing or character, like a JRPG sprite drawn large.",
     "generic": "A very simple pixel icon, bold and flat, like a 16 by 16 game icon, readable at 32 pixels.",
-    "ui": "A simple, friendly pixel icon for a child's game screen, bold and flat, with a dark outline, readable at 32 pixels, on a transparent background."
+    "ui": "A simple, friendly pixel icon for a child's game screen, bold and flat, with a dark outline, readable at 32 pixels, on a transparent background.",
+    "hero": "A hero portrait, head and shoulders, facing the viewer with a friendly smile, like a JRPG character portrait; also readable small as a marker on a map.",
+    "trait": "A very simple pixel icon for the idea, bold and flat, like a 16 by 16 game icon, readable at 32 pixels."
   },
   "review": [
     "Passer stilen med konseptbildene og de andre godkjente bildene (ekte pixel art: harde piksler, ingen utvisking)?",

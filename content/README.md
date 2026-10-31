@@ -17,6 +17,7 @@ Bakgrunn for klassifiseringen: `docs/v2/CONTENT_MATRIX_V2.md`.
 | `recipes.json` | få kombinasjoner (A + B → C) |
 | `missions.json` | klassikere: oppdrag med fast tema |
 | `themes.json` | deler til sammensatte oppdrag (nytt tema for hver kode) |
+| `heroes.json` | heltene barnet kan velge, og egenskapene («ekstra god på») |
 
 Sjekk dataene med:
 

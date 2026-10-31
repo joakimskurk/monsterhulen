@@ -4,6 +4,16 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-31 - The hero choice is back (look, trait, name)
+
+Owner: «Ja, vi skal ha heltevalg – det har vært i siden hele tiden.» The original (V0.12.3, `HulerCharacterSystem`) had a hero with a look, a trait («ekstra god på») and a start item. Workshop: `docs/v2/workshops/2026-10-31_heltevalg.md`.
+
+- **The hero is look + one trait + name.** The child picks the look and the trait on the iPad, with pictures («HVEM ER DU?», then «HVA ER DU EKSTRA GOD PÅ?»). The DM may type a name on the Helteboka tab; without one the hero is called by its look («Panda»). No start item: packing a friend and a TING before the run already covers that.
+- **The trait is the DM's rule, not the app's:** when the DM asks for a roll and what the child tries fits the trait, she rolls two dice and uses the higher. The dice card on the DM page says so. The trait is not a tag and does not touch the generator, so every run is proven solvable as before. Whether traits should become tags (MODIG = MOT) is taken up again after playtesting.
+- **Where it lives:** `book.hero` in Helteboka (`prototype/herobook.mjs`), one hero per book. HERO is a request the DM page accepts by itself, like BRING and PICK_TING, only while the book has no hero. «Bytt helt» on the DM page clears it and the iPad asks again; friends and TING are kept. Backups made before this still load.
+- **Where it shows:** top left on the iPad (picture and name; a tap shows the trait), as the marker on the map instead of ★, in «DU KLARTE DET, LUNA!» and on the DM page.
+- **Content:** `content/heroes.json`, 15 heroes (the original's 10 selectable; alv, fe, dverg, katteridder and muserøver from the concept banner with `selectable: false` until the owner turns them on) and 7 traits, each with an entry in `content/assets.json` (`hero:*` portraits, `trait:*` icons).
+
 ## 2026-10-31 - The art style is 16-bit SNES-RPG pixel art (owner's concept art)
 
 The owner brought concept art (`docs/v2/concept/`): tilesets of slate-blue stone blocks with brown dirt floors, torches and doors; hero portraits (Heks, Trollmann, Alv, Fe, Dverg, Katteridder, Muserøver, Liten drake); figures (frog king, gnome, witch with a cauldron, moss troll); and a title banner. «16-bit SNES rpg stil – magic/fantasy/D&D.» Names and looks may still change; the feel is what counts.

@@ -1,0 +1,31 @@
+{
+  "status": "draft-1",
+  "updated": "2026-10-31",
+  "note": "Heltevalget (workshop 2026-10-31, heltevalg). Fra originalen V0.12.3: ti helter å velge mellom, og én egenskap helten er «ekstra god på». Passer egenskapen til det barnet prøver, kaster hun to terninger og bruker den høyeste (Fortellers avgjørelse). De fem med selectable=false er fra konseptbannerets portretter; eieren slår dem på når de skal kunne velges. Bilder bestilles i assets.json (hero:*, trait:*).",
+  "heroes": [
+    { "id": "EVENTYRER", "name": "Eventyreren", "selectable": true, "describe": "En liten eventyrer med grønn hette, kappe og ryggsekk, modig og nysgjerrig.", "placeholder": "🧒" },
+    { "id": "PANDA", "name": "Panda", "selectable": true, "describe": "En rund, snill panda med rødt skjerf, blå kappe og en stor ryggsekk.", "placeholder": "🐼" },
+    { "id": "LITEN_DRAGE", "name": "Liten drage", "selectable": true, "describe": "En liten, vennlig drage med blå kappe og små vinger, stolt og glad.", "placeholder": "🐲" },
+    { "id": "MUS", "name": "Mus", "selectable": true, "describe": "En liten mus med rødt skjerf og ryggsekk, kvikk og modig.", "placeholder": "🐭" },
+    { "id": "UGLE", "name": "Ugle", "selectable": true, "describe": "En klok ugle i blå kappe med gullkanter, rolig og oppmerksom.", "placeholder": "🦉" },
+    { "id": "SLANGE", "name": "Slange", "selectable": true, "describe": "En vennlig, grønn slange i lilla hette og kappe, med små vesker, smilende.", "placeholder": "🐍" },
+    { "id": "KATT", "name": "Katt", "selectable": true, "describe": "En svart-hvit katt i blå kappe, smidig og nysgjerrig.", "placeholder": "🐱" },
+    { "id": "SKOGSALV", "name": "Skogsalv", "selectable": true, "describe": "En skogsalv kledd i blader og blomster, barbeint, med spisse ører.", "placeholder": "🧝" },
+    { "id": "HEKS", "name": "Heks", "selectable": true, "describe": "En liten heks med stor lilla hatt, lilla kappe, langt brunt hår og en stav med en lysende krystall.", "placeholder": "🧙‍♀️" },
+    { "id": "TROLLMANN", "name": "Trollmann", "selectable": true, "describe": "En liten trollmann med blå spisshatt med stjerner, blå kappe og en stav med en blå krystall.", "placeholder": "🧙" },
+    { "id": "ALV", "name": "Alv", "selectable": false, "describe": "En alv med langt lyst hår, grønne klær og bue, i skogen.", "placeholder": "🏹" },
+    { "id": "FE", "name": "Fe", "selectable": false, "describe": "En liten fe med glitrende vinger og grønn kjole, svevende.", "placeholder": "🧚" },
+    { "id": "DVERG", "name": "Dverg", "selectable": false, "describe": "En dverg med rødt skjegg, hjelm og en stor hammer, i fjellet.", "placeholder": "🔨" },
+    { "id": "KATTERIDDER", "name": "Katteridder", "selectable": false, "describe": "En oransje katt i rustning med rød kappe, sverd og skjold.", "placeholder": "🛡️" },
+    { "id": "MUSEROVER", "name": "Muserøver", "selectable": false, "describe": "En mus i grønn hette med en liten dolk, lur og rask.", "placeholder": "🗡️" }
+  ],
+  "traits": [
+    { "id": "STERK", "label": "Sterk", "child": "Jeg er sterk!", "dm": "Løfte, holde, dytte, bære og bryte når kraft er det viktige.", "describe": "En bøyd arm med muskel.", "placeholder": "💪" },
+    { "id": "SMIDIG", "label": "Smidig", "child": "Jeg er smidig!", "dm": "Klatre, hoppe, balansere og komme seg gjennom vanskelige steder.", "describe": "En figur som hopper høyt.", "placeholder": "🤸" },
+    { "id": "SKARP", "label": "Skarp", "child": "Jeg ser alt!", "dm": "Legge merke til spor, mønstre, detaljer og ting som ikke stemmer.", "describe": "Et stort, oppmerksomt øye.", "placeholder": "👀" },
+    { "id": "OPPFINNSOM", "label": "Oppfinnsom", "child": "Jeg finner på ting!", "dm": "Finne på uvanlige løsninger, bygge, fikse og bruke ting kreativt.", "describe": "En lysende lyspære.", "placeholder": "💡" },
+    { "id": "GOD_MED_ANDRE", "label": "God med andre", "child": "Jeg er god med andre!", "dm": "Lytte, roe ned, overtale, hjelpe og finne ut hva andre trenger.", "describe": "To hender som holder hverandre.", "placeholder": "🤝" },
+    { "id": "MODIG", "label": "Modig", "child": "Jeg er modig!", "dm": "Holde hodet kaldt når noe er skummelt, farlig eller vanskelig.", "describe": "Et vennlig løvehode.", "placeholder": "🦁" },
+    { "id": "MAGISK", "label": "Magisk", "child": "Jeg kan magi!", "dm": "Merke, forstå og forsøke magiske ting når magi er en del av løsningen.", "describe": "Glitrende stjerner.", "placeholder": "✨" }
+  ]
+}

@@ -111,4 +111,9 @@ pre { white-space: pre-wrap; font-size: 13px; }
 .last-roll.low { border-left: 4px solid var(--gate); } .last-roll.mid { border-left: 4px solid var(--here); } .last-roll.high { border-left: 4px solid var(--open); }
 .last-roll .hint { margin: 2px 0 0; }
 label.check { display: flex; flex-direction: row; align-items: center; gap: 6px; font-size: 15px; color: var(--text); margin: 4px 0; }
+
+/* The hero in Helteboka (DM page) */
+.hero-row { display: flex; gap: 12px; align-items: flex-start; margin: 6px 0 10px; }
+.hero-pic { font-size: 40px; line-height: 1; }
+.hero-pic img { width: 56px; height: 56px; object-fit: contain; image-rendering: pixelated; }
 label.check input { min-height: 0; width: 18px; height: 18px; }

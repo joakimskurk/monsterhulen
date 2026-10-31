@@ -3,7 +3,35 @@
 import { makeRng } from '../tools/runsim/rng.mjs';
 
 export function emptyBook() {
-  return { runs: [], friends: [], ting: [], memories: [] };
+  return { runs: [], friends: [], ting: [], memories: [], hero: null };
+}
+
+// ---------- the hero (workshop 2026-10-31, heltevalg) ----------
+// One hero per book: a look (content/heroes.json), what she is «ekstra god på», and a name the DM may
+// type. The child chooses look and trait on the iPad; the DM page accepts it like BRING and PICK_TING.
+// Returns the new book, or null if the choice is not in the content.
+export function setHero(book, { kind, trait, name = null }, content) {
+  const h = content.heroes.heroes.find((x) => x.id === kind && x.selectable);
+  const t = content.heroes.traits.find((x) => x.id === trait);
+  if (!h || !t) return null;
+  return { ...book, hero: { kind: h.id, trait: t.id, name: typeof name === 'string' && name.trim() ? name.trim() : null } };
+}
+
+// The hero as the screens show her: name (the look's name when none is given), picture and trait.
+export function heroView(book, content) {
+  if (!book.hero) return null;
+  const h = content.heroes.heroes.find((x) => x.id === book.hero.kind);
+  const t = content.heroes.traits.find((x) => x.id === book.hero.trait);
+  if (!h || !t) return null;
+  return { kind: h.id, name: book.hero.name || h.name, look: h.name, icon: h.icon || h.placeholder, trait: { id: t.id, label: t.label, child: t.child, dm: t.dm, icon: t.icon || t.placeholder } };
+}
+
+// What the iPad offers when the book has no hero yet.
+export function heroChoices(content) {
+  return {
+    heroes: content.heroes.heroes.filter((h) => h.selectable).map((h) => ({ id: h.id, name: h.name, icon: h.icon || h.placeholder })),
+    traits: content.heroes.traits.map((t) => ({ id: t.id, label: t.label, child: t.child, icon: t.icon || t.placeholder })),
+  };
 }
 
 // Two lasting TING the child does not have yet, the same for the same run code (workshop B3).
@@ -25,6 +53,7 @@ export function recordRun(book, { code, summary, ting = null, date = null }) {
     friends,
     ting: owned,
     memories: [...book.memories, summary.headline].slice(-30),
+    hero: book.hero ?? null,
   };
 }
 
@@ -41,8 +70,15 @@ export function parseBook(text, content) {
   for (const f of friends) if (typeof f?.name !== 'string' || !Array.isArray(f.ability)) throw new Error('En venn i filen mangler navn eller evne.');
   for (const x of ting) if (!lasting.has(x?.id)) throw new Error(`Ukjent TING i filen: ${x?.id}.`);
   if (!memories.every((m) => typeof m === 'string')) throw new Error('Et minne i filen er ikke tekst.');
+  // The hero (books saved before 2026-10-31 have none): the look and the trait must exist in the content.
+  let hero = null;
+  if (book.hero) {
+    const next = setHero({ hero: null }, { kind: book.hero.kind, trait: book.hero.trait, name: book.hero.name ?? null }, content);
+    if (!next) throw new Error('Helten i filen finnes ikke.');
+    hero = next.hero;
+  }
   // Names and tags of TING come from the item cards, not from the file.
-  return { runs, friends, ting: ting.map((x) => ({ id: x.id, name: lasting.get(x.id).name, tags: lasting.get(x.id).tags })), memories };
+  return { runs, friends, ting: ting.map((x) => ({ id: x.id, name: lasting.get(x.id).name, tags: lasting.get(x.id).tags })), memories, hero };
 }
 
 // The backup file: the book plus what it is, so a future version can read it.

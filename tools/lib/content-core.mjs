@@ -22,6 +22,9 @@ function attachPlaceholders(content) {
     for (const card of list) card.icon = ph(`${kind}:${card.id}`);
   }
   for (const r of content.recipes) r.output.icon = ph(`recipe:${r.id}`);
+  // The hero choice (content/heroes.json): heroes and what they are «ekstra god på».
+  for (const h of content.heroes?.heroes || []) h.icon = ph(`hero:${h.id}`);
+  for (const t of content.heroes?.traits || []) t.icon = ph(`trait:${t.id}`);
   for (const m of content.missions) {
     if (m.giver) m.giver.icon = ph(`mission:${m.id}:giver`);
     m.goal.icon = ph(`mission:${m.id}`);
@@ -49,6 +52,7 @@ export const CONTENT_FILES = {
   themes: ['themes.json', null],
   assets: ['assets.json', 'assets'],
   places: ['places.json', null],
+  heroes: ['heroes.json', null],
 };
 
 export const isCarryTag = (content, tag) => content.tagById.get(tag)?.carry === true;

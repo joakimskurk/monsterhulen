@@ -153,6 +153,23 @@ for (const tag of c.vocabulary.tags) if (tag.carry && !tag.phrase) err(`tag ${ta
   ['backpack', 'magnifier', 'player', 'room-thing', 'room-look', 'room-looked'].forEach((g) => want(`ui:${g}`));
   // The look of the cave (workshop 2026-10-31): CSS until these are drawn.
   ['frame-stone', 'parchment', 'rock', 'leather', 'button-wood', 'torch'].forEach((g) => want(`ui:${g}`));
+  // The hero choice (workshop 2026-10-31, heltevalg): a portrait per hero, an icon per trait.
+  const heroIds = new Set();
+  for (const h of c.heroes?.heroes || []) {
+    if (!h.id || !h.name || !h.placeholder || typeof h.selectable !== 'boolean') err(`hero ${h.id}`, 'needs id, name, placeholder and selectable');
+    if (heroIds.has(h.id)) err(`hero ${h.id}`, 'id used twice');
+    heroIds.add(h.id);
+    want(`hero:${h.id}`);
+  }
+  if (!(c.heroes?.heroes || []).some((h) => h.selectable)) err('heroes', 'no hero can be chosen');
+  const traitIds = new Set();
+  for (const t of c.heroes?.traits || []) {
+    if (!t.id || !t.label || !t.child || !t.dm || !t.placeholder) err(`trait ${t.id}`, 'needs id, label, child, dm and placeholder');
+    if (traitIds.has(t.id)) err(`trait ${t.id}`, 'id used twice');
+    traitIds.add(t.id);
+    want(`trait:${t.id}`);
+  }
+  if (!traitIds.size) err('heroes', 'no traits');
 
   const files = new Set();
   for (const a of c.assets) {

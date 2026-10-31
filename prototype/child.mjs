@@ -139,7 +139,36 @@ function render() {
   renderEnd(v);
   renderDie(v);
   renderBook(v);
+  renderHero(v);
 }
+
+// ---------- the hero (workshop 2026-10-31, heltevalg) ----------
+// The first time: «HVEM ER DU?», ten heroes to tap, then «HVA ER DU EKSTRA GOD PÅ?». The choice goes to
+// the DM page as HERO and lands in Helteboka. Afterwards she is at the top left, and on the map.
+let heroPick = null; // the look she tapped, until she has tapped a trait
+function renderHero(v) {
+  const chipBtn = $('#heroChip');
+  chipBtn.hidden = !v.hero;
+  if (v.hero) chipBtn.replaceChildren(pic(v.hero.icon), ' ', v.hero.name.toUpperCase());
+  const c = v.heroChoices;
+  $('#heroLayer').hidden = !c;
+  if (!c) { heroPick = null; return; }
+  const card = (icon, text, selected, onclick) => el('button', { class: `hero-card${selected ? ' selected' : ''}`, onclick }, pic(icon), el('span', { class: 'hero-name' }, text));
+  $('#heroPick').replaceChildren(...[
+    el('h1', {}, 'HVEM ER DU?', speaker('Hvem er du?')),
+    el('div', { class: 'hero-grid' }, ...c.heroes.map((h) => card(h.icon, h.name.toUpperCase(), heroPick === h.id, () => { heroPick = h.id; renderHero(v); }))),
+    heroPick ? el('h2', {}, 'HVA ER DU EKSTRA GOD PÅ?', speaker(`Hva er du ekstra god på? ${c.traits.map((t) => t.child).join(' ')}`)) : null,
+    heroPick ? el('div', { class: 'hero-grid traits' }, ...c.traits.map((t) => card(t.icon, t.child.toUpperCase(), false, () => request('HERO', { kind: heroPick, trait: t.id })))) : null,
+  ].filter(Boolean));
+}
+$('#heroChip').addEventListener('click', () => {
+  const h = view?.hero;
+  if (!h) return;
+  $('#infoThing').replaceChildren(String(h.icon).startsWith('assets/') ? el('img', { src: `/${h.icon}`, alt: '' }) : el('span', {}, h.icon));
+  $('#infoName').replaceChildren(h.name.toUpperCase(), speaker(`${h.name}. ${h.trait.child}`) || '');
+  $('#infoText').textContent = `${h.look}. ${h.trait.child}`;
+  $('#info').hidden = false;
+});
 
 // ---------- the die: she rolls a real D6 and taps the same face ----------
 const PIPS = { 1: [5], 2: [1, 9], 3: [1, 5, 9], 4: [1, 3, 7, 9], 5: [1, 3, 5, 7, 9], 6: [1, 3, 4, 6, 7, 9] };
@@ -298,7 +327,7 @@ function renderEnd(v) {
   const e = v.end;
   const line = (title, items) => (items.length ? el('p', {}, el('b', {}, `${title}: `), items.join(', ')) : null);
   const pictures = (names) => names;
-  box.replaceChildren(...[el('h1', {}, 'DU KLARTE DET! 🎉'), el('p', { class: 'headline' }, e.headline, speaker(e.headline)),
+  box.replaceChildren(...[el('h1', {}, `DU KLARTE DET${v.hero ? `, ${v.hero.name.toUpperCase()}` : ''}! 🎉`), el('p', { class: 'headline' }, e.headline, speaker(e.headline)),
     line('DU HJALP', pictures(e.helped)), line('NYE VENNER', pictures(e.friends.map((f) => f.name))), line('DU FANT', pictures(e.found)),
     e.chosen ? el('p', { class: 'headline' }, `${e.chosen} er din nå!`)
       : e.offer.length ? el('div', {}, el('h2', {}, 'VELG EN TING TIL HELTEBOKA'),

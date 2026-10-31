@@ -1,7 +1,7 @@
 // Helteboka (prototype/herobook.mjs): what the child keeps between runs.
 import assert from 'node:assert/strict';
 import { loadContent } from '../../tools/lib/content.mjs';
-import { emptyBook, tingOffer, recordRun, parseBook, bookFile } from '../../prototype/herobook.mjs';
+import { emptyBook, tingOffer, recordRun, parseBook, bookFile, setHero, heroView, heroChoices } from '../../prototype/herobook.mjs';
 
 const content = loadContent();
 const lasting = content.items.filter((i) => i.persistent);
@@ -35,4 +35,20 @@ assert.deepEqual(parseBook(bookFile(book, '2026-10-28'), content), book, 'backup
 for (const [bad, why] of [['ikke json', 'JSON'], ['{}', 'runs'], [JSON.stringify({ ...book, ting: [{ id: 'FINNES_IKKE' }] }), 'Ukjent TING'], [JSON.stringify({ ...book, friends: [{ name: 'X' }] }), 'venn']]) {
   assert.throws(() => parseBook(bad, content), (e) => e.message.includes(why), `broken file not refused: ${why}`);
 }
-console.log(`herobook test: ${lasting.length} TING collected without repeats, friends kept once, double recording ignored, backup round-trips, broken files refused, OK`);
+// The hero (workshop 2026-10-31, heltevalg): chosen from the content, kept through runs and backups, named by the DM.
+const choices = heroChoices(content);
+assert.ok(choices.heroes.length >= 10 && choices.traits.length === 7, 'ten heroes to choose, seven traits');
+assert.ok(choices.heroes.every((h) => h.icon) && choices.traits.every((t) => t.icon && t.child), 'every choice has a picture and a line');
+assert.equal(setHero(book, { kind: 'FINNES_IKKE', trait: 'MODIG' }, content), null, 'an unknown hero is refused');
+assert.equal(setHero(book, { kind: 'ALV', trait: 'MODIG' }, content), null, 'a hero that cannot be chosen yet is refused');
+assert.equal(setHero(book, { kind: 'PANDA', trait: 'TØFF' }, content), null, 'an unknown trait is refused');
+book = setHero(book, { kind: 'PANDA', trait: 'MODIG' }, content);
+assert.equal(heroView(book, content).name, 'Panda', 'without a name the hero is called by its look');
+book = setHero(book, { ...book.hero, name: '  Luna ' }, content);
+assert.deepEqual({ name: heroView(book, content).name, look: heroView(book, content).look, trait: heroView(book, content).trait.id }, { name: 'Luna', look: 'Panda', trait: 'MODIG' });
+book = recordRun(book, run(500));
+assert.equal(book.hero.kind, 'PANDA', 'a recorded run keeps the hero');
+assert.deepEqual(parseBook(bookFile(book, '2026-10-31'), content).hero, book.hero, 'the hero round-trips through a backup');
+assert.equal(parseBook(JSON.stringify({ runs: [], friends: [], ting: [], memories: [] }), content).hero, null, 'an old backup without a hero still loads');
+assert.throws(() => parseBook(JSON.stringify({ ...book, hero: { kind: 'X', trait: 'MODIG' } }), content), (e) => e.message.includes('Helten'), 'a broken hero is refused');
+console.log(`herobook test: ${lasting.length} TING collected without repeats, friends kept once, double recording ignored, backup round-trips, broken files refused, hero chosen/named/kept, OK`);

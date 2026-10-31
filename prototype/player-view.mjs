@@ -133,7 +133,11 @@ export function playerView(run, state, extra = {}) {
       ...(extra.end ? [...extra.end.helped, ...extra.end.found, ...extra.end.friends.map((f) => f.name), ...extra.end.offer.map((o) => o.name)] : [])].map((n) => [n, iconOf(n)])),
     book: extra.book || null,
     pack: extra.pack || null,
-    ui: { backpack: '🎒', magnifier: '🔍', player: '★', ...extra.ui },
+    // The hero (workshop 2026-10-31, heltevalg): who she is, and the choices while the book has none.
+    hero: extra.hero || null,
+    heroChoices: !extra.hero && extra.heroChoices ? extra.heroChoices : null,
+    // Her hero is the marker on the map, in place of the star.
+    ui: { backpack: '🎒', magnifier: '🔍', player: '★', ...extra.ui, ...(extra.hero ? { player: extra.hero.icon } : {}) },
     log: state.log.slice(-3).map((l) => l.replace(' (Forteller bestemte)', '')),
     news: latestNews(state.log),
     // When she is stuck (prototype/stuck.mjs): a nudge that says no more than her map already shows.
