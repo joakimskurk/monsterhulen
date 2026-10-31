@@ -75,7 +75,13 @@ Eieren la fram konseptbilder (`docs/v2/concept/`): «16-bit SNES rpg stil – ma
 - **Skriften** er «Cinzel» (fet), som bokstavene på tittelbanneret, i stedet for «MedievalSharp».
 - Bilder vises med harde piksler (`image-rendering: pixelated`), så pixel art holder seg skarp i stor størrelse.
 
-Heltene på konseptbildene (Heks, Trollmann, Alv, Fe, Dverg, Katteridder, Muserøver, Liten drake) antyder at barnet kan velge en helt. Det er ikke laget og venter på eieren.
+Heltene på konseptbildene (Heks, Trollmann, Alv, Fe, Dverg, Katteridder, Muserøver, Liten drake) ble til heltevalget (`2026-10-31_heltevalg.md`).
+
+Eieren, senere samme dag: «Siden skal ligne mer på bildene, spesielt kartet, og siden ellers. Emoji som plassholdere er fint, men det skal byttes med custom art etter hvert.» Derfor:
+
+- **Kartet tegnes nå med CSS etter konsept-tilesettet**, ikke med originalens fliser: hvert rom er én ring av runde, skiferblå steinblokker (en SVG som kantbilde) rundt et brunt jordgulv med småstein, med fakler (🔥, plassholder for `ui:torch`) på toppveggen og et varmt skjær. Dører er åpninger i veggen med en dørblad av planker, hengelås (🔒) når låst. Det ukjente er mørkt fjell. Romsymbolene og «?» er gullrammede fliser som ikonene i tilesettet.
+- **Siden ellers:** pergamentkortene er byttet med mørke steinkort med gullramme, som ikonflisene og helteportrettene i bildene. Panelene har små gullornamenter i hjørnene, som banneret.
+- Når det ekte tilesettet kommer, byttes SVG-ene i `map-view.mjs` (stein, jord, fjell) med bildene, uten at tegningen ellers endres.
 
 ## Etter workshopen
 

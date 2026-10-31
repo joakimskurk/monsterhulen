@@ -40,7 +40,13 @@ body.child h1, body.child h2, body.child h3, body.child button, .found-text, .fo
 /* Pixel art stays crisp however large it is shown. */
 .thumb, .icon img, .found-thing img, .found-bag img, .drag-ghost img, .lupe-icon img { image-rendering: pixelated; }
 
-/* ---------- Stone boxes with a gold frame: the panels ---------- */
+/* ---------- Stone boxes with a gold frame and corner ornaments (the concept banner): the panels ---------- */
+.app .panel, #join.panel, .found-card, .layer-card { position: relative; }
+.app .panel::before, .app .panel::after, #join.panel::before, #join.panel::after, .found-card::before, .found-card::after, .layer-card::before, .layer-card::after {
+  content: ''; position: absolute; width: 10px; height: 10px; background: var(--gold); box-shadow: 0 0 0 2px var(--black); pointer-events: none; z-index: 1; transform: rotate(45deg);
+}
+.app .panel::before, #join.panel::before, .found-card::before, .layer-card::before { left: -2px; top: -2px; }
+.app .panel::after, #join.panel::after, .found-card::after, .layer-card::after { right: -2px; bottom: -2px; }
 .app .panel, #join.panel {
   background: linear-gradient(rgba(0, 0, 0, .45), rgba(0, 0, 0, .6)), var(--rock) var(--slate);
   border: 4px solid var(--black);
@@ -78,23 +84,25 @@ body.child .lupe {
 body.child .lupe:active { transform: translateY(3px); box-shadow: 0 0 0 3px var(--gold-dark), 0 0 0 5px var(--black), 0 2px 0 var(--black); }
 .lupe-text { font-weight: 700; }
 
-/* ---------- Parchment: what is in the room, and what the DM says ---------- */
+/* ---------- Gold-framed stone cards: what is in the room, and what the DM says (as the icon tiles and
+   hero portraits in the concept art: dark, with a gold frame) ---------- */
 body.child .thing {
-  background: linear-gradient(var(--parchment), var(--parchment-dark));
-  color: var(--ink);
+  background: linear-gradient(var(--slate-light), var(--slate));
+  color: #f1e6cc;
   border: 3px solid var(--black);
   border-radius: 4px;
-  box-shadow: inset 0 0 0 2px #b8924a, 3px 3px 0 rgba(0, 0, 0, .55);
+  box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 3px 3px 0 rgba(0, 0, 0, .55);
 }
-body.child .thing h3 { color: #3b2210; }
-body.child .thing p { color: var(--ink-soft); }
-body.child .thing .task { color: #8a3a10; font-weight: 700; }
+body.child .thing h3 { color: var(--gold-light); text-shadow: 1px 1px 0 var(--black); }
+body.child .thing p { color: #e2d8c0; }
+body.child .thing .task { color: var(--ember); font-weight: 700; }
 body.child .thing .done-task { background: linear-gradient(#fff1b8, var(--gold)); color: var(--ink); box-shadow: inset 0 0 0 2px var(--gold-dark), 0 3px 0 var(--black); text-shadow: none; }
-body.child .thing .speak { background: transparent; color: #3b2210; border-color: #8a6a3a; box-shadow: none; text-shadow: none; }
-body.dragging .thing.drop-ok { border-color: var(--gold-dark); border-style: dashed; }
-body.dragging .thing.drop-hot { border-style: solid; border-color: var(--ember); background: linear-gradient(#fff3d0, #f3e0b0); }
-body.child .say { background: linear-gradient(var(--parchment), var(--parchment-dark)); color: var(--ink); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px #b8924a, 3px 3px 0 rgba(0, 0, 0, .55); font-style: italic; }
-body.child .say.nudge { background: linear-gradient(var(--slate-light), var(--slate)); color: var(--gold-light); border: 3px solid var(--black); box-shadow: inset 0 0 0 2px var(--gold); font-style: normal; }
+body.child .thing .speak { background: transparent; color: var(--gold-light); box-shadow: inset 0 0 0 2px var(--slate-edge); text-shadow: none; }
+body.dragging .thing.drop-ok { box-shadow: inset 0 0 0 2px var(--gold-light), inset 0 0 0 4px var(--gold); }
+body.dragging .thing.drop-hot { background: linear-gradient(#5a4a1a, #3a2f12); box-shadow: inset 0 0 0 3px var(--gold-light), 0 0 18px rgba(255, 200, 80, .55); }
+body.dragging .thing:not(.drop-ok) { opacity: .4; }
+body.child .say { background: linear-gradient(var(--slate-light), var(--slate)); color: #f1e6cc; border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark), 3px 3px 0 rgba(0, 0, 0, .55); font-style: italic; }
+body.child .say.nudge { color: var(--gold-light); box-shadow: inset 0 0 0 2px var(--gold); border-style: dashed; border-color: var(--gold); font-style: normal; }
 body.child .news { background: linear-gradient(var(--slate-light), var(--slate)); color: var(--gold-light); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark); }
 
 /* ---------- The backpack along the bottom: gold-framed icon tiles ---------- */
@@ -131,7 +139,7 @@ body.child .hero-card.selected { background: linear-gradient(#5a4a1a, #3a2f12); 
 #join h1 { color: var(--gold); font-size: 42px; letter-spacing: .1em; text-shadow: 3px 3px 0 var(--black), 0 0 18px rgba(255, 170, 60, .4); }
 #join h1::before { content: '🏰'; display: block; font-size: 72px; margin-bottom: 8px; text-shadow: none; }
 #join p { color: var(--muted); }
-#join input { background: var(--parchment); color: var(--ink); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px #b8924a; font-family: var(--display); font-weight: 700; }
+#join input { background: var(--slate-dark); color: var(--gold-light); border: 3px solid var(--black); border-radius: 4px; box-shadow: inset 0 0 0 2px var(--gold), inset 0 0 0 3px var(--gold-dark); font-family: var(--display); font-weight: 700; }
 
 /* Turn the iPad */
 .turn { background: var(--rock) #11141a; color: var(--gold); }

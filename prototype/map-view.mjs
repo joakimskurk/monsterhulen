@@ -1,7 +1,8 @@
-// Draws the cave as the owner's original does (V0.12.3, docs/reference/original-v0.12.3/): a grid of
-// tiles, each room cell with a floor tile, stone walls where the room ends, corners, and door tiles
-// where the doors are; everything else is fog. The tiles are the original's own
-// (assets/tileset/v3-map/). Shared by the DM page and the iPad.
+// Draws the cave as the owner's concept art does (docs/v2/concept/, 2026-10-31): rooms of chunky
+// slate-blue stone blocks around a brown dirt floor, torches on the walls, doors as openings in the
+// wall with a wooden leaf, and the unknown as dark rock. Everything is CSS (an SVG ring of stones as a
+// border image, a dirt pattern for the floor), so no image file is needed until the real tileset comes
+// (content/assets.json, ui:*). Shared by the DM page and the iPad.
 //
 // model = {
 //   bounds: { minX, minY, maxX, maxY },                     the grid to draw; outside rooms is fog
@@ -9,58 +10,80 @@
 //   doors:  [{ x, y, dir: 'n'|'e'|'s'|'w', kind: 'open' | 'closed' | 'locked' | 'loop' | 'secret', draw }],   see doorsFor
 //   probes: [{ x, y, room, locked }],                        «?» or 🔒 in the fog beyond an exit
 // }
-const ROOT = '/assets/tileset/v3-map/';
-const FLOORS = 9;
-const SIDE = { n: 'N', e: 'E', s: 'S', w: 'W' };
+
+// A ring of rounded stones, 96 × 96 with 32 px sides, cut as a border image (the middle is not drawn).
+const STONES = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='96' height='96'>
+<rect width='96' height='96' fill='#171a22'/>
+<g stroke='#11141a' stroke-width='1.5'>
+<rect x='2' y='2' width='28' height='28' rx='9' fill='#4d566b'/><rect x='66' y='2' width='28' height='28' rx='9' fill='#525c72'/>
+<rect x='2' y='66' width='28' height='28' rx='9' fill='#48516a'/><rect x='66' y='66' width='28' height='28' rx='9' fill='#4d566b'/>
+<rect x='33' y='2' width='13' height='28' rx='6' fill='#56617a'/><rect x='49' y='2' width='14' height='28' rx='6' fill='#454e62'/>
+<rect x='33' y='66' width='14' height='28' rx='6' fill='#454e62'/><rect x='50' y='66' width='13' height='28' rx='6' fill='#56617a'/>
+<rect x='2' y='33' width='28' height='13' rx='6' fill='#56617a'/><rect x='2' y='49' width='28' height='14' rx='6' fill='#454e62'/>
+<rect x='66' y='33' width='28' height='14' rx='6' fill='#454e62'/><rect x='66' y='50' width='28' height='13' rx='6' fill='#56617a'/>
+</g>
+<g fill='#6d7891' opacity='.55'>
+<rect x='6' y='5' width='14' height='6' rx='3'/><rect x='70' y='5' width='14' height='6' rx='3'/><rect x='6' y='69' width='14' height='6' rx='3'/><rect x='70' y='69' width='14' height='6' rx='3'/>
+<rect x='36' y='5' width='7' height='5' rx='2'/><rect x='52' y='5' width='8' height='5' rx='2'/><rect x='36' y='69' width='8' height='5' rx='2'/><rect x='53' y='69' width='7' height='5' rx='2'/>
+<rect x='5' y='36' width='8' height='5' rx='2'/><rect x='5' y='52' width='8' height='5' rx='2'/><rect x='69' y='36' width='8' height='5' rx='2'/><rect x='69' y='53' width='8' height='5' rx='2'/>
+</g>
+<g fill='#5f8a4a' opacity='.7'><circle cx='27' cy='27' r='2.5'/><circle cx='70' cy='9' r='2'/><circle cx='9' cy='70' r='2'/></g>
+</svg>`)}`;
+// Brown dirt with a few pebbles, one tile per cell.
+const DIRT = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'>
+<rect width='64' height='64' fill='#6b5238'/>
+<g fill='#5c4530'><ellipse cx='12' cy='18' rx='5' ry='3'/><ellipse cx='44' cy='40' rx='6' ry='3.5'/><ellipse cx='30' cy='56' rx='3' ry='2'/><ellipse cx='54' cy='10' rx='3' ry='2'/></g>
+<g fill='#7d6346'><ellipse cx='26' cy='30' rx='3' ry='2'/><ellipse cx='8' cy='46' rx='2.5' ry='1.5'/><ellipse cx='50' cy='24' rx='2' ry='1.5'/></g>
+<g fill='#8a7052'><circle cx='40' cy='12' r='1.6'/><circle cx='18' cy='60' r='1.4'/><circle cx='58' cy='50' r='1.4'/></g>
+</svg>`)}`;
+// Dark rock for the unknown.
+const ROCK = `data:image/svg+xml;utf8,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='r'><feTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='4' seed='7' stitchTiles='stitch'/><feColorMatrix values='0.22 0 0 0 0.05  0.24 0 0 0 0.055  0.30 0 0 0 0.075  0 0 0 0 1'/></filter><rect width='240' height='240' filter='url(#r)'/></svg>`)}`;
 
 const STYLE = `
-.cave-wrap { container-type: inline-size; width: 100%; }
-/* The map fills the width it is given: square tiles of an equal share, text scaled with them.
-   The fog is rock (workshop 2026-10-31, S3): noise drawn by the browser, no file, darkened. */
-.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; padding: 6px; border: 3px solid #0e1014; border-radius: 4px; image-rendering: pixelated; box-sizing: border-box; width: 100%; overflow: hidden;
-  background: linear-gradient(rgba(2, 3, 5, .66), rgba(2, 3, 5, .66)), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.22 0 0 0 0.05  0.24 0 0 0 0.055  0.30 0 0 0 0.075  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23r)'/%3E%3C/svg%3E") #11141a;
+.cave-wrap { container-type: inline-size; width: 100%; position: relative; z-index: 0; isolation: isolate; }
+/* The map fills the width it is given: square cells of an equal share, everything scaled with them.
+   Every tile is placed by hand on the grid, so a room's wall (one element over the whole room) can sit on top. */
+.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); --wall: calc(var(--cell) * .3); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; padding: 6px; border: 3px solid #0e1014; border-radius: 4px; box-sizing: border-box; width: 100%; overflow: hidden;
+  background: linear-gradient(rgba(2, 3, 5, .82), rgba(2, 3, 5, .82)), url("${ROCK}") #0b0d12;
   box-shadow: inset 0 0 0 2px #e8b93a, inset 0 0 0 3px #8a6414, inset 0 0 60px rgba(0, 0, 0, .8); }
 .cave-tile { position: relative; aspect-ratio: 1; }
-.cave-tile img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
-/* As in the owner's concept art: slate-blue stone walls, brown dirt floors (the floor is the first tile,
-   the walls come after). The room she is in is lit; the rooms she has been in lie in half-dark. */
-.cave-tile.room img { filter: brightness(.55); }
-.cave-tile.room img:first-child { filter: sepia(.75) saturate(.8) brightness(.5); }
-.cave-tile.here img { filter: brightness(1); }
-.cave-tile.here img:first-child { filter: sepia(.75) saturate(.8) brightness(.95); }
-/* Torchlight (workshop 2026-10-31, S3): a warm glow over the room she is in, reaching into the rock. */
-.cave-tile .torch { position: absolute; z-index: 1; pointer-events: none; left: calc(var(--cell) * var(--rw) / 2); top: calc(var(--cell) * var(--rh) / 2); width: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); height: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; opacity: .9;
-  background: radial-gradient(circle, rgba(255, 180, 80, .55) 0%, rgba(255, 140, 50, .3) 32%, rgba(255, 110, 40, .1) 52%, transparent 68%); animation: cave-flicker 2.8s ease-in-out infinite alternate; }
-@keyframes cave-flicker { from { opacity: .8; } to { opacity: 1; } }
+/* The floor: brown dirt. The room she is in is lit; the rooms she has been in lie in half-dark. */
+.cave-tile.room { background: url("${DIRT}") center / var(--cell) var(--cell); image-rendering: pixelated; filter: brightness(.7) saturate(.85); }
+.cave-tile.here { filter: none; }
+/* The wall: one ring of stone blocks around the whole room, over the floor. */
+.cave-wall { position: relative; z-index: 2; pointer-events: none; box-sizing: border-box; border: var(--wall) solid transparent; border-image: url("${STONES}") 32 / var(--wall) round; filter: brightness(.72); }
+.cave-wall.here { filter: none; }
+.cave-wall.here { box-shadow: 0 0 0 max(2px, calc(var(--cell) * .05)) #e8b93a; }
+.cave-wall.go { box-shadow: 0 0 0 max(2px, calc(var(--cell) * .04)) rgba(255, 224, 138, .75); }
+/* Torches on the top wall (emoji as placeholder, content/assets.json ui:torch), with a glow. */
+.cave-wall .flame { position: absolute; top: calc(var(--wall) * -1); width: calc(var(--cell) * .3); height: calc(var(--cell) * .3); font-size: calc(var(--cell) * .24); line-height: 1; display: grid; place-items: center; text-shadow: 0 0 calc(var(--cell) * .12) rgba(255, 170, 60, .9); animation: cave-flicker 1.6s ease-in-out infinite alternate; }
+.cave-wall .flame::before { content: ''; position: absolute; inset: -60%; border-radius: 50%; background: radial-gradient(circle, rgba(255, 170, 60, .45), transparent 70%); z-index: -1; }
+.cave-wall .flame.l { left: 0; } .cave-wall .flame.r { right: 0; }
 /* DM only: rooms she has not been in are faint (what can be explored); the child gets fog instead. */
-.cave-tile.unexplored img, .cave-tile.unexplored .door { opacity: .3; }
-/* One frame around the whole room (not one per tile): gold where she is, a warm light where she can go
-   back to. The frame sits above the tile images. */
-.cave-tile .frame { position: absolute; inset: 0; pointer-events: none; z-index: 2; border: 0 solid transparent; }
-.cave-tile.here .frame { border-color: #e8b93a; }
+.cave-tile.unexplored, .cave-wall.unexplored, .cave-tile.unexplored .door { opacity: .3; }
+/* Torchlight: a warm glow over the room she is in, reaching into the rock. */
+.cave-tile .torch { position: absolute; z-index: 3; pointer-events: none; left: calc(var(--cell) * var(--rw) / 2); top: calc(var(--cell) * var(--rh) / 2); width: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); height: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; opacity: .9;
+  background: radial-gradient(circle, rgba(255, 180, 80, .5) 0%, rgba(255, 140, 50, .28) 32%, rgba(255, 110, 40, .1) 52%, transparent 68%); animation: cave-flicker 2.8s ease-in-out infinite alternate; }
+@keyframes cave-flicker { from { opacity: .8; } to { opacity: 1; } }
 .cave-tile.go { cursor: pointer; }
-.cave-tile.go .frame { border-color: rgba(255, 224, 138, .7); }
-.cave-tile .mark, .cave-tile .corner { z-index: 3; }
+.cave-tile .mark, .cave-tile .corner { z-index: 6; }
 .cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
-.cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
-/* A door is an opening through the wall: the walls stay, and floor stones are laid across both walls
-   (each wall is 6 of 32 pixels) where the door is, so you see a passage of the same stones as the floor.
-   Drawn once, centred on the boundary, with a wooden leaf (below); extra passage: stone edges;
-   secret (DM only): dashed pink, no leaf. */
-.cave-tile .door { position: absolute; z-index: 4; pointer-events: none; box-sizing: border-box; --t: calc(var(--cell) * .42); --edge: max(2px, calc(var(--cell) * .05));
-  background: url('/assets/tileset/v3-map/floors-1.png') center / var(--cell) var(--cell); image-rendering: pixelated; }
-.cave-tile .door.dir-e, .cave-tile .door.dir-w { top: 25%; height: 50%; width: var(--t); }
-.cave-tile .door.dir-n, .cave-tile .door.dir-s { left: 25%; width: 50%; height: var(--t); }
+.cave-tile .corner { position: absolute; left: calc(var(--wall) + 2px); top: var(--wall); font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
+/* A door is an opening cut through the wall, centred on the boundary, of the same dirt as the floor,
+   with a wooden leaf (below). Extra passage: stone edges; secret (DM only): dashed pink, no leaf. */
+.cave-tile .door { position: absolute; z-index: 4; pointer-events: none; box-sizing: border-box; --t: calc(var(--wall) * 2.2); --edge: max(2px, calc(var(--cell) * .04));
+  background: url("${DIRT}") center / var(--cell) var(--cell) #6b5238; image-rendering: pixelated; }
+.cave-tile .door.dir-e, .cave-tile .door.dir-w { top: 25%; height: 50%; width: var(--t); border-top: var(--edge) solid #171a22; border-bottom: var(--edge) solid #171a22; }
+.cave-tile .door.dir-n, .cave-tile .door.dir-s { left: 25%; width: 50%; height: var(--t); border-left: var(--edge) solid #171a22; border-right: var(--edge) solid #171a22; }
 .cave-tile .door.dir-e { right: calc(var(--t) / -2); } .cave-tile .door.dir-w { left: calc(var(--t) / -2); }
 .cave-tile .door.dir-s { bottom: calc(var(--t) / -2); } .cave-tile .door.dir-n { top: calc(var(--t) / -2); }
-.cave-tile .door.dir-e, .cave-tile .door.dir-w { border-top: var(--edge) solid #1a1426; border-bottom: var(--edge) solid #1a1426; }
-.cave-tile .door.dir-n, .cave-tile .door.dir-s { border-left: var(--edge) solid #1a1426; border-right: var(--edge) solid #1a1426; }
-.cave-tile .door.loop { border-color: #6f7690 !important; }
-/* Every door has a wooden leaf. Closed: lying across the opening, centred on the boundary (locked: with
-   a yellow lock on it). Open: turned 90 degrees on its hinge into the room farther from the entrance
-   (into = 'out' across the boundary, 'in' back into this room). A door the child has just walked through
-   swings open (.swing); the room behind it fades in (.fresh). */
-.cave-tile .door .leaf { position: absolute; background: #8a5a2b; border: 1px solid #3b2210; box-shadow: inset 0 0 0 1px #a8743d; box-sizing: border-box; --thick: max(3px, calc(var(--cell) * .12)); --rot: 0deg; transform: rotate(var(--rot)); }
+.cave-tile .door.loop { border-color: #8a94ad !important; }
+/* Every door has a wooden leaf of planks. Closed: lying across the opening, centred on the boundary
+   (locked: with a padlock on it). Open: turned 90 degrees on its hinge into the room farther from the
+   entrance (into = 'out' across the boundary, 'in' back into this room). A door the child has just walked
+   through swings open (.swing); the room behind it fades in (.fresh). */
+.cave-tile .door .leaf { position: absolute; background: repeating-linear-gradient(90deg, #8a5a2b 0 28%, #6b4421 28% 33%); border: 1px solid #2b1a0c; box-shadow: inset 0 0 0 1px #a8743d; box-sizing: border-box; --thick: max(4px, calc(var(--cell) * .14)); --rot: 0deg; transform: rotate(var(--rot)); }
+.cave-tile .door.dir-n .leaf, .cave-tile .door.dir-s .leaf { background: repeating-linear-gradient(0deg, #8a5a2b 0 28%, #6b4421 28% 33%); }
 .cave-tile .door.dir-e .leaf, .cave-tile .door.dir-w .leaf { top: 0; height: 100%; left: calc(50% - var(--thick) / 2); width: var(--thick); transform-origin: 50% 0; }
 .cave-tile .door.dir-n .leaf, .cave-tile .door.dir-s .leaf { left: 0; width: 100%; top: calc(50% - var(--thick) / 2); height: var(--thick); transform-origin: 0 50%; }
 .cave-tile .door.open.dir-e .leaf.out, .cave-tile .door.open.dir-w .leaf.in, .cave-tile .door.open.dir-n .leaf.out, .cave-tile .door.open.dir-s .leaf.in,
@@ -69,21 +92,22 @@ const STYLE = `
 .cave-tile .door.loop.dir-e .leaf.in, .cave-tile .door.loop.dir-w .leaf.out, .cave-tile .door.loop.dir-n .leaf.in, .cave-tile .door.loop.dir-s .leaf.out { --rot: 90deg; }
 .cave-tile .door .leaf.swing { animation: cave-swing .5s ease-out both; }
 @keyframes cave-swing { from { transform: rotate(0deg); } to { transform: rotate(var(--rot)); } }
-.cave-tile .door.locked .leaf::after { content: ''; position: absolute; left: 50%; top: 50%; width: max(5px, calc(var(--cell) * .16)); height: max(5px, calc(var(--cell) * .16)); transform: translate(-50%, -50%); background: #ffd95c; border: 1px solid #3b2210; box-sizing: border-box; }
-.cave-tile.fresh > img { animation: cave-fade .8s ease-out var(--delay, .35s) both; }
+.cave-tile .door.locked .leaf::after { content: '🔒'; position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: calc(var(--cell) * .22); line-height: 1; }
+.cave-tile.fresh, .cave-wall.fresh { animation: cave-fade .8s ease-out var(--delay, .35s) both; }
 @keyframes cave-fade { from { opacity: var(--from, 0); } to { opacity: 1; } }
 .cave-tile .door.secret { opacity: .55; border: 2px dashed #ff73b8 !important; }
 /* Room symbols on the child's map (workshop K2; owner: in the middle): a box over the whole room
-   (--rw × --rh cells), the symbols centred in it at --s cells each. */
+   (--rw × --rh cells), the symbols centred in it at --s cells each, as gold-framed tiles like the icons
+   in the concept art. */
 .cave-tile .marks { position: absolute; left: 0; top: 0; width: calc(100% * var(--rw)); height: calc(100% * var(--rh)); z-index: 5; display: flex; flex-wrap: wrap; align-content: center; justify-content: center; gap: calc(var(--cell) * .04); pointer-events: none; }
-.cave-tile .mk { width: calc(var(--cell) * var(--s) * .92); height: calc(var(--cell) * var(--s) * .92); display: grid; place-items: center; border-radius: 50%; background: rgba(7, 5, 13, .8); border: max(1px, calc(var(--cell) * .03)) solid #ffd95c; font-size: calc(var(--cell) * var(--s) * .55); line-height: 1; box-sizing: border-box; }
-.cave-tile .mk img { width: 82%; height: 82%; object-fit: contain; }
-.cave-tile .mk-here { background: #ffd95c; color: #271b00; border-color: #07050d; font-weight: 800; }
+.cave-tile .mk { width: calc(var(--cell) * var(--s) * .92); height: calc(var(--cell) * var(--s) * .92); display: grid; place-items: center; border-radius: 4px; background: #1d2129; border: max(1px, calc(var(--cell) * .03)) solid #e8b93a; box-shadow: 0 0 0 1px #0e1014, inset 0 0 0 1px #8a6414; font-size: calc(var(--cell) * var(--s) * .55); line-height: 1; box-sizing: border-box; }
+.cave-tile .mk img { width: 82%; height: 82%; object-fit: contain; image-rendering: pixelated; }
+.cave-tile .mk-here { border-width: max(2px, calc(var(--cell) * .05)); border-color: #ffe08a; color: #ffe08a; font-weight: 800; }
 .cave-tile .mk-looked { border-color: #7fe0a0; color: #7fe0a0; font-weight: 800; }
 .cave-tile .mk-look { border-color: #8fa0c0; }
-/* «?» beyond an exit: a yellow square as in the original; a locked door is red. */
-.cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #3b2210 !important; border-radius: 3px; background: linear-gradient(#ffefb8, #f0c75e) !important; color: #271b00 !important; box-shadow: 2px 2px 0 #1a0f06 !important; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; text-shadow: none !important; }
-.cave-probe.locked { background: linear-gradient(#ffb0a0, #e06a5a) !important; cursor: default; }
+/* «?» beyond an exit: a gold-framed tile as in the concept art; a locked door is red. */
+.cave-probe { width: 72%; height: 72%; margin: 14%; min-height: 0 !important; padding: 0 !important; border: 3px solid #0e1014 !important; border-radius: 4px; background: linear-gradient(#3a4150, #252a34) !important; color: #ffe08a !important; box-shadow: inset 0 0 0 2px #e8b93a, inset 0 0 0 3px #8a6414 !important; font: 800 calc(var(--cell) * .5)/1 'Courier New', monospace !important; cursor: pointer; text-shadow: 1px 1px 0 #0e1014 !important; }
+.cave-probe.locked { background: linear-gradient(#5a2a2a, #3a1a1a) !important; cursor: default; }
 `;
 function ensureStyle() {
   if (document.getElementById('cave-style')) return;
@@ -92,13 +116,6 @@ function ensureStyle() {
   s.textContent = STYLE;
   document.head.append(s);
 }
-const img = (file, rot) => {
-  const i = document.createElement('img');
-  i.src = ROOT + file;
-  i.alt = '';
-  if (rot) i.style.transform = `rotate(${rot}deg)`;
-  return i;
-};
 const span = (cls, text) => { const s = document.createElement('span'); s.className = cls; s.textContent = text; return s; };
 
 // What each screen showed before, so a door the child just walked through swings open and the room
@@ -131,12 +148,21 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
 
   const roomAt = (x, y) => model.rooms.find((r) => x >= r.x && x < r.x + r.w && y >= r.y && y < r.y + r.h);
   const probeAt = (x, y) => (model.probes || []).find((p) => p.x === x && p.y === y);
+  // The room's fade-in, shared by its floor tiles and its wall: how long it has been shown.
+  const freshness = (r) => {
+    if (r.look === 'unexplored') { (seen.wasFaint ||= new Set()).add(r.id); return null; }
+    const t = remember('rooms', r.id, since('rooms', r.id, 0) ?? now);
+    return now - t < SWING_MS ? { from: before?.wasFaint?.has(r.id) ? '.3' : '0', delay: `${0.35 - (now - t) / 1000}s` } : null;
+  };
+  const fresh = new Map(model.rooms.map((r) => [r.id, freshness(r)]));
+  const markFresh = (node, f) => { if (!f) return; node.classList.add('fresh'); node.style.setProperty('--from', f.from); node.style.setProperty('--delay', f.delay); };
 
   for (let y = minY; y <= maxY; y++) {
     for (let x = minX; x <= maxX; x++) {
       const tile = document.createElement('div');
       tile.className = 'cave-tile';
       tile.dataset.x = x; tile.dataset.y = y; // where a walk animates through (child.mjs)
+      tile.style.gridColumn = String(x - minX + 1); tile.style.gridRow = String(y - minY + 1);
       const r = roomAt(x, y);
       if (!r) {
         // Fog. Beyond an exit of the room the child is in: «?» to explore, 🔒 if the door is locked.
@@ -154,36 +180,12 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
         continue;
       }
       tile.classList.add('room', r.look);
-      if (r.look !== 'unexplored') {
-        const t = remember('rooms', r.id, since('rooms', r.id, 0) ?? now);
-        if (now - t < SWING_MS) {
-          tile.classList.add('fresh');
-          tile.style.setProperty('--from', before?.wasFaint?.has(r.id) ? '.3' : '0');
-          tile.style.setProperty('--delay', `${0.35 - (now - t) / 1000}s`);
-        }
-      } else (seen.wasFaint ||= new Set()).add(r.id);
+      markFresh(tile, fresh.get(r.id));
       if (r.canGo) tile.classList.add('go');
       tile.title = r.label || '';
 
-      // Floor: one of the variants, fixed by position and rotated, as in the original.
-      const seed = Math.abs(((x + 17) * 73856093) ^ ((y + 31) * 19349663));
-      tile.append(img(`floors-${(seed % FLOORS) + 1}.png`, (Math.abs(seed >>> 3) % 4) * 90));
-
-      const join = { N: roomAt(x, y - 1) === r, E: roomAt(x + 1, y) === r, S: roomAt(x, y + 1) === r, W: roomAt(x - 1, y) === r };
-      const doors = Object.fromEntries(model.doors.filter((d) => d.x === x && d.y === y).map((d) => [SIDE[d.dir], d]));
-      // Walls stay where the room ends, also at doors: the door is cut through them (see .door).
-      for (const s of ['N', 'E', 'S', 'W']) if (!join[s]) tile.append(img(`wall-${s}.png`));
-      if (!join.N && !join.W) tile.append(img('outer-NW.png'));
-      if (!join.N && !join.E) tile.append(img('outer-NE.png'));
-      if (!join.S && !join.E) tile.append(img('outer-SE.png'));
-      if (!join.S && !join.W) tile.append(img('outer-SW.png'));
-      // Inner corners only where a room is not a plain rectangle (kept for other room shapes).
-      const diag = (dx, dy) => roomAt(x + dx, y + dy) === r;
-      if (join.N && join.W && !diag(-1, -1)) tile.append(img('inner-NW.png'));
-      if (join.N && join.E && !diag(1, -1)) tile.append(img('inner-NE.png'));
-      if (join.S && join.E && !diag(1, 1)) tile.append(img('inner-SE.png'));
-      if (join.S && join.W && !diag(-1, 1)) tile.append(img('inner-SW.png'));
-      for (const d of Object.values(doors)) {
+      const doors = model.doors.filter((d) => d.x === x && d.y === y);
+      for (const d of doors) {
         if (!d.draw) continue;
         const door = span(`door ${d.kind} dir-${d.dir}`, '');
         if (d.kind !== 'secret') {
@@ -198,16 +200,6 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
         tile.append(door);
       }
 
-      // The frame: a border only on the sides where the room ends.
-      if (r.look === 'here' || r.canGo) {
-        const f = span('frame', '');
-        const w = r.look === 'here' ? '3px' : '2px';
-        if (!join.N) f.style.borderTopWidth = w;
-        if (!join.E) f.style.borderRightWidth = w;
-        if (!join.S) f.style.borderBottomWidth = w;
-        if (!join.W) f.style.borderLeftWidth = w;
-        tile.append(f);
-      }
       // Torchlight over the room she is in: one glow, centred on the room, from its first cell.
       if (r.look === 'here' && x === r.x && y === r.y) {
         const t = span('torch', '');
@@ -218,7 +210,7 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
       const midX = r.x + Math.floor((r.w - 1) / 2), midY = r.y + Math.floor((r.h - 1) / 2);
       if (x === midX && y === midY && r.look === 'here' && !r.marks) tile.append(span('mark', '★'));
       if (x === r.x && y === r.y && r.corner) tile.append(span('corner', r.corner));
-      // Symbols (child's map only, owner: in the middle of the room): the player first, then the room's
+      // Symbols (child's map only, owner: in the middle): the player first, then the room's
       // own symbols, in a box over the whole room, sized so they always fit, also in a 1×1 room.
       if (r.marks && x === r.x && y === r.y) {
         const items = [...(r.look === 'here' ? [{ kind: 'here', icon: model.player || '★', label: 'Her er du' }] : []), ...r.marks];
@@ -238,6 +230,15 @@ export function caveGrid(model, { maxWidth = null, onRoom = null, memo = null } 
       if (onRoom) tile.addEventListener('click', () => onRoom(r.id));
       grid.append(tile);
     }
+  }
+  // The walls: one ring of stone blocks per room, over its floor tiles, with torches on the top wall.
+  for (const r of model.rooms) {
+    const wall = document.createElement('div');
+    wall.className = `cave-wall ${r.look}${r.canGo ? ' go' : ''}`;
+    wall.style.gridColumn = `${r.x - minX + 1} / span ${r.w}`; wall.style.gridRow = `${r.y - minY + 1} / span ${r.h}`;
+    markFresh(wall, fresh.get(r.id));
+    if (r.look !== 'unexplored') { wall.append(span('flame l', '🔥')); if (r.w > 1) wall.append(span('flame r', '🔥')); }
+    grid.append(wall);
   }
   return wrap;
 }
