@@ -66,6 +66,17 @@ Utseendet legges i en egen fil, `prototype/dungeon.css`, etter `child.css`. `chi
 
 > **Avgjørelse S4:** Seks nye `ui:`-poster i `content/assets.json`: `ui:frame-stone`, `ui:parchment`, `ui:rock`, `ui:leather`, `ui:button-wood` og `ui:torch`. CSS er plassholderen til bildene finnes.
 
+## Endret av eieren samme dag
+
+Eieren la fram konseptbilder (`docs/v2/concept/`): «16-bit SNES rpg stil – magic/fantasy/D&D.» Det overstyrer S1 og S2 på disse punktene:
+
+- **Stilen for alt som genereres** er 16-bit pixel art, ikke gouache. `content/art-style.json` er versjon 2, med konseptbildene som referanser.
+- **Paletten** følger konsept-tilesettet: skiferblå steinblokker, brune jordgulv, fakler, og gullrammer (pixel-ramme) på alle bokser og knapper, som ikonflisene i tilesettet. Tre og lær er tatt ut; pergament beholdes for det som skal leses.
+- **Skriften** er «Cinzel» (fet), som bokstavene på tittelbanneret, i stedet for «MedievalSharp».
+- Bilder vises med harde piksler (`image-rendering: pixelated`), så pixel art holder seg skarp i stor størrelse.
+
+Heltene på konseptbildene (Heks, Trollmann, Alv, Fe, Dverg, Katteridder, Muserøver, Liten drake) antyder at barnet kan velge en helt. Det er ikke laget og venter på eieren.
+
 ## Etter workshopen
 
 `prototype/dungeon.css` er laget, kartstilen i `map-view.mjs` er endret, og `child.html` laster skriften og den nye stilen. Forteller-siden har samme kart (fjell og fakkellys) men ellers samme utseende som før; den er et verktøy for den voksne. `npm run check` er grønn.

@@ -4,14 +4,22 @@ Only durable decisions that would be costly or confusing to lose belong here.
 
 Canonical V2 design: `docs/v2/SYSTEM_DESIGN_V2.md`. Content matrix draft: `docs/v2/CONTENT_MATRIX_V2.md`. Background analysis: `docs/reviews/2026-10-27_*`.
 
+## 2026-10-31 - The art style is 16-bit SNES-RPG pixel art (owner's concept art)
+
+The owner brought concept art (`docs/v2/concept/`): tilesets of slate-blue stone blocks with brown dirt floors, torches and doors; hero portraits (Heks, Trollmann, Alv, Fe, Dverg, Katteridder, Muserøver, Liten drake); figures (frog king, gnome, witch with a cauldron, moss troll); and a title banner. «16-bit SNES rpg stil – magic/fantasy/D&D.» Names and looks may still change; the feel is what counts.
+
+- `content/art-style.json` is now **version 2**: 16-bit JRPG pixel art, crisp pixels with a dark outline, warm saturated palette, cute chibi proportions, never scary. The concept images are listed as `references`. Images made with version 1 (there are none approved) would be made again.
+- The screen follows the concept: slate-blue stone, brown floors, gold pixel frames on every box and button (like the icon tiles in the tileset), parchment for what is to be read, torches. The headline font is «Cinzel» (bold, like the banner's lettering). Pixel art is drawn crisp (`image-rendering: pixelated`) however large it is shown.
+- The hero portraits suggest that the child could pick a hero. That is not built; it waits for the owner.
+
 ## 2026-10-31 - The iPad looks like a dungeon crawler (warm, never scary)
 
-Owner: «Vi må forbedre designet, så det ser ut som en skikkelig dungeon crawler.» Workshop: `docs/v2/workshops/2026-10-31_dungeon_crawler_stil.md`.
+Owner: «Vi må forbedre designet, så det ser ut som en skikkelig dungeon crawler.» Workshop: `docs/v2/workshops/2026-10-31_dungeon_crawler_stil.md`. The palette was changed the same day to the owner's concept art (above).
 
-- **A warm, dark cave:** stone, wood, brass, leather and parchment, with gold and amber as the accent. Torchlight is amber, never white or blue. It matches the picture-book style in `content/art-style.json`: cosy, not «Diablo».
-- **The look is its own file.** `prototype/dungeon.css` (loaded after `child.css`) owns only how things look; `child.css` owns the layout and is unchanged. The panels are stone slabs with a brass edge, the cards for what is in the room are parchment with dark ink, the buttons are wood, the magnifier is brass, the backpack bar is leather, and popups are wooden chests. Rock is noise the browser draws itself (an SVG `feTurbulence` data URI), so no image file is needed.
-- **The map:** the fog is rock, not black. The room she is in is lit like a torch (a warm glow in `map-view.mjs`, so the DM's map has it too). Rooms she has been in lie in half-dark, a little warmer than the original's blue-grey tiles. The frame around a room she can walk to is a warm light, not cyan. «?» and 🔒 are as before.
-- **Font:** «MedievalSharp» from Google Fonts for headlines and buttons, a serif without net. Running text keeps the system font, so it stays easy to read.
+- **A warm, dark dungeon:** stone, gold, torches and parchment, with gold and amber as the accent. Torchlight is amber, never white or blue. Cosy, not «Diablo».
+- **The look is its own file.** `prototype/dungeon.css` (loaded after `child.css`) owns only how things look; `child.css` owns the layout and is unchanged. The panels are stone boxes with a gold pixel frame, the cards for what is in the room are parchment with dark ink, the buttons are gold-framed stone tiles, the magnifier is a gold medallion, and popups are the same boxes, bigger. Rock is noise the browser draws itself (an SVG `feTurbulence` data URI), so no image file is needed.
+- **The map:** the fog is rock, not black. The room she is in is lit like a torch (a warm glow in `map-view.mjs`, so the DM's map has it too). Rooms she has been in lie in half-dark. The floor tiles are tinted brown and the walls stay slate-blue, as in the concept tileset. The frame around a room she can walk to is a warm light, not cyan. «?» and 🔒 are as before.
+- **Font:** «Cinzel» from Google Fonts for headlines and buttons, a serif without net. Running text keeps the system font, so it stays easy to read.
 - **To be drawn later:** six `ui:` entries in `content/assets.json` (`frame-stone`, `parchment`, `rock`, `leather`, `button-wood`, `torch`). CSS is the placeholder until they exist, and they are swapped in piece by piece.
 - The DM page is a tool for the adult and keeps its look, apart from the shared map.
 

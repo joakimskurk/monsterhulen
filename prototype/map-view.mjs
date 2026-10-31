@@ -17,15 +17,17 @@ const STYLE = `
 .cave-wrap { container-type: inline-size; width: 100%; }
 /* The map fills the width it is given: square tiles of an equal share, text scaled with them.
    The fog is rock (workshop 2026-10-31, S3): noise drawn by the browser, no file, darkened. */
-.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; padding: 6px; border: 3px solid #3a2a18; border-radius: 8px; image-rendering: pixelated; box-sizing: border-box; width: 100%; overflow: hidden;
-  background: linear-gradient(rgba(4, 2, 1, .62), rgba(4, 2, 1, .62)), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.045' numOctaves='5' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.34 0 0 0 0.06  0.27 0 0 0 0.045  0.20 0 0 0 0.035  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23r)'/%3E%3C/svg%3E") #15100c;
-  box-shadow: inset 0 0 0 2px rgba(201, 162, 76, .35), inset 0 0 60px rgba(0, 0, 0, .8); }
+.cave-grid { --cell: calc((100cqw - 18px) / var(--cols)); display: grid; grid-template-columns: repeat(var(--cols), minmax(0, 1fr)); gap: 0; padding: 6px; border: 3px solid #0e1014; border-radius: 4px; image-rendering: pixelated; box-sizing: border-box; width: 100%; overflow: hidden;
+  background: linear-gradient(rgba(2, 3, 5, .66), rgba(2, 3, 5, .66)), url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='r'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.06' numOctaves='4' seed='7' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0.22 0 0 0 0.05  0.24 0 0 0 0.055  0.30 0 0 0 0.075  0 0 0 0 1'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23r)'/%3E%3C/svg%3E") #11141a;
+  box-shadow: inset 0 0 0 2px #e8b93a, inset 0 0 0 3px #8a6414, inset 0 0 60px rgba(0, 0, 0, .8); }
 .cave-tile { position: relative; aspect-ratio: 1; }
 .cave-tile img { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
-/* Cave stone: the original's blue-grey tiles warmed up. The room she is in is lit; the rooms she has been
-   in lie in half-dark. */
-.cave-tile.room img { filter: sepia(.25) brightness(.6); }
-.cave-tile.here img { filter: sepia(.12) brightness(1); }
+/* As in the owner's concept art: slate-blue stone walls, brown dirt floors (the floor is the first tile,
+   the walls come after). The room she is in is lit; the rooms she has been in lie in half-dark. */
+.cave-tile.room img { filter: brightness(.55); }
+.cave-tile.room img:first-child { filter: sepia(.75) saturate(.8) brightness(.5); }
+.cave-tile.here img { filter: brightness(1); }
+.cave-tile.here img:first-child { filter: sepia(.75) saturate(.8) brightness(.95); }
 /* Torchlight (workshop 2026-10-31, S3): a warm glow over the room she is in, reaching into the rock. */
 .cave-tile .torch { position: absolute; z-index: 1; pointer-events: none; left: calc(var(--cell) * var(--rw) / 2); top: calc(var(--cell) * var(--rh) / 2); width: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); height: calc(var(--cell) * (max(var(--rw), var(--rh)) + 2.6)); transform: translate(-50%, -50%); border-radius: 50%; mix-blend-mode: screen; opacity: .9;
   background: radial-gradient(circle, rgba(255, 180, 80, .55) 0%, rgba(255, 140, 50, .3) 32%, rgba(255, 110, 40, .1) 52%, transparent 68%); animation: cave-flicker 2.8s ease-in-out infinite alternate; }
@@ -35,9 +37,9 @@ const STYLE = `
 /* One frame around the whole room (not one per tile): gold where she is, a warm light where she can go
    back to. The frame sits above the tile images. */
 .cave-tile .frame { position: absolute; inset: 0; pointer-events: none; z-index: 2; border: 0 solid transparent; }
-.cave-tile.here .frame { border-color: #f0c75e; }
+.cave-tile.here .frame { border-color: #e8b93a; }
 .cave-tile.go { cursor: pointer; }
-.cave-tile.go .frame { border-color: rgba(255, 225, 160, .7); }
+.cave-tile.go .frame { border-color: rgba(255, 224, 138, .7); }
 .cave-tile .mark, .cave-tile .corner { z-index: 3; }
 .cave-tile .mark { position: absolute; inset: 0; display: grid; place-items: center; font: 700 calc(var(--cell) * .6)/1 'Courier New', monospace; color: #ffd95c; text-shadow: 2px 2px 0 #07050d; pointer-events: none; }
 .cave-tile .corner { position: absolute; left: 3px; top: 1px; font: 700 max(10px, calc(var(--cell) * .3)) 'Courier New', monospace; color: #fff9e8; text-shadow: 1px 1px 0 #07050d; pointer-events: none; }
